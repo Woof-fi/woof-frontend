@@ -102,6 +102,13 @@ function initCreatePostModal() {
  * Open create post modal
  */
 function openCreatePostModal() {
+    // Check authentication first
+    if (!isAuthenticated()) {
+        showToast('Please login to create a post', 'error');
+        openAuthModal();
+        return;
+    }
+
     const modal = document.getElementById('create-post-modal');
     if (!modal) return;
 
@@ -451,7 +458,7 @@ function initAuthModal() {
 /**
  * Open auth modal
  */
-function openAuthModal() {
+export function openAuthModal() {
     const modal = document.getElementById('auth-modal');
     if (modal) {
         modal.style.display = 'block';
@@ -483,7 +490,7 @@ function updateUIForAuth() {
         if (!authLink) return;
 
         if (isAuthenticated()) {
-            authLink.textContent = 'Logout';
+            authLink.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
             authLink.onclick = (e) => {
                 e.preventDefault();
                 if (confirm('Are you sure you want to logout?')) {
@@ -491,7 +498,7 @@ function updateUIForAuth() {
                 }
             };
         } else {
-            authLink.textContent = 'Login';
+            authLink.innerHTML = '<i class="fas fa-user-circle"></i> Login';
             authLink.onclick = (e) => {
                 e.preventDefault();
                 openAuthModal();

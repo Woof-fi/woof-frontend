@@ -3,10 +3,11 @@
  * Handles post creation, display, and interactions
  */
 
-import { getAllDogs, uploadImage, createPost as createPostAPI } from './api.js';
+import { getAllDogs, getFeed, uploadImage, createPost as createPostAPI } from './api.js';
 import { escapeHTML, generateUsername, isValidFileType, isValidFileSize, showToast } from './utils.js';
 import { showLoading, hideLoading, showError, showFeedSkeleton, animateIn } from './ui.js';
 import { getCurrentUser, isAuthenticated } from './auth.js';
+import { openAuthModal } from './modals.js';
 
 /**
  * Initialize feed
@@ -17,9 +18,17 @@ export async function initFeed() {
 
     try {
         showFeedSkeleton(feedContainer);
-        const dogs = await getAllDogs();
-        renderFeed(dogs, feedContainer);
+        // Try to load real posts first
+        const posts = await getFeed('public');
+        if (posts && posts.length > 0) {
+            renderPostFeed(posts, feedContainer);
+        } else {
+            // Fallback to showing dogs if no posts yet
+            const dogs = await getAllDogs();
+            renderFeed(dogs, feedContainer);
+        }
     } catch (error) {
+        console.error('Failed to load feed:', error);
         showError(feedContainer, 'Failed to load feed', () => initFeed());
     }
 }
@@ -149,6 +158,40 @@ function createPostElement(postData) {
 }
 
 /**
+ * Render posts from API
+ * @param {object[]} posts - Array of post objects from API
+ * @param {HTMLElement} container - Container element
+ */
+function renderPostFeed(posts, container) {
+    container.innerHTML = '';
+
+    if (posts.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>No posts yet. Be the first to share!</p>
+            </div>
+        `;
+        return;
+    }
+
+    posts.forEach(post => {
+        const postElement = createPostElement({
+            profilePic: post.dogPhoto || 'assets/images/dog_profile_pic.jpg',
+            username: post.dogName || 'Unknown Dog',
+            imageUrl: post.imageUrl,
+            caption: post.caption,
+            location: post.dogLocation
+        });
+        container.appendChild(postElement);
+        animateIn(postElement);
+    });
+
+    // Bind like buttons
+    bindLikeButtons();
+}
+
+/**
  * Bind like button functionality
  */
 function bindLikeButtons() {
@@ -159,6 +202,13 @@ function bindLikeButtons() {
 
         // Add new listener
         newButton.addEventListener('click', function() {
+            // Check authentication
+            if (!isAuthenticated()) {
+                showToast('Please login to like posts', 'error');
+                openAuthModal();
+                return;
+            }
+
             this.classList.toggle('liked');
             const icon = this.querySelector('i');
             if (icon) {
@@ -225,23 +275,10 @@ export async function createPost(formData) {
         // Create post in database
         const post = await createPostAPI(user.primaryDogId, imageUrl, caption);
 
-        // Add to feed UI
-        const postElement = createPostElement({
-            profilePic: user.dogPhoto || 'assets/images/dog_profile_pic.jpg',
-            username: user.dogName || user.name,
-            imageUrl: post.imageUrl,
-            caption: post.caption,
-            location: user.location
-        });
+        showToast('Post created successfully!', 'success');
 
-        const feedContainer = document.querySelector('#following') || document.querySelector('.content');
-        if (feedContainer) {
-            feedContainer.prepend(postElement);
-            animateIn(postElement);
-        }
-
-        // Rebind like buttons
-        bindLikeButtons();
+        // Reload the feed to show the new post
+        await initFeed();
     } catch (error) {
         console.error('Failed to create post:', error);
         // Error message already shown by API functions
@@ -286,12 +323,20 @@ export function initFeedTabs() {
 async function loadForYouFeed(container) {
     try {
         showFeedSkeleton(container);
-        const dogs = await getAllDogs();
-
-        // Shuffle for "For You" algorithm
-        const shuffled = [...dogs].sort(() => Math.random() - 0.5);
-        renderFeed(shuffled, container);
+        // Load public feed (all posts)
+        const posts = await getFeed('public');
+        if (posts && posts.length > 0) {
+            // Shuffle for "For You" algorithm
+            const shuffled = [...posts].sort(() => Math.random() - 0.5);
+            renderPostFeed(shuffled, container);
+        } else {
+            // Fallback to dogs if no posts
+            const dogs = await getAllDogs();
+            const shuffled = [...dogs].sort(() => Math.random() - 0.5);
+            renderFeed(shuffled, container);
+        }
     } catch (error) {
+        console.error('Failed to load For You feed:', error);
         showError(container, 'Failed to load feed', () => loadForYouFeed(container));
     }
 }

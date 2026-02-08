@@ -62,10 +62,27 @@ header {
     margin-right: 10px;
 }
 
+.header-icons a,
 .header-icons i {
     font-size: 24px;
     color: var(--color-text);
     cursor: pointer;
+    text-decoration: none;
+    margin-left: 15px;
+    transition: color 0.2s;
+}
+
+.header-icons a:hover,
+.header-icons i:hover {
+    color: var(--color-text-muted);
+}
+
+.auth-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .header-icons .profile-pic {
@@ -135,7 +152,9 @@ header {
 .content {
     flex-grow: 1;
     padding: 20px;
-    max-width: 800px;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .tabs {
@@ -187,8 +206,10 @@ header {
 .post {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
     border-radius: var(--radius-sm);
+    max-width: 500px;
+    width: 100%;
 }
 
 .post-header {
@@ -204,10 +225,22 @@ header {
     margin-right: 10px;
 }
 
+.post-image {
+    width: 100%;
+    max-height: 600px;
+    overflow: hidden;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .post-image img,
 .post-image video {
     width: 100%;
-    height: auto;
+    max-height: 600px;
+    object-fit: contain;
+    display: block;
 }
 
 .post-actions {
@@ -445,6 +478,24 @@ header {
 
 #create-post-form button:hover {
     background-color: var(--color-primary-hover);
+}
+
+.image-preview {
+    margin-bottom: 15px;
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    display: block;
 }
 
 /* Map Section Styles */
