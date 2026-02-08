@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Woof — Share and discover posts from pets. Feed, map, store, and profiles for animals.">
+    <title>Woof - Instagram for Animals</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="Woof Logo">
+                </a>
+                <div class="header-icons">
+                    <input type="text" id="desktop-search-input" class="desktop-search-input" placeholder="Search..." aria-label="Search">
+                    <a href="#" id="desktop-search-button" aria-label="Search"><i class="fas fa-search"></i></a>
+                    <a href="#" aria-label="Messages"><i class="fas fa-envelope"></i></a>
+                    <a href="#" aria-label="Notifications"><i class="fas fa-bell"></i></a>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <nav class="left-panel">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#" id="create-post-link"><i class="fas fa-plus-square"></i> Create</a></li>
+                    <li><a href="map.html"><i class="fas fa-map-marker-alt"></i> Map</a></li>
+                    <li><a href="store.html"><i class="fas fa-store"></i> Store</a></li>
+                    <li><a href="nelli.html"><img src="dog_profile_pic.jpg" alt="Profile" class="profile-pic"> Profile</a></li>
+                </ul>
+            </nav>
+            <main class="content">
+                <!-- Tabs for toggling content -->
+                <div class="tabs">
+                    <button class="tab-link active" data-tab="following">Following</button>
+                    <button class="tab-link" data-tab="foryou">For you</button>
+                </div>
+                
+                <!-- Following content -->
+                <div id="following" class="tab-content active">
+                    <div class="post">
+                        <div class="post-header">
+                            <img src="https://picsum.photos/32" alt="Profile picture">
+                            <strong>fluffy_cat</strong>
+                        </div>
+                        <div class="post-image">
+                            <img src="https://placedog.net/600/400" alt="Cat post" loading="lazy">
+                        </div>
+                        <div class="post-actions">
+                            <button class="like-button" aria-label="Like post"><i class="far fa-heart"></i></button>
+                            <button aria-label="Comment on post"><i class="far fa-comment"></i></button>
+                            <button aria-label="Share post"><i class="far fa-paper-plane"></i></button>
+                        </div>
+                        <div class="post-caption">
+                            <p><strong>fluffy_cat</strong> Just chillin' on a sunny day! #catstagram #sunbathing</p>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <div class="post-header">
+                            <img src="https://placedog.net/32/32" alt="Profile picture">
+                            <strong>barking_buddy</strong>
+                        </div>
+                        <div class="post-image">
+                            <video src="cat_video.mp4" controls></video>
+                        </div>
+                        <div class="post-actions">
+                            <button class="like-button" aria-label="Like post"><i class="far fa-heart"></i></button>
+                            <button aria-label="Comment on post"><i class="far fa-comment"></i></button>
+                            <button aria-label="Share post"><i class="far fa-paper-plane"></i></button>
+                        </div>
+                        <div class="post-caption">
+                            <p><strong>barking_buddy</strong> Love playing fetch! #doglife #fetchgame</p>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <div class="post-header">
+                            <img src="https://picsum.photos/32" alt="Profile picture">
+                            <strong>lazy_koala</strong>
+                        </div>
+                        <div class="post-image">
+                            <img src="https://placedog.net/600/400?random=1" alt="Koala post" loading="lazy">
+                        </div>
+                        <div class="post-actions">
+                            <button class="like-button" aria-label="Like post"><i class="far fa-heart"></i></button>
+                            <button aria-label="Comment on post"><i class="far fa-comment"></i></button>
+                            <button aria-label="Share post"><i class="far fa-paper-plane"></i></button>
+                        </div>
+                        <div class="post-caption">
+                            <p><strong>lazy_koala</strong> Sleeping is life. #koalalove #sleepytime</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- For You content -->
+                <div id="foryou" class="tab-content">
+                    <div class="post">
+                        <div class="post-header">
+                            <img src="https://placedog.net/32/32" alt="Profile picture">
+                            <strong>goodboy_max</strong>
+                        </div>
+                        <div class="post-image">
+                            <img src="https://placedog.net/600/400?random=2" alt="Dog post" loading="lazy">
+                        </div>
+                        <div class="post-actions">
+                            <button class="like-button" aria-label="Like post"><i class="far fa-heart"></i></button>
+                            <button aria-label="Comment on post"><i class="far fa-comment"></i></button>
+                            <button aria-label="Share post"><i class="far fa-paper-plane"></i></button>
+                        </div>
+                        <div class="post-caption">
+                            <p><strong>goodboy_max</strong> Beach day with my humans! 🐾🏖️ #dogsofwoof #beachday</p>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <div class="post-header">
+                            <img src="https://picsum.photos/32" alt="Profile picture">
+                            <strong>adventurous_kitty</strong>
+                        </div>
+                        <div class="post-image">
+                            <img src="https://placedog.net/600/400?random=3" alt="Cat post" loading="lazy">
+                        </div>
+                        <div class="post-actions">
+                            <button class="like-button" aria-label="Like post"><i class="far fa-heart"></i></button>
+                            <button aria-label="Comment on post"><i class="far fa-comment"></i></button>
+                            <button aria-label="Share post"><i class="far fa-paper-plane"></i></button>
+                        </div>
+                        <div class="post-caption">
+                            <p><strong>adventurous_kitty</strong> Exploring the great outdoors! #kittyadventure #explorer</p>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <div class="post-header">
+                            <img src="https://placedog.net/32/32" alt="Profile picture">
+                            <strong>splashy_fish</strong>
+                        </div>
+                        <div class="post-image">
+                            <img src="https://placedog.net/600/400?random=4" alt="Fish post" loading="lazy">
+                        </div>
+                        <div class="post-actions">
+                            <button class="like-button" aria-label="Like post"><i class="far fa-heart"></i></button>
+                            <button aria-label="Comment on post"><i class="far fa-comment"></i></button>
+                            <button aria-label="Share post"><i class="far fa-paper-plane"></i></button>
+                        </div>
+                        <div class="post-caption">
+                            <p><strong>splashy_fish</strong> Life is better under the sea. #fishlife #aquarium</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <nav class="bottom-nav">
+        <a href="index.html" aria-label="Home"><i class="fas fa-home"></i></a>
+        <a href="map.html" aria-label="Map"><i class="fas fa-map-marker-alt"></i></a>
+        <a href="#" id="create-post-link-mobile" aria-label="Create post"><i class="fas fa-plus-square"></i></a>
+        <a href="store.html" aria-label="Store"><i class="fas fa-store"></i></a>
+        <a href="nelli.html" aria-label="Profile"><img src="dog_profile_pic.jpg" alt="Profile" class="profile-pic"></a>
+    </nav>
+    <div class="search-panel" id="search-panel">
+        <span class="close close-search">&times;</span> <!-- Close button for mobile search modal -->
+        <input type="text" id="mobile-search-input" class="search-input" placeholder="Search" aria-label="Search">
+        <div class="recent-searches">
+            <h3>Recent</h3>
+            <ul id="search-results">
+                <!-- Search results will be dynamically added here -->
+            </ul>
+        </div>
+    </div>
+    <div id="create-post-modal" class="modal" aria-hidden="true">
+        <div class="modal-content">
+            <span class="close" aria-label="Close">&times;</span>
+            <h2>Create New Post</h2>
+            <form id="create-post-form">
+                <input type="file" id="post-image" name="post-image" accept="image/*" required>
+                <textarea id="post-caption" name="post-caption" placeholder="Write a caption..." required></textarea>
+                <button type="submit">Post</button>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

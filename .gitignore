@@ -1,0 +1,52 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.env
+.env.local
+
+# Dependencies (when you add backend)
+node_modules/
+venv/
+__pycache__/
+*.pyc
+.python-version
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets & Config
+.env
+.env.local
+.env.*.local
+config/local.json
+secrets/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Testing
+coverage/
+.coverage
+*.cover
+
+# Large media files (optional - uncomment if repo gets too large)
+# *.mp4
+# *.mov
+# *.avi

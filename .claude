@@ -1,0 +1,352 @@
+# Woof - Dog-Centric Social Network
+
+## Project Overview
+Woof (aka Petbook/Dogbook) is a **dog-centric social network and local discovery platform** where dogs are the main users, not humans. It combines social networking, location-based discovery, and pet marketplace.
+
+## Vision
+A platform where:
+- **Dogs have profiles**, not just owners
+- Social interactions happen between dogs (and their owners)
+- Local discovery is based on **territories** (parks, neighborhoods)
+- Marketplace is focused on pet products and services
+
+## Current State: Startup Mode 🚀
+
+**Status:** Ready to execute - developer committed, needs execution plan and funding strategy
+
+**Team:**
+- **Tommi Kivisaari** - Co-founder, CEO/CPO
+  - Lead PM at Oikotie Asunnot (PM since 2016)
+  - 15+ years in top Finnish IT companies
+  - Product vision, strategy, fundraising, user research
+  - Can dedicate 20+ hours/week (considering 4-day work week at Oikotie)
+  - Strong financial runway (years without salary if needed, significant savings)
+  - Dog owner (understands user needs firsthand)
+  - Boss at Oikotie from VC world (potential advisor later, not disclosed yet)
+
+- **Developer** (name private) - Co-founder, CTO
+  - Best developer Tommi worked with in 15 years across top Finnish IT companies
+  - Former team lead (led by being better than everyone) and CTO
+  - Currently senior consultant at elite consultancy (only top-tier talent)
+  - Working on AI projects for major bank currently
+  - Expert in Angular, versatile across full tech stack
+  - AI-assisted development capabilities
+  - Loves the idea, sees market potential, ready to build
+  - Can dedicate 20+ hours/week as side hustle initially
+  - Close friend of Tommi (meet almost daily, lunch 2x/week)
+  - Waiting for: proper project plan + funding strategy to start
+
+**Relationship:** High trust, daily communication, strong friendship
+
+**Current Approach:**
+- Side hustle initially (both 20+ hrs/week)
+- Bootstrap with equity only (no salaries initially)
+- Use funding for growth when secured
+- Developer full-time only after funding or significant traction
+
+## MVP Strategy (Phase 1)
+
+**Core Focus:** Hybrid - Social Network + Health Diary + Dog Park Meetups
+
+**Multi-value proposition:**
+- Social features (posts, dog friends, engagement) = fun and addictive
+- Health diary (vet visits, vaccinations, medications) = practical value
+- Dog park meetups (schedule playdates, find parks) = real-world connection
+
+**Open Question - MUST DECIDE:**
+What is the PRIMARY core feature?
+- Option A: Social feed (Instagram for dogs)
+- Option B: Health diary (practical tracking tool)
+- Option C: Dog park meetups (local connection)
+- Option D: All three equally important
+
+**Decision needed:** Test with early users to see what sticks
+
+**MVP Features (Must-Have):**
+- ✅ User authentication (Google, Apple login)
+- ✅ Dog profiles (public + private)
+- ✅ Social feed (posts, likes, comments)
+- ✅ Dog friends (add, accept, list)
+- ✅ Health diary (vet visits, vaccinations, medications, weight)
+- ✅ Reminders (vaccination, medication)
+- ✅ Dog park discovery (using OpenStreetMap)
+- ✅ Meetup coordination (schedule playdates at parks)
+
+**Explicitly OUT of MVP:**
+- ❌ Marketplace/store (too complex, add later)
+- ❌ Territory system (simplify to just parks)
+- ❌ Direct messaging (comments on posts only)
+- ❌ Advanced maps/GPS features
+
+**Monetization Strategy:**
+- **Phase 1:** Free with contextual ads
+  - Native advertising from vets, dog food brands, pet shops
+  - Ads MUST be contextual and non-intrusive (Tommi dislikes bad ads)
+- **Phase 2:** Premium features (after user base established)
+- **Phase 3:** Veterinarian accounts and B2B
+
+**Exit Strategy:**
+- Build beloved service with strong user base
+- Exit to major pet company (Mars Petcare, Nestlé Purina, Petco, etc.)
+- Prefer exit before needing complex monetization
+- Open to long-haul if trajectory excellent
+
+## Tech Stack
+
+### Current (Prototype)
+- HTML5
+- CSS3 (single global stylesheet)
+- Vanilla JavaScript
+- Google Maps JavaScript API
+- Font Awesome icons
+
+### Production Stack (Recommended, but Developer decides)
+
+**Mobile/Frontend:**
+- React Native + Expo (mobile-first, iOS + Android from one codebase)
+- OR Angular (developer is expert, knows it inside-out)
+- OR other framework developer prefers
+- **Final decision:** Developer's call - he's the expert
+
+**Backend:**
+- Node.js + TypeScript + Express (JavaScript everywhere)
+- OR developer's preference
+- RESTful API
+
+**Database:**
+- PostgreSQL (structured data for health records, relationships)
+
+**Cloud:**
+- AWS (recommended for startup ecosystem and credits)
+- AWS Cognito for auth (Google, Apple, email login)
+- S3 for photo storage
+- RDS for database
+
+**Maps:**
+- OpenStreetMap (free, scalable globally)
+- NOT Google Maps (expensive, licensing)
+
+**Key Principle:**
+- With AI, can use any language/framework efficiently
+- Developer decides based on his expertise and preferences
+- Tommi trusts developer's technical judgment completely
+
+## Core Features
+
+### 1. Dog Profiles
+- Name, breed, age, weight, coat type
+- Location (linked to territory)
+- Family/kennel connections
+- Achievements/badges
+- Dog friends list
+- Photo gallery
+- Health records (private, owner-only)
+
+### 2. Social Feed
+- Posts from dogs in your network
+- Images and videos
+- Likes and interactions
+- Comments (planned)
+
+### 3. Territories
+- Location-based discovery (parks, neighborhoods)
+- See dogs in territory
+- Local activities and events
+- Nearby services (vets, groomers, etc.)
+- Nearby territories
+
+### 4. Marketplace
+- Pet products (food, toys, accessories)
+- Product categories
+- Shopping cart
+- Seller profiles (planned)
+
+### 5. Maps & Discovery
+- Google Maps integration
+- Territory boundaries
+- Places dogs visit
+- Dog meetup planning
+
+## Data Model
+
+### Dog
+- Profile info (name, breed, age, weight, coat)
+- Location/territory
+- Friends (other dogs)
+- Gallery (photos/videos)
+- Achievements
+- Owners
+- Health records (private)
+
+### Territory
+- Name
+- Dog count
+- Activities
+- Dogs in territory
+- Services
+- Nearby territories
+
+### Product (Marketplace)
+- Name, image, price
+- Category
+- Seller info
+
+## Market & Competition
+
+**Initial Market:**
+- Finland (possibly start Helsinki only for focus)
+- Should be scalable to Nordics, then Europe, then global
+- Finnish + English language support
+
+**Competition:**
+- Very little established competition
+- In Finland: "koirapuisto" app (small)
+- Some dog park finder apps exist but haven't picked up
+- No established market leader
+- **This is an opportunity - no dominant player yet**
+
+**Validation:**
+- Tommi has talked to dog/pet owners - they love the idea
+- Positive feedback on concept
+- Ready for more validation when needed
+
+## Business Model
+
+**Phase 1: Free with Ads**
+- Only realistic initial path
+- Build user base first
+- Contextual, native advertising
+- Ad partners: vets, dog food brands, pet shops, groomers
+- Must be non-intrusive and contextual (not annoying)
+
+**Phase 2: Premium (when established)**
+- Freemium model
+- Premium features for power users
+- Vet/clinic accounts
+
+**Phase 3: Exit**
+- Sell to major pet company
+- Mars Petcare, Nestlé Purina, Petco, Chewy, etc.
+- Before needing heavy monetization complexity
+
+## Funding & Financials
+
+**Bootstrap Phase (Now - Month 3):**
+- Own investment: €100-€5,000 for initial costs
+- No salaries (equity only)
+- Server costs, domain, AWS, tools
+- Tommi can fund easily from savings
+- Question: Should costs be split 50/50 or Tommi funds?
+
+**Funding Strategy:**
+- **NIY Grant** (Business Finland): €30K-€75K (50-75% grant, no equity taken!)
+- Timeline: Apply Month 2-3, receive Month 5-6
+- Use for: Salaries when needed, marketing, growth
+- Alternative: Angels from Tommi's network if NIY rejected
+
+**Financial Runway:**
+- Tommi: Can go years without salary (strong savings/investments)
+- Developer: Can sustain as side hustle, needs salary for full-time
+
+**Company Formation:**
+- Name: Woof Oy (if available)
+- Cost: ~€330 to register
+- Needed for NIY application
+
+## File Structure
+```
+/src/
+├── index.html       # Home feed
+├── map.html         # Territory map
+├── nelli.html       # Dog profile (example)
+├── store.html       # Marketplace
+├── styles.css       # Global styles
+├── script.js        # UI logic
+├── images/          # Product images
+└── assets/          # Profile & UI images
+```
+
+## Design Principles
+1. **Dog-first identity** - Dogs are the primary users, not humans
+2. **Territory-based** - Local discovery is core to the experience
+3. **Mobile parity** - Mobile UX is as important as desktop
+4. **Real-world connections** - Focus on actual meetups and places
+5. **Community-driven** - Social features enable dog owner communities
+
+## Next Steps / Roadmap
+See [docs/roadmap.md](docs/roadmap.md) for detailed next steps.
+
+**High-level priorities:**
+1. Choose backend stack and architecture
+2. Implement authentication system
+3. Build API and database
+4. Add real-time features (messaging, notifications)
+5. Implement marketplace backend
+6. Content moderation and safety
+
+## Working with This Project
+
+When helping with Woof:
+- **Preserve the UI foundation** - The frontend is solid, don't rebuild unnecessarily
+- **Think dog-first** - Features should make sense from a dog's perspective
+- **Consider territory logic** - Location is a first-class concept
+- **Mobile matters** - Always consider mobile UX
+- **Keep it fun** - This is a personal project, not work. Be creative!
+
+## Equity & Ownership
+
+**Open Questions (Need to Decide):**
+1. **Equity split:**
+   - Option A: 50/50 (Tommi + Developer)
+   - Option B: 60/40 (Tommi gets more for the idea)
+   - Option C: 40/30/30 (Tommi/Developer/Wife as UX designer)
+
+2. **Considerations:**
+   - Tommi came up with the idea
+   - Developer does most technical work initially
+   - If Tommi funds more, should he get more equity?
+   - If costs split 50/50, then 50/50 equity?
+   - Tommi's wife: Former UX designer, but out of game for years
+
+3. **Standard practice needed:** What's typical for co-founder equity splits?
+
+**Decision criteria:**
+- Fair split based on contribution (idea, execution, funding)
+- Keep it simple and aligned
+- Don't overthink it
+
+## Domain & Branding
+
+**Domain Search:**
+- woof.fi (TAKEN - Tommi bid €50, unlikely to get)
+- Need alternatives (ask Claude for suggestions)
+
+**Company Name:**
+- Woof Oy (if available)
+
+**Design:**
+- Fun and playful
+- NOT overly tacky
+- Clean and approachable
+
+## Privacy & Stealth Mode
+
+**Current Status:**
+- Not telling Oikotie yet (Tommi still works there)
+- Some concern about revealing too much publicly
+- Boss at Oikotie from VC world (could be advisor later)
+- Want to be somewhat discreet in early validation
+
+**Approach:**
+- Informal validation with dog owners (not formal interviews yet)
+- Keep service concept somewhat private until launch
+- Can do casual user research without revealing everything
+
+## Context Notes
+- This is a **personal side project** (not Oikotie work)
+- Tommi: Lead PM at Oikotie, but Woof is separate
+- Started as exploration with ChatGPT, now ready for serious build
+- Both treating as side hustle initially (20+ hrs/week each)
+- Will go full-time only after funding or strong traction
+- Developer won't back out until working service built
+- Would only quit together if no traction/future
