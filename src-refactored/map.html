@@ -19,6 +19,7 @@
                     <a href="#" id="desktop-search-button" aria-label="Search"><i class="fas fa-search"></i></a>
                     <a href="#" aria-label="Messages"><i class="fas fa-envelope"></i></a>
                     <a href="#" aria-label="Notifications"><i class="fas fa-bell"></i></a>
+                    <a href="#" class="auth-link" aria-label="Login">Login</a>
                 </div>
             </div>
         </header>
@@ -60,6 +61,37 @@
             <ul id="search-results">
                 <!-- Search results will be dynamically added here -->
             </ul>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="auth-title">
+        <div class="modal-content">
+            <span class="close" aria-label="Close">&times;</span>
+            <h2 id="auth-title">Welcome to Woof</h2>
+
+            <!-- Login Form -->
+            <div id="login-form-container">
+                <h3>Login</h3>
+                <form id="login-form">
+                    <input type="email" name="email" placeholder="Email" required aria-label="Email">
+                    <input type="password" name="password" placeholder="Password" required aria-label="Password">
+                    <button type="submit">Login</button>
+                </form>
+                <p>Don't have an account? <a href="#" id="show-register">Sign up</a></p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form-container" style="display: none;">
+                <h3>Create Account</h3>
+                <form id="register-form">
+                    <input type="text" name="name" placeholder="Your name" required aria-label="Name">
+                    <input type="email" name="email" placeholder="Email" required aria-label="Email">
+                    <input type="password" name="password" placeholder="Password (min 8 chars)" required minlength="8" aria-label="Password">
+                    <button type="submit">Sign Up</button>
+                </form>
+                <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+            </div>
         </div>
     </div>
 
