@@ -3,7 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nelli's Profile - Woof</title>
+
+    <!-- Primary Meta Tags -->
+    <title>Dog Profile - View Pet Photos & Info | Woof</title>
+    <meta name="title" content="Dog Profile - View Pet Photos & Info | Woof">
+    <meta name="description" content="Explore dog profiles on Woof! View adorable pet photos, learn about different breeds, and connect with dog owners in your community.">
+    <meta name="keywords" content="dog profile, pet photos, dog breed, pet info, dog community, puppy pictures">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="profile">
+    <meta property="og:url" content="http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com/nelli.html">
+    <meta property="og:title" content="Dog Profile | Woof">
+    <meta property="og:description" content="Explore dog profiles on Woof! View adorable pet photos and connect with dog owners in your community.">
+    <meta property="og:image" content="http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com/assets/images/dog_profile_pic.jpg">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dog Profile | Woof">
+    <meta name="twitter:description" content="Explore dog profiles on Woof! View adorable pet photos and connect with dog owners.">
+
+    <!-- Additional SEO -->
+    <link rel="canonical" href="http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com/nelli.html">
+    <meta name="theme-color" content="#FF6B6B">
+    <meta name="robots" content="index, follow">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon.png">
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
@@ -15,7 +43,6 @@
                     <img src="assets/images/logo.png" alt="Woof Logo">
                 </a>
                 <div class="header-icons">
-                    <input type="text" id="desktop-search-input" class="desktop-search-input" placeholder="Search..." aria-label="Search">
                     <a href="#" id="desktop-search-button" aria-label="Search"><i class="fas fa-search"></i></a>
                     <a href="#" aria-label="Messages"><i class="fas fa-envelope"></i></a>
                     <a href="#" aria-label="Notifications"><i class="fas fa-bell"></i></a>
@@ -31,6 +58,7 @@
                     <li><a href="#" id="create-post-link"><i class="fas fa-plus-square"></i> Create</a></li>
                     <li><a href="map.html"><i class="fas fa-map-marker-alt"></i> Map</a></li>
                     <li><a href="nelli.html"><img src="assets/images/dog_profile_pic.jpg" alt="Profile" class="profile-pic"> Profile</a></li>
+                    <li class="invite-friends-nav"><a href="#" id="invite-friends-link"><i class="fas fa-paw"></i> Invite a Doggy Friend</a></li>
                 </ul>
             </nav>
 
@@ -130,10 +158,52 @@
         </div>
     </div>
 
+    <!-- Invite Friends Modal -->
+    <div id="invite-modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="invite-title">
+        <div class="modal-content">
+            <span class="close" aria-label="Close">&times;</span>
+            <h2 id="invite-title"><i class="fas fa-paw"></i> Invite a Doggy Friend!</h2>
+            <p class="invite-subtitle">Help grow the Woof pack! Share with fellow dog lovers.</p>
+
+            <div class="invite-options">
+                <div class="invite-option">
+                    <h3><i class="fas fa-envelope"></i> Share via Email</h3>
+                    <form id="email-invite-form">
+                        <input type="email" name="friend_email" placeholder="Friend's email address" required aria-label="Friend's email">
+                        <textarea name="personal_message" placeholder="Add a personal message (optional)" rows="3" aria-label="Personal message"></textarea>
+                        <button type="submit" class="btn-primary">Send Invitation</button>
+                    </form>
+                </div>
+
+                <div class="invite-divider">OR</div>
+
+                <div class="invite-option">
+                    <h3><i class="fas fa-share-alt"></i> Share Your Link</h3>
+                    <p>Copy this unique invite link and share it anywhere:</p>
+                    <div class="invite-link-container">
+                        <input type="text" id="invite-link-input" readonly value="http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com/?ref=USER_ID" aria-label="Invite link">
+                        <button id="copy-link-btn" class="btn-secondary" aria-label="Copy link"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+
+                    <div class="social-share-buttons">
+                        <button class="social-btn twitter" aria-label="Share on Twitter"><i class="fab fa-twitter"></i> Twitter</button>
+                        <button class="social-btn facebook" aria-label="Share on Facebook"><i class="fab fa-facebook"></i> Facebook</button>
+                        <button class="social-btn whatsapp" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    </div>
+                </div>
+
+                <div class="invite-stats">
+                    <p><i class="fas fa-trophy"></i> <strong id="invite-count">0</strong> friends invited</p>
+                    <small>Invite 5 friends to unlock exclusive badge!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast container for notifications -->
     <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-    <!-- Load modular JavaScript -->
-    <script type="module" src="js/app.js"></script>
+    <!-- Load modular TypeScript (Vite will handle compilation) -->
+    <script type="module" src="/js/app.js"></script>
 </body>
 </html>
