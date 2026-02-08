@@ -44,9 +44,13 @@ function renderFeed(dogs, container) {
     // Create mock posts from dogs (until we have real posts API)
     dogs.forEach(dog => {
         const post = createPostElement({
-            profilePic: dog.profilePhoto,
+            profilePic: dog.profilePhoto && dog.profilePhoto.startsWith('/')
+                ? `assets/images${dog.profilePhoto}`
+                : dog.profilePhoto || 'assets/images/dog_profile_pic.jpg',
             username: dog.name,
-            imageUrl: dog.profilePhoto || '/assets/images/placeholder-dog.jpg',
+            imageUrl: dog.profilePhoto && dog.profilePhoto.startsWith('/')
+                ? `assets/images${dog.profilePhoto}`
+                : dog.profilePhoto || 'assets/images/dog_profile_pic.jpg',
             caption: dog.bio || 'No caption',
             location: dog.location
         });
@@ -77,10 +81,12 @@ function createPostElement(postData) {
     postHeader.className = 'post-header';
 
     const profileImg = document.createElement('img');
-    profileImg.src = postData.profilePic || '/assets/images/default-dog.jpg';
+    profileImg.src = postData.profilePic || 'assets/images/dog_profile_pic.jpg';
     profileImg.alt = `${username}'s profile picture`;
     profileImg.onerror = function() {
-        this.src = '/assets/images/default-dog.jpg';
+        if (this.src !== 'assets/images/dog_profile_pic.jpg') {
+            this.src = 'assets/images/dog_profile_pic.jpg';
+        }
     };
 
     const usernameStrong = document.createElement('strong');
@@ -103,7 +109,9 @@ function createPostElement(postData) {
     img.alt = `Post by ${username}`;
     img.loading = 'lazy';
     img.onerror = function() {
-        this.src = '/assets/images/placeholder-dog.jpg';
+        if (this.src !== 'assets/images/dog_profile_pic.jpg') {
+            this.src = 'assets/images/dog_profile_pic.jpg';
+        }
     };
     postImage.appendChild(img);
 
@@ -197,7 +205,7 @@ export async function createPost(formData) {
     // For now, just add to feed locally
     const imageUrl = URL.createObjectURL(imageFile);
     const post = createPostElement({
-        profilePic: '/assets/images/default-dog.jpg',
+        profilePic: 'assets/images/dog_profile_pic.jpg',
         username: generateUsername(),
         imageUrl,
         caption

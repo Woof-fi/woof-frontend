@@ -1,7 +1,7 @@
 # Project Status & Cleanup
 
 **Date:** 2026-02-08
-**Status:** Refactored, Ready for Deployment
+**Status:** ✅ Deployed to Production - Closed Beta Ready
 
 ---
 
@@ -142,44 +142,40 @@ src-refactored/
 
 ---
 
-## Remaining Work
+## Completed Work ✅
 
-### 1. Copy Assets ⚡ (5 minutes)
-```bash
-cd /Users/tommikivisaari/Documents/Personal/Projects/Woof
+### 1. Copy Assets ✅ (Completed)
+All assets copied to src-refactored/:
+- ✅ logo.png
+- ✅ dog_profile_pic.jpg
+- ✅ chew-toy.jpg, dry-food.jpg, wet-food.jpg
+- ✅ styles.css
 
-# Copy images
-cp src/logo.png src-refactored/assets/images/
-cp src/dog_profile_pic.jpg src-refactored/assets/images/
-cp -r src/images/* src-refactored/assets/images/ 2>/dev/null || true
+### 2. Create Updated HTML Files ✅ (Completed)
+All HTML files updated with ES6 modules:
+- ✅ index.html - Feed page
+- ✅ nelli.html - Profile page
+- ✅ map.html - Map placeholder
+- ✅ store.html - Descoped, removed from navigation
 
-# Copy CSS
-cp src/styles.css src-refactored/css/
-```
+### 3. Bug Fixes ✅ (Completed)
+- ✅ Fixed infinite image loading errors
+- ✅ Corrected image paths (assets/images/ not /assets/images/)
+- ✅ Added onerror guards to prevent infinite loops
+- ✅ Updated profile.js and posts.js
 
-### 2. Create Updated HTML Files ⚡ (15 minutes)
+### 4. Deployment ✅ (Completed)
+- ✅ Created S3 bucket: woof-app-frontend-2026
+- ✅ Enabled static website hosting
+- ✅ Configured public access
+- ✅ Uploaded all files to S3
+- ✅ Production URL: http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com
 
-Update each HTML file to use modular JavaScript:
-
-**Before (src/index.html):**
-```html
-<script src="script.js"></script>
-```
-
-**After (src-refactored/index.html):**
-```html
-<script type="module" src="js/app.js"></script>
-```
-
-### 3. Test Locally 🧪 (10 minutes)
-```bash
-cd src-refactored
-python3 -m http.server 8000
-# Visit http://localhost:8000
-```
-
-### 4. Deploy 🚀 (20 minutes)
-Follow DEPLOYMENT_PLAN.md - Option 1 (Elastic Beanstalk)
+### 5. Configuration ✅ (Completed)
+- ✅ Updated .claude/settings.json with allowed prompts
+- ✅ Added curl commands for Woof backend
+- ✅ Added test commands (npm test, pytest)
+- ✅ Created .claude/README.md with comprehensive instructions
 
 ---
 
@@ -233,15 +229,30 @@ git commit -m "Archive original prototype after successful refactor"
 
 ---
 
-## Next Immediate Actions
+## Current Status Summary
 
-1. **Copy assets** (5 min)
-2. **Create updated HTML files** (15 min)
-3. **Test locally** (10 min)
-4. **Git commit** (5 min)
-5. **Deploy to AWS** (20 min)
+### Frontend
+- ✅ **Deployed**: http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com
+- ✅ **Local**: http://localhost:8000 (server running)
+- ✅ **Git**: Committed locally
+- ⚠️ **GitHub**: Not pushed (optional for frontend)
 
-**Total Time to Live:** ~1 hour
+### Backend
+- ✅ **Deployed**: http://woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com
+- ✅ **Database**: PostgreSQL on RDS (seeded)
+- ✅ **Tests**: 37+ tests passing
+- ⚠️ **Git Push**: Blocked - needs GitHub token with `workflow` scope
+  - Current: `gist`, `read:org`, `repo`
+  - Missing: `workflow`
+  - Fix: https://github.com/settings/tokens
+
+### Next Actions (Optional Enhancements)
+
+1. **Fix GitHub Token** - Add workflow scope
+2. **Custom Domain** - Set up CloudFront + Route53
+3. **Add Posts API** - Backend endpoint for posts
+4. **File Upload** - S3 integration for images
+5. **User Testing** - Share URL with friends for closed beta
 
 ---
 
