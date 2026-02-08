@@ -5,7 +5,8 @@
 
 import { createPost } from './posts.js';
 import { toggleBodyScroll, focusFirstElement } from './ui.js';
-import { trapFocus } from './utils.js';
+import { trapFocus, showToast } from './utils.js';
+import { login, register, isAuthenticated, logout } from './auth.js';
 
 /**
  * Initialize modal functionality
@@ -13,6 +14,8 @@ import { trapFocus } from './utils.js';
 export function initModals() {
     initCreatePostModal();
     initCartModal();
+    initAuthModal();
+    updateUIForAuth();
 
     // Global escape key handler
     document.addEventListener('keydown', (e) => {
@@ -358,11 +361,152 @@ function updateCartBadge(count) {
 }
 
 /**
+ * Initialize auth modal
+ */
+function initAuthModal() {
+    const authModal = document.getElementById('auth-modal');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const loginContainer = document.getElementById('login-form-container');
+    const registerContainer = document.getElementById('register-form-container');
+
+    if (!authModal) return;
+
+    // Show register form
+    const showRegisterLink = document.getElementById('show-register');
+    if (showRegisterLink) {
+        showRegisterLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (loginContainer) loginContainer.style.display = 'none';
+            if (registerContainer) registerContainer.style.display = 'block';
+        });
+    }
+
+    // Show login form
+    const showLoginLink = document.getElementById('show-login');
+    if (showLoginLink) {
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (registerContainer) registerContainer.style.display = 'none';
+            if (loginContainer) loginContainer.style.display = 'block';
+        });
+    }
+
+    // Login form submission
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(loginForm);
+
+            try {
+                await login(formData.get('email'), formData.get('password'));
+                closeAuthModal();
+                loginForm.reset();
+                updateUIForAuth();
+                // Reload page to refresh content
+                window.location.reload();
+            } catch (error) {
+                // Error already shown by login()
+            }
+        });
+    }
+
+    // Register form submission
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(registerForm);
+
+            try {
+                await register(
+                    formData.get('email'),
+                    formData.get('password'),
+                    formData.get('name')
+                );
+                closeAuthModal();
+                registerForm.reset();
+                updateUIForAuth();
+                // Reload page to refresh content
+                window.location.reload();
+            } catch (error) {
+                // Error already shown by register()
+            }
+        });
+    }
+
+    // Close modal
+    const closeButton = authModal.querySelector('.close');
+    if (closeButton) {
+        closeButton.addEventListener('click', closeAuthModal);
+    }
+
+    // Close on outside click
+    authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) {
+            closeAuthModal();
+        }
+    });
+}
+
+/**
+ * Open auth modal
+ */
+function openAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.setAttribute('aria-hidden', 'false');
+        toggleBodyScroll(true);
+    }
+}
+
+/**
+ * Close auth modal
+ */
+function closeAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+        toggleBodyScroll(false);
+    }
+}
+
+/**
+ * Update UI based on authentication state
+ */
+function updateUIForAuth() {
+    // Update auth link in header
+    const authLinks = document.querySelectorAll('.auth-link');
+
+    authLinks.forEach(authLink => {
+        if (!authLink) return;
+
+        if (isAuthenticated()) {
+            authLink.textContent = 'Logout';
+            authLink.onclick = (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    logout();
+                }
+            };
+        } else {
+            authLink.textContent = 'Login';
+            authLink.onclick = (e) => {
+                e.preventDefault();
+                openAuthModal();
+            };
+        }
+    });
+}
+
+/**
  * Close all open modals
  */
 function closeAllModals() {
     closeCreatePostModal();
     closeCartDrawer();
+    closeAuthModal();
 
     const searchPanel = document.getElementById('search-panel');
     if (searchPanel && searchPanel.classList.contains('active')) {

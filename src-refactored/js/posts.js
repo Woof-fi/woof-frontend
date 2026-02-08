@@ -3,9 +3,10 @@
  * Handles post creation, display, and interactions
  */
 
-import { getAllDogs } from './api.js';
+import { getAllDogs, uploadImage, createPost as createPostAPI } from './api.js';
 import { escapeHTML, generateUsername, isValidFileType, isValidFileSize, showToast } from './utils.js';
 import { showLoading, hideLoading, showError, showFeedSkeleton, animateIn } from './ui.js';
+import { getCurrentUser, isAuthenticated } from './auth.js';
 
 /**
  * Initialize feed
@@ -185,6 +186,12 @@ export async function createPost(formData) {
     const imageFile = formData.get('post-image');
     const caption = formData.get('post-caption');
 
+    // Check authentication
+    if (!isAuthenticated()) {
+        showToast('Please login to create a post', 'error');
+        return;
+    }
+
     // Validate file
     if (!imageFile || !caption) {
         showToast('Please provide both an image and caption', 'error');
@@ -201,26 +208,44 @@ export async function createPost(formData) {
         return;
     }
 
-    // TODO: Upload to S3 and create post via API
-    // For now, just add to feed locally
-    const imageUrl = URL.createObjectURL(imageFile);
-    const post = createPostElement({
-        profilePic: 'assets/images/dog_profile_pic.jpg',
-        username: generateUsername(),
-        imageUrl,
-        caption
-    });
-
-    const feedContainer = document.querySelector('#following') || document.querySelector('.content');
-    if (feedContainer) {
-        feedContainer.prepend(post);
-        animateIn(post);
+    // Get current user's dog (for now, we'll need the user to have created a dog first)
+    const user = getCurrentUser();
+    if (!user || !user.primaryDogId) {
+        showToast('Please create a dog profile first', 'error');
+        return;
     }
 
-    // Rebind like buttons
-    bindLikeButtons();
+    try {
+        // Show uploading message
+        showToast('Uploading image...', 'info');
 
-    showToast('Post created successfully!', 'success');
+        // Upload image to S3
+        const imageUrl = await uploadImage(imageFile);
+
+        // Create post in database
+        const post = await createPostAPI(user.primaryDogId, imageUrl, caption);
+
+        // Add to feed UI
+        const postElement = createPostElement({
+            profilePic: user.dogPhoto || 'assets/images/dog_profile_pic.jpg',
+            username: user.dogName || user.name,
+            imageUrl: post.imageUrl,
+            caption: post.caption,
+            location: user.location
+        });
+
+        const feedContainer = document.querySelector('#following') || document.querySelector('.content');
+        if (feedContainer) {
+            feedContainer.prepend(postElement);
+            animateIn(postElement);
+        }
+
+        // Rebind like buttons
+        bindLikeButtons();
+    } catch (error) {
+        console.error('Failed to create post:', error);
+        // Error message already shown by API functions
+    }
 }
 
 /**
