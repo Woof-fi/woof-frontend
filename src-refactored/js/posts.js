@@ -52,15 +52,13 @@ function renderFeed(dogs, container) {
     }
 
     // Create mock posts from dogs (until we have real posts API)
+    const placeholderImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23cccccc" width="150" height="150"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EDog%3C/text%3E%3C/svg%3E';
+
     dogs.forEach(dog => {
         const post = createPostElement({
-            profilePic: dog.profilePhoto && dog.profilePhoto.startsWith('/')
-                ? `assets/images${dog.profilePhoto}`
-                : dog.profilePhoto || 'assets/images/dog_profile_pic.jpg',
+            profilePic: dog.profilePhoto || placeholderImage,
             username: dog.name,
-            imageUrl: dog.profilePhoto && dog.profilePhoto.startsWith('/')
-                ? `assets/images${dog.profilePhoto}`
-                : dog.profilePhoto || 'assets/images/dog_profile_pic.jpg',
+            imageUrl: dog.profilePhoto || placeholderImage,
             caption: dog.bio || 'No caption',
             location: dog.location
         });
@@ -91,11 +89,13 @@ function createPostElement(postData) {
     postHeader.className = 'post-header';
 
     const profileImg = document.createElement('img');
-    profileImg.src = postData.profilePic || 'assets/images/dog_profile_pic.jpg';
+    profileImg.src = postData.profilePic || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23cccccc" width="150" height="150"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EDog%3C/text%3E%3C/svg%3E';
     profileImg.alt = `${username}'s profile picture`;
     profileImg.onerror = function() {
-        if (this.src !== 'assets/images/dog_profile_pic.jpg') {
-            this.src = 'assets/images/dog_profile_pic.jpg';
+        // Use SVG data URI as fallback - will never fail
+        const fallback = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23cccccc" width="150" height="150"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EDog%3C/text%3E%3C/svg%3E';
+        if (this.src !== fallback) {
+            this.src = fallback;
         }
     };
 
@@ -119,8 +119,10 @@ function createPostElement(postData) {
     img.alt = `Post by ${username}`;
     img.loading = 'lazy';
     img.onerror = function() {
-        if (this.src !== 'assets/images/dog_profile_pic.jpg') {
-            this.src = 'assets/images/dog_profile_pic.jpg';
+        // Use SVG data URI as fallback - will never fail
+        const fallback = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23cccccc" width="400" height="400"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="30" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
+        if (this.src !== fallback) {
+            this.src = fallback;
         }
     };
     postImage.appendChild(img);
