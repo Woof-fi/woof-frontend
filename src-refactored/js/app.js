@@ -160,10 +160,8 @@ if (document.readyState === 'loading') {
     initApp();
 }
 
-// Export for debugging
-if (process.env.NODE_ENV === 'development') {
-    window.WoofApp = {
-        CONFIG,
-        reinit: initApp
-    };
-}
+// Export for debugging (always available for development)
+window.WoofApp = {
+    CONFIG,
+    reinit: initApp
+};
