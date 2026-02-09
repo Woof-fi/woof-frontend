@@ -3,15 +3,30 @@
  * Centralized API calls with error handling and timeouts
  */
 
-import { CONFIG } from './config.js';
-import { showToast } from './utils.js';
-import { getToken } from './auth.js';
+import { CONFIG } from './config';
+import { showToast } from './utils';
+import { getToken } from './auth';
+import type {
+    Dog,
+    Post,
+    DogsResponse,
+    DogResponse,
+    FeedResponse,
+    PostResponse,
+    PresignedUrlRequest,
+    PresignedUrlResponse,
+    HealthResponse,
+    APIError as APIErrorData
+} from '../types/api';
 
 /**
  * Custom error class for API errors
  */
-class APIError extends Error {
-    constructor(message, status, data) {
+export class APIError extends Error {
+    status: number;
+    data: APIErrorData | null;
+
+    constructor(message: string, status: number, data: APIErrorData | null = null) {
         super(message);
         this.name = 'APIError';
         this.status = status;
@@ -21,11 +36,8 @@ class APIError extends Error {
 
 /**
  * Make API request with timeout and error handling
- * @param {string} endpoint - API endpoint (e.g., '/api/dogs')
- * @param {object} options - Fetch options
- * @returns {Promise<any>} - Response data
  */
-async function apiRequest(endpoint, options = {}) {
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${CONFIG.API_BASE_URL}${endpoint}`;
     const token = getToken();
 
@@ -57,11 +69,11 @@ async function apiRequest(endpoint, options = {}) {
             );
         }
 
-        return data;
+        return data as T;
     } catch (error) {
         clearTimeout(timeout);
 
-        if (error.name === 'AbortError') {
+        if (error instanceof Error && error.name === 'AbortError') {
             throw new APIError('Request timeout', 408, null);
         }
 
@@ -74,13 +86,16 @@ async function apiRequest(endpoint, options = {}) {
     }
 }
 
+// ============================================================================
+// DOG ENDPOINTS
+// ============================================================================
+
 /**
  * Get all dogs
- * @returns {Promise<object[]>} - Array of dog objects
  */
-export async function getAllDogs() {
+export async function getAllDogs(): Promise<Dog[]> {
     try {
-        const data = await apiRequest('/api/dogs');
+        const data = await apiRequest<DogsResponse>('/api/dogs');
         return data.dogs || [];
     } catch (error) {
         console.error('Failed to fetch dogs:', error);
@@ -91,11 +106,10 @@ export async function getAllDogs() {
 
 /**
  * Get current user's dogs (requires authentication)
- * @returns {Promise<object[]>} - Array of user's dog objects
  */
-export async function getMyDogs() {
+export async function getMyDogs(): Promise<Dog[]> {
     try {
-        const data = await apiRequest('/api/dogs/my/dogs');
+        const data = await apiRequest<DogsResponse>('/api/dogs/my/dogs');
         return data.dogs || [];
     } catch (error) {
         console.error('Failed to fetch my dogs:', error);
@@ -106,16 +120,14 @@ export async function getMyDogs() {
 
 /**
  * Get dog by ID
- * @param {string} id - Dog ID
- * @returns {Promise<object>} - Dog object
  */
-export async function getDog(id) {
+export async function getDog(id: string): Promise<Dog> {
     try {
-        const data = await apiRequest(`/api/dogs/${id}`);
+        const data = await apiRequest<DogResponse>(`/api/dogs/${id}`);
         return data.dog;
     } catch (error) {
         console.error(`Failed to fetch dog ${id}:`, error);
-        if (error.status === 404) {
+        if (error instanceof APIError && error.status === 404) {
             showToast('Dog not found.', 'error');
         } else {
             showToast('Failed to load dog profile. Please try again.', 'error');
@@ -126,12 +138,17 @@ export async function getDog(id) {
 
 /**
  * Create new dog
- * @param {object} dogData - Dog data
- * @returns {Promise<object>} - Created dog object
  */
-export async function createDog(dogData) {
+export async function createDog(dogData: {
+    name: string;
+    breed: string;
+    age: number;
+    location: string;
+    bio?: string;
+    profile_photo?: string;
+}): Promise<Dog> {
     try {
-        const data = await apiRequest('/api/dogs', {
+        const data = await apiRequest<DogResponse>('/api/dogs', {
             method: 'POST',
             body: JSON.stringify(dogData)
         });
@@ -146,13 +163,17 @@ export async function createDog(dogData) {
 
 /**
  * Update dog
- * @param {string} id - Dog ID
- * @param {object} dogData - Dog data to update
- * @returns {Promise<object>} - Updated dog object
  */
-export async function updateDog(id, dogData) {
+export async function updateDog(id: string, dogData: Partial<{
+    name: string;
+    breed: string;
+    age: number;
+    location: string;
+    bio: string;
+    profile_photo: string;
+}>): Promise<Dog> {
     try {
-        const data = await apiRequest(`/api/dogs/${id}`, {
+        const data = await apiRequest<DogResponse>(`/api/dogs/${id}`, {
             method: 'PUT',
             body: JSON.stringify(dogData)
         });
@@ -167,12 +188,10 @@ export async function updateDog(id, dogData) {
 
 /**
  * Delete dog
- * @param {string} id - Dog ID
- * @returns {Promise<void>}
  */
-export async function deleteDog(id) {
+export async function deleteDog(id: string): Promise<void> {
     try {
-        await apiRequest(`/api/dogs/${id}`, {
+        await apiRequest<void>(`/api/dogs/${id}`, {
             method: 'DELETE'
         });
         showToast('Profile deleted successfully.', 'success');
@@ -183,30 +202,16 @@ export async function deleteDog(id) {
     }
 }
 
-/**
- * Health check
- * @returns {Promise<boolean>} - True if API is healthy
- */
-export async function healthCheck() {
-    try {
-        const data = await apiRequest('/health');
-        return data.status === 'OK';
-    } catch (error) {
-        console.error('Health check failed:', error);
-        return false;
-    }
-}
+// ============================================================================
+// POST ENDPOINTS
+// ============================================================================
 
 /**
  * Create a new post
- * @param {string} dogId - Dog ID
- * @param {string} imageUrl - S3 image URL
- * @param {string} caption - Post caption
- * @returns {Promise<object>} - Created post object
  */
-export async function createPost(dogId, imageUrl, caption) {
+export async function createPost(dogId: string, imageUrl: string, caption?: string): Promise<Post> {
     try {
-        const data = await apiRequest('/api/posts', {
+        const data = await apiRequest<PostResponse>('/api/posts', {
             method: 'POST',
             body: JSON.stringify({ dog_id: dogId, image_url: imageUrl, caption })
         });
@@ -221,12 +226,10 @@ export async function createPost(dogId, imageUrl, caption) {
 
 /**
  * Get feed (public or following)
- * @param {string} type - 'public' or 'following'
- * @returns {Promise<object[]>} - Array of post objects
  */
-export async function getFeed(type = 'public') {
+export async function getFeed(type: 'public' | 'following' = 'public'): Promise<Post[]> {
     try {
-        const data = await apiRequest(`/api/posts/feed?type=${type}`);
+        const data = await apiRequest<FeedResponse>(`/api/posts/feed?type=${type}`);
         return data.posts || [];
     } catch (error) {
         console.error('Failed to fetch feed:', error);
@@ -235,20 +238,22 @@ export async function getFeed(type = 'public') {
     }
 }
 
+// ============================================================================
+// UPLOAD ENDPOINTS
+// ============================================================================
+
 /**
  * Upload image to S3
- * @param {File} file - Image file to upload
- * @returns {Promise<string>} - Public URL of uploaded image
  */
-export async function uploadImage(file) {
+export async function uploadImage(file: File): Promise<string> {
     try {
         // Get presigned URL from backend
-        const urlData = await apiRequest('/api/upload/presigned-url', {
+        const urlData = await apiRequest<PresignedUrlResponse>('/api/upload/presigned-url', {
             method: 'POST',
             body: JSON.stringify({
                 filename: file.name,
                 contentType: file.type
-            })
+            } as PresignedUrlRequest)
         });
 
         // Upload directly to S3 using presigned URL
@@ -272,5 +277,19 @@ export async function uploadImage(file) {
     }
 }
 
-// Export APIError for use in other modules
-export { APIError };
+// ============================================================================
+// HEALTH CHECK
+// ============================================================================
+
+/**
+ * Health check
+ */
+export async function healthCheck(): Promise<boolean> {
+    try {
+        const data = await apiRequest<HealthResponse>('/health');
+        return data.status === 'OK';
+    } catch (error) {
+        console.error('Health check failed:', error);
+        return false;
+    }
+}

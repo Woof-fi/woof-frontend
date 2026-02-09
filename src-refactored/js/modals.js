@@ -6,7 +6,7 @@
 import { createPost } from './posts.js';
 import { toggleBodyScroll, focusFirstElement } from './ui.js';
 import { trapFocus, showToast } from './utils.js';
-import { login, register, isAuthenticated, logout } from './auth.js';
+import { login, register, isAuthenticated, logout, getCurrentUser } from './auth.js';
 
 /**
  * Initialize modal functionality
@@ -482,7 +482,7 @@ function closeAuthModal() {
 /**
  * Update UI based on authentication state
  */
-function updateUIForAuth() {
+async function updateUIForAuth() {
     // Update auth link in header
     const authLinks = document.querySelectorAll('.auth-link');
 
@@ -505,6 +505,43 @@ function updateUIForAuth() {
             };
         }
     });
+
+    // Update navigation visibility and profile link text
+    const messagesLinks = document.querySelectorAll('a[aria-label="Messages"]');
+    const profileLinks = document.querySelectorAll('.left-panel a[href="nelli.html"], .bottom-nav a[href="nelli.html"]');
+
+    if (isAuthenticated()) {
+        // Show Messages and Profile links
+        messagesLinks.forEach(link => {
+            link.style.display = '';
+        });
+        profileLinks.forEach(link => {
+            link.style.display = '';
+        });
+
+        // Update Profile link text with dog name
+        const user = getCurrentUser();
+        if (user && user.dogs && user.dogs.length > 0) {
+            const profileText = user.dogs.length === 1 ? user.dogs[0].name : 'My Dogs';
+
+            // Update desktop profile link text (left panel)
+            const desktopProfileLink = document.querySelector('.left-panel a[href="nelli.html"]');
+            if (desktopProfileLink) {
+                const textNode = desktopProfileLink.childNodes[desktopProfileLink.childNodes.length - 1];
+                if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                    textNode.textContent = ' ' + profileText;
+                }
+            }
+        }
+    } else {
+        // Hide Messages and Profile links when not logged in
+        messagesLinks.forEach(link => {
+            link.style.display = 'none';
+        });
+        profileLinks.forEach(link => {
+            link.style.display = 'none';
+        });
+    }
 }
 
 /**
