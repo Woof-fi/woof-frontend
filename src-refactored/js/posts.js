@@ -236,7 +236,8 @@ function bindLikeButtons() {
  */
 export async function createPost(formData) {
     const imageFile = formData.get('post-image');
-    const caption = formData.get('post-caption');
+    const caption = formData.get('post-caption') || ''; // Caption is optional
+    const dogId = formData.get('post-dog-select');
 
     // Check authentication
     if (!isAuthenticated()) {
@@ -244,9 +245,15 @@ export async function createPost(formData) {
         return;
     }
 
-    // Validate file
-    if (!imageFile || !caption) {
-        showToast('Please provide both an image and caption', 'error');
+    // Validate dog selection
+    if (!dogId) {
+        showToast('Please select a dog', 'error');
+        return;
+    }
+
+    // Validate image file
+    if (!imageFile) {
+        showToast('Please select an image', 'error');
         return;
     }
 
@@ -260,13 +267,6 @@ export async function createPost(formData) {
         return;
     }
 
-    // Get current user's dog (for now, we'll need the user to have created a dog first)
-    const user = getCurrentUser();
-    if (!user || !user.primaryDogId) {
-        showToast('Please create a dog profile first', 'error');
-        return;
-    }
-
     try {
         // Show uploading message
         showToast('Uploading image...', 'info');
@@ -275,7 +275,7 @@ export async function createPost(formData) {
         const imageUrl = await uploadImage(imageFile);
 
         // Create post in database
-        const post = await createPostAPI(user.primaryDogId, imageUrl, caption);
+        const post = await createPostAPI(dogId, imageUrl, caption);
 
         showToast('Post created successfully!', 'success');
 

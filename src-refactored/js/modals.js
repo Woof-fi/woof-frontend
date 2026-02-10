@@ -262,7 +262,7 @@ function openCartDrawer() {
     if (!drawer) return;
 
     drawer.classList.add('open');
-    drawer.setAttribute('aria-hidden', 'false');
+    drawer.removeAttribute('aria-hidden');
 }
 
 /**
@@ -508,7 +508,7 @@ export function openAuthModal() {
     const modal = document.getElementById('auth-modal');
     if (modal) {
         modal.style.display = 'block';
-        modal.setAttribute('aria-hidden', 'false');
+        modal.removeAttribute('aria-hidden');
         toggleBodyScroll(true);
     }
 }
