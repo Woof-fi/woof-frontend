@@ -379,80 +379,80 @@ function updateCartBadge(count) {
  */
 function initAuthModal() {
     const authModal = document.getElementById('auth-modal');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const loginContainer = document.getElementById('login-form-container');
-    const registerContainer = document.getElementById('register-form-container');
+    const authForm = document.getElementById('auth-form');
+    const authTabs = document.querySelectorAll('.auth-tab');
+    const nameGroup = document.getElementById('auth-name-group');
+    const authSubmit = document.getElementById('auth-submit');
+    const authModalTitle = document.getElementById('auth-modal-title');
 
-    if (!authModal) return;
+    if (!authModal || !authForm) return;
 
-    // Show register form
-    const showRegisterLink = document.getElementById('show-register');
-    if (showRegisterLink) {
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (loginContainer) loginContainer.style.display = 'none';
-            if (registerContainer) registerContainer.style.display = 'block';
-        });
-    }
+    let currentMode = 'login'; // 'login' or 'register'
 
-    // Show login form
-    const showLoginLink = document.getElementById('show-login');
-    if (showLoginLink) {
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (registerContainer) registerContainer.style.display = 'none';
-            if (loginContainer) loginContainer.style.display = 'block';
-        });
-    }
+    // Tab switching
+    authTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Update active tab
+            authTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
 
-    // Login form submission
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(loginForm);
+            // Switch mode
+            const mode = tab.dataset.tab;
+            currentMode = mode;
 
-            try {
-                await login(formData.get('email'), formData.get('password'));
-                closeAuthModal();
-                loginForm.reset();
-                updateUIForAuth();
-                // Reload page to refresh content
-                window.location.reload();
-            } catch (error) {
-                // Error already shown by login()
+            // Update UI based on mode
+            if (mode === 'register') {
+                nameGroup.style.display = 'block';
+                authSubmit.textContent = 'Register';
+                authModalTitle.textContent = 'Register';
+            } else {
+                nameGroup.style.display = 'none';
+                authSubmit.textContent = 'Login';
+                authModalTitle.textContent = 'Login';
             }
         });
-    }
+    });
 
-    // Register form submission
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(registerForm);
+    // Form submission
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            try {
-                await register(
-                    formData.get('email'),
-                    formData.get('password'),
-                    formData.get('name')
-                );
-                closeAuthModal();
-                registerForm.reset();
-                updateUIForAuth();
-                // Reload page to refresh content
-                window.location.reload();
-            } catch (error) {
-                // Error already shown by register()
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        const name = document.getElementById('auth-name').value;
+
+        const submitButton = authForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = currentMode === 'login' ? 'Logging in...' : 'Registering...';
+
+        try {
+            if (currentMode === 'register') {
+                await register(email, password, name);
+            } else {
+                await login(email, password);
             }
-        });
-    }
 
-    // Close modal
-    const closeButton = authModal.querySelector('.close');
-    if (closeButton) {
-        closeButton.addEventListener('click', closeAuthModal);
-    }
+            closeAuthModal();
+            authForm.reset();
+
+            // Update navigation after successful auth
+            await updateProfileNavigation();
+            await updateUIForAuth();
+        } catch (error) {
+            // Error already shown by login()/register()
+            console.error('Auth error:', error);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        }
+    });
+
+    // Close buttons
+    const closeButtons = authModal.querySelectorAll('.modal-close');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', closeAuthModal);
+    });
 
     // Close on outside click
     authModal.addEventListener('click', (e) => {
