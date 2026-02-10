@@ -72,11 +72,16 @@ export function isAuthenticated() {
 }
 
 // Logout
-export function logout() {
+export async function logout() {
     clearToken();
     clearCurrentUser();
     showToast('Logged out successfully', 'success');
-    // Use router to navigate to home instead of reloading page
+
+    // Update UI to reflect logged out state
+    const { updateUIForAuth } = await import('./modals.js');
+    await updateUIForAuth();
+
+    // Navigate to home
     if (window.WoofApp && window.WoofApp.router) {
         window.WoofApp.router.navigate('/');
     } else {

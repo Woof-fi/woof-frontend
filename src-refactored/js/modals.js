@@ -442,11 +442,11 @@ function initAuthModal() {
             // Update UI based on mode
             if (mode === 'register') {
                 nameGroup.style.display = 'block';
-                authSubmit.textContent = 'Register';
+                authSubmit.textContent = 'Sign Up';
                 authModalTitle.textContent = 'Register';
             } else {
                 nameGroup.style.display = 'none';
-                authSubmit.textContent = 'Login';
+                authSubmit.textContent = 'Sign In';
                 authModalTitle.textContent = 'Login';
             }
         });
@@ -528,7 +528,7 @@ function closeAuthModal() {
 /**
  * Update UI based on authentication state
  */
-async function updateUIForAuth() {
+export async function updateUIForAuth() {
     // Update auth link in header
     const authLinks = document.querySelectorAll('.auth-link');
 
