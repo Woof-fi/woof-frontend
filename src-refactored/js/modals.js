@@ -334,11 +334,15 @@ function updateCartDisplay(cart) {
         const emptyMsg = drawerBody.querySelector('.cart-drawer-empty');
         if (emptyMsg) emptyMsg.remove();
 
-        cartSummary.innerHTML = cart.map(item => {
+        // Clear existing items
+        cartSummary.innerHTML = '';
+
+        // Safely append each cart item
+        cart.forEach(item => {
             const li = document.createElement('li');
             li.textContent = `${item.name} — $${item.price} × ${item.quantity}`;
-            return li.outerHTML;
-        }).join('');
+            cartSummary.appendChild(li);
+        });
 
         // Update cart badge
         updateCartBadge(cart.length);
