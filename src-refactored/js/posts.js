@@ -13,7 +13,7 @@ import { openAuthModal } from './modals.js';
  * Initialize feed
  */
 export async function initFeed() {
-    const feedContainer = document.querySelector('#following') || document.querySelector('.content');
+    const feedContainer = document.querySelector('#feed-container') || document.querySelector('#following') || document.querySelector('.content');
     if (!feedContainer) return;
 
     try {

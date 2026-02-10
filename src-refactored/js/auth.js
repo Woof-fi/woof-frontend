@@ -76,7 +76,12 @@ export function logout() {
     clearToken();
     clearCurrentUser();
     showToast('Logged out successfully', 'success');
-    window.location.href = 'index.html';
+    // Use router to navigate to home instead of reloading page
+    if (window.WoofApp && window.WoofApp.router) {
+        window.WoofApp.router.navigate('/');
+    } else {
+        window.location.href = '/';
+    }
 }
 
 // API calls
