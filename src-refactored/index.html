@@ -43,10 +43,12 @@
 
         <div class="main-container">
             <nav class="left-panel">
-                <ul>
+                <ul id="nav-links">
                     <li><a href="/" data-link><i class="fas fa-home"></i> Home</a></li>
                     <li><a href="#" id="create-post-link"><i class="fas fa-plus-square"></i> Create</a></li>
-                    <li><a href="/dog/nelli-1" data-link><img src="assets/images/dog_profile_pic.jpg" alt="Profile" class="profile-pic"> Nelli</a></li>
+                    <li id="profile-nav-item">
+                        <!-- Profile link will be rendered dynamically based on auth state -->
+                    </li>
                     <li class="invite-friends-nav"><a href="#" id="invite-friends-link"><i class="fas fa-paw"></i> Invite a Doggy Friend</a></li>
                 </ul>
             </nav>
@@ -59,39 +61,6 @@
                     <p>Loading...</p>
                 </div>
             </div>
-
-            <aside class="right-panel">
-                <div class="suggested-friends">
-                    <h3>Suggested Friends</h3>
-                    <div class="friend-suggestions">
-                        <div class="friend-card">
-                            <img src="assets/images/dog2.jpg" alt="Luna">
-                            <div>
-                                <h4>Luna</h4>
-                                <p>Golden Retriever</p>
-                            </div>
-                            <button class="follow-btn">Follow</button>
-                        </div>
-                        <div class="friend-card">
-                            <img src="assets/images/dog3.jpg" alt="Max">
-                            <div>
-                                <h4>Max</h4>
-                                <p>German Shepherd</p>
-                            </div>
-                            <button class="follow-btn">Follow</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="trending">
-                    <h3>Trending</h3>
-                    <ul class="trending-list">
-                        <li><a href="#"><i class="fas fa-hashtag"></i>DogOfTheDay</a></li>
-                        <li><a href="#"><i class="fas fa-hashtag"></i>PuppyLove</a></li>
-                        <li><a href="#"><i class="fas fa-hashtag"></i>DogPark</a></li>
-                    </ul>
-                </div>
-            </aside>
         </div>
     </div>
 
@@ -163,6 +132,46 @@
                         <input type="text" id="auth-name">
                     </div>
                     <button type="submit" class="btn-primary" id="auth-submit">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Dog Modal -->
+    <div id="create-dog-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add a Pet</h2>
+                <button class="modal-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-dog-form">
+                    <div class="form-group">
+                        <label for="dog-name">Name *</label>
+                        <input type="text" id="dog-name" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="dog-breed">Breed *</label>
+                        <input type="text" id="dog-breed" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="dog-age">Age *</label>
+                        <input type="number" id="dog-age" required min="0" max="30" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="dog-location">Location (optional)</label>
+                        <input type="text" id="dog-location" maxlength="100" placeholder="e.g., Helsinki, Finland">
+                    </div>
+                    <div class="form-group">
+                        <label for="dog-bio">Bio (optional)</label>
+                        <textarea id="dog-bio" rows="3" maxlength="500" placeholder="Tell us about your dog..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="dog-photo">Profile Photo (optional)</label>
+                        <input type="file" id="dog-photo" accept="image/*">
+                        <div id="dog-photo-preview" class="image-preview"></div>
+                    </div>
+                    <button type="submit" class="btn-primary">Add Pet</button>
                 </form>
             </div>
         </div>

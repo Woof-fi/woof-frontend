@@ -12,6 +12,7 @@ import router from './router.js';
 import ViewManager from './views/ViewManager.js';
 import HomeView from './views/HomeView.js';
 import ProfileView from './views/ProfileView.js';
+import { initNavigation } from './navigation.js';
 
 // Create view manager
 const viewManager = new ViewManager('#app');
@@ -35,6 +36,7 @@ async function initApp() {
     // Initialize common functionality (runs once, persists across views)
     initModals();
     initSearch();
+    await initNavigation();
 
     // Define routes
     router

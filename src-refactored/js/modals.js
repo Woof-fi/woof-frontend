@@ -7,12 +7,15 @@ import { createPost } from './posts.js';
 import { toggleBodyScroll, focusFirstElement } from './ui.js';
 import { trapFocus, showToast } from './utils.js';
 import { login, register, isAuthenticated, logout, getCurrentUser } from './auth.js';
+import { createDog, uploadImage } from './api.js';
+import { updateProfileNavigation } from './navigation.js';
 
 /**
  * Initialize modal functionality
  */
 export function initModals() {
     initCreatePostModal();
+    initCreateDogModal();
     initCartModal();
     initAuthModal();
     updateUIForAuth();
@@ -549,10 +552,150 @@ async function updateUIForAuth() {
 }
 
 /**
+ * Initialize create dog modal
+ */
+function initCreateDogModal() {
+    const createDogModal = document.getElementById('create-dog-modal');
+    const createDogForm = document.getElementById('create-dog-form');
+
+    if (!createDogModal || !createDogForm) return;
+
+    // Close buttons
+    const closeButtons = createDogModal.querySelectorAll('.modal-close');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            closeCreateDogModal();
+        });
+    });
+
+    // Click outside to close
+    createDogModal.addEventListener('click', (e) => {
+        if (e.target === createDogModal) {
+            closeCreateDogModal();
+        }
+    });
+
+    // Image preview
+    const photoInput = document.getElementById('dog-photo');
+    const photoPreview = document.getElementById('dog-photo-preview');
+
+    if (photoInput && photoPreview) {
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    photoPreview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                photoPreview.innerHTML = '';
+            }
+        });
+    }
+
+    // Form submission
+    createDogForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Check authentication
+        if (!isAuthenticated()) {
+            showToast('Please login to add a pet', 'error');
+            closeCreateDogModal();
+            openAuthModal();
+            return;
+        }
+
+        const submitButton = createDogForm.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.textContent = 'Adding...';
+
+        try {
+            // Get form data
+            const name = document.getElementById('dog-name').value.trim();
+            const breed = document.getElementById('dog-breed').value.trim();
+            const age = parseInt(document.getElementById('dog-age').value);
+            const location = document.getElementById('dog-location').value.trim();
+            const bio = document.getElementById('dog-bio').value.trim();
+            const photoFile = photoInput.files[0];
+
+            // Upload photo if provided
+            let profilePhoto = null;
+            if (photoFile) {
+                showToast('Uploading photo...', 'info');
+                profilePhoto = await uploadImage(photoFile);
+            }
+
+            // Create dog profile
+            const dogData = {
+                name,
+                breed,
+                age,
+                ...(location && { location }),
+                ...(bio && { bio }),
+                ...(profilePhoto && { profilePhoto })
+            };
+
+            await createDog(dogData);
+
+            // Update navigation to show the new dog
+            await updateProfileNavigation();
+
+            // Close and reset
+            closeCreateDogModal();
+            createDogForm.reset();
+            photoPreview.innerHTML = '';
+        } catch (error) {
+            console.error('Failed to create dog:', error);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        }
+    });
+}
+
+/**
+ * Open create dog modal
+ */
+function openCreateDogModal() {
+    // Check authentication first
+    if (!isAuthenticated()) {
+        showToast('Please login to add a pet', 'error');
+        openAuthModal();
+        return;
+    }
+
+    const modal = document.getElementById('create-dog-modal');
+    if (!modal) return;
+
+    modal.style.display = 'block';
+    toggleBodyScroll(true);
+
+    // Focus first input
+    const firstInput = modal.querySelector('input');
+    if (firstInput) {
+        setTimeout(() => firstInput.focus(), 100);
+    }
+}
+
+/**
+ * Close create dog modal
+ */
+function closeCreateDogModal() {
+    const modal = document.getElementById('create-dog-modal');
+    if (!modal) return;
+
+    modal.style.display = 'none';
+    toggleBodyScroll(false);
+}
+
+/**
  * Close all open modals
  */
 function closeAllModals() {
     closeCreatePostModal();
+    closeCreateDogModal();
     closeCartDrawer();
     closeAuthModal();
 
