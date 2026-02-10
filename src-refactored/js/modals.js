@@ -83,6 +83,15 @@ function initCreatePostModal() {
                 await createPost(formData);
                 closeCreatePostModal();
                 createPostForm.reset();
+
+                // Clear preview
+                const previewContainer = document.getElementById('image-preview');
+                if (previewContainer) previewContainer.innerHTML = '';
+
+                // Navigate to home to see the new post
+                if (window.WoofApp && window.WoofApp.router) {
+                    window.WoofApp.router.navigate('/');
+                }
             } catch (error) {
                 console.error('Failed to create post:', error);
             }
@@ -153,7 +162,7 @@ async function openCreatePostModal() {
     }
 
     modal.style.display = 'block';
-    modal.setAttribute('aria-hidden', 'false');
+    modal.removeAttribute('aria-hidden'); // Don't set aria-hidden on visible modal
     toggleBodyScroll(true);
 
     // Focus first input
@@ -181,9 +190,9 @@ function closeCreatePostModal() {
     const form = document.getElementById('create-post-form');
     if (form) form.reset();
 
-    // Remove preview
-    const preview = modal.querySelector('.image-preview');
-    if (preview) preview.remove();
+    // Clear preview
+    const previewContainer = document.getElementById('image-preview');
+    if (previewContainer) previewContainer.innerHTML = '';
 }
 
 /**
@@ -191,29 +200,22 @@ function closeCreatePostModal() {
  * @param {File} file - Image file
  */
 function previewImage(file) {
-    const modal = document.getElementById('create-post-modal');
-    if (!modal) return;
+    const previewContainer = document.getElementById('image-preview');
+    if (!previewContainer) return;
 
-    // Remove existing preview
-    const existingPreview = modal.querySelector('.image-preview');
-    if (existingPreview) existingPreview.remove();
+    // Clear existing preview
+    previewContainer.innerHTML = '';
 
-    // Create preview
-    const preview = document.createElement('div');
-    preview.className = 'image-preview';
-
+    // Create preview image
     const img = document.createElement('img');
     img.src = URL.createObjectURL(file);
     img.alt = 'Image preview';
+    img.style.maxWidth = '100%';
+    img.style.maxHeight = '300px';
+    img.style.borderRadius = '8px';
+    img.style.marginTop = '10px';
 
-    preview.appendChild(img);
-
-    // Insert before form
-    const modalContent = modal.querySelector('.modal-content');
-    const form = modal.querySelector('form');
-    if (modalContent && form) {
-        modalContent.insertBefore(preview, form);
-    }
+    previewContainer.appendChild(img);
 }
 
 /**
