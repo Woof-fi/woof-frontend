@@ -19,17 +19,6 @@ export class HomeView {
             <main>
                 <!-- Feed Section -->
                 <section class="feed">
-                    <div class="feed-tabs">
-                        <button class="feed-tab active" data-feed-type="public" aria-selected="true">
-                            <i class="fas fa-globe"></i>
-                            Public
-                        </button>
-                        <button class="feed-tab" data-feed-type="following" aria-selected="false">
-                            <i class="fas fa-users"></i>
-                            Following
-                        </button>
-                    </div>
-
                     <div id="feed-container" class="feed-container" role="feed" aria-label="Dog posts feed">
                         <!-- Posts will be loaded here by posts.js -->
                     </div>
@@ -44,7 +33,6 @@ export class HomeView {
     async onMount() {
         // Initialize feed functionality
         initFeed();
-        initFeedTabs();
     }
 
     /**
