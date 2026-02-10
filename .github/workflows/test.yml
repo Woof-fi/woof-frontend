@@ -1,0 +1,42 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: src-refactored/package-lock.json
+
+    - name: Install dependencies
+      run: cd src-refactored && npm ci
+
+    - name: Run type check
+      run: cd src-refactored && npm run type-check
+
+    - name: Run tests
+      run: cd src-refactored && npm test
+
+    - name: Run tests with coverage
+      run: cd src-refactored && npm run test:coverage
+      if: matrix.node-version == '20.x'
+
+    - name: Build
+      run: cd src-refactored && npm run build

@@ -8,12 +8,20 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "deploy": "npm run build && aws s3 sync dist/ s3://woof-app-frontend-2026/ --delete --exclude '.DS_Store'",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
+    "@vitest/ui": "^4.0.18",
+    "happy-dom": "^20.6.0",
+    "jsdom": "^28.0.0",
     "typescript": "^5.9.3",
-    "vite": "^6.0.6"
+    "vite": "^6.0.6",
+    "vitest": "^4.0.18"
   },
   "author": "Tommi Kivisaari",
   "license": "UNLICENSED"
