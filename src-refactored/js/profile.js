@@ -3,24 +3,30 @@
  * Handles dog profile display and interactions
  */
 
-import { getDog } from './api.js';
+import { getDog, getDogBySlug } from './api.js';
 import { showLoading, hideLoading, showError, showProfileSkeleton } from './ui.js';
 import { escapeHTML, formatDate } from './utils.js';
 
 /**
  * Initialize profile page
- * @param {string} dogId - Dog ID to load
+ * @param {string} slugOrId - Dog slug (e.g., 'nelli-1') or ID to load
  */
-export async function initProfile(dogId) {
-    const profileContainer = document.querySelector('.profile');
+export async function initProfile(slugOrId) {
+    // Support both SPA (.profile-container) and legacy (.profile) selectors
+    const profileContainer = document.querySelector('.profile-container') || document.querySelector('.profile');
     if (!profileContainer) return;
 
     try {
         showProfileSkeleton(profileContainer);
-        const dog = await getDog(dogId);
+
+        // Detect if parameter is a slug (contains dash) or ID (numeric)
+        const dog = slugOrId.includes('-')
+            ? await getDogBySlug(slugOrId)
+            : await getDog(slugOrId);
+
         renderProfile(dog, profileContainer);
     } catch (error) {
-        showError(profileContainer, 'Failed to load profile', () => initProfile(dogId));
+        showError(profileContainer, 'Failed to load profile', () => initProfile(slugOrId));
     }
 }
 

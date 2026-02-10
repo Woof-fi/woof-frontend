@@ -125,6 +125,26 @@ export async function getDog(id) {
 }
 
 /**
+ * Get dog by slug (e.g., "nelli-1")
+ * @param {string} slug - Dog slug
+ * @returns {Promise<object>} - Dog object
+ */
+export async function getDogBySlug(slug) {
+    try {
+        const data = await apiRequest(`/api/dogs/slug/${slug}`);
+        return data.dog;
+    } catch (error) {
+        console.error(`Failed to fetch dog ${slug}:`, error);
+        if (error.status === 404) {
+            showToast('Dog not found.', 'error');
+        } else {
+            showToast('Failed to load dog profile. Please try again.', 'error');
+        }
+        throw error;
+    }
+}
+
+/**
  * Create new dog
  * @param {object} dogData - Dog data
  * @returns {Promise<object>} - Created dog object
