@@ -7,7 +7,7 @@ import { createPost } from './posts.js';
 import { toggleBodyScroll, focusFirstElement } from './ui.js';
 import { trapFocus, showToast } from './utils.js';
 import { login, register, isAuthenticated, logout, getCurrentUser } from './auth.js';
-import { createDog, uploadImage } from './api.js';
+import { createDog, uploadImage, getMyDogs } from './api.js';
 import { updateProfileNavigation } from './navigation.js';
 
 /**
@@ -104,7 +104,7 @@ function initCreatePostModal() {
 /**
  * Open create post modal
  */
-function openCreatePostModal() {
+async function openCreatePostModal() {
     // Check authentication first
     if (!isAuthenticated()) {
         showToast('Please login to create a post', 'error');
@@ -113,7 +113,44 @@ function openCreatePostModal() {
     }
 
     const modal = document.getElementById('create-post-modal');
-    if (!modal) return;
+    const dogSelect = document.getElementById('post-dog-select');
+    if (!modal || !dogSelect) return;
+
+    // Fetch user's dogs and populate select
+    try {
+        const dogs = await getMyDogs();
+
+        if (dogs.length === 0) {
+            showToast('Please add a dog first', 'error');
+            // Open create dog modal instead
+            const createDogModal = document.getElementById('create-dog-modal');
+            if (createDogModal) {
+                createDogModal.style.display = 'block';
+            }
+            return;
+        }
+
+        // Populate dog select
+        dogSelect.innerHTML = '<option value="">Choose a dog...</option>';
+        dogs.forEach(dog => {
+            const option = document.createElement('option');
+            option.value = dog.id;
+            option.textContent = dog.name;
+            dogSelect.appendChild(option);
+        });
+
+        // Auto-select if only one dog
+        if (dogs.length === 1) {
+            dogSelect.value = dogs[0].id;
+            dogSelect.parentElement.style.display = 'none'; // Hide the select since there's only one option
+        } else {
+            dogSelect.parentElement.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Failed to load dogs:', error);
+        showToast('Failed to load your dogs', 'error');
+        return;
+    }
 
     modal.style.display = 'block';
     modal.setAttribute('aria-hidden', 'false');
