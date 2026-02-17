@@ -1,7 +1,7 @@
 # Woof - Claude Code Instructions
 
 **Last Updated:** 2026-02-17
-**Status:** Phase 0 complete. Phase 1 (Stabilize Testing) is next.
+**Status:** Phase 0 complete. Phase 1 (Refactor) is next.
 
 ## Project Overview
 
@@ -87,40 +87,31 @@ Validated all flows with Playwright MCP (Feb 17, 2026):
 - ✅ No console errors on any page (0 errors across all flows)
 - Found 5 new issues documented in Known Issues Tracker below
 
-## Phase 1: Stabilize Testing ← CURRENT PHASE
+## Phase 1: Refactor for Maintainability ← CURRENT PHASE
 
-### 1.1 - Frontend test infrastructure
-- Add tests for `api.js` (296 lines, 0% coverage) - mock fetch, verify headers, error handling
-- Add tests for `auth.js` login/register (async API flows, token storage)
-- Add tests for `router.js` (route matching, navigation)
-- Target: 60%+ coverage on core modules
+Write tests alongside each refactor - not retroactively.
 
-### 1.2 - Backend test gaps
-- Add tests for rate limiter behavior
-- Add cascade delete tests (admin auth tests already done ✅)
-
-### 1.3 - CI gate
-- Add coverage threshold to CI (fail below 50%, increase over time)
-
-## Phase 2: Refactor for Maintainability
-
-### 2.1 - Break up modals.js (716 lines)
+### 1.1 - Break up modals.js (716 lines)
 - Extract auth modal into `auth-modal.js`
 - Extract post creation modal into `create-post-modal.js`
+- Extract dog creation modal into `create-dog-modal.js`
 - Keep thin `modals.js` for shared open/close/overlay utilities
+- Write tests for each extracted module
 
-### 2.2 - Backend consistency
+### 1.2 - Backend consistency
 - Extract JWT generation into shared helper (duplicated in register + login)
 - Create ownership verification middleware (repeated in 3 controllers)
 - Standardize error response format
 - Replace all `console.log` with Pino logger
 - Move hardcoded values to config/env (S3 bucket, rate limits, JWT expiry)
+- Write tests for new shared helpers/middleware
 
-### 2.3 - Add feed pagination
+### 1.3 - Add feed pagination
 - Cursor-based pagination (currently hardcoded LIMIT 50)
 - Add index on `posts.created_at`
+- Write tests for pagination behavior
 
-## Phase 3: Resume Feature Development (only after 0-2 complete)
+## Phase 2: Resume Feature Development (only after 0-1 complete)
 
 - Following/friends feed (follows table already exists in DB)
 - Profile editing
@@ -141,14 +132,13 @@ Validated all flows with Playwright MCP (Feb 17, 2026):
 | ~~`initFeedTabs()` dead code~~ | `posts.js` | ✅ Done |
 | ~~Feed endpoint missing middleware~~ | `woof-backend/src/routes/posts.ts` | ✅ Done |
 | ~~Admin routes unprotected~~ | `woof-backend/src/routes/admin.ts` | ✅ Done |
-| Low test coverage (frontend) | `src-refactored/src/__tests__/` | Phase 1 |
-| `modals.js` is 716 lines | `src-refactored/js/modals.js` | Phase 2.1 |
-| Duplicated JWT generation | `woof-backend/src/controllers/authController.ts` | Phase 2.2 |
-| Duplicated ownership checks | `woof-backend/src/controllers/` | Phase 2.2 |
-| No feed pagination | `woof-backend/src/controllers/postController.ts` | Phase 2.3 |
-| Hardcoded S3 bucket name | `woof-backend/src/controllers/uploadController.ts` | Phase 2.2 |
-| Mixed console.log/Pino | `woof-backend/src/db/` | Phase 2.2 |
-| Missing DB indexes | `posts.created_at`, `follows` | Phase 2.3 |
+| `modals.js` is 716 lines | `src-refactored/js/modals.js` | Phase 1.1 |
+| Duplicated JWT generation | `woof-backend/src/controllers/authController.ts` | Phase 1.2 |
+| Duplicated ownership checks | `woof-backend/src/controllers/` | Phase 1.2 |
+| Hardcoded S3 bucket name | `woof-backend/src/controllers/uploadController.ts` | Phase 1.2 |
+| Mixed console.log/Pino | `woof-backend/src/db/` | Phase 1.2 |
+| No feed pagination | `woof-backend/src/controllers/postController.ts` | Phase 1.3 |
+| Missing DB indexes | `posts.created_at`, `follows` | Phase 1.3 |
 | ~~Dog slug `undefined` after creation~~ | `dogController.ts` response missing slug | ✅ Done |
 | ~~Relative image paths break on `/dog/*`~~ | `navigation.js`, `profile.js`, `posts.js` | ✅ Done |
 | ~~Post caption double-encodes HTML entities~~ | `posts.js` redundant `escapeHTML()` with DOM methods | ✅ Done |
