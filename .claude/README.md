@@ -1,296 +1,165 @@
-# Woof Frontend - Claude Code Instructions
+# Woof - Claude Code Instructions
 
-**Last Updated:** 2026-02-08
-**Status:** Closed Beta Ready
+**Last Updated:** 2026-02-17
+**Status:** Needs cleanup before further development
 
 ## Project Overview
 
-Woof frontend is a social media platform for pets (Instagram for animals).
-- **Frontend**: Vanilla JavaScript (ES6 modules) + HTML + CSS
-- **Backend API**: http://woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com
-- **Deployment**: AWS S3 Static Website
-- **Website**: http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com
+Woof is a dog-centric social network (Instagram for dogs). Dogs are the primary users.
 
-## Current State
+- **Frontend repo**: `/Users/tommikivisaari/Documents/Personal/Projects/Woof` (GitHub: Woof-fi/woof-frontend)
+- **Backend repo**: `/Users/tommikivisaari/Documents/Personal/Projects/woof-backend` (GitHub: Woof-fi/woof-backend)
+- **Frontend source**: `src-refactored/` is the active directory
+- **Tech stack**: Vite + vanilla JS/TS (frontend), Express + PostgreSQL (backend)
+- **Hosting**: S3 (frontend), Elastic Beanstalk (backend), both in eu-north-1
+- **Frontend URL**: http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com/
+- **Backend URL**: http://woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com
 
-### Production (AWS S3)
-- **Bucket**: woof-app-frontend-2026
-- **Region**: eu-north-1
-- **URL**: http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com
-- **Status**: ✅ Deployed and working
+## Development
 
-### Local Development
-- **Directory**: `/Users/tommikivisaari/Documents/Personal/Projects/Woof/src-refactored`
-- **Server**: `python3 -m http.server 8000`
-- **URL**: http://localhost:8000
-
-### Architecture
-**Modular JavaScript (9 files):**
-1. `config.js` - Configuration (API URL, feature flags, IDs)
-2. `utils.js` - Utilities (escapeHTML, validation, toast)
-3. `api.js` - API service layer (getAllDogs, getDog, etc.)
-4. `ui.js` - UI management (loading, error, empty states)
-5. `profile.js` - Profile page logic
-6. `posts.js` - Feed and posts logic
-7. `search.js` - Search functionality
-8. `modals.js` - Modal management
-9. `app.js` - Main initialization
-
-**HTML Pages:**
-- `index.html` - Feed (Following & For You)
-- `nelli.html` - Nelli's profile
-- `map.html` - Map placeholder
-- `store.html` - Descoped for Phase 1
-
-## Phase 1 Features (Closed Beta)
-
-**✅ Implemented:**
-- View feed of dog posts
-- View dog profiles (Nelli, Luna, Max)
-- Search functionality
-- Create post modal (frontend only)
-- Responsive design (mobile + desktop)
-- XSS prevention
-- Error handling and loading states
-
-**❌ Descoped:**
-- Store/Shopping cart
-- Google Maps (needs API key)
-- File uploads to S3
-- Authentication
-- Comments/messaging
-
-## Development Workflow
-
-### Local Development
 ```bash
+# Frontend dev server
 cd /Users/tommikivisaari/Documents/Personal/Projects/Woof/src-refactored
-python3 -m http.server 8000
-# Visit http://localhost:8000
+npm run dev
+
+# Backend dev server
+cd /Users/tommikivisaari/Documents/Personal/Projects/woof-backend
+npm run dev
+
+# Tests
+cd src-refactored && npm test          # Frontend (Vitest, 21 tests)
+cd woof-backend && npm test            # Backend (Jest, 81 tests)
+
+# Build
+cd src-refactored && npm run build     # Vite build to dist/
 ```
 
-### Deploy to S3
-```bash
-cd /Users/tommikivisaari/Documents/Personal/Projects/Woof/src-refactored
-aws s3 sync . s3://woof-app-frontend-2026/ \
-  --exclude ".DS_Store" \
-  --exclude "*.md" \
-  --exclude ".git*"
-```
+## MCP Tools Available
 
-### Test Production
-```bash
-curl http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com/
-```
+- **Playwright MCP**: Browser automation for visual validation. Use `browser_navigate`, `browser_snapshot`, `browser_click` etc. to verify the app works in a real browser. Configured in headed mode (visible Chrome window).
 
-### Update Configuration
-Edit `js/config.js`:
-```javascript
-export const CONFIG = {
-    API_BASE_URL: 'http://woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com',
-    FEATURES: {
-        GOOGLE_MAPS: false,
-        SHOPPING_CART: false, // Descoped for Phase 1
-        CREATE_POST: true,
-        SEARCH: true
-    }
-};
-```
+## Git Workflow
 
-## Common Tasks
-
-### Add New Feature
-1. Update `config.js` if needed (feature flags, IDs)
-2. Create/update module file (e.g., `posts.js`)
-3. Import in `app.js` if needed
-4. Test locally
-5. Deploy to S3
-
-### Fix Bug
-1. Reproduce locally
-2. Check browser console for errors
-3. Fix in appropriate module
-4. Test locally
-5. Deploy to S3
-
-### Update Content
-1. Edit HTML files for structure
-2. Edit `css/styles.css` for styling
-3. Edit `js/*` for behavior
-4. Deploy to S3
-
-## Troubleshooting
-
-### Images Not Loading
-**Problem:** Infinite errors in console about missing images
-**Fix:** Image paths must use `assets/images/` (relative, no leading slash)
-
-**Incorrect:**
-```javascript
-img.src = '/assets/images/dog.jpg'; // Infinite loop!
-```
-
-**Correct:**
-```javascript
-img.src = 'assets/images/dog_profile_pic.jpg';
-img.onerror = function() {
-    if (this.src !== 'assets/images/dog_profile_pic.jpg') {
-        this.src = 'assets/images/dog_profile_pic.jpg';
-    }
-};
-```
-
-### API Calls Failing
-**Problem:** Cannot fetch data from backend
-**Check:**
-1. Backend is running: `curl http://woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com/health`
-2. API_BASE_URL in `config.js` is correct
-3. CORS is enabled (backend allows all origins in dev)
-4. Browser console for network errors
-
-### JavaScript Not Loading
-**Problem:** Blank page or console errors
-**Check:**
-1. ES6 modules require `type="module"` in script tag
-2. All imports use `.js` extension
-3. Files are uploaded to S3
-4. Browser supports ES6 modules (all modern browsers)
-
-### Deploy Not Working
-**Problem:** S3 sync fails
-**Check:**
-1. AWS credentials configured: `aws sts get-caller-identity`
-2. Bucket exists: `aws s3 ls | grep woof`
-3. Permissions: Bucket policy allows public read
-4. Website hosting enabled: `aws s3api get-bucket-website --bucket woof-app-frontend-2026`
-
-## Security
-
-### XSS Prevention ✅
-- Use `escapeHTML()` for all user-generated content
-- Use DOM methods (createElement, textContent) instead of innerHTML
-- Validate file uploads (type, size)
-
-**Example:**
-```javascript
-import { escapeHTML } from './utils.js';
-
-const username = escapeHTML(dog.name); // Safe
-const caption = escapeHTML(post.caption); // Safe
-
-const element = document.createElement('p');
-element.textContent = username; // Safe - no HTML parsing
-```
-
-### File Upload Validation ✅
-```javascript
-import { isValidFileType, isValidFileSize } from './utils.js';
-
-if (!isValidFileType(file)) {
-    showToast('Invalid file type', 'error');
-    return;
-}
-
-if (!isValidFileSize(file, 5)) { // 5MB limit
-    showToast('File too large', 'error');
-    return;
-}
-```
-
-## Backend Integration
-
-### API Endpoints Used
-```javascript
-// Get all dogs
-GET /api/dogs
-Response: { dogs: [...], total: 3 }
-
-// Get single dog
-GET /api/dogs/:id
-Response: { dog: {...} }
-
-// Health check
-GET /health
-Response: { status: 'OK' }
-```
-
-### Data Models
-```javascript
-// Dog object from API
-{
-    id: '10000000-0000-0000-0000-000000000001',
-    name: 'Nelli',
-    breed: 'Miniature Schnauzer',
-    age: 5,
-    profilePhoto: '/dog_profile_pic.jpg',
-    location: 'Patola, Helsinki',
-    bio: '5 gold medals in being the best dog...'
-}
-```
-
-## Testing
-
-### Manual Testing Checklist
-- [ ] Feed loads with 3 dogs (Nelli, Luna, Max)
-- [ ] Profile page shows dog details
-- [ ] Search panel opens and closes
-- [ ] Create post modal opens and closes
-- [ ] Responsive design works on mobile
-- [ ] Images load without errors
-- [ ] Error states show properly
-- [ ] Loading states appear and disappear
-
-### Browser Console Checks
-```javascript
-// Should see no errors
-// Should see successful API calls
-// Network tab should show 200 responses
-```
-
-## Next Steps (Future Phases)
-
-### Phase 2: Full MVP
-- [ ] User authentication (login/signup)
-- [ ] Real file uploads to S3
-- [ ] Posts API integration
-- [ ] Comments functionality
-- [ ] Following/followers
-
-### Phase 3: Enhanced Features
-- [ ] Google Maps integration
-- [ ] Shopping cart (restore from descoped)
-- [ ] Health tracking
-- [ ] Events and meetups
-
-### Phase 4: Polish
-- [ ] CloudFront CDN
-- [ ] Custom domain
-- [ ] Service Worker (PWA)
-- [ ] Image optimization
-- [ ] Analytics
-
-## Resources
-
-### Documentation
-- [FRONTEND_AUDIT.md](../FRONTEND_AUDIT.md) - Security audit
-- [REFACTORING_COMPLETE.md](../REFACTORING_COMPLETE.md) - Refactoring summary
-- [TESTING_STRATEGY.md](../TESTING_STRATEGY.md) - Testing approach
-
-### AWS Resources
-- **S3 Bucket**: woof-app-frontend-2026
-- **Backend API**: woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com
-- **Region**: eu-north-1
-
-### Git Repository
-- **Location**: `/Users/tommikivisaari/Documents/Personal/Projects/Woof`
-- **Status**: Committed locally
-- **Branch**: main
-- **Remote**: Not configured (optional)
+- Always push to GitHub after commits. Both repos have remotes configured.
+- Frontend: `git push origin main` from `/Users/tommikivisaari/Documents/Personal/Projects/Woof`
+- Backend: `git push origin main` from `/Users/tommikivisaari/Documents/Personal/Projects/woof-backend`
+- CI runs on push (GitHub Actions: type-check, tests, build)
 
 ---
 
-**Quick Reference:**
-- Deploy: `aws s3 sync . s3://woof-app-frontend-2026/`
-- Test: `curl http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com/`
-- Dev: `python3 -m http.server 8000`
-- Backend API: http://woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com
+# CLEANUP PLAN (Execute in order)
+
+## Analysis Summary (2026-02-17)
+
+The codebase accumulated technical debt from rapid Phase 2 development. The core problem: every module exists in both `.js` and `.ts` versions that have diverged. The `.js` files are what actually runs, the `.ts` files are dead code. Other issues: dead code, abandoned directories, half-finished SPA conversion, removed middleware, low test coverage (27% frontend).
+
+## Phase 0: Clean Up Foundation (DO THIS FIRST)
+
+### 0.1 - Resolve .js/.ts file duality
+The following `.ts` files in `src-refactored/js/` have diverged `.js` counterparts. The `.js` versions are what actually runs. Delete the dead `.ts` files:
+- `js/app.ts` (dead - `app.js` is used, plus `app-spa.js` exists)
+- `js/auth.ts` (dead - redirects to `index.html` instead of `/`, missing fixes)
+- `js/api.ts` (dead - `.js` version is used)
+- `js/config.ts` (dead - `.js` version is used)
+- `js/utils.ts` (dead - thin wrapper, `.js` has full implementation)
+- `js/invite.ts` (dead - no `.js` counterpart imports it)
+Keep `types/api.ts` for type documentation.
+
+### 0.2 - Remove dead code and abandoned directories
+- Delete `woof-frontend/` directory (abandoned Vite template, never used)
+- Delete or archive `src/` directory (original static prototype, superseded by `src-refactored/`)
+- Delete `nelli.html`, `map.html`, `store.html` (SPA router handles these now)
+- Delete `index-old.html`
+- Remove `initFeedTabs()` from `posts.js` (feed tabs were removed but function remains)
+- Remove `app-spa.js` OR `app.js` (keep whichever is the real entry point - `app-spa.js` is the SPA version)
+- Remove unused utils: `generateSlug()` if unused
+- Clean `i18n.js` if it's just a stub
+- Update Vite config to single-page (remove multi-page entries for deleted HTML files)
+
+### 0.3 - Fix the build pipeline
+- Verify `npm run build` produces working `dist/` output
+- Deploy should use `dist/` not raw source sync to S3
+- Verify Vite dev server proxies API calls correctly
+
+### 0.4 - Fix backend middleware
+- Re-enable `optionalAuth` on feed endpoint in `woof-backend/src/routes/posts.ts`
+- Verify `JWT_SECRET` is set in Elastic Beanstalk environment
+- Remove or protect admin endpoints (add auth or delete if one-time use)
+
+### 0.5 - Validate with Playwright
+- Start dev servers
+- Use Playwright MCP to navigate the app
+- Verify: home feed loads, login/register works, post creation works, dog profiles work, logout works
+- Fix any issues found
+
+## Phase 1: Stabilize Testing
+
+### 1.1 - Frontend test infrastructure
+- Set up proper fetch mocking in `setup.ts` with configurable responses
+- Add tests for `api.js` (296 lines, 0% coverage) - mock fetch, verify headers, error handling
+- Add tests for `auth.js` login/register (async API flows, token storage)
+- Add tests for `router.js` (route matching, navigation)
+- Target: 60%+ coverage on core modules
+
+### 1.2 - Backend test gaps
+- Add tests for admin endpoint authorization
+- Add tests for rate limiter behavior
+- Add cascade delete tests
+
+### 1.3 - CI gate
+- Add coverage threshold to CI (fail below 50%, increase over time)
+
+## Phase 2: Refactor for Maintainability
+
+### 2.1 - Break up modals.js (746 lines)
+- Extract auth modal into `auth-modal.js`
+- Extract post creation modal into `create-post-modal.js`
+- Keep thin `modals.js` for shared open/close/overlay utilities
+
+### 2.2 - Backend consistency
+- Extract JWT generation into shared helper (duplicated in register + login)
+- Create ownership verification middleware (repeated in 3 controllers)
+- Standardize error response format
+- Replace all `console.log` with Pino logger
+- Move hardcoded values to config/env (S3 bucket, rate limits, JWT expiry)
+
+### 2.3 - Add feed pagination
+- Cursor-based pagination (currently hardcoded LIMIT 50)
+- Add index on `posts.created_at`
+
+## Phase 3: Resume Feature Development (only after 0-2 complete)
+
+- Following/friends feed (follows table already exists in DB)
+- Profile editing
+- Notifications
+- Search improvements
+- Each feature: write tests -> implement -> verify locally with Playwright -> deploy
+
+---
+
+## Known Issues Tracker
+
+| Issue | Location | Status |
+|-------|----------|--------|
+| Duplicate .js/.ts files | `src-refactored/js/` | Phase 0.1 |
+| Dead `woof-frontend/` dir | project root | Phase 0.2 |
+| Dead `src/` prototype dir | project root | Phase 0.2 |
+| Orphan HTML pages (nelli, map, store) | `src-refactored/` | Phase 0.2 |
+| `initFeedTabs()` dead code | `posts.js` | Phase 0.2 |
+| Feed endpoint missing middleware | `woof-backend/src/routes/posts.ts` | Phase 0.4 |
+| Admin routes unprotected | `woof-backend/src/routes/admin.ts` | Phase 0.4 |
+| 27% test coverage (frontend) | `src-refactored/src/__tests__/` | Phase 1 |
+| `modals.js` is 746 lines | `src-refactored/js/modals.js` | Phase 2.1 |
+| Duplicated JWT generation | `woof-backend/src/controllers/authController.ts` | Phase 2.2 |
+| Duplicated ownership checks | `woof-backend/src/controllers/` | Phase 2.2 |
+| No feed pagination | `woof-backend/src/controllers/postController.ts` | Phase 2.3 |
+| Hardcoded S3 bucket name | `woof-backend/src/controllers/uploadController.ts` | Phase 2.2 |
+| Mixed console.log/Pino | `woof-backend/src/db/` | Phase 2.2 |
+| Missing DB indexes | `posts.created_at`, `follows` | Phase 2.3 |
+
+## Security Notes
+
+- XSS: Use `escapeHTML()` from utils.js for all user content
+- File uploads: Validate type and size before upload
+- Auth: JWT-based, 7-day expiry, Bearer token header
+- NEVER commit `.env` files or secrets
