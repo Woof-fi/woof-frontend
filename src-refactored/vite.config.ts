@@ -18,10 +18,7 @@ export default defineConfig({
 
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        nelli: resolve(__dirname, 'nelli.html'),
-        map: resolve(__dirname, 'map.html'),
-        store: resolve(__dirname, 'store.html')
+        main: resolve(__dirname, 'index.html')
       },
       output: {
         // Content-based hashing for cache busting

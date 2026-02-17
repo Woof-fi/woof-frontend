@@ -125,6 +125,7 @@ async function loadSearchData() {
         const dogs = await getAllDogs();
         searchCache = dogs.map(dog => ({
             id: dog.id,
+            slug: dog.slug,
             name: dog.name,
             breed: dog.breed,
             profilePhoto: dog.profilePhoto
@@ -199,7 +200,8 @@ function renderSearchResults(results, container, query) {
         breedSpan.textContent = result.breed;
 
         const link = document.createElement('a');
-        link.href = `nelli.html?id=${result.id}`;
+        link.href = `/dog/${result.slug || result.id}`;
+        link.setAttribute('data-link', '');
         link.appendChild(img);
 
         const textContainer = document.createElement('div');
