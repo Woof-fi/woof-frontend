@@ -1,7 +1,7 @@
 # Woof - Claude Code Instructions
 
 **Last Updated:** 2026-02-17
-**Status:** Phase 0 complete. Phase 1 (Refactor) is next.
+**Status:** Phase 1.2 complete. Phase 1.3 (Pagination) is next.
 
 ## Project Overview
 
@@ -28,7 +28,7 @@ npm run dev
 
 # Tests
 cd src-refactored && npm test          # Frontend (Vitest, 36 tests)
-cd woof-backend && npm test            # Backend (Jest, 86 tests)
+cd woof-backend && npm test            # Backend (Jest, 89 tests)
 
 # Build
 cd src-refactored && npm run build     # Vite build to dist/
@@ -99,13 +99,15 @@ Write tests alongside each refactor - not retroactively.
 - `modals.js` reduced to 48-line coordinator with re-exports
 - Existing tests updated and passing (36/36)
 
-### 1.2 - Backend consistency
-- Extract JWT generation into shared helper (duplicated in register + login)
-- Create ownership verification middleware (repeated in 3 controllers)
-- Standardize error response format
-- Replace all `console.log` with Pino logger
-- Move hardcoded values to config/env (S3 bucket, rate limits, JWT expiry)
-- Write tests for new shared helpers/middleware
+### 1.2 - Backend consistency ✅
+- Extracted JWT generation into `utils/jwt.ts` (shared by register + login)
+- Created `middleware/ownership.ts` (replaces duplicated checks in updateDog/deleteDog)
+- Created `config/env.ts` (S3 bucket, region, presigned URL expiry, JWT secret/expiry)
+- Replaced all `console.log` with Pino logger in `db/connection.ts`
+- Updated `uploadController.ts` to use config instead of hardcoded S3 values
+- Updated `middleware/auth.ts` to use config + logger
+- Error response format reviewed: already consistent (`{ error: 'message' }`)
+- Added 3 JWT utility tests (89 total backend tests)
 
 ### 1.3 - Add feed pagination
 - Cursor-based pagination (currently hardcoded LIMIT 50)
@@ -134,10 +136,10 @@ Write tests alongside each refactor - not retroactively.
 | ~~Feed endpoint missing middleware~~ | `woof-backend/src/routes/posts.ts` | ✅ Done |
 | ~~Admin routes unprotected~~ | `woof-backend/src/routes/admin.ts` | ✅ Done |
 | ~~`modals.js` is 716 lines~~ | Split into 4 modules + coordinator | ✅ Done |
-| Duplicated JWT generation | `woof-backend/src/controllers/authController.ts` | Phase 1.2 |
-| Duplicated ownership checks | `woof-backend/src/controllers/` | Phase 1.2 |
-| Hardcoded S3 bucket name | `woof-backend/src/controllers/uploadController.ts` | Phase 1.2 |
-| Mixed console.log/Pino | `woof-backend/src/db/` | Phase 1.2 |
+| ~~Duplicated JWT generation~~ | Extracted to `utils/jwt.ts` | ✅ Done |
+| ~~Duplicated ownership checks~~ | Extracted to `middleware/ownership.ts` | ✅ Done |
+| ~~Hardcoded S3 bucket name~~ | Moved to `config/env.ts` | ✅ Done |
+| ~~Mixed console.log/Pino~~ | `db/connection.ts` now uses Pino | ✅ Done |
 | No feed pagination | `woof-backend/src/controllers/postController.ts` | Phase 1.3 |
 | Missing DB indexes | `posts.created_at`, `follows` | Phase 1.3 |
 | ~~Dog slug `undefined` after creation~~ | `dogController.ts` response missing slug | ✅ Done |
