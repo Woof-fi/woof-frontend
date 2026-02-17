@@ -1,7 +1,7 @@
 # Woof - Claude Code Instructions
 
 **Last Updated:** 2026-02-17
-**Status:** Phase 1 complete. Phase 2 (Features) is next.
+**Status:** Phase 2 in progress. Following feed, profile editing, UX fixes done.
 
 ## Project Overview
 
@@ -28,7 +28,7 @@ npm run dev
 
 # Tests
 cd src-refactored && npm test          # Frontend (Vitest, 36 tests)
-cd woof-backend && npm test            # Backend (Jest, 95 tests)
+cd woof-backend && npm test            # Backend (Jest, 108 tests)
 
 # Build
 cd src-refactored && npm run build     # Vite build to dist/
@@ -118,8 +118,18 @@ Write tests alongside each refactor - not retroactively.
 
 ## Phase 2: Resume Feature Development ← CURRENT PHASE
 
-- Following/friends feed (follows table already exists in DB)
-- Profile editing
+### 2.1 - Following feed, profile editing, UX fixes ✅
+- Follow/unfollow backend API (`followController.ts`, routes, 13 tests → 108 total backend tests)
+- Feed tabs (For You / Following) with tab switching in `HomeView.js`
+- `initFeed(type)` accepts feed type, `loadMorePosts()` uses `currentFeedType`
+- Profile editing: `edit-dog-modal.js` with pre-populated form, photo upload
+- Edit button on own profile, Follow/Unfollow button on other profiles
+- Follower/following counts on profile page via `GET /api/follows/status/:dogId`
+- Post avatars link to dog profile (backend returns `dogSlug` in feed, frontend wraps in `<a data-link>`)
+- Create Post validation: `createPost()` returns boolean, modal stays open on failure
+- UX fixes: clickable post avatars, create post error feedback
+
+### 2.2 - Next features
 - Notifications
 - Search improvements
 - Each feature: write tests -> implement -> verify locally with Playwright -> deploy
@@ -147,8 +157,8 @@ Write tests alongside each refactor - not retroactively.
 | ~~Dog slug `undefined` after creation~~ | `dogController.ts` response missing slug | ✅ Done |
 | ~~Relative image paths break on `/dog/*`~~ | `navigation.js`, `profile.js`, `posts.js` | ✅ Done |
 | ~~Post caption double-encodes HTML entities~~ | `posts.js` redundant `escapeHTML()` with DOM methods | ✅ Done |
-| Create Post silently fails without image | No validation message shown when submitting without an image | UX |
-| Clicking post author avatar doesn't navigate to profile | Post header images are not wrapped in links | UX |
+| ~~Create Post silently fails without image~~ | `createPost()` returns boolean, modal checks result | ✅ Done |
+| ~~Clicking post author avatar doesn't navigate to profile~~ | Avatar+username wrapped in `<a data-link>` | ✅ Done |
 
 ## Security Notes
 

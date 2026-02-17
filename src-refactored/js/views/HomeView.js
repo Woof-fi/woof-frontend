@@ -1,9 +1,9 @@
 /**
  * Home View
- * Main feed page
+ * Main feed page with For You / Following tabs
  */
 
-import { initFeed } from '../posts.js';
+import { initFeed, initFeedTabs } from '../posts.js';
 
 export class HomeView {
     constructor() {
@@ -17,6 +17,16 @@ export class HomeView {
     getHTML() {
         return `
             <main>
+                <!-- Feed Tabs -->
+                <div class="feed-tabs" role="tablist">
+                    <button class="feed-tab active" data-feed-type="public" role="tab" aria-selected="true">
+                        For You
+                    </button>
+                    <button class="feed-tab" data-feed-type="following" role="tab" aria-selected="false">
+                        Following
+                    </button>
+                </div>
+
                 <!-- Feed Section -->
                 <section class="feed">
                     <div id="feed-container" class="feed-container" role="feed" aria-label="Dog posts feed">
@@ -31,8 +41,10 @@ export class HomeView {
      * Called after view is rendered to DOM
      */
     async onMount() {
-        // Initialize feed functionality
-        initFeed();
+        // Set up tab switching
+        initFeedTabs();
+        // Load initial feed (public/For You)
+        initFeed('public');
     }
 
     /**

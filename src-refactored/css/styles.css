@@ -203,6 +203,41 @@ header {
     display: block;
 }
 
+/* Feed Tabs (For You / Following) */
+.feed-tabs {
+    display: flex;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    background: var(--color-background);
+    z-index: 10;
+}
+
+.feed-tab {
+    flex: 1;
+    padding: 14px 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.feed-tab:hover {
+    color: var(--color-text);
+}
+
+.feed-tab.active {
+    color: var(--color-text);
+    border-bottom-color: var(--color-text);
+}
+
 .post {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -223,6 +258,18 @@ header {
     height: 32px;
     border-radius: 50%;
     margin-right: 10px;
+}
+
+.post-author-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.post-author-link:hover strong {
+    text-decoration: underline;
 }
 
 .post-image {
@@ -783,10 +830,74 @@ header {
     margin-right: 20px;
 }
 
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
 .profile-info h3 {
     font-size: 24px;
     margin: 0;
     color: #333;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+}
+
+.edit-profile-btn {
+    padding: 6px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.edit-profile-btn:hover {
+    background: var(--color-background);
+}
+
+.follow-btn {
+    padding: 6px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-primary, #0095f6);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.follow-btn:hover {
+    background: #0081d6;
+}
+
+.follow-btn.following {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+.follow-btn.following:hover {
+    background: #ffeaea;
+    color: #e0245e;
+    border-color: #e0245e;
+}
+
+.follow-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .profile-info p {

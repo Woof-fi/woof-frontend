@@ -264,6 +264,49 @@ export async function getFeed(type = 'public', cursor = null, limit = 20) {
     }
 }
 
+// ============================================================================
+// FOLLOW API
+// ============================================================================
+
+/**
+ * Follow a dog
+ * @param {string} dogId - ID of the dog to follow
+ * @param {string} [followerDogId] - Optional: ID of your dog that should follow (defaults to first dog)
+ * @returns {Promise<object>} Follow relationship data
+ */
+export async function followDog(dogId, followerDogId = null) {
+    const body = { dog_id: dogId };
+    if (followerDogId) body.follower_dog_id = followerDogId;
+
+    return apiRequest('/api/follows', {
+        method: 'POST',
+        body: JSON.stringify(body)
+    });
+}
+
+/**
+ * Unfollow a dog
+ * @param {string} dogId - ID of the dog to unfollow
+ */
+export async function unfollowDog(dogId) {
+    return apiRequest(`/api/follows/${dogId}`, {
+        method: 'DELETE'
+    });
+}
+
+/**
+ * Get follow status for a dog
+ * @param {string} dogId - ID of the dog to check
+ * @returns {Promise<{isFollowing: boolean, followerCount: number, followingCount: number}>}
+ */
+export async function getFollowStatus(dogId) {
+    return apiRequest(`/api/follows/status/${dogId}`);
+}
+
+// ============================================================================
+// UPLOAD API
+// ============================================================================
+
 /**
  * Upload image to S3
  * @param {File} file - Image file to upload

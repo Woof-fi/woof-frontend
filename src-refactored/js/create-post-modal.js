@@ -62,7 +62,9 @@ export function initCreatePostModal() {
             const formData = new FormData(createPostForm);
 
             try {
-                await createPost(formData);
+                const success = await createPost(formData);
+                if (!success) return; // Validation failed — toast already shown, keep modal open
+
                 closeCreatePostModal();
                 createPostForm.reset();
 

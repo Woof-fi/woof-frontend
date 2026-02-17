@@ -177,6 +177,47 @@
         </div>
     </div>
 
+    <!-- Edit Dog Modal -->
+    <div id="edit-dog-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <button class="modal-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-dog-form">
+                    <input type="hidden" id="edit-dog-id">
+                    <div class="form-group">
+                        <label for="edit-dog-name">Name *</label>
+                        <input type="text" id="edit-dog-name" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-dog-breed">Breed *</label>
+                        <input type="text" id="edit-dog-breed" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-dog-age">Age *</label>
+                        <input type="number" id="edit-dog-age" required min="0" max="30" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-dog-location">Location</label>
+                        <input type="text" id="edit-dog-location" maxlength="100" placeholder="e.g., Helsinki, Finland">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-dog-bio">Bio</label>
+                        <textarea id="edit-dog-bio" rows="3" maxlength="500" placeholder="Tell us about your dog..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-dog-photo">Change Profile Photo</label>
+                        <input type="file" id="edit-dog-photo" accept="image/*">
+                        <div id="edit-dog-photo-preview" class="image-preview"></div>
+                    </div>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 

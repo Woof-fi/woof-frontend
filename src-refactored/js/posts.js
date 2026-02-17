@@ -13,13 +13,43 @@ import { openAuthModal } from './modals.js';
 let feedNextCursor = null;
 let feedLoading = false;
 let feedObserver = null;
+let currentFeedType = 'public';
+
+/**
+ * Initialize feed tabs (For You / Following)
+ * Sets up click handlers on .feed-tab buttons.
+ */
+export function initFeedTabs() {
+    const tabs = document.querySelectorAll('.feed-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const type = tab.dataset.feedType;
+            if (type === currentFeedType) return;
+
+            // Update active state
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+
+            // Load the selected feed
+            initFeed(type);
+        });
+    });
+}
 
 /**
  * Initialize feed
+ * @param {string} type - 'public' or 'following'
  */
-export async function initFeed() {
+export async function initFeed(type = 'public') {
     const feedContainer = document.querySelector('#feed-container') || document.querySelector('#following') || document.querySelector('.content');
     if (!feedContainer) return;
+
+    // Store current feed type for pagination
+    currentFeedType = type;
 
     // Reset pagination state
     feedNextCursor = null;
@@ -31,8 +61,7 @@ export async function initFeed() {
 
     try {
         showFeedSkeleton(feedContainer);
-        // Try to load real posts first
-        const result = await getFeed('public');
+        const result = await getFeed(type);
         if (result.posts && result.posts.length > 0) {
             renderPostFeed(result.posts, feedContainer);
             feedNextCursor = result.nextCursor;
@@ -40,6 +69,14 @@ export async function initFeed() {
             if (feedNextCursor) {
                 setupInfiniteScroll(feedContainer);
             }
+        } else if (type === 'following') {
+            feedContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-user-friends"></i>
+                    <p>No posts from dogs you follow yet.</p>
+                    <p>Follow some dogs to see their posts here!</p>
+                </div>
+            `;
         } else {
             // Fallback to showing dogs if no posts yet
             const dogs = await getAllDogs();
@@ -47,7 +84,7 @@ export async function initFeed() {
         }
     } catch (error) {
         console.error('Failed to load feed:', error);
-        showError(feedContainer, 'Failed to load feed', () => initFeed());
+        showError(feedContainer, 'Failed to load feed', () => initFeed(type));
     }
 }
 
@@ -91,7 +128,7 @@ async function loadMorePosts() {
     }
 
     try {
-        const result = await getFeed('public', feedNextCursor);
+        const result = await getFeed(currentFeedType, feedNextCursor);
 
         if (result.posts && result.posts.length > 0) {
             // Insert posts before the sentinel
@@ -187,8 +224,19 @@ function createPostElement(postData) {
     const usernameStrong = document.createElement('strong');
     usernameStrong.textContent = username;
 
-    postHeader.appendChild(profileImg);
-    postHeader.appendChild(usernameStrong);
+    // Wrap avatar + username in a link to the dog's profile
+    if (postData.dogSlug) {
+        const profileLink = document.createElement('a');
+        profileLink.href = `/dog/${postData.dogSlug}`;
+        profileLink.setAttribute('data-link', '');
+        profileLink.className = 'post-author-link';
+        profileLink.appendChild(profileImg);
+        profileLink.appendChild(usernameStrong);
+        postHeader.appendChild(profileLink);
+    } else {
+        postHeader.appendChild(profileImg);
+        postHeader.appendChild(usernameStrong);
+    }
 
     if (location) {
         const locationSpan = document.createElement('span');
@@ -278,7 +326,8 @@ function appendPosts(posts, container, beforeElement = null) {
             username: post.dogName || 'Unknown Dog',
             imageUrl: post.imageUrl,
             caption: post.caption,
-            location: post.dogLocation
+            location: post.dogLocation,
+            dogSlug: post.dogSlug
         });
         if (beforeElement) {
             container.insertBefore(postElement, beforeElement);
@@ -331,7 +380,7 @@ function bindLikeButtons() {
 /**
  * Handle post creation
  * @param {FormData} formData - Form data with image and caption
- * @returns {Promise<void>}
+ * @returns {Promise<boolean>} true if post was created, false on validation failure
  */
 export async function createPost(formData) {
     const imageFile = formData.get('post-image');
@@ -341,29 +390,29 @@ export async function createPost(formData) {
     // Check authentication
     if (!isAuthenticated()) {
         showToast('Please login to create a post', 'error');
-        return;
+        return false;
     }
 
     // Validate dog selection
     if (!dogId) {
         showToast('Please select a dog', 'error');
-        return;
+        return false;
     }
 
     // Validate image file
-    if (!imageFile) {
+    if (!imageFile || !imageFile.size) {
         showToast('Please select an image', 'error');
-        return;
+        return false;
     }
 
     if (!isValidFileType(imageFile)) {
         showToast('Please upload a valid image file (JPG, PNG, GIF, WebP)', 'error');
-        return;
+        return false;
     }
 
     if (!isValidFileSize(imageFile, 5)) {
         showToast('Image size must be less than 5MB', 'error');
-        return;
+        return false;
     }
 
     try {
@@ -380,8 +429,10 @@ export async function createPost(formData) {
 
         // Reload the feed to show the new post
         await initFeed();
+        return true;
     } catch (error) {
         console.error('Failed to create post:', error);
-        // Error message already shown by API functions
+        showToast('Failed to create post. Please try again.', 'error');
+        return false;
     }
 }

@@ -1,11 +1,16 @@
 /**
  * Profile Page Functionality
- * Handles dog profile display and interactions
+ * Handles dog profile display, edit button, and follow button
  */
 
-import { getDog, getDogBySlug } from './api.js';
+import { getDog, getDogBySlug, getFollowStatus, followDog, unfollowDog } from './api.js';
 import { showLoading, hideLoading, showError, showProfileSkeleton } from './ui.js';
-import { escapeHTML, formatDate } from './utils.js';
+import { escapeHTML, formatDate, showToast } from './utils.js';
+import { isAuthenticated } from './auth.js';
+import { openEditDogModal } from './edit-dog-modal.js';
+
+// Store current dog data for edit modal
+let currentDog = null;
 
 /**
  * Initialize profile page
@@ -24,7 +29,8 @@ export async function initProfile(slugOrId) {
             ? await getDogBySlug(slugOrId)
             : await getDog(slugOrId);
 
-        renderProfile(dog, profileContainer);
+        currentDog = dog;
+        renderProfile(dog, profileContainer, slugOrId);
     } catch (error) {
         showError(profileContainer, 'Failed to load profile', () => initProfile(slugOrId));
     }
@@ -34,8 +40,9 @@ export async function initProfile(slugOrId) {
  * Render dog profile
  * @param {object} dog - Dog data
  * @param {HTMLElement} container - Container element
+ * @param {string} slugOrId - Current slug/ID for reloading
  */
-function renderProfile(dog, container) {
+function renderProfile(dog, container, slugOrId) {
     // Security: Escape all user-generated content
     const name = escapeHTML(dog.name);
     const breed = escapeHTML(dog.breed);
@@ -47,16 +54,44 @@ function renderProfile(dog, container) {
         ? `/assets/images${dog.profilePhoto}`
         : dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
 
+    // Build action button HTML
+    let actionButtonHtml = '';
+    if (dog.isOwner) {
+        actionButtonHtml = `
+            <button class="edit-profile-btn" id="edit-profile-btn">
+                <i class="fas fa-edit"></i> Edit Profile
+            </button>
+        `;
+    } else {
+        // Follow button placeholder — state set after render
+        actionButtonHtml = `
+            <button class="follow-btn" id="follow-btn" data-dog-id="${dog.id}" disabled>
+                <i class="fas fa-user-plus"></i> Follow
+            </button>
+        `;
+    }
+
+    // Follower/following counts placeholder
+    const statsHtml = `
+        <div class="profile-stats" id="profile-stats">
+            <span><strong id="follower-count">-</strong> followers</span>
+            <span><strong id="following-count">-</strong> following</span>
+        </div>
+    `;
+
     container.innerHTML = `
         <section class="profile">
-            <h2>${name}'s Profile</h2>
             <div class="profile-header">
                 <img src="${profilePhoto}"
                      alt="${name}'s Profile Picture"
                      class="profile-pic-large"
                      onerror="if(this.src!=='/assets/images/dog_profile_pic.jpg') this.src='/assets/images/dog_profile_pic.jpg'">
                 <div class="profile-info">
-                    <h3>${name}</h3>
+                    <div class="profile-name-row">
+                        <h3>${name}</h3>
+                        ${actionButtonHtml}
+                    </div>
+                    ${statsHtml}
                     <p><strong>Breed:</strong> ${breed}</p>
                     <p><strong>Age:</strong> ${dog.age} years</p>
                     <p><strong>Location:</strong> ${location}</p>
@@ -68,6 +103,95 @@ function renderProfile(dog, container) {
             </div>
         </section>
     `;
+
+    // Wire up edit button
+    if (dog.isOwner) {
+        const editBtn = document.getElementById('edit-profile-btn');
+        if (editBtn) {
+            editBtn.addEventListener('click', () => {
+                openEditDogModal(dog, () => initProfile(slugOrId));
+            });
+        }
+    }
+
+    // Wire up follow button and load follow status
+    if (!dog.isOwner && dog.id) {
+        loadFollowStatus(dog.id);
+    }
+}
+
+/**
+ * Load follow status and wire up follow/unfollow button
+ * @param {string} dogId - Dog ID
+ */
+async function loadFollowStatus(dogId) {
+    const followBtn = document.getElementById('follow-btn');
+    const followerCountEl = document.getElementById('follower-count');
+    const followingCountEl = document.getElementById('following-count');
+
+    try {
+        const status = await getFollowStatus(dogId);
+
+        // Update counts
+        if (followerCountEl) followerCountEl.textContent = status.followerCount;
+        if (followingCountEl) followingCountEl.textContent = status.followingCount;
+
+        // Update button state
+        if (followBtn) {
+            followBtn.disabled = false;
+            updateFollowButton(followBtn, status.isFollowing);
+
+            followBtn.addEventListener('click', async () => {
+                if (!isAuthenticated()) {
+                    showToast('Please login to follow dogs', 'error');
+                    return;
+                }
+
+                followBtn.disabled = true;
+                const wasFollowing = followBtn.classList.contains('following');
+
+                try {
+                    if (wasFollowing) {
+                        await unfollowDog(dogId);
+                        updateFollowButton(followBtn, false);
+                        if (followerCountEl) {
+                            followerCountEl.textContent = Math.max(0, parseInt(followerCountEl.textContent) - 1);
+                        }
+                    } else {
+                        await followDog(dogId);
+                        updateFollowButton(followBtn, true);
+                        if (followerCountEl) {
+                            followerCountEl.textContent = parseInt(followerCountEl.textContent) + 1;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Follow action failed:', error);
+                    showToast('Failed to update follow status', 'error');
+                } finally {
+                    followBtn.disabled = false;
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Failed to load follow status:', error);
+        // Still enable button as fallback
+        if (followBtn) followBtn.disabled = false;
+    }
+}
+
+/**
+ * Update follow button appearance
+ * @param {HTMLElement} btn - Button element
+ * @param {boolean} isFollowing - Whether currently following
+ */
+function updateFollowButton(btn, isFollowing) {
+    if (isFollowing) {
+        btn.classList.add('following');
+        btn.innerHTML = '<i class="fas fa-user-check"></i> Following';
+    } else {
+        btn.classList.remove('following');
+        btn.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+    }
 }
 
 /**
@@ -148,8 +272,7 @@ export async function loadHealthRecords(dogId) {
     const healthContainer = document.querySelector('#health');
     if (!healthContainer) return;
 
-    // Check if user is authenticated (TODO: implement proper auth check)
-    const isOwner = false; // Will be true once we have authentication
+    const isOwner = currentDog && currentDog.isOwner;
 
     if (!isOwner) {
         healthContainer.innerHTML = `

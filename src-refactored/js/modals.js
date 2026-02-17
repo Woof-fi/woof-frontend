@@ -8,6 +8,7 @@ import { initAuthModal, openAuthModal, updateUIForAuth, closeAuthModal } from '.
 import { initCreatePostModal, closeCreatePostModal } from './create-post-modal.js';
 import { initCreateDogModal, closeCreateDogModal } from './create-dog-modal.js';
 import { initCartModal, closeCartDrawer } from './cart-modal.js';
+import { initEditDogModal, closeEditDogModal } from './edit-dog-modal.js';
 import { toggleBodyScroll } from './ui.js';
 
 // Re-export for existing consumers (posts.js, modals.test.ts)
@@ -19,6 +20,7 @@ export { openAuthModal, updateUIForAuth };
 export function initModals() {
     initCreatePostModal();
     initCreateDogModal();
+    initEditDogModal();
     initCartModal();
     initAuthModal();
     updateUIForAuth();
@@ -37,6 +39,7 @@ export function initModals() {
 function closeAllModals() {
     closeCreatePostModal();
     closeCreateDogModal();
+    closeEditDogModal();
     closeCartDrawer();
     closeAuthModal();
 
