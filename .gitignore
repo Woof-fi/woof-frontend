@@ -50,3 +50,19 @@ coverage/
 # *.mp4
 # *.mov
 # *.avi
+
+# Session documentation (keep only active docs in git)
+# Archive these instead of committing
+SESSION_NOTES.md
+*_PLAN.md
+*_COMPLETE.md
+*_STATUS.md
+*_LESSONS.md
+*_ISSUES.md
+*_PROGRESS.md
+*_SUMMARY.md
+*_AUDIT.md
+*_IMPROVEMENTS.md
+# Exceptions: Keep README.md, CURRENT_STATE.md, and core docs
+!README.md
+!.claude/README.md
