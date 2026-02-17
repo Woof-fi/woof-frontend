@@ -28,7 +28,7 @@ npm run dev
 
 # Tests
 cd src-refactored && npm test          # Frontend (Vitest, 36 tests)
-cd woof-backend && npm test            # Backend (Jest, 108 tests)
+cd woof-backend && npm test            # Backend (Jest, 120 tests)
 
 # Build
 cd src-refactored && npm run build     # Vite build to dist/
@@ -129,7 +129,15 @@ Write tests alongside each refactor - not retroactively.
 - Create Post validation: `createPost()` returns boolean, modal stays open on failure
 - UX fixes: clickable post avatars, create post error feedback
 
-### 2.2 - Next features
+### 2.2 - Likes API ✅
+- Like/unlike backend API (`likeController.ts`, routes, 12 tests → 120 total backend tests)
+- Feed response includes `likeCount` and `likedByUser` per post
+- Frontend like button calls API with optimistic UI updates
+- Like count displayed next to heart icon
+- Fixed EB deployment: `.ebignore` includes `dist/`, build locally before `eb deploy`
+
+### 2.3 - Next features
+- Comments
 - Notifications
 - Search improvements
 - Each feature: write tests -> implement -> verify locally with Playwright -> deploy

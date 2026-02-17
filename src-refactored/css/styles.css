@@ -308,6 +308,18 @@ header {
     color: var(--color-like);
 }
 
+.post-actions .like-count {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+.post-actions .like-button {
+    transition: transform 0.2s ease;
+}
+
 .post-caption {
     padding: 0 10px 10px;
 }

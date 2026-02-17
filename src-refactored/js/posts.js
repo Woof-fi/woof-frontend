@@ -3,7 +3,7 @@
  * Handles post creation, display, and interactions
  */
 
-import { getAllDogs, getFeed, uploadImage, createPost as createPostAPI } from './api.js';
+import { getAllDogs, getFeed, uploadImage, createPost as createPostAPI, likePost, unlikePost } from './api.js';
 import { escapeHTML, generateUsername, isValidFileType, isValidFileSize, showToast } from './utils.js';
 import { showLoading, hideLoading, showError, showFeedSkeleton, animateIn } from './ui.js';
 import { getCurrentUser, isAuthenticated } from './auth.js';
@@ -260,12 +260,29 @@ function createPostElement(postData) {
     };
     postImage.appendChild(img);
 
+    const postId = postData.id;
+    const likeCount = postData.likeCount || 0;
+    const likedByUser = postData.likedByUser || false;
+
     const postActions = document.createElement('div');
     postActions.className = 'post-actions';
-    postActions.innerHTML = `
-        <button class="like-button" aria-label="Like post">
-            <i class="far fa-heart"></i>
-        </button>
+
+    const likeButton = document.createElement('button');
+    likeButton.className = 'like-button' + (likedByUser ? ' liked' : '');
+    likeButton.setAttribute('aria-label', likedByUser ? 'Unlike post' : 'Like post');
+    if (postId) likeButton.dataset.postId = postId;
+
+    const likeIcon = document.createElement('i');
+    likeIcon.className = likedByUser ? 'fas fa-heart' : 'far fa-heart';
+    likeButton.appendChild(likeIcon);
+
+    const likeCountSpan = document.createElement('span');
+    likeCountSpan.className = 'like-count';
+    likeCountSpan.textContent = likeCount > 0 ? String(likeCount) : '';
+
+    postActions.appendChild(likeButton);
+    postActions.appendChild(likeCountSpan);
+    postActions.innerHTML += `
         <button aria-label="Comment on post">
             <i class="far fa-comment"></i>
         </button>
@@ -322,12 +339,15 @@ function renderPostFeed(posts, container) {
 function appendPosts(posts, container, beforeElement = null) {
     posts.forEach(post => {
         const postElement = createPostElement({
+            id: post.id,
             profilePic: post.dogPhoto || '/assets/images/dog_profile_pic.jpg',
             username: post.dogName || 'Unknown Dog',
             imageUrl: post.imageUrl,
             caption: post.caption,
             location: post.dogLocation,
-            dogSlug: post.dogSlug
+            dogSlug: post.dogSlug,
+            likeCount: post.likeCount,
+            likedByUser: post.likedByUser
         });
         if (beforeElement) {
             container.insertBefore(postElement, beforeElement);
@@ -346,12 +366,11 @@ function appendPosts(posts, container, beforeElement = null) {
  */
 function bindLikeButtons() {
     document.querySelectorAll('.like-button').forEach(button => {
-        // Remove existing listeners
-        const newButton = button.cloneNode(true);
-        button.parentNode.replaceChild(newButton, button);
+        // Skip if already bound
+        if (button.dataset.bound) return;
+        button.dataset.bound = 'true';
 
-        // Add new listener
-        newButton.addEventListener('click', function() {
+        button.addEventListener('click', async function() {
             // Check authentication
             if (!isAuthenticated()) {
                 showToast('Please login to like posts', 'error');
@@ -359,19 +378,47 @@ function bindLikeButtons() {
                 return;
             }
 
-            this.classList.toggle('liked');
+            const postId = this.dataset.postId;
+            if (!postId) return;
+
+            const isLiked = this.classList.contains('liked');
             const icon = this.querySelector('i');
+            const countSpan = this.parentElement.querySelector('.like-count');
+
+            // Optimistic UI update
+            this.classList.toggle('liked');
             if (icon) {
                 icon.classList.toggle('far');
                 icon.classList.toggle('fas');
+            }
 
-                // Animate
-                if (this.classList.contains('liked')) {
-                    this.style.transform = 'scale(1.2)';
-                    setTimeout(() => {
-                        this.style.transform = 'scale(1)';
-                    }, 200);
+            // Animate on like
+            if (!isLiked) {
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            }
+
+            try {
+                let result;
+                if (isLiked) {
+                    result = await unlikePost(postId);
+                } else {
+                    result = await likePost(postId);
                 }
+                // Update count from server
+                if (countSpan && result.likeCount !== undefined) {
+                    countSpan.textContent = result.likeCount > 0 ? String(result.likeCount) : '';
+                }
+            } catch (error) {
+                // Revert optimistic update on failure
+                this.classList.toggle('liked');
+                if (icon) {
+                    icon.classList.toggle('far');
+                    icon.classList.toggle('fas');
+                }
+                console.error('Like/unlike failed:', error);
             }
         });
     });

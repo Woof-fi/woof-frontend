@@ -304,6 +304,33 @@ export async function getFollowStatus(dogId) {
 }
 
 // ============================================================================
+// LIKES API
+// ============================================================================
+
+/**
+ * Like a post
+ * @param {string} postId - ID of the post to like
+ * @returns {Promise<{like: object, likeCount: number}>}
+ */
+export async function likePost(postId) {
+    return apiRequest('/api/likes', {
+        method: 'POST',
+        body: JSON.stringify({ post_id: postId })
+    });
+}
+
+/**
+ * Unlike a post
+ * @param {string} postId - ID of the post to unlike
+ * @returns {Promise<{likeCount: number}>}
+ */
+export async function unlikePost(postId) {
+    return apiRequest(`/api/likes/${postId}`, {
+        method: 'DELETE'
+    });
+}
+
+// ============================================================================
 // UPLOAD API
 // ============================================================================
 
