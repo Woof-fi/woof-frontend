@@ -3,7 +3,7 @@
  * Main feed page
  */
 
-import { initFeed, initFeedTabs } from '../posts.js';
+import { initFeed } from '../posts.js';
 
 export class HomeView {
     constructor() {
