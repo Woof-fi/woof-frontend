@@ -91,12 +91,13 @@ Validated all flows with Playwright MCP (Feb 17, 2026):
 
 Write tests alongside each refactor - not retroactively.
 
-### 1.1 - Break up modals.js (716 lines)
-- Extract auth modal into `auth-modal.js`
-- Extract post creation modal into `create-post-modal.js`
-- Extract dog creation modal into `create-dog-modal.js`
-- Keep thin `modals.js` for shared open/close/overlay utilities
-- Write tests for each extracted module
+### 1.1 - Break up modals.js (716 lines) ✅
+- Extracted `auth-modal.js` (auth login/register/logout UI)
+- Extracted `create-post-modal.js` (post creation form)
+- Extracted `create-dog-modal.js` (dog profile creation form)
+- Extracted `cart-modal.js` (shopping cart drawer)
+- `modals.js` reduced to 48-line coordinator with re-exports
+- Existing tests updated and passing (36/36)
 
 ### 1.2 - Backend consistency
 - Extract JWT generation into shared helper (duplicated in register + login)
@@ -132,7 +133,7 @@ Write tests alongside each refactor - not retroactively.
 | ~~`initFeedTabs()` dead code~~ | `posts.js` | ✅ Done |
 | ~~Feed endpoint missing middleware~~ | `woof-backend/src/routes/posts.ts` | ✅ Done |
 | ~~Admin routes unprotected~~ | `woof-backend/src/routes/admin.ts` | ✅ Done |
-| `modals.js` is 716 lines | `src-refactored/js/modals.js` | Phase 1.1 |
+| ~~`modals.js` is 716 lines~~ | Split into 4 modules + coordinator | ✅ Done |
 | Duplicated JWT generation | `woof-backend/src/controllers/authController.ts` | Phase 1.2 |
 | Duplicated ownership checks | `woof-backend/src/controllers/` | Phase 1.2 |
 | Hardcoded S3 bucket name | `woof-backend/src/controllers/uploadController.ts` | Phase 1.2 |

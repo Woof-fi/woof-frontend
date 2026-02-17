@@ -1,6 +1,6 @@
 /**
- * Modals Module Tests
- * Tests for updateUIForAuth after nelli.html removal
+ * Auth Modal Tests
+ * Tests for updateUIForAuth and auth modal behavior
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -14,18 +14,8 @@ vi.mock('../../js/auth.js', () => ({
   getCurrentUser: vi.fn(),
 }));
 
-vi.mock('../../js/api.js', () => ({
-  createDog: vi.fn(),
-  uploadImage: vi.fn(),
-  getMyDogs: vi.fn().mockResolvedValue([]),
-}));
-
 vi.mock('../../js/navigation.js', () => ({
   updateProfileNavigation: vi.fn().mockResolvedValue(undefined),
-}));
-
-vi.mock('../../js/posts.js', () => ({
-  createPost: vi.fn(),
 }));
 
 vi.mock('../../js/ui.js', () => ({
@@ -33,12 +23,7 @@ vi.mock('../../js/ui.js', () => ({
   focusFirstElement: vi.fn(),
 }));
 
-vi.mock('../../js/utils.js', () => ({
-  trapFocus: vi.fn(),
-  showToast: vi.fn(),
-}));
-
-import { updateUIForAuth } from '../../js/modals.js';
+import { updateUIForAuth } from '../../js/auth-modal.js';
 import { isAuthenticated } from '../../js/auth.js';
 import { updateProfileNavigation } from '../../js/navigation.js';
 
@@ -111,7 +96,7 @@ describe('updateUIForAuth', () => {
     vi.mocked(isAuthenticated).mockReturnValue(false);
     await updateUIForAuth();
 
-    // The nelli.html link should NOT be hidden (modals.js doesn't know about it anymore)
+    // The nelli.html link should NOT be hidden (auth-modal.js doesn't know about it)
     expect(nelliLink.style.display).toBe('');
   });
 });
