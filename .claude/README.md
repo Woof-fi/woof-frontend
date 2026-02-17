@@ -1,7 +1,7 @@
 # Woof - Claude Code Instructions
 
 **Last Updated:** 2026-02-17
-**Status:** Phase 1.2 complete. Phase 1.3 (Pagination) is next.
+**Status:** Phase 1 complete. Phase 2 (Features) is next.
 
 ## Project Overview
 
@@ -28,7 +28,7 @@ npm run dev
 
 # Tests
 cd src-refactored && npm test          # Frontend (Vitest, 36 tests)
-cd woof-backend && npm test            # Backend (Jest, 89 tests)
+cd woof-backend && npm test            # Backend (Jest, 95 tests)
 
 # Build
 cd src-refactored && npm run build     # Vite build to dist/
@@ -87,7 +87,7 @@ Validated all flows with Playwright MCP (Feb 17, 2026):
 - ✅ No console errors on any page (0 errors across all flows)
 - Found 5 new issues documented in Known Issues Tracker below
 
-## Phase 1: Refactor for Maintainability ← CURRENT PHASE
+## Phase 1: Refactor for Maintainability - COMPLETE ✅
 
 Write tests alongside each refactor - not retroactively.
 
@@ -109,12 +109,14 @@ Write tests alongside each refactor - not retroactively.
 - Error response format reviewed: already consistent (`{ error: 'message' }`)
 - Added 3 JWT utility tests (89 total backend tests)
 
-### 1.3 - Add feed pagination
-- Cursor-based pagination (currently hardcoded LIMIT 50)
-- Add index on `posts.created_at`
-- Write tests for pagination behavior
+### 1.3 - Add feed pagination ✅
+- Cursor-based pagination on `GET /api/posts/feed` (query params: `cursor`, `limit`)
+- Default page size 20, max 50; response includes `nextCursor` for next page
+- Frontend uses IntersectionObserver for infinite scroll (Instagram-style)
+- DB indexes on `posts.created_at` and `follows` already existed (migration 003)
+- Added 6 pagination tests (95 total backend tests)
 
-## Phase 2: Resume Feature Development (only after 0-1 complete)
+## Phase 2: Resume Feature Development ← CURRENT PHASE
 
 - Following/friends feed (follows table already exists in DB)
 - Profile editing
@@ -140,8 +142,8 @@ Write tests alongside each refactor - not retroactively.
 | ~~Duplicated ownership checks~~ | Extracted to `middleware/ownership.ts` | ✅ Done |
 | ~~Hardcoded S3 bucket name~~ | Moved to `config/env.ts` | ✅ Done |
 | ~~Mixed console.log/Pino~~ | `db/connection.ts` now uses Pino | ✅ Done |
-| No feed pagination | `woof-backend/src/controllers/postController.ts` | Phase 1.3 |
-| Missing DB indexes | `posts.created_at`, `follows` | Phase 1.3 |
+| ~~No feed pagination~~ | Cursor-based with infinite scroll | ✅ Done |
+| ~~Missing DB indexes~~ | Already existed in migration 003 | ✅ Done |
 | ~~Dog slug `undefined` after creation~~ | `dogController.ts` response missing slug | ✅ Done |
 | ~~Relative image paths break on `/dog/*`~~ | `navigation.js`, `profile.js`, `posts.js` | ✅ Done |
 | ~~Post caption double-encodes HTML entities~~ | `posts.js` redundant `escapeHTML()` with DOM methods | ✅ Done |

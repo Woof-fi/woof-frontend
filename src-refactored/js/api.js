@@ -240,14 +240,23 @@ export async function createPost(dogId, imageUrl, caption) {
 }
 
 /**
- * Get feed (public or following)
+ * Get feed (public or following) with cursor-based pagination
  * @param {string} type - 'public' or 'following'
- * @returns {Promise<object[]>} - Array of post objects
+ * @param {string|null} cursor - ISO timestamp cursor for next page (null for first page)
+ * @param {number} limit - Number of posts per page (default 20, max 50)
+ * @returns {Promise<{posts: object[], nextCursor: string|null}>}
  */
-export async function getFeed(type = 'public') {
+export async function getFeed(type = 'public', cursor = null, limit = 20) {
     try {
-        const data = await apiRequest(`/api/posts/feed?type=${type}`);
-        return data.posts || [];
+        let url = `/api/posts/feed?type=${type}&limit=${limit}`;
+        if (cursor) {
+            url += `&cursor=${encodeURIComponent(cursor)}`;
+        }
+        const data = await apiRequest(url);
+        return {
+            posts: data.posts || [],
+            nextCursor: data.nextCursor || null
+        };
     } catch (error) {
         console.error('Failed to fetch feed:', error);
         showToast('Failed to load feed. Please try again.', 'error');

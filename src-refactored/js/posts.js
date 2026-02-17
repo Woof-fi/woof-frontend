@@ -9,6 +9,11 @@ import { showLoading, hideLoading, showError, showFeedSkeleton, animateIn } from
 import { getCurrentUser, isAuthenticated } from './auth.js';
 import { openAuthModal } from './modals.js';
 
+// Pagination state
+let feedNextCursor = null;
+let feedLoading = false;
+let feedObserver = null;
+
 /**
  * Initialize feed
  */
@@ -16,12 +21,25 @@ export async function initFeed() {
     const feedContainer = document.querySelector('#feed-container') || document.querySelector('#following') || document.querySelector('.content');
     if (!feedContainer) return;
 
+    // Reset pagination state
+    feedNextCursor = null;
+    feedLoading = false;
+    if (feedObserver) {
+        feedObserver.disconnect();
+        feedObserver = null;
+    }
+
     try {
         showFeedSkeleton(feedContainer);
         // Try to load real posts first
-        const posts = await getFeed('public');
-        if (posts && posts.length > 0) {
-            renderPostFeed(posts, feedContainer);
+        const result = await getFeed('public');
+        if (result.posts && result.posts.length > 0) {
+            renderPostFeed(result.posts, feedContainer);
+            feedNextCursor = result.nextCursor;
+
+            if (feedNextCursor) {
+                setupInfiniteScroll(feedContainer);
+            }
         } else {
             // Fallback to showing dogs if no posts yet
             const dogs = await getAllDogs();
@@ -30,6 +48,72 @@ export async function initFeed() {
     } catch (error) {
         console.error('Failed to load feed:', error);
         showError(feedContainer, 'Failed to load feed', () => initFeed());
+    }
+}
+
+/**
+ * Set up infinite scroll using IntersectionObserver.
+ * Appends a sentinel element that triggers loading when scrolled into view.
+ */
+function setupInfiniteScroll(container) {
+    // Remove any existing sentinel
+    const existing = container.querySelector('.feed-sentinel');
+    if (existing) existing.remove();
+
+    const sentinel = document.createElement('div');
+    sentinel.className = 'feed-sentinel';
+    container.appendChild(sentinel);
+
+    feedObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+            loadMorePosts();
+        }
+    }, { rootMargin: '200px' }); // Start loading 200px before the sentinel is visible
+
+    feedObserver.observe(sentinel);
+}
+
+/**
+ * Load the next page of posts (triggered by infinite scroll)
+ */
+async function loadMorePosts() {
+    if (feedLoading || !feedNextCursor) return;
+
+    const feedContainer = document.querySelector('#feed-container') || document.querySelector('#following') || document.querySelector('.content');
+    if (!feedContainer) return;
+
+    feedLoading = true;
+
+    // Show loading spinner at the bottom
+    const sentinel = feedContainer.querySelector('.feed-sentinel');
+    if (sentinel) {
+        sentinel.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    }
+
+    try {
+        const result = await getFeed('public', feedNextCursor);
+
+        if (result.posts && result.posts.length > 0) {
+            // Insert posts before the sentinel
+            appendPosts(result.posts, feedContainer, sentinel);
+            feedNextCursor = result.nextCursor;
+        }
+
+        if (!feedNextCursor) {
+            // No more posts — remove sentinel and disconnect observer
+            if (sentinel) sentinel.remove();
+            if (feedObserver) {
+                feedObserver.disconnect();
+                feedObserver = null;
+            }
+        } else if (sentinel) {
+            sentinel.innerHTML = '';
+        }
+    } catch (error) {
+        console.error('Failed to load more posts:', error);
+        if (sentinel) sentinel.innerHTML = '';
+    } finally {
+        feedLoading = false;
     }
 }
 
@@ -161,7 +245,7 @@ function createPostElement(postData) {
 }
 
 /**
- * Render posts from API
+ * Render posts from API (replaces container contents)
  * @param {object[]} posts - Array of post objects from API
  * @param {HTMLElement} container - Container element
  */
@@ -178,6 +262,16 @@ function renderPostFeed(posts, container) {
         return;
     }
 
+    appendPosts(posts, container);
+}
+
+/**
+ * Append posts to the container (for pagination)
+ * @param {object[]} posts - Array of post objects from API
+ * @param {HTMLElement} container - Container element
+ * @param {HTMLElement|null} beforeElement - Insert before this element (for infinite scroll sentinel)
+ */
+function appendPosts(posts, container, beforeElement = null) {
     posts.forEach(post => {
         const postElement = createPostElement({
             profilePic: post.dogPhoto || '/assets/images/dog_profile_pic.jpg',
@@ -186,7 +280,11 @@ function renderPostFeed(posts, container) {
             caption: post.caption,
             location: post.dogLocation
         });
-        container.appendChild(postElement);
+        if (beforeElement) {
+            container.insertBefore(postElement, beforeElement);
+        } else {
+            container.appendChild(postElement);
+        }
         animateIn(postElement);
     });
 
@@ -287,4 +385,3 @@ export async function createPost(formData) {
         // Error message already shown by API functions
     }
 }
-
