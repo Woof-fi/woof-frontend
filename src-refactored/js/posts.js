@@ -79,10 +79,11 @@ function createPostElement(postData) {
     const post = document.createElement('div');
     post.className = 'post';
 
-    // Security: Escape all user-generated content
-    const username = escapeHTML(postData.username);
-    const caption = escapeHTML(postData.caption);
-    const location = postData.location ? escapeHTML(postData.location) : '';
+    // DOM methods (textContent, createTextNode) are used below,
+    // which are inherently XSS-safe - no need for escapeHTML()
+    const username = postData.username;
+    const caption = postData.caption;
+    const location = postData.location || '';
 
     // Create elements using DOM methods (safer than innerHTML)
     const postHeader = document.createElement('div');
@@ -179,7 +180,7 @@ function renderPostFeed(posts, container) {
 
     posts.forEach(post => {
         const postElement = createPostElement({
-            profilePic: post.dogPhoto || 'assets/images/dog_profile_pic.jpg',
+            profilePic: post.dogPhoto || '/assets/images/dog_profile_pic.jpg',
             username: post.dogName || 'Unknown Dog',
             imageUrl: post.imageUrl,
             caption: post.caption,

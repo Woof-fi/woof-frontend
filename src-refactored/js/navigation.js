@@ -57,7 +57,7 @@ export async function updateProfileNavigation() {
         } else if (dogs.length === 1) {
             // One dog - show dog's name and profile pic
             const dog = dogs[0];
-            const profilePhoto = dog.profilePhoto || 'assets/images/dog_profile_pic.jpg';
+            const profilePhoto = dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
             const slug = dog.slug || `${dog.name.toLowerCase()}-${dog.displayId}`;
 
             profileNavItem.innerHTML = `
@@ -65,7 +65,7 @@ export async function updateProfileNavigation() {
                     <img src="${profilePhoto}"
                          alt="${dog.name}"
                          class="profile-pic"
-                         onerror="this.src='assets/images/dog_profile_pic.jpg'">
+                         onerror="this.src='/assets/images/dog_profile_pic.jpg'">
                     ${dog.name}
                 </a>
             `;

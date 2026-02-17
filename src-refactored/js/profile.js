@@ -44,8 +44,8 @@ function renderProfile(dog, container) {
 
     // Fix profile photo path if it starts with /
     const profilePhoto = dog.profilePhoto && dog.profilePhoto.startsWith('/')
-        ? `assets/images${dog.profilePhoto}`
-        : dog.profilePhoto || 'assets/images/dog_profile_pic.jpg';
+        ? `/assets/images${dog.profilePhoto}`
+        : dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
 
     container.innerHTML = `
         <section class="profile">
@@ -54,7 +54,7 @@ function renderProfile(dog, container) {
                 <img src="${profilePhoto}"
                      alt="${name}'s Profile Picture"
                      class="profile-pic-large"
-                     onerror="if(this.src!=='assets/images/dog_profile_pic.jpg') this.src='assets/images/dog_profile_pic.jpg'">
+                     onerror="if(this.src!=='/assets/images/dog_profile_pic.jpg') this.src='/assets/images/dog_profile_pic.jpg'">
                 <div class="profile-info">
                     <h3>${name}</h3>
                     <p><strong>Breed:</strong> ${breed}</p>

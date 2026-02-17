@@ -1,7 +1,7 @@
 # Woof - Claude Code Instructions
 
 **Last Updated:** 2026-02-17
-**Status:** Phase 0 cleanup complete (0.1-0.4 done), Phase 0.5 browser validation pending
+**Status:** Phase 0 complete. Phase 1 (Stabilize Testing) is next.
 
 ## Project Overview
 
@@ -36,7 +36,7 @@ cd src-refactored && npm run build     # Vite build to dist/
 
 ## MCP Tools Available
 
-- **Playwright MCP**: Browser automation for visual validation. Configured in `.mcp.json`. Use `browser_navigate`, `browser_snapshot`, `browser_click` etc. to verify the app works in a real browser.
+- **Playwright MCP**: Browser automation for visual validation. Configured in `Projects/.mcp.json` (moved from `Woof/.mcp.json` so it loads when running from the Projects directory). Use `browser_navigate`, `browser_snapshot`, `browser_click` etc. to verify the app works in a real browser.
 
 ## Git Workflow
 
@@ -76,11 +76,18 @@ Deleted 6 dead `.ts` files: `app.ts`, `auth.ts`, `api.ts`, `config.ts`, `utils.t
 - Replaced `console.error` with Pino logger in admin routes
 - Added 5 admin endpoint tests (auth rejection, success)
 
-### 0.5 - Validate with Playwright ⏳
-- Playwright MCP configured in `.mcp.json` (needs session restart to load)
-- TODO: Start dev servers, navigate app, verify all flows work
+### 0.5 - Validate with Playwright ✅
+Validated all flows with Playwright MCP (Feb 17, 2026):
+- ✅ Home feed loads and displays posts (3 posts from Nelli)
+- ✅ Login/register modal works (register, logout, re-login all functional)
+- ✅ Post creation flow works (image + caption, post appears in feed)
+- ✅ Dog profile pages load (`/dog/nelli-1` shows profile with tabs)
+- ✅ Logout clears state and redirects to home (confirm dialog works)
+- ✅ Navigation: sidebar Home/Create/Logo links work, SPA routing functional
+- ✅ No console errors on any page (0 errors across all flows)
+- Found 5 new issues documented in Known Issues Tracker below
 
-## Phase 1: Stabilize Testing (NEXT)
+## Phase 1: Stabilize Testing ← CURRENT PHASE
 
 ### 1.1 - Frontend test infrastructure
 - Add tests for `api.js` (296 lines, 0% coverage) - mock fetch, verify headers, error handling
@@ -142,10 +149,15 @@ Deleted 6 dead `.ts` files: `app.ts`, `auth.ts`, `api.ts`, `config.ts`, `utils.t
 | Hardcoded S3 bucket name | `woof-backend/src/controllers/uploadController.ts` | Phase 2.2 |
 | Mixed console.log/Pino | `woof-backend/src/db/` | Phase 2.2 |
 | Missing DB indexes | `posts.created_at`, `follows` | Phase 2.3 |
+| ~~Dog slug `undefined` after creation~~ | `dogController.ts` response missing slug | ✅ Done |
+| ~~Relative image paths break on `/dog/*`~~ | `navigation.js`, `profile.js`, `posts.js` | ✅ Done |
+| ~~Post caption double-encodes HTML entities~~ | `posts.js` redundant `escapeHTML()` with DOM methods | ✅ Done |
+| Create Post silently fails without image | No validation message shown when submitting without an image | UX |
+| Clicking post author avatar doesn't navigate to profile | Post header images are not wrapped in links | UX |
 
 ## Security Notes
 
-- XSS: Use `escapeHTML()` from utils.js for all user content
+- XSS: Use `escapeHTML()` for innerHTML; DOM methods (textContent, createTextNode) are inherently safe
 - File uploads: Validate type and size before upload
 - Auth: JWT-based, 7-day expiry, Bearer token header
 - Admin endpoints: Protected by `x-admin-secret` header
