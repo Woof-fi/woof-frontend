@@ -264,6 +264,30 @@ export async function getFeed(type = 'public', cursor = null, limit = 20) {
     }
 }
 
+/**
+ * Get posts by a specific dog (for profile page)
+ * @param {string} dogId - Dog ID
+ * @param {string|null} cursor - ISO timestamp cursor for next page
+ * @param {number} limit - Number of posts per page
+ * @returns {Promise<{posts: object[], nextCursor: string|null}>}
+ */
+export async function getDogPosts(dogId, cursor = null, limit = 20) {
+    try {
+        let url = `/api/posts/dog/${dogId}?limit=${limit}`;
+        if (cursor) {
+            url += `&cursor=${encodeURIComponent(cursor)}`;
+        }
+        const data = await apiRequest(url);
+        return {
+            posts: data.posts || [],
+            nextCursor: data.nextCursor || null
+        };
+    } catch (error) {
+        console.error(`Failed to fetch posts for dog ${dogId}:`, error);
+        throw error;
+    }
+}
+
 // ============================================================================
 // FOLLOW API
 // ============================================================================

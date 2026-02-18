@@ -3,7 +3,7 @@
  * Dog profile page (handles any dog slug)
  */
 
-import { initProfile, initProfileTabs, loadGallery, loadFriends, loadHealthRecords } from '../profile.js';
+import { initProfile, initProfileTabs, loadProfilePosts, loadGallery, loadFriends, loadHealthRecords } from '../profile.js';
 
 export class ProfileView {
     constructor() {
@@ -16,8 +16,8 @@ export class ProfileView {
      * @param {Object} params - Route parameters
      * @returns {string} HTML content
      */
-    getHTML(params = {}) {
-        this.currentSlug = params.slug || 'nelli-1';
+    getHTML(data = {}) {
+        this.currentSlug = data.params?.slug || 'nelli-1';
 
         return `
             <main>
@@ -76,8 +76,8 @@ export class ProfileView {
      * Called after view is rendered to DOM
      * @param {Object} params - Route parameters
      */
-    async onMount(params = {}) {
-        const slug = params.slug || 'nelli-1';
+    async onMount(data = {}) {
+        const slug = data.params?.slug || 'nelli-1';
 
         // Initialize profile with slug
         // Note: We'll need to update initProfile to accept slug instead of ID
@@ -85,6 +85,7 @@ export class ProfileView {
         initProfileTabs();
 
         // Load tab content
+        loadProfilePosts();
         loadGallery(slug);
         loadFriends(slug);
         loadHealthRecords(slug);

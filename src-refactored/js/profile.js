@@ -3,9 +3,9 @@
  * Handles dog profile display, edit button, and follow button
  */
 
-import { getDog, getDogBySlug, getFollowStatus, followDog, unfollowDog } from './api.js';
+import { getDog, getDogBySlug, getDogPosts, getFollowStatus, followDog, unfollowDog } from './api.js';
 import { showLoading, hideLoading, showError, showProfileSkeleton } from './ui.js';
-import { escapeHTML, formatDate, showToast } from './utils.js';
+import { escapeHTML, formatDate, showToast, timeAgo } from './utils.js';
 import { isAuthenticated } from './auth.js';
 import { openEditDogModal } from './edit-dog-modal.js';
 
@@ -262,6 +262,64 @@ export async function loadFriends(dogId) {
             <p>No friends yet. Start connecting!</p>
         </div>
     `;
+}
+
+/**
+ * Load dog's posts into the profile Posts tab grid
+ * Uses the dog ID stored in currentDog (set by initProfile)
+ */
+export async function loadProfilePosts() {
+    const postsGrid = document.querySelector('#posts .posts-grid');
+    if (!postsGrid || !currentDog) return;
+
+    try {
+        const result = await getDogPosts(currentDog.id);
+
+        if (!result.posts || result.posts.length === 0) {
+            postsGrid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-camera"></i>
+                    <p>No posts yet.</p>
+                </div>
+            `;
+            return;
+        }
+
+        postsGrid.innerHTML = '';
+        result.posts.forEach(post => {
+            const gridItem = document.createElement('div');
+            gridItem.className = 'posts-grid-item';
+
+            const img = document.createElement('img');
+            img.src = post.imageUrl;
+            img.alt = post.caption || 'Post image';
+            img.loading = 'lazy';
+            img.onerror = function() {
+                const fallback = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23cccccc" width="300" height="300"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage%3C/text%3E%3C/svg%3E';
+                if (this.src !== fallback) {
+                    this.src = fallback;
+                }
+            };
+
+            const overlay = document.createElement('div');
+            overlay.className = 'posts-grid-overlay';
+            overlay.innerHTML = `
+                <span><i class="fas fa-heart"></i> ${post.likeCount || 0}</span>
+            `;
+
+            gridItem.appendChild(img);
+            gridItem.appendChild(overlay);
+            postsGrid.appendChild(gridItem);
+        });
+    } catch (error) {
+        console.error('Failed to load profile posts:', error);
+        postsGrid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load posts.</p>
+            </div>
+        `;
+    }
 }
 
 /**

@@ -63,6 +63,37 @@ export function formatDate(date) {
 }
 
 /**
+ * Format date as relative time ("2 days ago", "45 minutes ago", etc.)
+ * @param {Date|string} date - Date to format
+ * @returns {string} - Relative time string
+ */
+export function timeAgo(date) {
+    const now = new Date();
+    const past = new Date(date);
+    const seconds = Math.floor((now - past) / 1000);
+
+    if (seconds < 60) return 'just now';
+
+    const minutes = Math.floor(seconds / 60);
+    if (minutes === 1) return '1 minute ago';
+    if (minutes < 60) return `${minutes} minutes ago`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours === 1) return '1 hour ago';
+    if (hours < 24) return `${hours} hours ago`;
+
+    const days = Math.floor(hours / 24);
+    if (days === 1) return '1 day ago';
+    if (days < 7) return `${days} days ago`;
+
+    const weeks = Math.floor(days / 7);
+    if (weeks === 1) return '1 week ago';
+    if (weeks < 4) return `${weeks} weeks ago`;
+
+    return past.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+/**
  * Check if element is in viewport
  * @param {HTMLElement} element - Element to check
  * @returns {boolean} - True if in viewport

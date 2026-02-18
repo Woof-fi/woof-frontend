@@ -4,7 +4,7 @@
  */
 
 import { getAllDogs, getFeed, uploadImage, createPost as createPostAPI, likePost, unlikePost } from './api.js';
-import { escapeHTML, generateUsername, isValidFileType, isValidFileSize, showToast } from './utils.js';
+import { escapeHTML, generateUsername, isValidFileType, isValidFileSize, showToast, timeAgo } from './utils.js';
 import { showLoading, hideLoading, showError, showFeedSkeleton, animateIn } from './ui.js';
 import { getCurrentUser, isAuthenticated } from './auth.js';
 import { openAuthModal } from './modals.js';
@@ -306,6 +306,36 @@ function createPostElement(postData) {
     post.appendChild(postActions);
     post.appendChild(postCaption);
 
+    if (postData.createdAt) {
+        const timestampContainer = document.createElement('div');
+        timestampContainer.className = 'post-timestamp-container';
+        const timestamp = document.createElement('time');
+        timestamp.className = 'post-timestamp';
+        const createdDate = new Date(postData.createdAt);
+        timestamp.dateTime = createdDate.toISOString();
+        timestamp.textContent = timeAgo(postData.createdAt);
+        timestamp.title = createdDate.toLocaleString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long',
+            day: 'numeric', hour: 'numeric', minute: '2-digit'
+        });
+        timestamp.style.cursor = 'pointer';
+        timestamp.addEventListener('click', () => {
+            const isRelative = timestamp.dataset.showing !== 'full';
+            if (isRelative) {
+                timestamp.textContent = createdDate.toLocaleString('en-US', {
+                    month: 'long', day: 'numeric', year: 'numeric',
+                    hour: 'numeric', minute: '2-digit'
+                });
+                timestamp.dataset.showing = 'full';
+            } else {
+                timestamp.textContent = timeAgo(postData.createdAt);
+                timestamp.dataset.showing = 'relative';
+            }
+        });
+        timestampContainer.appendChild(timestamp);
+        post.appendChild(timestampContainer);
+    }
+
     return post;
 }
 
@@ -347,7 +377,8 @@ function appendPosts(posts, container, beforeElement = null) {
             location: post.dogLocation,
             dogSlug: post.dogSlug,
             likeCount: post.likeCount,
-            likedByUser: post.likedByUser
+            likedByUser: post.likedByUser,
+            createdAt: post.createdAt
         });
         if (beforeElement) {
             container.insertBefore(postElement, beforeElement);
