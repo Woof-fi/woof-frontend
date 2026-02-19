@@ -130,7 +130,7 @@
                 <button class="modal-close" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="create-post-form">
+                <form id="create-post-form" novalidate>
                     <div class="form-group">
                         <label for="post-dog-select">Select Dog</label>
                         <select id="post-dog-select" name="post-dog-select" required>
@@ -272,40 +272,45 @@
 
     <!-- Health Record Modal -->
     <div id="health-record-modal" class="modal" style="display: none;">
-        <div class="modal-content">
+        <div class="modal-content health-modal-content">
             <div class="modal-header">
-                <h2>Add Health Record</h2>
+                <h2 id="health-modal-title">Add Health Record</h2>
                 <button class="modal-close" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
+                <div class="health-type-tabs" id="health-type-tabs">
+                    <button type="button" class="health-type-tab active" data-type="vet_visit"><i class="fas fa-stethoscope"></i> Vet Visit</button>
+                    <button type="button" class="health-type-tab" data-type="vaccination"><i class="fas fa-syringe"></i> Vaccination</button>
+                    <button type="button" class="health-type-tab" data-type="medication"><i class="fas fa-pills"></i> Medication</button>
+                    <button type="button" class="health-type-tab" data-type="weight"><i class="fas fa-weight"></i> Weight</button>
+                    <button type="button" class="health-type-tab" data-type="note"><i class="fas fa-sticky-note"></i> Note</button>
+                </div>
                 <form id="health-record-form">
-                    <div class="form-group">
-                        <label for="health-record-type">Type *</label>
-                        <select id="health-record-type" required>
-                            <option value="vet_visit">Vet Visit</option>
-                            <option value="vaccination">Vaccination</option>
-                            <option value="medication">Medication</option>
-                            <option value="weight">Weight</option>
-                            <option value="note">Note</option>
-                        </select>
+                    <input type="hidden" id="health-record-type" value="vet_visit">
+                    <div class="health-form-fields">
+                        <div class="form-row">
+                            <div class="form-group form-group-flex">
+                                <label for="health-record-date">Date *</label>
+                                <input type="date" id="health-record-date" required>
+                            </div>
+                            <div class="form-group form-group-flex" id="health-record-value-group" style="display: none;">
+                                <label for="health-record-value">Weight (kg) *</label>
+                                <input type="number" id="health-record-value" min="0.1" max="200" step="0.1" placeholder="e.g., 25.5">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="health-record-description" id="health-desc-label">Description *</label>
+                            <input type="text" id="health-record-description" required maxlength="1000" placeholder="e.g., Annual check-up">
+                        </div>
+                        <div class="form-group">
+                            <label for="health-record-notes">Notes (optional)</label>
+                            <textarea id="health-record-notes" rows="3" maxlength="2000" placeholder="Additional details..."></textarea>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="health-record-date">Date *</label>
-                        <input type="date" id="health-record-date" required>
+                    <div class="health-modal-actions">
+                        <button type="button" class="btn-secondary health-cancel-btn">Cancel</button>
+                        <button type="submit" class="btn-primary" id="health-submit-btn">Add Record</button>
                     </div>
-                    <div class="form-group">
-                        <label for="health-record-description">Description *</label>
-                        <input type="text" id="health-record-description" required maxlength="1000" placeholder="e.g., Annual check-up, Rabies vaccine">
-                    </div>
-                    <div class="form-group" id="health-record-value-group" style="display: none;">
-                        <label for="health-record-value">Weight (kg)</label>
-                        <input type="number" id="health-record-value" min="0.1" max="200" step="0.1" placeholder="e.g., 25.5">
-                    </div>
-                    <div class="form-group">
-                        <label for="health-record-notes">Notes (optional)</label>
-                        <textarea id="health-record-notes" rows="3" maxlength="2000" placeholder="Additional details..."></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary">Add Record</button>
                 </form>
             </div>
         </div>

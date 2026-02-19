@@ -1,7 +1,7 @@
 {
   "name": "woof-frontend",
   "version": "2.0.0",
-  "description": "Woof - Instagram for Animals (Frontend)",
+  "description": "Woof - Dog Social Network (Frontend)",
   "type": "module",
   "scripts": {
     "dev": "vite",

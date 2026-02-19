@@ -1900,27 +1900,33 @@ header {
 .health-add-btn {
     padding: 8px 16px;
     font-size: 13px;
+    border-radius: 20px;
 }
 
 .health-filters {
     display: flex;
     gap: 6px;
     overflow-x: auto;
-    padding-bottom: 12px;
+    padding-bottom: 14px;
     margin-bottom: 16px;
     border-bottom: 1px solid var(--color-border);
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.health-filters::-webkit-scrollbar {
+    display: none;
 }
 
 .health-filter-btn {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
+    gap: 5px;
+    padding: 7px 14px;
     border: 1px solid var(--color-border);
     border-radius: 20px;
     background: var(--color-surface);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--color-text-secondary);
     cursor: pointer;
@@ -1928,8 +1934,13 @@ header {
     transition: all 0.2s;
 }
 
+.health-filter-btn i {
+    font-size: 11px;
+}
+
 .health-filter-btn:hover {
     border-color: var(--color-text-secondary);
+    background: var(--color-bg-alt);
 }
 
 .health-filter-btn.active {
@@ -2078,6 +2089,103 @@ header {
 @media (max-width: 768px) {
     .health-card-actions {
         opacity: 1;
+    }
+}
+
+/* Health Record Modal */
+.health-modal-content {
+    max-width: 600px;
+    width: 90%;
+    margin: 8% auto;
+}
+
+.health-type-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.health-type-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-surface);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.health-type-tab:hover {
+    border-color: var(--color-text-secondary);
+    background: var(--color-bg-alt);
+}
+
+.health-type-tab.active {
+    background: var(--color-text);
+    color: var(--color-surface);
+    border-color: var(--color-text);
+}
+
+.health-type-tab i {
+    font-size: 12px;
+}
+
+.health-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-group-flex {
+    flex: 1;
+}
+
+.health-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+}
+
+.health-modal-actions .btn-secondary,
+.health-modal-actions .btn-primary {
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+@media (max-width: 480px) {
+    .health-modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 16px;
+    }
+
+    .health-type-tabs {
+        gap: 4px;
+    }
+
+    .health-type-tab {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 14px;
     }
 }
 

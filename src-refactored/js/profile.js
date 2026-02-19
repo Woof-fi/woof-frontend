@@ -402,7 +402,7 @@ export async function loadHealthRecords(dogId) {
     const addBtn = document.getElementById('add-health-record-btn');
     if (addBtn) {
         addBtn.addEventListener('click', () => {
-            openHealthRecordModal(currentDog.id, null, () => loadHealthTimeline(currentDog.id));
+            openHealthRecordModal(currentDog.id, null, () => loadHealthTimeline(currentDog.id), healthFilterType);
         });
     }
 
@@ -449,7 +449,10 @@ async function loadHealthTimeline(dogId) {
         timeline.innerHTML = '';
         data.records.forEach(record => {
             const config = HEALTH_TYPE_CONFIG[record.type] || HEALTH_TYPE_CONFIG.note;
-            const recordDate = new Date(record.date + 'T00:00:00');
+            const dateParseable = typeof record.date === 'string' && record.date.length === 10
+                ? record.date + 'T00:00:00'
+                : record.date;
+            const recordDate = new Date(dateParseable);
             const dateStr = recordDate.toLocaleDateString('en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'
             });

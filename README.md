@@ -1,124 +1,155 @@
-# 🐶 Woof - Dog-Centric Social Network
+# Woof - Dog Social Network
 
-A social network and local discovery platform where **dogs are the main users**, not humans.
+A social network where dogs are the main users. Live at [woofapp.fi](https://woofapp.fi).
 
-## Quick Start
+## Architecture
 
-### View the Prototype
+**Frontend:** Vanilla JS SPA built with Vite, deployed to S3 + Cloudflare (HTTPS, custom domain)
+**Backend:** Express + TypeScript + PostgreSQL, deployed on AWS Elastic Beanstalk
+**Storage:** S3 for image uploads (presigned URL flow)
+
+### Repos
+
+| Repo | Purpose |
+|------|---------|
+| `Woof/src-refactored/` | Frontend SPA |
+| `woof-backend/` | REST API |
+
+## Features
+
+### Working
+
+- **Feed** - For You + Following tabs, cursor-based pagination, infinite scroll
+- **Posts** - Image upload to S3, captions, like/comment/share
+- **Post Detail** - Single post view at `/post/:id` with full comment thread
+- **Comments** - Threaded comments with pagination
+- **Dog Profiles** - Avatar, bio, breed/age/location, posts grid, follower counts
+- **Profile Editing** - Edit dog info + profile photo
+- **Health Records** - Vet visits, vaccinations, medications, weight tracking with timeline view
+- **Search** - Search dogs by name/breed
+- **Follow/Unfollow** - Follow dogs, following feed tab
+- **Messaging** - Dog-to-dog DMs with conversation list, polling-based
+- **Auth** - JWT-based register/login/logout with password requirements
+- **SPA Routing** - `/dog/:slug`, `/post/:id`, `/messages`, deep linking
+- **Mobile** - Instagram-style bottom nav, responsive layout
+- **Loading Skeletons** - Shimmer cards during feed/profile loading
+
+### Infrastructure
+
+- **Domain:** woofapp.fi via Cloudflare (free tier SSL/DNS)
+- **Frontend:** S3 static hosting (`npm run deploy`)
+- **Backend:** Elastic Beanstalk (eu-north-1)
+- **Database:** RDS PostgreSQL
+- **Images:** S3 presigned URL uploads (`woof-prod-photos` bucket)
+
+## Development
+
+### Frontend
+
 ```bash
-cd src
-open index.html
+cd src-refactored
+npm install
+npm run dev          # Vite dev server
+npm run build        # TypeScript check + Vite build
+npm run test         # Vitest
+npm run deploy       # Build + sync to S3
 ```
 
-Or use a local server:
+### Backend
+
 ```bash
-cd src
-python3 -m http.server 8000
-# Then open http://localhost:8000
+cd ../woof-backend
+npm install
+npm run dev          # Express dev server with ts-node
+npm run build        # Compile TypeScript to dist/
+npm test             # Jest (183 tests)
+eb deploy            # Deploy to Elastic Beanstalk
 ```
-
-## What is Woof?
-
-Woof combines:
-- 🐕 **Dog profiles** - Dogs have their own identity and social presence
-- 📍 **Territory-based discovery** - Find dogs and activities in your local area
-- 🗺️ **Maps & places** - Real-world locations dogs visit
-- 🛍️ **Pet marketplace** - Buy/sell pet products and services
-- 💬 **Social feed** - Share updates, photos, and connect with other dogs
-
-## Current Status
-
-**Phase:** Frontend Prototype ✅
-
-This is a fully navigable static frontend that demonstrates the complete product vision.
-
-### What Works Now
-- Home feed with dog posts
-- Dog profile pages (public + private sections)
-- Territory maps with local activity
-- Marketplace with products
-- Responsive navigation (mobile + desktop)
-- UI interactions (likes, tabs, modals)
-
-### What's Next
-- Backend infrastructure
-- User authentication
-- Database integration
-- Real messaging system
-- Payment processing
-- Content moderation
-
-See [docs/roadmap.md](docs/roadmap.md) for detailed next steps.
 
 ## Project Structure
 
 ```
-Woof/
-├── .claude              # Claude Code context
-├── README.md            # This file
-├── docs/                # Documentation
-│   ├── woof.md          # Comprehensive product & technical docs
-│   └── roadmap.md       # Development roadmap
-└── src/                 # Source code
-    ├── index.html       # Home feed
-    ├── map.html         # Territory map
-    ├── nelli.html       # Dog profile example
-    ├── store.html       # Marketplace
-    ├── styles.css       # Global styles
-    ├── script.js        # UI logic
-    └── images/          # Assets
+Woof/src-refactored/
+├── index.html              # Main SPA entry point
+├── css/styles.css          # All styles
+├── js/
+│   ├── app-spa.js          # SPA bootstrap + route registration
+│   ├── router.js           # Client-side router
+│   ├── api.js              # All API calls
+│   ├── auth.js             # JWT token management
+│   ├── posts.js            # Feed rendering, likes, comments
+│   ├── profile.js          # Dog profile page + health records
+│   ├── navigation.js       # Sidebar + bottom nav
+│   ├── search.js           # Search panel
+│   ├── views/
+│   │   ├── HomeView.js     # Feed view
+│   │   ├── ProfileView.js  # Dog profile view
+│   │   ├── PostDetailView.js # Single post view
+│   │   └── MessagesView.js # DM conversations
+│   ├── *-modal.js          # Auth, create post/dog, edit dog, health record modals
+│   └── utils.js            # Shared utilities
+└── package.json
+
+woof-backend/
+├── src/
+│   ├── app.ts              # Express app setup
+│   ├── routes/             # Route definitions
+│   ├── controllers/        # Request handlers
+│   ├── middleware/          # Auth, validation, rate limiting
+│   ├── schemas/            # Zod validation schemas
+│   ├── db/
+│   │   ├── pool.ts         # PostgreSQL connection
+│   │   └── migrations/     # SQL migrations (001-012)
+│   └── __tests__/          # Jest test suites
+└── package.json
 ```
 
-## Core Concepts
+## API Endpoints
 
-### 1. Dog-First Identity
-Unlike other pet platforms, Woof treats dogs as the primary users. Dogs have profiles, friends, achievements, and social presence.
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| POST | `/api/auth/register` | - | Register |
+| POST | `/api/auth/login` | - | Login |
+| GET | `/api/posts/feed` | optional | Feed (For You / Following) |
+| GET | `/api/posts/:id` | optional | Single post |
+| GET | `/api/posts/dog/:dogId` | optional | Dog's posts |
+| POST | `/api/posts` | required | Create post |
+| DELETE | `/api/posts/:id` | required | Delete post |
+| POST | `/api/posts/:id/like` | required | Like/unlike |
+| GET/POST | `/api/comments/post/:postId` | varies | Comments |
+| GET | `/api/dogs/search` | - | Search dogs |
+| GET | `/api/dogs/:idOrSlug` | optional | Dog profile |
+| POST | `/api/dogs` | required | Create dog |
+| PUT | `/api/dogs/:id` | required | Update dog |
+| POST/GET | `/api/dogs/:id/follow` | required | Follow/unfollow |
+| GET/POST/PUT/DELETE | `/api/dogs/:dogId/health` | required | Health records |
+| GET/POST | `/api/messages/*` | required | Messaging |
+| POST | `/api/upload/presigned-url` | required | Get S3 upload URL |
 
-### 2. Territories
-Location-based discovery organized around territories (parks, neighborhoods). Each territory has:
-- Dogs currently there
-- Local activities and events
-- Nearby services (vets, groomers, trainers)
-- Connected territories
+## Tests
 
-### 3. Real-World Connections
-Woof focuses on actual meetups and places, not just online interaction. The map is a core feature, not an afterthought.
+- **Backend:** 183 tests across 11 suites (Jest) - auth, posts, dogs, comments, likes, follows, health records, messaging, uploads
+- **Frontend:** Vitest with happy-dom
 
-## Tech Stack
+## Next Up
 
-### Current
-- HTML5 / CSS3 / Vanilla JavaScript
-- Google Maps JavaScript API
-- Font Awesome icons
+- **Remove Gallery tab** - Profile should only show Posts tab (gallery is redundant)
+- **Fix mobile profile tab padding** - Layout shifts when switching between tabs on mobile
+- **Friends tab: mutual follow indicators** - Mark dogs where the follow is mutual
+- **Seed test data for friends** - Make some existing dogs follow Nelli so the friends feature can be verified
 
-### Future (TBD)
-Backend stack to be determined. Options being considered:
-- Node.js / Express
-- Python / Django or Flask
-- Ruby / Rails
-- Or others...
+## Future Plans
 
-## Documentation
+Features planned for upcoming phases (see `ROADMAP.md`):
 
-- [woof.md](docs/woof.md) - Complete product, business & technical documentation
-- [roadmap.md](docs/roadmap.md) - Development roadmap and next steps
-
-## Design Principles
-
-1. **Dog-first** - Features make sense from a dog's perspective
-2. **Territory-based** - Location is a first-class concept
-3. **Mobile parity** - Mobile UX equals desktop
-4. **Real-world focus** - Encourage actual meetups and activities
-5. **Community-driven** - Enable dog owner communities
-
-## Contributing
-
-This is a personal project, but ideas and feedback welcome!
+- **Breed Communities** - Browse/join breed-based communities, breed-filtered feeds
+- **Dog-friendly Places** - Map with dog parks, vets, pet stores (Leaflet + OpenStreetMap)
+- **Dog Park Check-in** - Check in at places, see who's there
+- **CDN for images** - Serve images through CloudFront at `cdn.woofapp.fi` instead of direct S3 URLs
+- **Notifications** - Like/comment/follow notifications
+- **Video posts** - Short video support
+- **Stories** - 24h ephemeral content
 
 ## License
 
-Personal project - not open source (yet?)
-
----
-
-**Note:** Woof is a personal side project by Tommi, separate from work at Oikotie.
+Personal project - UNLICENSED

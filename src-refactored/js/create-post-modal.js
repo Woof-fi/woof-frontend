@@ -133,8 +133,10 @@ async function openCreatePostModal() {
         // Auto-select if only one dog
         if (dogs.length === 1) {
             dogSelect.value = dogs[0].id;
-            dogSelect.parentElement.style.display = 'none'; // Hide the select since there's only one option
+            dogSelect.removeAttribute('required'); // Remove required so hidden field doesn't block mobile form validation
+            dogSelect.parentElement.style.display = 'none';
         } else {
+            dogSelect.setAttribute('required', '');
             dogSelect.parentElement.style.display = 'block';
         }
     } catch (error) {
