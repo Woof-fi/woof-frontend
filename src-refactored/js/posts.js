@@ -539,11 +539,39 @@ function shouldShowInviteCard(position) {
 }
 
 /**
- * Fallback: copy site URL to clipboard and show visual feedback on button
+ * Copy text to clipboard with fallback for non-secure contexts (HTTP)
+ * @param {string} text - Text to copy
+ * @returns {Promise<boolean>} Whether the copy succeeded
+ */
+function copyToClipboard(text) {
+    // Modern API (requires HTTPS)
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
+    }
+    // Legacy fallback for HTTP
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return Promise.resolve(success);
+    } catch {
+        document.body.removeChild(textarea);
+        return Promise.resolve(false);
+    }
+}
+
+/**
+ * Copy site URL to clipboard and show visual feedback on button
  * @param {HTMLElement} btn - Button to update with feedback
  */
-function copyToClipboardFallback(btn) {
-    navigator.clipboard.writeText(window.location.origin).then(() => {
+async function copyToClipboardFallback(btn) {
+    const success = await copyToClipboard(window.location.origin);
+    if (success) {
         showToast('Link copied!', 'success');
         const originalHTML = btn.innerHTML;
         btn.innerHTML = '';
@@ -554,9 +582,9 @@ function copyToClipboardFallback(btn) {
         setTimeout(() => {
             btn.innerHTML = originalHTML;
         }, 2000);
-    }).catch(() => {
+    } else {
         showToast('Failed to copy link', 'error');
-    });
+    }
 }
 
 /**
@@ -587,9 +615,9 @@ function createInviteCard() {
     const shareBtn = document.createElement('button');
     shareBtn.className = 'btn-primary invite-card-btn';
     const shareIcon = document.createElement('i');
-    shareIcon.className = navigator.share ? 'fas fa-share-alt' : 'fas fa-link';
+    shareIcon.className = 'fas fa-share-alt';
     shareBtn.appendChild(shareIcon);
-    shareBtn.appendChild(document.createTextNode(navigator.share ? ' Share Woof' : ' Copy Invite Link'));
+    shareBtn.appendChild(document.createTextNode(' Share'));
 
     shareBtn.addEventListener('click', async () => {
         if (navigator.share) {
