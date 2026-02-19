@@ -5,7 +5,7 @@
 
 export const CONFIG = {
     // API Configuration
-    API_BASE_URL: 'http://woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com',
+    API_BASE_URL: import.meta.env.VITE_API_URL || 'https://api.woofapp.fi',
     API_TIMEOUT: 10000, // 10 seconds
 
     // Known Dog IDs (from seed data)
