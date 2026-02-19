@@ -288,6 +288,16 @@ export async function getDogPosts(dogId, cursor = null, limit = 20) {
     }
 }
 
+/**
+ * Get a single post by ID
+ * @param {string} postId - Post ID
+ * @returns {Promise<object>} - Post object with full details
+ */
+export async function getPost(postId) {
+    const data = await apiRequest(`/api/posts/${postId}`);
+    return data.post;
+}
+
 // ============================================================================
 // FOLLOW API
 // ============================================================================
@@ -436,6 +446,140 @@ export async function uploadImage(file) {
         showToast('Failed to upload image. Please try again.', 'error');
         throw error;
     }
+}
+
+// ============================================================================
+// HEALTH RECORDS API
+// ============================================================================
+
+/**
+ * Get health records for a dog
+ * @param {string} dogId - Dog ID
+ * @param {object} options - Query options
+ * @param {string} [options.type] - Filter by record type
+ * @param {string} [options.cursor] - Pagination cursor
+ * @param {number} [options.limit] - Records per page
+ * @returns {Promise<{records: object[], total: number, nextCursor: string|null}>}
+ */
+export async function getHealthRecords(dogId, { type, cursor, limit = 20 } = {}) {
+    let url = `/api/dogs/${dogId}/health?limit=${limit}`;
+    if (type) url += `&type=${encodeURIComponent(type)}`;
+    if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
+    return apiRequest(url);
+}
+
+/**
+ * Create a health record
+ * @param {string} dogId - Dog ID
+ * @param {object} data - Record data { type, date, description, notes?, value? }
+ * @returns {Promise<{record: object}>}
+ */
+export async function createHealthRecord(dogId, data) {
+    return apiRequest(`/api/dogs/${dogId}/health`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
+}
+
+/**
+ * Update a health record
+ * @param {string} dogId - Dog ID
+ * @param {string} recordId - Health record ID
+ * @param {object} data - Fields to update
+ * @returns {Promise<{record: object}>}
+ */
+export async function updateHealthRecord(dogId, recordId, data) {
+    return apiRequest(`/api/dogs/${dogId}/health/${recordId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+    });
+}
+
+/**
+ * Delete a health record
+ * @param {string} dogId - Dog ID
+ * @param {string} recordId - Health record ID
+ * @returns {Promise<{success: boolean}>}
+ */
+export async function deleteHealthRecord(dogId, recordId) {
+    return apiRequest(`/api/dogs/${dogId}/health/${recordId}`, {
+        method: 'DELETE'
+    });
+}
+
+// ============================================================================
+// MESSAGING API
+// ============================================================================
+
+/**
+ * Get conversations list
+ * @returns {Promise<{conversations: object[]}>}
+ */
+export async function getConversations() {
+    return apiRequest('/api/messages/conversations');
+}
+
+/**
+ * Start or find a conversation with a dog
+ * @param {string} dogId - Target dog ID
+ * @param {string} [senderDogId] - Optional sender dog ID
+ * @returns {Promise<{conversationId: string, created: boolean}>}
+ */
+export async function startConversation(dogId, senderDogId = null) {
+    const body = { dogId };
+    if (senderDogId) body.senderDogId = senderDogId;
+    return apiRequest('/api/messages/conversations', {
+        method: 'POST',
+        body: JSON.stringify(body)
+    });
+}
+
+/**
+ * Get messages in a conversation
+ * @param {string} conversationId - Conversation ID
+ * @param {string|null} cursor - Pagination cursor
+ * @param {number} limit - Messages per page
+ * @returns {Promise<{messages: object[], nextCursor: string|null, otherDog: object}>}
+ */
+export async function getMessages(conversationId, cursor = null, limit = 50) {
+    let url = `/api/messages/conversations/${conversationId}?limit=${limit}`;
+    if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
+    return apiRequest(url);
+}
+
+/**
+ * Send a message in a conversation
+ * @param {string} conversationId - Conversation ID
+ * @param {string} content - Message text
+ * @param {string} [senderDogId] - Optional sender dog ID
+ * @returns {Promise<{message: object}>}
+ */
+export async function sendMessage(conversationId, content, senderDogId = null) {
+    const body = { content };
+    if (senderDogId) body.senderDogId = senderDogId;
+    return apiRequest(`/api/messages/conversations/${conversationId}`, {
+        method: 'POST',
+        body: JSON.stringify(body)
+    });
+}
+
+/**
+ * Mark a conversation as read
+ * @param {string} conversationId - Conversation ID
+ * @returns {Promise<{success: boolean}>}
+ */
+export async function markConversationRead(conversationId) {
+    return apiRequest(`/api/messages/conversations/${conversationId}/read`, {
+        method: 'PUT'
+    });
+}
+
+/**
+ * Get total unread message count
+ * @returns {Promise<{unreadCount: number}>}
+ */
+export async function getUnreadCount() {
+    return apiRequest('/api/messages/unread-count');
 }
 
 // Export APIError for use in other modules

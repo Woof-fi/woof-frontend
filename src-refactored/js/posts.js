@@ -209,7 +209,7 @@ function renderFeed(dogs, container) {
  * @param {object} postData - Post data
  * @returns {HTMLElement} - Post element
  */
-function createPostElement(postData) {
+export function createPostElement(postData) {
     const post = document.createElement('div');
     post.className = 'post';
 

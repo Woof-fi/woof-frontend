@@ -3,11 +3,13 @@
  * Handles dog profile display, edit button, and follow button
  */
 
-import { getDog, getDogBySlug, getDogPosts, getFollowStatus, followDog, unfollowDog } from './api.js';
+import { getDog, getDogBySlug, getDogPosts, getFollowStatus, followDog, unfollowDog, getHealthRecords, deleteHealthRecord, startConversation } from './api.js';
 import { showLoading, hideLoading, showError, showProfileSkeleton } from './ui.js';
 import { escapeHTML, formatDate, showToast, timeAgo } from './utils.js';
 import { isAuthenticated } from './auth.js';
 import { openEditDogModal } from './edit-dog-modal.js';
+import { openHealthRecordModal } from './health-record-modal.js';
+import router from './router.js';
 
 // Store current dog data for edit modal
 let currentDog = null;
@@ -60,10 +62,13 @@ function renderProfile(dog, container, slugOrId) {
             </button>
         `;
     } else {
-        // Follow button placeholder — state set after render
+        // Follow button + Message button — state set after render
         actionButtonHtml = `
             <button class="follow-btn" id="follow-btn" data-dog-id="${dog.id}" disabled>
                 <i class="fas fa-user-plus"></i> Follow
+            </button>
+            <button class="message-profile-btn" id="message-profile-btn" data-dog-id="${dog.id}">
+                <i class="fas fa-envelope"></i> Message
             </button>
         `;
     }
@@ -113,6 +118,27 @@ function renderProfile(dog, container, slugOrId) {
     // Wire up follow button and load follow status
     if (!dog.isOwner && dog.id) {
         loadFollowStatus(dog.id);
+
+        // Wire up message button
+        const messageBtn = document.getElementById('message-profile-btn');
+        if (messageBtn) {
+            messageBtn.addEventListener('click', async () => {
+                if (!isAuthenticated()) {
+                    showToast('Please login to send messages', 'error');
+                    return;
+                }
+                messageBtn.disabled = true;
+                try {
+                    const result = await startConversation(dog.id);
+                    router.navigate(`/messages/${result.conversationId}`);
+                } catch (error) {
+                    console.error('Failed to start conversation:', error);
+                    showToast('Failed to start conversation', 'error');
+                } finally {
+                    messageBtn.disabled = false;
+                }
+            });
+        }
     }
 }
 
@@ -281,9 +307,6 @@ export async function loadProfilePosts() {
 
         postsGrid.innerHTML = '';
         result.posts.forEach(post => {
-            const gridItem = document.createElement('div');
-            gridItem.className = 'posts-grid-item';
-
             const img = document.createElement('img');
             img.src = post.imageUrl;
             img.alt = post.caption || 'Post image';
@@ -301,9 +324,15 @@ export async function loadProfilePosts() {
                 <span><i class="fas fa-heart"></i> ${post.likeCount || 0}</span>
             `;
 
-            gridItem.appendChild(img);
-            gridItem.appendChild(overlay);
-            postsGrid.appendChild(gridItem);
+            // Wrap in a link to post detail
+            const link = document.createElement('a');
+            link.href = `/post/${post.id}`;
+            link.setAttribute('data-link', '');
+            link.className = 'posts-grid-item';
+
+            link.appendChild(img);
+            link.appendChild(overlay);
+            postsGrid.appendChild(link);
         });
     } catch (error) {
         console.error('Failed to load profile posts:', error);
@@ -315,6 +344,18 @@ export async function loadProfilePosts() {
         `;
     }
 }
+
+// Health record type icons and labels
+const HEALTH_TYPE_CONFIG = {
+    vet_visit: { icon: 'fa-stethoscope', label: 'Vet Visit', color: '#3b82f6' },
+    vaccination: { icon: 'fa-syringe', label: 'Vaccination', color: '#10b981' },
+    medication: { icon: 'fa-pills', label: 'Medication', color: '#f59e0b' },
+    weight: { icon: 'fa-weight', label: 'Weight', color: '#8b5cf6' },
+    note: { icon: 'fa-sticky-note', label: 'Note', color: '#6b7280' },
+};
+
+// Current filter state for health records
+let healthFilterType = null;
 
 /**
  * Load health records (owner only)
@@ -336,12 +377,141 @@ export async function loadHealthRecords(dogId) {
         return;
     }
 
-    // TODO: Replace with real API call when health records endpoint exists
+    // Render header with add button and filter tabs
     healthContainer.innerHTML = `
-        <h2>Health Records</h2>
-        <div class="empty-state">
-            <i class="fas fa-heartbeat"></i>
-            <p>No health records yet.</p>
+        <div class="health-header">
+            <h2>Health Records</h2>
+            <button class="btn-primary health-add-btn" id="add-health-record-btn">
+                <i class="fas fa-plus"></i> Add Record
+            </button>
+        </div>
+        <div class="health-filters" id="health-filters">
+            <button class="health-filter-btn active" data-type="">All</button>
+            <button class="health-filter-btn" data-type="vet_visit"><i class="fas fa-stethoscope"></i> Vet</button>
+            <button class="health-filter-btn" data-type="vaccination"><i class="fas fa-syringe"></i> Vaccines</button>
+            <button class="health-filter-btn" data-type="medication"><i class="fas fa-pills"></i> Meds</button>
+            <button class="health-filter-btn" data-type="weight"><i class="fas fa-weight"></i> Weight</button>
+            <button class="health-filter-btn" data-type="note"><i class="fas fa-sticky-note"></i> Notes</button>
+        </div>
+        <div class="health-timeline" id="health-timeline">
+            <div class="health-loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
         </div>
     `;
+
+    // Wire up add button
+    const addBtn = document.getElementById('add-health-record-btn');
+    if (addBtn) {
+        addBtn.addEventListener('click', () => {
+            openHealthRecordModal(currentDog.id, null, () => loadHealthTimeline(currentDog.id));
+        });
+    }
+
+    // Wire up filter buttons
+    const filterBtns = healthContainer.querySelectorAll('.health-filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            healthFilterType = btn.dataset.type || null;
+            loadHealthTimeline(currentDog.id);
+        });
+    });
+
+    // Load records
+    await loadHealthTimeline(currentDog.id);
+}
+
+/**
+ * Load and render health timeline records
+ * @param {string} dogId - Dog ID
+ */
+async function loadHealthTimeline(dogId) {
+    const timeline = document.getElementById('health-timeline');
+    if (!timeline) return;
+
+    timeline.innerHTML = '<div class="health-loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+    try {
+        const opts = { limit: 50 };
+        if (healthFilterType) opts.type = healthFilterType;
+        const data = await getHealthRecords(dogId, opts);
+
+        if (!data.records || data.records.length === 0) {
+            timeline.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-heartbeat"></i>
+                    <p>${healthFilterType ? 'No records of this type yet.' : 'No health records yet. Add your first record!'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        timeline.innerHTML = '';
+        data.records.forEach(record => {
+            const config = HEALTH_TYPE_CONFIG[record.type] || HEALTH_TYPE_CONFIG.note;
+            const recordDate = new Date(record.date + 'T00:00:00');
+            const dateStr = recordDate.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
+            });
+
+            const card = document.createElement('div');
+            card.className = 'health-card';
+
+            let valueHtml = '';
+            if (record.type === 'weight' && record.value != null) {
+                valueHtml = `<span class="health-value"><i class="fas fa-weight"></i> ${record.value} kg</span>`;
+            }
+
+            card.innerHTML = `
+                <div class="health-card-icon" style="background-color: ${config.color}">
+                    <i class="fas ${config.icon}"></i>
+                </div>
+                <div class="health-card-body">
+                    <div class="health-card-header">
+                        <span class="health-card-type">${config.label}</span>
+                        <span class="health-card-date">${dateStr}</span>
+                    </div>
+                    <p class="health-card-desc">${escapeHTML(record.description)}</p>
+                    ${record.notes ? `<p class="health-card-notes">${escapeHTML(record.notes)}</p>` : ''}
+                    ${valueHtml}
+                </div>
+                <div class="health-card-actions">
+                    <button class="health-action-btn health-edit-btn" title="Edit" data-id="${record.id}">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    <button class="health-action-btn health-delete-btn" title="Delete" data-id="${record.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+
+            // Wire up edit
+            card.querySelector('.health-edit-btn').addEventListener('click', () => {
+                openHealthRecordModal(dogId, record, () => loadHealthTimeline(dogId));
+            });
+
+            // Wire up delete
+            card.querySelector('.health-delete-btn').addEventListener('click', async () => {
+                if (!confirm('Delete this health record?')) return;
+                try {
+                    await deleteHealthRecord(dogId, record.id);
+                    showToast('Record deleted', 'success');
+                    loadHealthTimeline(dogId);
+                } catch (err) {
+                    console.error('Delete health record failed:', err);
+                    showToast('Failed to delete record', 'error');
+                }
+            });
+
+            timeline.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Failed to load health records:', error);
+        timeline.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load health records.</p>
+            </div>
+        `;
+    }
 }

@@ -9,6 +9,7 @@ import { initCreatePostModal, closeCreatePostModal } from './create-post-modal.j
 import { initCreateDogModal, closeCreateDogModal } from './create-dog-modal.js';
 import { initCartModal, closeCartDrawer } from './cart-modal.js';
 import { initEditDogModal, closeEditDogModal } from './edit-dog-modal.js';
+import { initHealthRecordModal, closeHealthRecordModal } from './health-record-modal.js';
 import { toggleBodyScroll } from './ui.js';
 
 // Re-export for existing consumers (posts.js, modals.test.ts)
@@ -22,6 +23,7 @@ export function initModals() {
     initCreateDogModal();
     initEditDogModal();
     initCartModal();
+    initHealthRecordModal();
     initAuthModal();
     updateUIForAuth();
 
@@ -41,6 +43,7 @@ function closeAllModals() {
     closeCreateDogModal();
     closeEditDogModal();
     closeCartDrawer();
+    closeHealthRecordModal();
     closeAuthModal();
 
     const searchPanel = document.getElementById('search-panel');

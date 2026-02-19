@@ -3,10 +3,12 @@
  * Handles dynamic navigation based on authentication state
  */
 
-import { getMyDogs } from './api.js';
+import { getMyDogs, getUnreadCount } from './api.js';
 import { getToken } from './auth.js';
 import { openSearchPanel } from './search.js';
 import { escapeHTML } from './utils.js';
+
+let unreadPollInterval = null;
 
 /**
  * Update profile navigation item based on auth state and user's dogs
@@ -17,6 +19,19 @@ export async function updateProfileNavigation() {
     const bottomNavProfile = document.getElementById('bottom-nav-profile');
 
     const token = getToken();
+
+    // Show/hide messages nav based on auth
+    const messagesNavItem = document.getElementById('messages-nav-item');
+    const bottomNavMessages = document.getElementById('bottom-nav-messages');
+    if (messagesNavItem) messagesNavItem.style.display = token ? '' : 'none';
+    if (bottomNavMessages) bottomNavMessages.style.display = token ? '' : 'none';
+
+    // Start or stop unread badge polling
+    if (token) {
+        startUnreadPolling();
+    } else {
+        stopUnreadPolling();
+    }
 
     // Not logged in - show "Add a pet" that prompts login
     if (!token) {
@@ -169,12 +184,57 @@ export function updateBottomNavActiveState() {
 
     if (path === '/') {
         document.getElementById('bottom-nav-home')?.classList.add('active');
+    } else if (path.startsWith('/messages')) {
+        document.getElementById('bottom-nav-messages')?.classList.add('active');
     } else if (path.startsWith('/dog/')) {
         // Highlight profile tab if viewing own dog's profile
         const profileLink = document.getElementById('bottom-nav-profile');
         if (profileLink && profileLink.getAttribute('href') === path) {
             profileLink.classList.add('active');
         }
+    }
+}
+
+/**
+ * Update unread message badges
+ */
+async function updateUnreadBadges() {
+    try {
+        const data = await getUnreadCount();
+        const count = data.unreadCount || 0;
+
+        const badge = document.getElementById('messages-badge');
+        const bottomBadge = document.getElementById('bottom-messages-badge');
+
+        if (badge) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.style.display = count > 0 ? '' : 'none';
+        }
+        if (bottomBadge) {
+            bottomBadge.textContent = count > 99 ? '99+' : count;
+            bottomBadge.style.display = count > 0 ? '' : 'none';
+        }
+    } catch (error) {
+        // Silently fail on badge polling
+    }
+}
+
+/**
+ * Start polling for unread message count
+ */
+function startUnreadPolling() {
+    stopUnreadPolling();
+    updateUnreadBadges();
+    unreadPollInterval = setInterval(updateUnreadBadges, 30000);
+}
+
+/**
+ * Stop polling for unread message count
+ */
+function stopUnreadPolling() {
+    if (unreadPollInterval) {
+        clearInterval(unreadPollInterval);
+        unreadPollInterval = null;
     }
 }
 

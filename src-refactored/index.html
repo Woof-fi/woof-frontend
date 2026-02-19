@@ -44,6 +44,9 @@
                 <ul id="nav-links">
                     <li><a href="/" data-link><i class="fas fa-home"></i> Home</a></li>
                     <li><a href="#" id="create-post-link"><i class="fas fa-plus-square"></i> Create</a></li>
+                    <li id="messages-nav-item" style="display: none;">
+                        <a href="/messages" data-link><i class="fas fa-envelope"></i> Messages <span class="nav-badge" id="messages-badge" style="display: none;">0</span></a>
+                    </li>
                     <li id="profile-nav-item">
                         <!-- Profile link will be rendered dynamically based on auth state -->
                     </li>
@@ -97,6 +100,10 @@
         </a>
         <a href="#" id="create-post-link-mobile" class="bottom-nav-item">
             <i class="fas fa-plus-square"></i>
+        </a>
+        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" style="display: none;">
+            <i class="fas fa-envelope"></i>
+            <span class="bottom-nav-badge" id="bottom-messages-badge" style="display: none;">0</span>
         </a>
         <a href="#" id="bottom-nav-profile" class="bottom-nav-item">
             <i class="fas fa-user-circle"></i>
@@ -258,6 +265,47 @@
                         <div id="edit-dog-photo-preview" class="image-preview"></div>
                     </div>
                     <button type="submit" class="btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Record Modal -->
+    <div id="health-record-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Health Record</h2>
+                <button class="modal-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="health-record-form">
+                    <div class="form-group">
+                        <label for="health-record-type">Type *</label>
+                        <select id="health-record-type" required>
+                            <option value="vet_visit">Vet Visit</option>
+                            <option value="vaccination">Vaccination</option>
+                            <option value="medication">Medication</option>
+                            <option value="weight">Weight</option>
+                            <option value="note">Note</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="health-record-date">Date *</label>
+                        <input type="date" id="health-record-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="health-record-description">Description *</label>
+                        <input type="text" id="health-record-description" required maxlength="1000" placeholder="e.g., Annual check-up, Rabies vaccine">
+                    </div>
+                    <div class="form-group" id="health-record-value-group" style="display: none;">
+                        <label for="health-record-value">Weight (kg)</label>
+                        <input type="number" id="health-record-value" min="0.1" max="200" step="0.1" placeholder="e.g., 25.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="health-record-notes">Notes (optional)</label>
+                        <textarea id="health-record-notes" rows="3" maxlength="2000" placeholder="Additional details..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Add Record</button>
                 </form>
             </div>
         </div>
