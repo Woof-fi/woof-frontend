@@ -6,6 +6,7 @@
 import { getMyDogs } from './api.js';
 import { getToken } from './auth.js';
 import { openSearchPanel } from './search.js';
+import { escapeHTML } from './utils.js';
 
 /**
  * Update profile navigation item based on auth state and user's dogs
@@ -90,12 +91,12 @@ export async function updateProfileNavigation() {
 
             if (profileNavItem) {
                 profileNavItem.innerHTML = `
-                    <a href="/dog/${slug}" data-link>
-                        <img src="${profilePhoto}"
-                             alt="${dog.name}"
+                    <a href="/dog/${encodeURIComponent(slug)}" data-link>
+                        <img src="${escapeHTML(profilePhoto)}"
+                             alt="${escapeHTML(dog.name)}"
                              class="profile-pic"
                              onerror="this.src='/assets/images/dog_profile_pic.jpg'">
-                        ${dog.name}
+                        ${escapeHTML(dog.name)}
                     </a>
                 `;
             }
@@ -103,8 +104,8 @@ export async function updateProfileNavigation() {
             // Bottom nav: profile pic linking to dog profile
             if (bottomNavProfile) {
                 bottomNavProfile.innerHTML = `
-                    <img src="${profilePhoto}"
-                         alt="${dog.name}"
+                    <img src="${escapeHTML(profilePhoto)}"
+                         alt="${escapeHTML(dog.name)}"
                          class="profile-pic"
                          onerror="this.src='/assets/images/dog_profile_pic.jpg'">
                 `;

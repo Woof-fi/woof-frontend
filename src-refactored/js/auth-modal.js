@@ -21,6 +21,28 @@ export function initAuthModal() {
     if (!authModal || !authForm) return;
 
     let currentMode = 'login'; // 'login' or 'register'
+    const passwordInput = document.getElementById('auth-password');
+    const passwordReqs = document.getElementById('password-requirements');
+
+    // Real-time password validation (register mode only)
+    function updatePasswordRequirements() {
+        if (currentMode !== 'register' || !passwordReqs) return;
+        const val = passwordInput.value;
+        const checks = {
+            'req-length': val.length >= 8,
+            'req-uppercase': /[A-Z]/.test(val),
+            'req-lowercase': /[a-z]/.test(val),
+            'req-number': /[0-9]/.test(val)
+        };
+        for (const [id, met] of Object.entries(checks)) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('met', met);
+        }
+    }
+
+    if (passwordInput) {
+        passwordInput.addEventListener('input', updatePasswordRequirements);
+    }
 
     // Tab switching
     authTabs.forEach(tab => {
@@ -38,10 +60,13 @@ export function initAuthModal() {
                 nameGroup.style.display = 'block';
                 authSubmit.textContent = 'Sign Up';
                 authModalTitle.textContent = 'Register';
+                if (passwordReqs) passwordReqs.style.display = '';
+                updatePasswordRequirements();
             } else {
                 nameGroup.style.display = 'none';
                 authSubmit.textContent = 'Sign In';
                 authModalTitle.textContent = 'Login';
+                if (passwordReqs) passwordReqs.style.display = 'none';
             }
         });
     });
