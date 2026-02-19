@@ -320,105 +320,106 @@ function createPostElement(postData) {
     captionP.appendChild(document.createTextNode(' ' + caption));
     postCaption.appendChild(captionP);
 
-    // Comments section
+    // Comments section — only visible to logged-in users
     const commentsSection = document.createElement('div');
     commentsSection.className = 'post-comments-section';
 
-    if (commentCount > 0 && postId) {
-        const viewAllLink = document.createElement('a');
-        viewAllLink.className = 'view-all-comments';
-        viewAllLink.href = '#';
-        viewAllLink.textContent = commentCount === 1
-            ? 'View 1 comment'
-            : `View all ${commentCount} comments`;
-        viewAllLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleComments(postId, commentsSection);
-        });
-        commentsSection.appendChild(viewAllLink);
-    }
+    if (isAuthenticated()) {
+        if (commentCount > 0 && postId) {
+            const viewAllLink = document.createElement('a');
+            viewAllLink.className = 'view-all-comments';
+            viewAllLink.href = '#';
+            viewAllLink.textContent = commentCount === 1
+                ? 'View 1 comment'
+                : `View all ${commentCount} comments`;
+            viewAllLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleComments(postId, commentsSection);
+            });
+            commentsSection.appendChild(viewAllLink);
+        }
 
-    const commentsList = document.createElement('div');
-    commentsList.className = 'comments-list';
-    commentsList.dataset.postId = postId || '';
-    commentsSection.appendChild(commentsList);
+        const commentsList = document.createElement('div');
+        commentsList.className = 'comments-list';
+        commentsList.dataset.postId = postId || '';
+        commentsSection.appendChild(commentsList);
 
-    // Comment input (always visible, Instagram-style)
-    if (postId) {
-        const commentForm = document.createElement('div');
-        commentForm.className = 'comment-form';
+        // Comment input (always visible for logged-in users, Instagram-style)
+        if (postId) {
+            const commentForm = document.createElement('div');
+            commentForm.className = 'comment-form';
 
-        const commentInput = document.createElement('input');
-        commentInput.type = 'text';
-        commentInput.className = 'comment-input';
-        commentInput.placeholder = 'Add a comment...';
-        commentInput.maxLength = 2200;
+            const commentInput = document.createElement('input');
+            commentInput.type = 'text';
+            commentInput.className = 'comment-input';
+            commentInput.placeholder = 'Add a comment...';
+            commentInput.maxLength = 2200;
 
-        const postCommentBtn = document.createElement('button');
-        postCommentBtn.className = 'comment-submit';
-        postCommentBtn.textContent = 'Post';
-        postCommentBtn.disabled = true;
-
-        commentInput.addEventListener('input', () => {
-            postCommentBtn.disabled = !commentInput.value.trim();
-        });
-
-        const submitComment = async () => {
-            const content = commentInput.value.trim();
-            if (!content || !postId) return;
-
-            if (!isAuthenticated()) {
-                showToast('Please login to comment', 'error');
-                openAuthModal();
-                return;
-            }
-
+            const postCommentBtn = document.createElement('button');
+            postCommentBtn.className = 'comment-submit';
+            postCommentBtn.textContent = 'Post';
             postCommentBtn.disabled = true;
-            try {
-                const result = await createComment(postId, content);
-                commentInput.value = '';
 
-                // Add the new comment to the list
-                const commentEl = createCommentElement(result.comment);
-                commentsList.prepend(commentEl);
+            commentInput.addEventListener('input', () => {
+                postCommentBtn.disabled = !commentInput.value.trim();
+            });
 
-                // Update comment count
-                const countSpan = post.querySelector('.comment-count');
-                if (countSpan) {
-                    countSpan.textContent = result.commentCount > 0 ? String(result.commentCount) : '';
+            const submitComment = async () => {
+                const content = commentInput.value.trim();
+                if (!content || !postId) return;
+
+                postCommentBtn.disabled = true;
+                try {
+                    const result = await createComment(postId, content);
+                    commentInput.value = '';
+
+                    // Add the new comment to the list
+                    const commentEl = createCommentElement(result.comment);
+                    commentsList.prepend(commentEl);
+
+                    // Update comment count
+                    const countSpan = post.querySelector('.comment-count');
+                    if (countSpan) {
+                        countSpan.textContent = result.commentCount > 0 ? String(result.commentCount) : '';
+                    }
+
+                    // Update "view all" link
+                    const viewAll = commentsSection.querySelector('.view-all-comments');
+                    if (viewAll) {
+                        viewAll.textContent = result.commentCount === 1
+                            ? 'View 1 comment'
+                            : `View all ${result.commentCount} comments`;
+                    }
+                } catch (error) {
+                    console.error('Failed to post comment:', error);
+                    showToast('Failed to post comment', 'error');
+                    postCommentBtn.disabled = false;
                 }
+            };
 
-                // Update "view all" link
-                const viewAll = commentsSection.querySelector('.view-all-comments');
-                if (viewAll) {
-                    viewAll.textContent = result.commentCount === 1
-                        ? 'View 1 comment'
-                        : `View all ${result.commentCount} comments`;
+            postCommentBtn.addEventListener('click', submitComment);
+            commentInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !postCommentBtn.disabled) {
+                    submitComment();
                 }
-            } catch (error) {
-                console.error('Failed to post comment:', error);
-                showToast('Failed to post comment', 'error');
-                postCommentBtn.disabled = false;
-            }
-        };
+            });
 
-        postCommentBtn.addEventListener('click', submitComment);
-        commentInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !postCommentBtn.disabled) {
-                submitComment();
-            }
+            commentForm.appendChild(commentInput);
+            commentForm.appendChild(postCommentBtn);
+            commentsSection.appendChild(commentForm);
+        }
+
+        // Wire comment button to focus the input
+        commentButton.addEventListener('click', () => {
+            const input = commentsSection.querySelector('.comment-input');
+            if (input) input.focus();
         });
-
-        commentForm.appendChild(commentInput);
-        commentForm.appendChild(postCommentBtn);
-        commentsSection.appendChild(commentForm);
+    } else {
+        // Not logged in — clicking comment button opens login modal
+        commentButton.addEventListener('click', () => {
+            openAuthModal();
+        });
     }
-
-    // Wire comment button to focus the input
-    commentButton.addEventListener('click', () => {
-        const input = commentsSection.querySelector('.comment-input');
-        if (input) input.focus();
-    });
 
     // Assemble post
     post.appendChild(postHeader);
