@@ -18,7 +18,7 @@ export function initCreatePostModal() {
     const createPostLinkMobile = document.getElementById('create-post-link-mobile');
     const createPostModal = document.getElementById('create-post-modal');
     const createPostForm = document.getElementById('create-post-form');
-    const closeButtons = document.querySelectorAll('.close');
+    const closeButtons = createPostModal.querySelectorAll('.modal-close');
 
     if (!createPostModal) return;
 
@@ -41,9 +41,7 @@ export function initCreatePostModal() {
     // Close buttons
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {
-            if (button.closest('#create-post-modal')) {
-                closeCreatePostModal();
-            }
+            closeCreatePostModal();
         });
     });
 

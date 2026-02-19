@@ -3,7 +3,7 @@
  * Handles post creation, display, and interactions
  */
 
-import { getAllDogs, getFeed, uploadImage, createPost as createPostAPI, likePost, unlikePost } from './api.js';
+import { getAllDogs, getFeed, uploadImage, createPost as createPostAPI, likePost, unlikePost, createComment, getComments } from './api.js';
 import { escapeHTML, generateUsername, isValidFileType, isValidFileSize, showToast, timeAgo } from './utils.js';
 import { showLoading, hideLoading, showError, showFeedSkeleton, animateIn } from './ui.js';
 import { getCurrentUser, isAuthenticated } from './auth.js';
@@ -14,6 +14,11 @@ let feedNextCursor = null;
 let feedLoading = false;
 let feedObserver = null;
 let currentFeedType = 'public';
+
+// Invite card tracking
+let totalPostsRendered = 0;
+const INVITE_FIRST_POSITION = 5;
+const INVITE_INTERVAL = 20;
 
 /**
  * Initialize feed tabs (For You / Following)
@@ -54,6 +59,7 @@ export async function initFeed(type = 'public') {
     // Reset pagination state
     feedNextCursor = null;
     feedLoading = false;
+    totalPostsRendered = 0;
     if (feedObserver) {
         feedObserver.disconnect();
         feedObserver = null;
@@ -63,10 +69,17 @@ export async function initFeed(type = 'public') {
         showFeedSkeleton(feedContainer);
         const result = await getFeed(type);
         if (result.posts && result.posts.length > 0) {
-            renderPostFeed(result.posts, feedContainer);
+            const GATE_POST_LIMIT = 4;
+            const postsToShow = !isAuthenticated()
+                ? result.posts.slice(0, GATE_POST_LIMIT)
+                : result.posts;
+
+            renderPostFeed(postsToShow, feedContainer);
             feedNextCursor = result.nextCursor;
 
-            if (feedNextCursor) {
+            if (!isAuthenticated()) {
+                insertContentGate(feedContainer);
+            } else if (feedNextCursor) {
                 setupInfiniteScroll(feedContainer);
             }
         } else if (type === 'following') {
@@ -264,6 +277,8 @@ function createPostElement(postData) {
     const likeCount = postData.likeCount || 0;
     const likedByUser = postData.likedByUser || false;
 
+    const commentCount = postData.commentCount || 0;
+
     const postActions = document.createElement('div');
     postActions.className = 'post-actions';
 
@@ -280,16 +295,21 @@ function createPostElement(postData) {
     likeCountSpan.className = 'like-count';
     likeCountSpan.textContent = likeCount > 0 ? String(likeCount) : '';
 
+    const commentButton = document.createElement('button');
+    commentButton.className = 'comment-button';
+    commentButton.setAttribute('aria-label', 'Comment on post');
+    const commentIcon = document.createElement('i');
+    commentIcon.className = 'far fa-comment';
+    commentButton.appendChild(commentIcon);
+
+    const commentCountSpan = document.createElement('span');
+    commentCountSpan.className = 'comment-count';
+    commentCountSpan.textContent = commentCount > 0 ? String(commentCount) : '';
+
     postActions.appendChild(likeButton);
     postActions.appendChild(likeCountSpan);
-    postActions.innerHTML += `
-        <button aria-label="Comment on post">
-            <i class="far fa-comment"></i>
-        </button>
-        <button aria-label="Share post">
-            <i class="far fa-paper-plane"></i>
-        </button>
-    `;
+    postActions.appendChild(commentButton);
+    postActions.appendChild(commentCountSpan);
 
     const postCaption = document.createElement('div');
     postCaption.className = 'post-caption';
@@ -300,11 +320,112 @@ function createPostElement(postData) {
     captionP.appendChild(document.createTextNode(' ' + caption));
     postCaption.appendChild(captionP);
 
+    // Comments section
+    const commentsSection = document.createElement('div');
+    commentsSection.className = 'post-comments-section';
+
+    if (commentCount > 0 && postId) {
+        const viewAllLink = document.createElement('a');
+        viewAllLink.className = 'view-all-comments';
+        viewAllLink.href = '#';
+        viewAllLink.textContent = commentCount === 1
+            ? 'View 1 comment'
+            : `View all ${commentCount} comments`;
+        viewAllLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleComments(postId, commentsSection);
+        });
+        commentsSection.appendChild(viewAllLink);
+    }
+
+    const commentsList = document.createElement('div');
+    commentsList.className = 'comments-list';
+    commentsList.dataset.postId = postId || '';
+    commentsSection.appendChild(commentsList);
+
+    // Comment input (always visible, Instagram-style)
+    if (postId) {
+        const commentForm = document.createElement('div');
+        commentForm.className = 'comment-form';
+
+        const commentInput = document.createElement('input');
+        commentInput.type = 'text';
+        commentInput.className = 'comment-input';
+        commentInput.placeholder = 'Add a comment...';
+        commentInput.maxLength = 2200;
+
+        const postCommentBtn = document.createElement('button');
+        postCommentBtn.className = 'comment-submit';
+        postCommentBtn.textContent = 'Post';
+        postCommentBtn.disabled = true;
+
+        commentInput.addEventListener('input', () => {
+            postCommentBtn.disabled = !commentInput.value.trim();
+        });
+
+        const submitComment = async () => {
+            const content = commentInput.value.trim();
+            if (!content || !postId) return;
+
+            if (!isAuthenticated()) {
+                showToast('Please login to comment', 'error');
+                openAuthModal();
+                return;
+            }
+
+            postCommentBtn.disabled = true;
+            try {
+                const result = await createComment(postId, content);
+                commentInput.value = '';
+
+                // Add the new comment to the list
+                const commentEl = createCommentElement(result.comment);
+                commentsList.prepend(commentEl);
+
+                // Update comment count
+                const countSpan = post.querySelector('.comment-count');
+                if (countSpan) {
+                    countSpan.textContent = result.commentCount > 0 ? String(result.commentCount) : '';
+                }
+
+                // Update "view all" link
+                const viewAll = commentsSection.querySelector('.view-all-comments');
+                if (viewAll) {
+                    viewAll.textContent = result.commentCount === 1
+                        ? 'View 1 comment'
+                        : `View all ${result.commentCount} comments`;
+                }
+            } catch (error) {
+                console.error('Failed to post comment:', error);
+                showToast('Failed to post comment', 'error');
+                postCommentBtn.disabled = false;
+            }
+        };
+
+        postCommentBtn.addEventListener('click', submitComment);
+        commentInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !postCommentBtn.disabled) {
+                submitComment();
+            }
+        });
+
+        commentForm.appendChild(commentInput);
+        commentForm.appendChild(postCommentBtn);
+        commentsSection.appendChild(commentForm);
+    }
+
+    // Wire comment button to focus the input
+    commentButton.addEventListener('click', () => {
+        const input = commentsSection.querySelector('.comment-input');
+        if (input) input.focus();
+    });
+
     // Assemble post
     post.appendChild(postHeader);
     post.appendChild(postImage);
     post.appendChild(postActions);
     post.appendChild(postCaption);
+    post.appendChild(commentsSection);
 
     if (postData.createdAt) {
         const timestampContainer = document.createElement('div');
@@ -377,6 +498,7 @@ function appendPosts(posts, container, beforeElement = null) {
             location: post.dogLocation,
             dogSlug: post.dogSlug,
             likeCount: post.likeCount,
+            commentCount: post.commentCount,
             likedByUser: post.likedByUser,
             createdAt: post.createdAt
         });
@@ -386,11 +508,184 @@ function appendPosts(posts, container, beforeElement = null) {
             container.appendChild(postElement);
         }
         animateIn(postElement);
+
+        totalPostsRendered++;
+
+        // Insert invite card at specific intervals (logged-in users only)
+        if (isAuthenticated() && shouldShowInviteCard(totalPostsRendered)) {
+            const inviteCard = createInviteCard();
+            if (beforeElement) {
+                container.insertBefore(inviteCard, beforeElement);
+            } else {
+                container.appendChild(inviteCard);
+            }
+            animateIn(inviteCard);
+        }
     });
 
     // Bind like buttons
     bindLikeButtons();
 }
+
+/**
+ * Check if an invite card should be shown after this post position
+ * @param {number} position - 1-based post position
+ * @returns {boolean}
+ */
+function shouldShowInviteCard(position) {
+    if (position === INVITE_FIRST_POSITION) return true;
+    if (position > INVITE_FIRST_POSITION && (position - INVITE_FIRST_POSITION) % INVITE_INTERVAL === 0) return true;
+    return false;
+}
+
+/**
+ * Fallback: copy site URL to clipboard and show visual feedback on button
+ * @param {HTMLElement} btn - Button to update with feedback
+ */
+function copyToClipboardFallback(btn) {
+    navigator.clipboard.writeText(window.location.origin).then(() => {
+        showToast('Link copied!', 'success');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '';
+        const checkIcon = document.createElement('i');
+        checkIcon.className = 'fas fa-check';
+        btn.appendChild(checkIcon);
+        btn.appendChild(document.createTextNode(' Copied!'));
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+        }, 2000);
+    }).catch(() => {
+        showToast('Failed to copy link', 'error');
+    });
+}
+
+/**
+ * Create an invite card element for the feed
+ * @returns {HTMLElement}
+ */
+function createInviteCard() {
+    const card = document.createElement('div');
+    card.className = 'invite-card';
+
+    const icon = document.createElement('div');
+    icon.className = 'invite-card-icon';
+    const iconEl = document.createElement('i');
+    iconEl.className = 'fas fa-envelope-open-text';
+    icon.appendChild(iconEl);
+
+    const heading = document.createElement('h3');
+    heading.className = 'invite-card-heading';
+    heading.textContent = 'Know a good boy or girl?';
+
+    const desc = document.createElement('p');
+    desc.className = 'invite-card-desc';
+    desc.textContent = 'Invite your friends and their dogs to join the pack!';
+
+    const actions = document.createElement('div');
+    actions.className = 'invite-card-actions';
+
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'btn-primary invite-card-btn';
+    const shareIcon = document.createElement('i');
+    shareIcon.className = navigator.share ? 'fas fa-share-alt' : 'fas fa-link';
+    shareBtn.appendChild(shareIcon);
+    shareBtn.appendChild(document.createTextNode(navigator.share ? ' Share Woof' : ' Copy Invite Link'));
+
+    shareBtn.addEventListener('click', async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Join Woof!',
+                    text: 'Come join the social network for dogs!',
+                    url: window.location.origin
+                });
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    copyToClipboardFallback(shareBtn);
+                }
+            }
+        } else {
+            copyToClipboardFallback(shareBtn);
+        }
+    });
+
+    actions.appendChild(shareBtn);
+
+    card.appendChild(icon);
+    card.appendChild(heading);
+    card.appendChild(desc);
+    card.appendChild(actions);
+
+    return card;
+}
+
+/**
+ * Insert a content gate for unauthenticated users
+ * @param {HTMLElement} container - Feed container
+ */
+function insertContentGate(container) {
+    const gate = document.createElement('div');
+    gate.className = 'content-gate';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'content-gate-overlay';
+
+    const content = document.createElement('div');
+    content.className = 'content-gate-content';
+
+    const icon = document.createElement('div');
+    icon.className = 'content-gate-icon';
+    const iconEl = document.createElement('i');
+    iconEl.className = 'fas fa-lock';
+    icon.appendChild(iconEl);
+
+    const heading = document.createElement('h2');
+    heading.className = 'content-gate-heading';
+    heading.textContent = 'Want to see more?';
+
+    const desc = document.createElement('p');
+    desc.className = 'content-gate-desc';
+    desc.textContent = "Sign up to browse the full feed, follow dogs, and share your own pup's adventures.";
+
+    const btnGroup = document.createElement('div');
+    btnGroup.className = 'content-gate-buttons';
+
+    const signupBtn = document.createElement('button');
+    signupBtn.className = 'btn-primary content-gate-btn';
+    signupBtn.textContent = 'Sign Up';
+    signupBtn.addEventListener('click', () => {
+        openAuthModal();
+        const registerTab = document.querySelector('.auth-tab[data-tab="register"]');
+        if (registerTab) registerTab.click();
+    });
+
+    const loginBtn = document.createElement('button');
+    loginBtn.className = 'btn-secondary content-gate-btn';
+    loginBtn.textContent = 'Log In';
+    loginBtn.addEventListener('click', () => {
+        openAuthModal();
+    });
+
+    btnGroup.appendChild(signupBtn);
+    btnGroup.appendChild(loginBtn);
+
+    content.appendChild(icon);
+    content.appendChild(heading);
+    content.appendChild(desc);
+    content.appendChild(btnGroup);
+
+    overlay.appendChild(content);
+    gate.appendChild(overlay);
+    container.appendChild(gate);
+}
+
+// Re-initialize feed when auth state changes (removes content gate after login)
+window.addEventListener('auth-state-changed', () => {
+    const feedContainer = document.querySelector('#feed-container');
+    if (feedContainer) {
+        initFeed(currentFeedType);
+    }
+});
 
 /**
  * Bind like button functionality
@@ -453,6 +748,70 @@ function bindLikeButtons() {
             }
         });
     });
+}
+
+/**
+ * Toggle comments visibility for a post — load from API on first expand
+ * @param {string} postId - Post ID
+ * @param {HTMLElement} section - Comments section container
+ */
+async function toggleComments(postId, section) {
+    const list = section.querySelector('.comments-list');
+    if (!list) return;
+
+    // If already loaded, toggle visibility
+    if (list.dataset.loaded === 'true') {
+        list.style.display = list.style.display === 'none' ? '' : 'none';
+        return;
+    }
+
+    // Load comments from API
+    try {
+        list.innerHTML = '<span class="comments-loading">Loading comments...</span>';
+        const result = await getComments(postId, null, 20);
+
+        list.innerHTML = '';
+        result.comments.forEach(comment => {
+            list.appendChild(createCommentElement(comment));
+        });
+        list.dataset.loaded = 'true';
+    } catch (error) {
+        console.error('Failed to load comments:', error);
+        list.innerHTML = '<span class="comments-loading">Failed to load comments</span>';
+    }
+}
+
+/**
+ * Create a single comment element
+ * @param {object} comment - Comment object from API
+ * @returns {HTMLElement}
+ */
+function createCommentElement(comment) {
+    const el = document.createElement('div');
+    el.className = 'comment-item';
+
+    const nameLink = document.createElement('a');
+    nameLink.href = `/dog/${comment.dogSlug || comment.dogId}`;
+    nameLink.setAttribute('data-link', '');
+    nameLink.className = 'comment-author';
+
+    const nameStrong = document.createElement('strong');
+    nameStrong.textContent = comment.dogName;
+    nameLink.appendChild(nameStrong);
+
+    const contentSpan = document.createElement('span');
+    contentSpan.className = 'comment-content';
+    contentSpan.textContent = ' ' + comment.content;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'comment-time';
+    timeSpan.textContent = timeAgo(comment.createdAt);
+
+    el.appendChild(nameLink);
+    el.appendChild(contentSpan);
+    el.appendChild(timeSpan);
+
+    return el;
 }
 
 /**

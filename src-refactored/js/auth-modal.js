@@ -72,6 +72,9 @@ export function initAuthModal() {
             // Update navigation after successful auth
             await updateProfileNavigation();
             await updateUIForAuth();
+
+            // Notify other modules (e.g., removes content gate from feed)
+            window.dispatchEvent(new CustomEvent('auth-state-changed'));
         } catch (error) {
             // Error already shown by login()/register()
             console.error('Auth error:', error);

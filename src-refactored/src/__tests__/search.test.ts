@@ -156,7 +156,7 @@ describe('Search Module', () => {
       }, { timeout: 500 });
 
       const img = document.querySelector('#search-results img') as HTMLImageElement;
-      expect(img.src).toContain('/assets/images/default-dog.jpg');
+      expect(img.src).toContain('/assets/images/dog_profile_pic.jpg');
     });
   });
 

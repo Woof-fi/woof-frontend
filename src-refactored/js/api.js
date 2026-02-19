@@ -355,6 +355,49 @@ export async function unlikePost(postId) {
 }
 
 // ============================================================================
+// COMMENTS API
+// ============================================================================
+
+/**
+ * Create a comment on a post
+ * @param {string} postId - ID of the post
+ * @param {string} content - Comment text
+ * @returns {Promise<{comment: object, commentCount: number}>}
+ */
+export async function createComment(postId, content) {
+    return apiRequest('/api/comments', {
+        method: 'POST',
+        body: JSON.stringify({ post_id: postId, content })
+    });
+}
+
+/**
+ * Get comments for a post
+ * @param {string} postId - ID of the post
+ * @param {string|null} cursor - ISO timestamp cursor for pagination
+ * @param {number} limit - Number of comments per page
+ * @returns {Promise<{comments: object[], total: number, nextCursor: string|null}>}
+ */
+export async function getComments(postId, cursor = null, limit = 20) {
+    let url = `/api/comments/${postId}?limit=${limit}`;
+    if (cursor) {
+        url += `&cursor=${encodeURIComponent(cursor)}`;
+    }
+    return apiRequest(url);
+}
+
+/**
+ * Delete a comment
+ * @param {string} commentId - ID of the comment
+ * @returns {Promise<{commentCount: number}>}
+ */
+export async function deleteComment(commentId) {
+    return apiRequest(`/api/comments/${commentId}`, {
+        method: 'DELETE'
+    });
+}
+
+// ============================================================================
 // UPLOAD API
 // ============================================================================
 

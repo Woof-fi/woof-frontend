@@ -79,21 +79,25 @@ export function initCreateDogModal() {
             const bio = document.getElementById('dog-bio').value.trim();
             const photoFile = photoInput.files[0];
 
-            // Upload photo if provided
-            let profilePhoto = null;
-            if (photoFile) {
-                showToast('Uploading photo...', 'info');
-                profilePhoto = await uploadImage(photoFile);
+            // Profile photo is required
+            if (!photoFile) {
+                showToast('Please add a profile photo for your dog', 'error');
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+                return;
             }
+
+            showToast('Uploading photo...', 'info');
+            const profilePhoto = await uploadImage(photoFile);
 
             // Create dog profile
             const dogData = {
                 name,
                 breed,
                 age,
+                profile_photo: profilePhoto,
                 ...(location && { location }),
-                ...(bio && { bio }),
-                ...(profilePhoto && { profilePhoto })
+                ...(bio && { bio })
             };
 
             await createDog(dogData);

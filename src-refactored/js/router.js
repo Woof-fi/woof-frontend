@@ -81,6 +81,7 @@ class Router {
                 const query = Object.fromEntries(new URLSearchParams(window.location.search));
                 this.currentRoute = routePath;
                 await route.handler({ params, query, path });
+                window.dispatchEvent(new CustomEvent('routechange', { detail: { path } }));
                 return;
             }
         }

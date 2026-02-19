@@ -49,10 +49,7 @@ function renderProfile(dog, container, slugOrId) {
     const location = dog.location ? escapeHTML(dog.location) : 'Unknown';
     const bio = dog.bio ? escapeHTML(dog.bio) : 'No bio yet';
 
-    // Fix profile photo path if it starts with /
-    const profilePhoto = dog.profilePhoto && dog.profilePhoto.startsWith('/')
-        ? `/assets/images${dog.profilePhoto}`
-        : dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
+    const profilePhoto = dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
 
     // Build action button HTML
     let actionButtonHtml = '';
@@ -71,11 +68,10 @@ function renderProfile(dog, container, slugOrId) {
         `;
     }
 
-    // Follower/following counts placeholder
+    // Follower count
     const statsHtml = `
         <div class="profile-stats" id="profile-stats">
             <span><strong id="follower-count">-</strong> followers</span>
-            <span><strong id="following-count">-</strong> following</span>
         </div>
     `;
 
@@ -127,14 +123,12 @@ function renderProfile(dog, container, slugOrId) {
 async function loadFollowStatus(dogId) {
     const followBtn = document.getElementById('follow-btn');
     const followerCountEl = document.getElementById('follower-count');
-    const followingCountEl = document.getElementById('following-count');
 
     try {
         const status = await getFollowStatus(dogId);
 
-        // Update counts
+        // Update follower count
         if (followerCountEl) followerCountEl.textContent = status.followerCount;
-        if (followingCountEl) followingCountEl.textContent = status.followingCount;
 
         // Update button state
         if (followBtn) {

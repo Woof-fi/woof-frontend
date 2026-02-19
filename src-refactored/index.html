@@ -34,8 +34,6 @@
                 </a>
                 <div class="header-icons">
                     <a href="#" id="desktop-search-button" aria-label="Search"><i class="fas fa-search"></i></a>
-                    <a href="#" aria-label="Messages"><i class="fas fa-envelope"></i></a>
-                    <a href="#" aria-label="Notifications"><i class="fas fa-bell"></i></a>
                     <a href="#" class="auth-link" aria-label="Login">Login</a>
                 </div>
             </div>
@@ -49,31 +47,72 @@
                     <li id="profile-nav-item">
                         <!-- Profile link will be rendered dynamically based on auth state -->
                     </li>
-                    <li class="invite-friends-nav"><a href="#" id="invite-friends-link"><i class="fas fa-paw"></i> Invite a Doggy Friend</a></li>
                 </ul>
             </nav>
 
             <!-- SPA Content Container -->
             <div id="app" class="content">
                 <!-- Views will be rendered here by ViewManager -->
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading...</p>
+                <div class="post-skeleton" aria-hidden="true">
+                    <div class="post-header-skeleton">
+                        <div class="skeleton skeleton-circle"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                    <div class="skeleton skeleton-image"></div>
+                    <div class="post-actions-skeleton">
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                </div>
+                <div class="post-skeleton" aria-hidden="true">
+                    <div class="post-header-skeleton">
+                        <div class="skeleton skeleton-circle"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                    <div class="skeleton skeleton-image"></div>
+                    <div class="post-actions-skeleton">
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                </div>
+                <div class="post-skeleton" aria-hidden="true">
+                    <div class="post-header-skeleton">
+                        <div class="skeleton skeleton-circle"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                    <div class="skeleton skeleton-image"></div>
+                    <div class="post-actions-skeleton">
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Search Overlay -->
-    <div id="search-overlay" class="search-overlay" style="display: none;">
-        <div class="search-container">
-            <div class="search-header">
-                <h2>Search</h2>
-                <button class="search-close" aria-label="Close search">&times;</button>
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+        <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item active">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="#" id="bottom-nav-search" class="bottom-nav-item">
+            <i class="fas fa-search"></i>
+        </a>
+        <a href="#" id="create-post-link-mobile" class="bottom-nav-item">
+            <i class="fas fa-plus-square"></i>
+        </a>
+        <a href="#" id="bottom-nav-profile" class="bottom-nav-item">
+            <i class="fas fa-user-circle"></i>
+        </a>
+    </nav>
+
+    <!-- Search Panel -->
+    <div id="search-panel" class="search-panel">
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-input-icon"></i>
+                <input type="text" id="mobile-search-input" placeholder="Search" autocomplete="off">
             </div>
-            <input type="text" id="search-input" placeholder="Search for dogs..." autocomplete="off">
-            <div id="search-results" class="search-results"></div>
+            <button class="close-search" aria-label="Close search">Cancel</button>
         </div>
+        <ul id="search-results" class="search-results"></ul>
     </div>
 
     <!-- Create Post Modal -->
@@ -167,8 +206,8 @@
                         <textarea id="dog-bio" rows="3" maxlength="500" placeholder="Tell us about your dog..."></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="dog-photo">Profile Photo (optional)</label>
-                        <input type="file" id="dog-photo" accept="image/*">
+                        <label for="dog-photo">Profile Photo *</label>
+                        <input type="file" id="dog-photo" accept="image/*" required>
                         <div id="dog-photo-preview" class="image-preview"></div>
                     </div>
                     <button type="submit" class="btn-primary">Add Pet</button>

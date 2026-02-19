@@ -78,7 +78,7 @@ export function initSearch() {
 /**
  * Open search panel
  */
-function openSearchPanel() {
+export function openSearchPanel() {
     const searchPanel = document.getElementById('search-panel');
     const searchInput = document.getElementById('mobile-search-input');
 
@@ -183,13 +183,22 @@ function renderSearchResults(results, container, query) {
         const li = document.createElement('li');
         li.className = 'search-result-item';
 
+        const link = document.createElement('a');
+        link.href = `/dog/${result.slug || result.id}`;
+        link.setAttribute('data-link', '');
+        link.className = 'search-result-link';
+
         const img = document.createElement('img');
-        img.src = result.profilePhoto || '/assets/images/default-dog.jpg';
+        img.src = result.profilePhoto || '/assets/images/dog_profile_pic.jpg';
         img.alt = escapeHTML(result.name);
+        img.className = 'search-result-avatar';
         img.loading = 'lazy';
         img.onerror = function() {
-            this.src = '/assets/images/default-dog.jpg';
+            this.src = '/assets/images/dog_profile_pic.jpg';
         };
+
+        const textContainer = document.createElement('div');
+        textContainer.className = 'search-result-text';
 
         const nameSpan = document.createElement('span');
         nameSpan.className = 'search-result-name';
@@ -199,18 +208,12 @@ function renderSearchResults(results, container, query) {
         breedSpan.className = 'search-result-breed';
         breedSpan.textContent = result.breed;
 
-        const link = document.createElement('a');
-        link.href = `/dog/${result.slug || result.id}`;
-        link.setAttribute('data-link', '');
-        link.appendChild(img);
-
-        const textContainer = document.createElement('div');
-        textContainer.className = 'search-result-text';
         textContainer.appendChild(nameSpan);
         textContainer.appendChild(breedSpan);
 
+        link.appendChild(img);
+        link.appendChild(textContainer);
         li.appendChild(link);
-        li.appendChild(textContainer);
 
         container.appendChild(li);
     });
