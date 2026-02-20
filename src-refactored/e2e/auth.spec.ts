@@ -3,21 +3,40 @@ import { createTestUser, adminConfirmUser, adminDeleteUser, adminGetUser } from 
 import type { TestUser } from './helpers/cognito';
 
 let testUser: TestUser;
+let savedAuthToken: string | null = null;
+
+/** The header auth link (Login/Logout) — specific to avoid sidebar .auth-link */
+const AUTH_LINK = '.header-icons .auth-link';
 
 /** Wait for the Woof app to fully initialize (auth link onclick handler set) */
 async function waitForAppReady(page: Page) {
   // The app is ready when updateUIForAuth() has run — auth link gets an icon
   await page.waitForFunction(() => {
-    const link = document.querySelector('.auth-link');
+    const link = document.querySelector('.header-icons .auth-link');
     return link && link.innerHTML.includes('<i ');
   }, { timeout: 10_000 });
 }
 
 test.beforeEach(() => {
   testUser = createTestUser();
+  savedAuthToken = null;
 });
 
-test.afterEach(() => {
+test.afterEach(async ({ page }) => {
+  // Delete the DB user record (cascades to all associated data)
+  // Use savedAuthToken if available (for tests that logout and clear localStorage)
+  try {
+    const token = savedAuthToken || await page.evaluate(() => localStorage.getItem('auth_token'));
+    if (token) {
+      await page.request.delete('https://api.woofapp.fi/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+    }
+  } catch (e) {
+    // DB user may not exist (e.g. test only registered, never logged in)
+  }
+
+  // Always delete the Cognito user
   adminDeleteUser(testUser.email);
 });
 
@@ -27,7 +46,7 @@ test.describe('Auth flow', () => {
     await waitForAppReady(page);
 
     // 1. Open auth modal
-    await page.click('.auth-link');
+    await page.click(AUTH_LINK);
     await expect(page.locator('#auth-modal')).toBeVisible();
 
     // 2. Switch to Register tab
@@ -70,21 +89,24 @@ test.describe('Auth flow', () => {
 
     // 9. Modal should close and nav should show Logout
     await expect(page.locator('#auth-modal')).toBeHidden({ timeout: 15_000 });
-    await expect(page.locator('.auth-link')).toContainText('Logout');
+    await expect(page.locator(AUTH_LINK)).toContainText('Logout');
+
+    // Save token before logout clears localStorage (needed for afterEach DB cleanup)
+    savedAuthToken = await page.evaluate(() => localStorage.getItem('auth_token'));
 
     // 10. Logout
     page.on('dialog', (dialog) => dialog.accept());
-    await page.click('.auth-link');
+    await page.click(AUTH_LINK);
 
     // 11. Should redirect to home and show Login again
-    await expect(page.locator('.auth-link')).toContainText('Login', { timeout: 10_000 });
+    await expect(page.locator(AUTH_LINK)).toContainText('Login', { timeout: 10_000 });
   });
 
   test('login with wrong password shows error', async ({ page }) => {
     // Create and confirm a user first
     await page.goto('/');
     await waitForAppReady(page);
-    await page.click('.auth-link');
+    await page.click(AUTH_LINK);
     await page.click('.auth-tab[data-tab="register"]');
     await page.fill('#auth-email', testUser.email);
     await page.fill('#auth-password', testUser.password);
@@ -107,7 +129,7 @@ test.describe('Auth flow', () => {
     // Register the user first
     await page.goto('/');
     await waitForAppReady(page);
-    await page.click('.auth-link');
+    await page.click(AUTH_LINK);
     await page.click('.auth-tab[data-tab="register"]');
     await page.fill('#auth-email', testUser.email);
     await page.fill('#auth-password', testUser.password);
@@ -131,7 +153,7 @@ test.describe('Auth flow', () => {
   test('auth modal UI states are correct', async ({ page }) => {
     await page.goto('/');
     await waitForAppReady(page);
-    await page.click('.auth-link');
+    await page.click(AUTH_LINK);
 
     // Login mode (default)
     await expect(page.locator('#auth-modal-title')).toHaveText('Login');
@@ -167,7 +189,7 @@ test.describe('Auth flow', () => {
   test('modal closes on outside click', async ({ page }) => {
     await page.goto('/');
     await waitForAppReady(page);
-    await page.click('.auth-link');
+    await page.click(AUTH_LINK);
     await expect(page.locator('#auth-modal')).toBeVisible();
 
     // Click the modal backdrop (outside the modal content)
@@ -178,7 +200,7 @@ test.describe('Auth flow', () => {
   test('modal closes on X button', async ({ page }) => {
     await page.goto('/');
     await waitForAppReady(page);
-    await page.click('.auth-link');
+    await page.click(AUTH_LINK);
     await expect(page.locator('#auth-modal')).toBeVisible();
 
     await page.locator('#auth-modal .modal-close').click();

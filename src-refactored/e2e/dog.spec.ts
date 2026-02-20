@@ -16,42 +16,16 @@ test.beforeEach(() => {
 });
 
 test.afterEach(async ({ page }) => {
-  // Clean up all dogs (and their posts) created by this test user
+  // Delete the DB user record (cascades to dogs, posts, comments, likes, follows, etc.)
   try {
     const token = await page.evaluate(() => localStorage.getItem('auth_token'));
     if (token) {
-      // Get all dogs owned by this user
-      const dogsRes = await page.request.get(`${API_BASE}/api/dogs/my/dogs`, {
+      await page.request.delete(`${API_BASE}/api/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      if (dogsRes.ok()) {
-        const dogsData = await dogsRes.json();
-        const dogs = Array.isArray(dogsData) ? dogsData : (dogsData.dogs || []);
-        for (const dog of dogs) {
-          // Delete all posts by this dog first
-          const postsRes = await page.request.get(`${API_BASE}/api/posts?dogId=${dog.id}`, {
-            headers: { 'Authorization': `Bearer ${token}` },
-          });
-          if (postsRes.ok()) {
-            const postsData = await postsRes.json();
-            const posts = postsData.posts || postsData;
-            if (Array.isArray(posts)) {
-              for (const post of posts) {
-                await page.request.delete(`${API_BASE}/api/posts/${post.id}`, {
-                  headers: { 'Authorization': `Bearer ${token}` },
-                });
-              }
-            }
-          }
-          // Delete the dog
-          await page.request.delete(`${API_BASE}/api/dogs/${dog.id}`, {
-            headers: { 'Authorization': `Bearer ${token}` },
-          });
-        }
-      }
     }
   } catch (e) {
-    console.error('Cleanup failed:', e);
+    console.error('DB cleanup failed:', e);
   }
 
   // Always delete the Cognito user
