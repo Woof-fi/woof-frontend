@@ -11,12 +11,24 @@ Vanilla JavaScript SPA for Woof (dog social network). Built with Vite, deployed 
 - **Backend**: `https://api.woofapp.fi` (Express on Elastic Beanstalk)
 
 ## Key Files
+- `js/app-spa.js` - App entry point, router setup, calls `refreshSession()` on init
+- `js/router.js` - Custom client-side router (path-to-regex matching, popstate handling)
 - `js/auth.js` - Cognito auth (register, confirmRegistration, login, forgotPassword, confirmNewPassword, logout, refreshSession)
 - `js/auth-modal.js` - Auth modal with 5 states (login, register, verify, forgot, reset)
+- `js/modals.js` - Modal coordinator: initializes all modals, manages browser history so back button closes modals on mobile
 - `js/config.js` - App config including Cognito User Pool ID and Client ID
 - `js/api.js` - All API calls (dogs, posts, follows, likes, comments, health records, messages, upload)
-- `js/app-spa.js` - App entry point, router setup, calls `refreshSession()` on init
-- `js/views/` - View components (HomeView, ProfileView, PostDetailView, MessagesView)
+- `js/posts.js` - Feed rendering, infinite scroll, feed tabs (For You / Following)
+- `js/profile.js` - Dog profile display, tabs (Posts/Friends/Health), health record timeline
+- `js/navigation.js` - Navigation state, profile links, sidebar updates
+- `js/search.js` - Dog search panel
+- `js/ui.js` - UI utilities (loading states, skeletons, toasts, body scroll toggle)
+- `js/utils.js` - Shared utilities (escapeHTML, timeAgo, file validation)
+- `js/health-record-modal.js` - Add/edit health records with type-specific forms
+- `js/create-post-modal.js` - Post creation with image upload
+- `js/create-dog-modal.js` - Dog creation form
+- `js/edit-dog-modal.js` - Dog profile editing
+- `js/views/` - View components (HomeView, ProfileView, PostDetailView, MessagesView, ViewManager)
 
 ## Auth Modal States
 The auth modal (`js/auth-modal.js`) handles 5 states:
@@ -31,6 +43,7 @@ The auth modal (`js/auth-modal.js`) handles 5 states:
 - Client ID: `2mr6ff413juuaeffjdramib5dk`
 - Region: `eu-north-1`
 - Password policy: 8+ chars, uppercase, lowercase, number, special character
+- Email sending: via Amazon SES (from `noreply@woofapp.fi`, domain `woofapp.fi` verified in SES)
 - Configurable via Vite env vars: `VITE_COGNITO_USER_POOL_ID`, `VITE_COGNITO_CLIENT_ID`
 
 ## Build & Deploy
@@ -100,3 +113,8 @@ VITE_COGNITO_CLIENT_ID=2mr6ff413juuaeffjdramib5dk
 ```
 
 Production uses hardcoded defaults in `js/config.js` (no `.env` needed for S3 deploy).
+
+## Infrastructure Notes
+- **S3 bucket** `woof-prod-photos`: Public read (GetObject) for viewing photos. Uploads via presigned URLs only (IAM role `WoofS3UploadPolicy`). No public write access.
+- **Source maps**: Disabled in production (`vite.config.ts`: `sourcemap: false`).
+- **SES**: Domain `woofapp.fi` verified in SES (eu-north-1) with DKIM. MAIL FROM domain: `mail.woofapp.fi`. Cognito configured to send verification emails via SES from `noreply@woofapp.fi`.

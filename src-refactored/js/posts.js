@@ -83,13 +83,22 @@ export async function initFeed(type = 'public') {
                 setupInfiniteScroll(feedContainer);
             }
         } else if (type === 'following') {
-            feedContainer.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-user-friends"></i>
-                    <p>No posts from dogs you follow yet.</p>
-                    <p>Follow some dogs to see their posts here!</p>
-                </div>
-            `;
+            if (!isAuthenticated()) {
+                feedContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-friends"></i>
+                        <p>Sign up to follow dogs and see their posts here!</p>
+                    </div>
+                `;
+            } else {
+                feedContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-friends"></i>
+                        <p>Your following feed is empty.</p>
+                        <p>Follow dogs from the <strong>For You</strong> tab to see their posts here!</p>
+                    </div>
+                `;
+            }
         } else {
             // Fallback to showing dogs if no posts yet
             const dogs = await getAllDogs();

@@ -34,6 +34,10 @@ body, html {
     overflow-x: hidden;
 }
 
+html {
+    overflow-y: scroll;
+}
+
 .app-container {
     display: flex;
     flex-direction: column;

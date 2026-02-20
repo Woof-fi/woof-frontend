@@ -1,8 +1,8 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-02-20
-**Current Phase:** Phase 4 Complete
-**Next Phase:** Phase 5 (Trust & Safety)
+**Current Phase:** Phase 5A Complete (Cognito + SES)
+**Next Phase:** Phase 5B (Content Moderation)
 
 ---
 
@@ -32,7 +32,7 @@ Every feature evaluated: build custom, use a managed service, or use an open-sou
 | Image moderation | **Buy** | AWS Rekognition | ~$1-5/mo | Single SDK call, high accuracy, same AWS ecosystem. Open-source models require hosting ML infra. |
 | Hate speech filter | **Buy** | Google Perspective API | $0 (free) | Detects racism/hate speech while allowing normal swearing. Supports Finnish. AWS Comprehend lacks Finnish support. |
 | i18n | **Library** | `i18next` | $0 | Industry standard, browser language detection, simple JSON translation files. Finnish + English. |
-| Email | **Buy** | AWS SES | $0 (62K free from EB) | Already on AWS. SES from Elastic Beanstalk instances is free up to 62K emails/month. |
+| Email | **Buy** | AWS SES | $0 (3K free/mo first year, then ~$0.10/1K) | Configured in eu-north-1. Cognito sends verification/reset emails via SES from `noreply@woofapp.fi`. |
 | Push notifications | **Library** | `web-push` (npm) | $0 | VAPID-based Web Push, no third-party dependency. Add FCM later for native mobile apps. |
 | Image optimization | **Build** | Sharp + S3 + CloudFront | $1-3/mo | Resize at upload time to 3 variants. You already have S3/CloudFront. Cloudinary adds a second image host. |
 | Video processing | **Buy** | Lambda + ffmpeg / MediaConvert | $0-5/mo | Offload CPU-heavy work from web server. Lambda free tier covers thumbnail generation. |
@@ -50,7 +50,7 @@ Every feature evaluated: build custom, use a managed service, or use an open-sou
 
 **Why first:** You cannot responsibly grow without moderation and proper auth. One inappropriate post on a dog app is devastating. Users who forget their password are lost forever.
 
-### 5A. Migrate Auth to AWS Cognito + Data Reset
+### 5A. Migrate Auth to AWS Cognito + Data Reset (COMPLETE)
 
 **Decision: Buy (AWS Cognito)**
 
@@ -104,7 +104,7 @@ role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'))
 
 **New infrastructure:**
 - AWS Cognito User Pool (eu-north-1)
-- SES verified domain for Cognito emails (or use Cognito's default email)
+- SES verified domain `woofapp.fi` for Cognito emails (from `noreply@woofapp.fi`, MAIL FROM `mail.woofapp.fi`)
 
 ### 5B. Content Moderation
 

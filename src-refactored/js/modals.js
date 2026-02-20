@@ -19,6 +19,8 @@ export { openAuthModal, updateUIForAuth };
 let modalStateActive = false;
 // Prevent close from triggering history.back() when popstate already fired
 let closingFromPopstate = false;
+// Set when popModalState calls history.back() so the router skips the resulting popstate
+let poppingModalState = false;
 
 /**
  * Push a history state when opening a modal.
@@ -38,6 +40,7 @@ export function pushModalState() {
 export function popModalState() {
     if (modalStateActive && !closingFromPopstate) {
         modalStateActive = false;
+        poppingModalState = true;
         history.back();
     }
     closingFromPopstate = false;
@@ -49,6 +52,12 @@ export function popModalState() {
  * @returns {boolean} true if a modal was closed (router should skip routing)
  */
 export function handleModalPopstate() {
+    // Modal was closed programmatically and history.back() fired — skip routing
+    if (poppingModalState) {
+        poppingModalState = false;
+        return true;
+    }
+    // User pressed browser back while modal is open — close it
     if (modalStateActive) {
         modalStateActive = false;
         closingFromPopstate = true;
@@ -85,6 +94,7 @@ function closeAllModals() {
     // Pop history state if closing via Escape key (not from popstate)
     if (!closingFromPopstate && modalStateActive) {
         modalStateActive = false;
+        poppingModalState = true;
         history.back();
     }
     closingFromPopstate = false;
