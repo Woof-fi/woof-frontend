@@ -66,3 +66,4 @@ SESSION_NOTES.md
 # Exceptions: Keep README.md, CURRENT_STATE.md, and core docs
 !README.md
 !.claude/README.md
+*.png

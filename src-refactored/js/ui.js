@@ -145,6 +145,15 @@ export function animateIn(element) {
         element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
         element.style.opacity = '1';
         element.style.transform = 'translateY(0)';
+
+        // Clean up inline styles after animation to release GPU compositing layers.
+        // Using setTimeout because transitionend doesn't fire reliably when
+        // many elements animate simultaneously (browser batches/skips transitions).
+        setTimeout(() => {
+            element.style.transition = '';
+            element.style.opacity = '';
+            element.style.transform = '';
+        }, 350);
     });
 }
 

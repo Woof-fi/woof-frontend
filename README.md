@@ -133,13 +133,20 @@ woof-backend/
 
 ## Next Up
 
-See `ROADMAP.md` for detailed plans. Key upcoming features:
+See [ROADMAP.md](ROADMAP.md) for the full product roadmap with build vs buy decisions, database schemas, and cost projections.
 
-- **Post Detail View** - Shareable post URLs with full comment thread
-- **Breed Communities** - Browse/join breed-based communities with breed-filtered feeds
-- **Dog-friendly Places** - Map with dog parks, vets, pet stores (Leaflet + OpenStreetMap)
-- **Dog Park Check-in** - Check in at places, see who's there
-- **CDN + image processing** - CloudFront at `cdn.woofapp.fi`, Sharp for resize/compress/WebP
+**Phase 5 — Trust & Safety** (current):
+- Migrate auth to AWS Cognito (email verification, password reset, MFA)
+- Content moderation (profanity filter + AWS Rekognition for images)
+- Reporting system + admin review queue
+- Sentry error tracking
+
+**Phase 6 — Performance:** Image CDN (`cdn.woofapp.fi`), Sharp resize, HTTP caching, PWA
+**Phase 7 — Engagement:** Notifications, hashtags, breed communities, UX improvements
+**Phase 8 — Real-time:** WebSocket messaging (Socket.io), transactional email (SES)
+**Phase 9 — Content:** Video posts, multi-photo posts
+**Phase 10 — Places:** Dog-friendly places map (Leaflet + OSM), check-ins
+**Phase 11 — Native:** Capacitor wrapper for App Store / Play Store
 
 ## License
 

@@ -311,14 +311,17 @@ export function createPostElement(postData) {
     postActions.appendChild(commentButton);
     postActions.appendChild(commentCountSpan);
 
-    const postCaption = document.createElement('div');
-    postCaption.className = 'post-caption';
-    const captionP = document.createElement('p');
-    const captionUsername = document.createElement('strong');
-    captionUsername.textContent = username;
-    captionP.appendChild(captionUsername);
-    captionP.appendChild(document.createTextNode(' ' + caption));
-    postCaption.appendChild(captionP);
+    let postCaption = null;
+    if (caption) {
+        postCaption = document.createElement('div');
+        postCaption.className = 'post-caption';
+        const captionP = document.createElement('p');
+        const captionUsername = document.createElement('strong');
+        captionUsername.textContent = username;
+        captionP.appendChild(captionUsername);
+        captionP.appendChild(document.createTextNode(' ' + caption));
+        postCaption.appendChild(captionP);
+    }
 
     // Comments section — only visible to logged-in users
     const commentsSection = document.createElement('div');
@@ -425,7 +428,7 @@ export function createPostElement(postData) {
     post.appendChild(postHeader);
     post.appendChild(postImage);
     post.appendChild(postActions);
-    post.appendChild(postCaption);
+    if (postCaption) post.appendChild(postCaption);
     post.appendChild(commentsSection);
 
     if (postData.createdAt) {
