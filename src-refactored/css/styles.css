@@ -2644,3 +2644,110 @@ header {
     font-size: 24px;
     margin-bottom: 12px;
 }
+
+/* ── Welcome Card ── */
+.welcome-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 32px 24px;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.welcome-card-icon {
+    font-size: 48px;
+    color: var(--color-primary);
+    margin-bottom: 12px;
+}
+
+.welcome-card h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    color: var(--color-text);
+}
+
+.welcome-card p {
+    margin: 0 0 20px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+.welcome-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Onboarding Tour ── */
+.onboarding-tour-content {
+    max-width: 400px;
+}
+
+.tour-step {
+    text-align: center;
+    padding: 24px;
+}
+
+.tour-icon {
+    font-size: 48px;
+    color: var(--color-primary);
+    margin-bottom: 16px;
+}
+
+.tour-step h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.tour-step p {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+
+.tour-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.tour-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border);
+}
+
+.tour-dot.active {
+    background: var(--color-primary);
+}
+
+.tour-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.tour-skip {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 10px 20px;
+}
+
+.tour-skip:hover {
+    color: var(--color-text-secondary);
+}
+
+/* ── Form hint text ── */
+.form-hint {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}

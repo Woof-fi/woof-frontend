@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-02-20
-**Current Phase:** Phase 5A Complete (Cognito + SES)
+**Current Phase:** Phase 5A Complete (Cognito + SES + Onboarding UX)
 **Next Phase:** Phase 5B (Content Moderation)
 
 ---
@@ -105,6 +105,12 @@ role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'))
 **New infrastructure:**
 - AWS Cognito User Pool (eu-north-1)
 - SES verified domain `woofapp.fi` for Cognito emails (from `noreply@woofapp.fi`, MAIL FROM `mail.woofapp.fi`)
+
+**Onboarding UX (added post-Cognito):**
+- Welcome banner in feed for authenticated users with 0 dogs
+- Create dog modal: placeholders, body scroll lock, navigate to profile after creation
+- Profile onboarding tour: 3-step carousel (Welcome, Sharing, Health Diary) shown once for new owners
+- Improved empty states: Posts tab shows "Share your first photo!" for owners, Health tab has "Add First Record" button
 
 ### 5B. Content Moderation
 

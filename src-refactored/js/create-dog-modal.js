@@ -10,6 +10,7 @@ import { createDog, uploadImage } from './api.js';
 import { updateProfileNavigation } from './navigation.js';
 import { openAuthModal } from './auth-modal.js';
 import { pushModalState, popModalState } from './modals.js';
+import router from './router.js';
 
 /**
  * Initialize create dog modal
@@ -101,7 +102,7 @@ export function initCreateDogModal() {
                 ...(bio && { bio })
             };
 
-            await createDog(dogData);
+            const createdDog = await createDog(dogData);
 
             // Update navigation to show the new dog
             await updateProfileNavigation();
@@ -110,6 +111,11 @@ export function initCreateDogModal() {
             closeCreateDogModal();
             createDogForm.reset();
             photoPreview.innerHTML = '';
+
+            // Navigate to the new dog's profile
+            if (createdDog && createdDog.slug) {
+                router.navigate(`/dog/${createdDog.slug}`);
+            }
         } catch (error) {
             console.error('Failed to create dog:', error);
         } finally {

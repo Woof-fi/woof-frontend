@@ -3,11 +3,11 @@
  * Handles post creation, display, and interactions
  */
 
-import { getAllDogs, getFeed, uploadImage, createPost as createPostAPI, likePost, unlikePost, createComment, getComments } from './api.js';
+import { getAllDogs, getFeed, getMyDogs, uploadImage, createPost as createPostAPI, likePost, unlikePost, createComment, getComments } from './api.js';
 import { escapeHTML, generateUsername, isValidFileType, isValidFileSize, showToast, timeAgo } from './utils.js';
-import { showLoading, hideLoading, showError, showFeedSkeleton, animateIn } from './ui.js';
+import { showLoading, hideLoading, showError, showFeedSkeleton, animateIn, toggleBodyScroll } from './ui.js';
 import { getCurrentUser, isAuthenticated } from './auth.js';
-import { openAuthModal } from './modals.js';
+import { openAuthModal, pushModalState } from './modals.js';
 
 // Pagination state
 let feedNextCursor = null;
@@ -104,10 +104,65 @@ export async function initFeed(type = 'public') {
             const dogs = await getAllDogs();
             renderFeed(dogs, feedContainer);
         }
+        // Show welcome card for authenticated users with no dogs
+        if (isAuthenticated()) {
+            try {
+                const myDogs = await getMyDogs();
+                if (myDogs.length === 0) {
+                    prependWelcomeCard(feedContainer);
+                }
+            } catch (err) {
+                // Silently fail — welcome card is non-critical
+            }
+        }
     } catch (error) {
         console.error('Failed to load feed:', error);
         showError(feedContainer, 'Failed to load feed', () => initFeed(type));
     }
+}
+
+/**
+ * Prepend a welcome card to the feed for users with no dogs
+ * @param {HTMLElement} container - Feed container
+ */
+function prependWelcomeCard(container) {
+    const card = document.createElement('div');
+    card.className = 'welcome-card';
+
+    const icon = document.createElement('div');
+    icon.className = 'welcome-card-icon';
+    const iconEl = document.createElement('i');
+    iconEl.className = 'fas fa-paw';
+    icon.appendChild(iconEl);
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Welcome to Woof!';
+
+    const desc = document.createElement('p');
+    desc.textContent = 'Add your dog to start posting, follow other dogs, and join the community.';
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary welcome-card-btn';
+    const btnIcon = document.createElement('i');
+    btnIcon.className = 'fas fa-plus';
+    btn.appendChild(btnIcon);
+    btn.appendChild(document.createTextNode(' Add Your Dog'));
+
+    btn.addEventListener('click', () => {
+        const createModal = document.getElementById('create-dog-modal');
+        if (createModal) {
+            createModal.style.display = 'block';
+            toggleBodyScroll(true);
+            pushModalState();
+        }
+    });
+
+    card.appendChild(icon);
+    card.appendChild(heading);
+    card.appendChild(desc);
+    card.appendChild(btn);
+
+    container.insertBefore(card, container.firstChild);
 }
 
 /**

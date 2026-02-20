@@ -9,6 +9,7 @@ import { escapeHTML, formatDate, showToast, timeAgo } from './utils.js';
 import { isAuthenticated } from './auth.js';
 import { openEditDogModal } from './edit-dog-modal.js';
 import { openHealthRecordModal } from './health-record-modal.js';
+import { showOnboardingTour, isOnboardingCompleted } from './onboarding-tour.js';
 import router from './router.js';
 
 // Store current dog data for edit modal
@@ -33,6 +34,12 @@ export async function initProfile(slugOrId) {
 
         currentDog = dog;
         renderProfile(dog, profileContainer, slugOrId);
+
+        // Show onboarding tour for new owners who haven't seen it
+        if (dog.isOwner && !isOnboardingCompleted()) {
+            // Short delay so profile renders first
+            setTimeout(() => showOnboardingTour(dog.name), 500);
+        }
     } catch (error) {
         showError(profileContainer, 'Failed to load profile', () => initProfile(slugOrId));
     }
@@ -373,10 +380,11 @@ export async function loadProfilePosts() {
         const result = await getDogPosts(currentDog.id);
 
         if (!result.posts || result.posts.length === 0) {
+            const isOwner = currentDog && currentDog.isOwner;
             postsGrid.innerHTML = `
                 <div class="empty-state">
                     <i class="fas fa-camera"></i>
-                    <p>No posts yet.</p>
+                    <p>${isOwner ? 'No posts yet. Share your first photo!' : 'No posts yet.'}</p>
                 </div>
             `;
             return;
@@ -514,12 +522,33 @@ async function loadHealthTimeline(dogId) {
         const data = await getHealthRecords(dogId, opts);
 
         if (!data.records || data.records.length === 0) {
-            timeline.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-heartbeat"></i>
-                    <p>${healthFilterType ? 'No records of this type yet.' : 'No health records yet. Add your first record!'}</p>
-                </div>
-            `;
+            if (healthFilterType) {
+                timeline.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heartbeat"></i>
+                        <p>No records of this type yet.</p>
+                    </div>
+                `;
+            } else {
+                timeline.innerHTML = '';
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.innerHTML = '<i class="fas fa-heartbeat"></i>';
+
+                const msg = document.createElement('p');
+                msg.textContent = "Start tracking your dog's health!";
+                empty.appendChild(msg);
+
+                const addBtn = document.createElement('button');
+                addBtn.className = 'btn-primary';
+                addBtn.style.marginTop = '12px';
+                addBtn.innerHTML = '<i class="fas fa-plus"></i> Add First Record';
+                addBtn.addEventListener('click', () => {
+                    openHealthRecordModal(dogId, null, () => loadHealthTimeline(dogId));
+                });
+                empty.appendChild(addBtn);
+                timeline.appendChild(empty);
+            }
             return;
         }
 

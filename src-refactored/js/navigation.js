@@ -8,6 +8,7 @@ import { getToken } from './auth.js';
 import { openSearchPanel } from './search.js';
 import { escapeHTML } from './utils.js';
 import { pushModalState } from './modals.js';
+import { toggleBodyScroll } from './ui.js';
 
 let unreadPollInterval = null;
 
@@ -88,6 +89,7 @@ export async function updateProfileNavigation() {
                     const createModal = document.getElementById('create-dog-modal');
                     if (createModal) {
                         createModal.style.display = 'block';
+                        toggleBodyScroll(true);
                         pushModalState();
                     }
                 });
@@ -103,6 +105,7 @@ export async function updateProfileNavigation() {
                     const createModal = document.getElementById('create-dog-modal');
                     if (createModal) {
                         createModal.style.display = 'block';
+                        toggleBodyScroll(true);
                         pushModalState();
                     }
                 };

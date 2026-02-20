@@ -26,8 +26,9 @@ Vanilla JavaScript SPA for Woof (dog social network). Built with Vite, deployed 
 - `js/utils.js` - Shared utilities (escapeHTML, timeAgo, file validation)
 - `js/health-record-modal.js` - Add/edit health records with type-specific forms
 - `js/create-post-modal.js` - Post creation with image upload
-- `js/create-dog-modal.js` - Dog creation form
+- `js/create-dog-modal.js` - Dog creation form (navigates to new dog's profile after creation)
 - `js/edit-dog-modal.js` - Dog profile editing
+- `js/onboarding-tour.js` - 3-step feature tour for new dog owners (shown once after first dog creation)
 - `js/views/` - View components (HomeView, ProfileView, PostDetailView, MessagesView, ViewManager)
 
 ## Auth Modal States
