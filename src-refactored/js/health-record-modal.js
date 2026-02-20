@@ -6,6 +6,7 @@
 import { createHealthRecord, updateHealthRecord } from './api.js';
 import { showToast } from './utils.js';
 import { toggleBodyScroll } from './ui.js';
+import { pushModalState, popModalState } from './modals.js';
 
 let onSaveCallback = null;
 let editingRecord = null;
@@ -166,6 +167,7 @@ export function openHealthRecordModal(dogId, record = null, onSave = null, prese
 
     modal.style.display = 'flex';
     toggleBodyScroll(true);
+    pushModalState();
 }
 
 /**
@@ -173,13 +175,14 @@ export function openHealthRecordModal(dogId, record = null, onSave = null, prese
  */
 export function closeHealthRecordModal() {
     const modal = document.getElementById('health-record-modal');
-    if (!modal) return;
+    if (!modal || modal.style.display === 'none') return;
 
     modal.style.display = 'none';
     toggleBodyScroll(false);
     editingRecord = null;
     currentDogId = null;
     onSaveCallback = null;
+    popModalState();
 }
 
 /**

@@ -3,6 +3,8 @@
  * Handles navigation without page reloads
  */
 
+import { handleModalPopstate } from './modals.js';
+
 class Router {
     constructor() {
         this.routes = new Map();
@@ -10,7 +12,11 @@ class Router {
         this.notFoundHandler = null;
 
         // Listen for navigation events
-        window.addEventListener('popstate', () => this.handleRoute());
+        window.addEventListener('popstate', () => {
+            // If a modal was open, close it instead of routing
+            if (handleModalPopstate()) return;
+            this.handleRoute();
+        });
 
         // Intercept link clicks
         document.addEventListener('click', (e) => {

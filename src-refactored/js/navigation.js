@@ -7,6 +7,7 @@ import { getMyDogs, getUnreadCount } from './api.js';
 import { getToken } from './auth.js';
 import { openSearchPanel } from './search.js';
 import { escapeHTML } from './utils.js';
+import { pushModalState } from './modals.js';
 
 let unreadPollInterval = null;
 
@@ -47,6 +48,7 @@ export async function updateProfileNavigation() {
                 const authModal = document.getElementById('auth-modal');
                 if (authModal) {
                     authModal.style.display = 'block';
+                    pushModalState();
                 }
             });
         }
@@ -59,7 +61,10 @@ export async function updateProfileNavigation() {
             bottomNavProfile.onclick = (e) => {
                 e.preventDefault();
                 const authModal = document.getElementById('auth-modal');
-                if (authModal) authModal.style.display = 'block';
+                if (authModal) {
+                    authModal.style.display = 'block';
+                    pushModalState();
+                }
             };
         }
         return;
@@ -83,6 +88,7 @@ export async function updateProfileNavigation() {
                     const createModal = document.getElementById('create-dog-modal');
                     if (createModal) {
                         createModal.style.display = 'block';
+                        pushModalState();
                     }
                 });
             }
@@ -95,7 +101,10 @@ export async function updateProfileNavigation() {
                 bottomNavProfile.onclick = (e) => {
                     e.preventDefault();
                     const createModal = document.getElementById('create-dog-modal');
-                    if (createModal) createModal.style.display = 'block';
+                    if (createModal) {
+                        createModal.style.display = 'block';
+                        pushModalState();
+                    }
                 };
             }
         } else if (dogs.length === 1) {

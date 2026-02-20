@@ -43,7 +43,11 @@ body, html {
 header {
     background-color: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
-    padding: 10px 20px;
+    padding: 0 20px;
+    height: var(--header-height);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;
@@ -57,6 +61,7 @@ header {
     align-items: center;
     max-width: 975px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .logo {
@@ -163,9 +168,10 @@ header {
 .content {
     flex-grow: 1;
     padding: 20px;
-    max-width: 600px;
+    max-width: 640px;
     width: 100%;
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .tabs {
@@ -927,6 +933,49 @@ header {
     flex-direction: column;
 }
 
+.image-source-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#post-image-camera {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #post-image-camera {
+        display: flex;
+    }
+}
+
+.image-source-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: all 0.2s;
+}
+
+.image-source-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(0, 149, 246, 0.05);
+}
+
+.image-source-btn i {
+    font-size: 18px;
+}
+
 .image-preview {
     margin-bottom: 15px;
     max-height: 400px;
@@ -1218,8 +1267,19 @@ header {
 .profile-name-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 4px;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.profile-actions .follow-btn,
+.profile-actions .message-profile-btn {
+    flex: 1;
 }
 
 .profile-info h3 {
@@ -1800,7 +1860,6 @@ header {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    margin-left: 8px;
 }
 
 .message-profile-btn:hover {
@@ -1848,40 +1907,147 @@ header {
     }
 }
 
-/* Gallery Styles */
-.gallery {
+/* Profile Tabs */
+.profile-tabs {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+    justify-content: center;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 0;
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+    z-index: 10;
 }
 
-.gallery img {
-    width: calc(50% - 10px);
-    height: auto;
-    border-radius: 8px;
+.profile-tabs .tab-link {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+}
+
+.profile-tabs .tab-link i {
+    font-size: 14px;
+}
+
+.profile-tabs .tab-link.active {
+    color: var(--color-text);
+}
+
+.profile-tabs .tab-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+.profile-tabs .tab-link.active::after {
+    background-color: var(--color-text);
 }
 
 /* Friend List Styles */
 .friend-list {
     list-style-type: none;
-    padding: 0;
+    padding: 8px 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0;
 }
 
-.friend-list li {
+.friend-item {
+    list-style: none;
+}
+
+.friend-link {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.15s;
 }
 
-.friend-list img {
-    width: 50px;
-    height: 50px;
+.friend-link:hover {
+    background-color: var(--color-hover, rgba(0, 0, 0, 0.03));
+}
+
+.friend-avatar {
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.friend-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.mutual-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.mutual-badge i {
+    font-size: 10px;
+}
+
+.friend-breed {
+    display: block;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.friend-relation {
+    display: block;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 1px;
+}
+
+.friends-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-muted);
 }
 
 /* Health Records */

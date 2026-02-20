@@ -3,7 +3,7 @@
  * Handles dog profile display, edit button, and follow button
  */
 
-import { getDog, getDogBySlug, getDogPosts, getFollowStatus, followDog, unfollowDog, getHealthRecords, deleteHealthRecord, startConversation } from './api.js';
+import { getDog, getDogBySlug, getDogPosts, getFollowStatus, followDog, unfollowDog, getHealthRecords, deleteHealthRecord, startConversation, getFollowers, getFollowing } from './api.js';
 import { showLoading, hideLoading, showError, showProfileSkeleton } from './ui.js';
 import { escapeHTML, formatDate, showToast, timeAgo } from './utils.js';
 import { isAuthenticated } from './auth.js';
@@ -54,22 +54,25 @@ function renderProfile(dog, container, slugOrId) {
     const profilePhoto = dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
 
     // Build action button HTML
-    let actionButtonHtml = '';
+    let nameRowAction = '';
+    let profileActionsHtml = '';
     if (dog.isOwner) {
-        actionButtonHtml = `
+        nameRowAction = `
             <button class="edit-profile-btn" id="edit-profile-btn">
                 <i class="fas fa-edit"></i> Edit Profile
             </button>
         `;
     } else {
-        // Follow button + Message button — state set after render
-        actionButtonHtml = `
-            <button class="follow-btn" id="follow-btn" data-dog-id="${dog.id}" disabled>
-                <i class="fas fa-user-plus"></i> Follow
-            </button>
-            <button class="message-profile-btn" id="message-profile-btn" data-dog-id="${dog.id}">
-                <i class="fas fa-envelope"></i> Message
-            </button>
+        // Follow + Message on their own row below the header
+        profileActionsHtml = `
+            <div class="profile-actions">
+                <button class="follow-btn" id="follow-btn" data-dog-id="${dog.id}" disabled>
+                    <i class="fas fa-user-plus"></i> Follow
+                </button>
+                <button class="message-profile-btn" id="message-profile-btn" data-dog-id="${dog.id}">
+                    <i class="fas fa-envelope"></i> Message
+                </button>
+            </div>
         `;
     }
 
@@ -90,7 +93,7 @@ function renderProfile(dog, container, slugOrId) {
                 <div class="profile-info">
                     <div class="profile-name-row">
                         <h3>${name}</h3>
-                        ${actionButtonHtml}
+                        ${nameRowAction}
                     </div>
                     ${statsHtml}
                     <p><strong>Breed:</strong> ${breed}</p>
@@ -98,6 +101,7 @@ function renderProfile(dog, container, slugOrId) {
                     <p><strong>Location:</strong> ${location}</p>
                 </div>
             </div>
+            ${profileActionsHtml}
             <div class="profile-details">
                 <h3>About</h3>
                 <p>${bio}</p>
@@ -113,6 +117,11 @@ function renderProfile(dog, container, slugOrId) {
                 openEditDogModal(dog, () => initProfile(slugOrId));
             });
         }
+    }
+
+    // Always load follower count
+    if (dog.id) {
+        loadFollowerCount(dog.id);
     }
 
     // Wire up follow button and load follow status
@@ -143,6 +152,22 @@ function renderProfile(dog, container, slugOrId) {
 }
 
 /**
+ * Load follower count for any profile (owner or visitor)
+ * @param {string} dogId - Dog ID
+ */
+async function loadFollowerCount(dogId) {
+    const followerCountEl = document.getElementById('follower-count');
+    if (!followerCountEl) return;
+
+    try {
+        const status = await getFollowStatus(dogId);
+        followerCountEl.textContent = status.followerCount;
+    } catch (error) {
+        console.error('Failed to load follower count:', error);
+    }
+}
+
+/**
  * Load follow status and wire up follow/unfollow button
  * @param {string} dogId - Dog ID
  */
@@ -152,9 +177,6 @@ async function loadFollowStatus(dogId) {
 
     try {
         const status = await getFollowStatus(dogId);
-
-        // Update follower count
-        if (followerCountEl) followerCountEl.textContent = status.followerCount;
 
         // Update button state
         if (followBtn) {
@@ -251,37 +273,92 @@ export function initProfileTabs() {
 }
 
 /**
- * Load dog gallery
- * @param {string} dogId - Dog ID
+ * Load dog friends (mutual follows only)
+ * @param {string} slugOrId - Dog slug or ID
  */
-export async function loadGallery(dogId) {
-    const galleryContainer = document.querySelector('#gallery .gallery');
-    if (!galleryContainer) return;
-
-    // TODO: Replace with real API call when photo endpoint exists
-    galleryContainer.innerHTML = `
-        <div class="empty-state">
-            <i class="fas fa-camera"></i>
-            <p>No photos yet. Start adding memories!</p>
-        </div>
-    `;
-}
-
-/**
- * Load dog friends
- * @param {string} dogId - Dog ID
- */
-export async function loadFriends(dogId) {
+export async function loadFriends(slugOrId) {
     const friendsContainer = document.querySelector('#friends .friend-list');
     if (!friendsContainer) return;
 
-    // TODO: Replace with real API call when friends endpoint exists
+    if (!currentDog) return;
+
     friendsContainer.innerHTML = `
-        <div class="empty-state">
-            <i class="fas fa-user-friends"></i>
-            <p>No friends yet. Start connecting!</p>
+        <div class="friends-loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
         </div>
     `;
+
+    try {
+        const [followers, following] = await Promise.all([
+            getFollowers(currentDog.id),
+            getFollowing(currentDog.id)
+        ]);
+
+        // Friends = mutual follows (in both followers AND following)
+        const followingIds = new Set(following.map(d => d.id));
+        const friends = followers
+            .filter(dog => followingIds.has(dog.id))
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+        if (friends.length === 0) {
+            friendsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-user-friends"></i>
+                    <p>No friends yet. Start connecting!</p>
+                </div>
+            `;
+            return;
+        }
+
+        friendsContainer.innerHTML = '';
+
+        friends.forEach(dog => {
+            const li = document.createElement('li');
+            li.className = 'friend-item';
+
+            const link = document.createElement('a');
+            link.href = `/dog/${dog.slug || dog.id}`;
+            link.setAttribute('data-link', '');
+            link.className = 'friend-link';
+
+            const img = document.createElement('img');
+            img.src = dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
+            img.alt = escapeHTML(dog.name);
+            img.className = 'friend-avatar';
+            img.loading = 'lazy';
+            img.onerror = function() {
+                this.src = '/assets/images/dog_profile_pic.jpg';
+            };
+
+            const info = document.createElement('div');
+            info.className = 'friend-info';
+
+            const name = document.createElement('span');
+            name.className = 'friend-name';
+            name.textContent = dog.name;
+
+            const breed = document.createElement('span');
+            breed.className = 'friend-breed';
+            breed.textContent = dog.breed || '';
+
+            info.appendChild(name);
+            info.appendChild(breed);
+
+            link.appendChild(img);
+            link.appendChild(info);
+            li.appendChild(link);
+
+            friendsContainer.appendChild(li);
+        });
+    } catch (error) {
+        console.error('Failed to load friends:', error);
+        friendsContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Failed to load friends.</p>
+            </div>
+        `;
+    }
 }
 
 /**

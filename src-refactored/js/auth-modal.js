@@ -6,6 +6,7 @@
 import { toggleBodyScroll } from './ui.js';
 import { login, register, isAuthenticated, logout } from './auth.js';
 import { updateProfileNavigation } from './navigation.js';
+import { pushModalState, popModalState } from './modals.js';
 
 /**
  * Initialize auth modal
@@ -132,6 +133,7 @@ export function openAuthModal() {
         modal.style.display = 'block';
         modal.removeAttribute('aria-hidden');
         toggleBodyScroll(true);
+        pushModalState();
     }
 }
 
@@ -140,11 +142,12 @@ export function openAuthModal() {
  */
 export function closeAuthModal() {
     const modal = document.getElementById('auth-modal');
-    if (modal) {
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
-        toggleBodyScroll(false);
-    }
+    if (!modal || modal.style.display === 'none') return;
+
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    toggleBodyScroll(false);
+    popModalState();
 }
 
 /**

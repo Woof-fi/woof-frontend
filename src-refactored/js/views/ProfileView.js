@@ -3,7 +3,7 @@
  * Dog profile page (handles any dog slug)
  */
 
-import { initProfile, initProfileTabs, loadProfilePosts, loadGallery, loadFriends, loadHealthRecords } from '../profile.js';
+import { initProfile, initProfileTabs, loadProfilePosts, loadFriends, loadHealthRecords } from '../profile.js';
 
 export class ProfileView {
     constructor() {
@@ -29,12 +29,8 @@ export class ProfileView {
                 <!-- Profile Tabs -->
                 <div class="profile-tabs" role="tablist">
                     <button class="tab-link active" data-tab="posts" role="tab" aria-selected="true">
-                        <i class="fas fa-images"></i>
+                        <i class="fas fa-th"></i>
                         Posts
-                    </button>
-                    <button class="tab-link" data-tab="gallery" role="tab" aria-selected="false">
-                        <i class="fas fa-camera"></i>
-                        Gallery
                     </button>
                     <button class="tab-link" data-tab="friends" role="tab" aria-selected="false">
                         <i class="fas fa-user-friends"></i>
@@ -50,12 +46,6 @@ export class ProfileView {
                 <div class="tab-content active" id="posts" role="tabpanel" aria-hidden="false">
                     <div class="posts-grid">
                         <!-- Posts will be loaded here -->
-                    </div>
-                </div>
-
-                <div class="tab-content" id="gallery" role="tabpanel" aria-hidden="true">
-                    <div class="gallery">
-                        <!-- Gallery will be loaded here -->
                     </div>
                 </div>
 
@@ -86,7 +76,6 @@ export class ProfileView {
 
         // Load tab content
         loadProfilePosts();
-        loadGallery(slug);
         loadFriends(slug);
         loadHealthRecords(slug);
     }

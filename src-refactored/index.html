@@ -138,8 +138,17 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="post-image">Image</label>
-                        <input type="file" id="post-image" name="post-image" accept="image/*" required>
+                        <label>Image</label>
+                        <div class="image-source-buttons">
+                            <button type="button" id="post-image-camera" class="btn-secondary image-source-btn">
+                                <i class="fas fa-camera"></i> Take Photo
+                            </button>
+                            <button type="button" id="post-image-gallery" class="btn-secondary image-source-btn">
+                                <i class="fas fa-images"></i> Gallery
+                            </button>
+                        </div>
+                        <input type="file" id="post-image" name="post-image" accept="image/*" capture="environment" style="display:none">
+                        <input type="file" id="post-image-gallery-input" accept="image/*" style="display:none">
                         <div id="image-preview" class="image-preview"></div>
                     </div>
                     <div class="form-group">

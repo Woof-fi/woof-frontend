@@ -133,22 +133,13 @@ woof-backend/
 
 ## Next Up
 
-- **Remove Gallery tab** - Profile should only show Posts tab (gallery is redundant)
-- **Fix mobile profile tab padding** - Layout shifts when switching between tabs on mobile
-- **Friends tab: mutual follow indicators** - Mark dogs where the follow is mutual
-- **Seed test data for friends** - Make some existing dogs follow Nelli so the friends feature can be verified
+See `ROADMAP.md` for detailed plans. Key upcoming features:
 
-## Future Plans
-
-Features planned for upcoming phases (see `ROADMAP.md`):
-
-- **Breed Communities** - Browse/join breed-based communities, breed-filtered feeds
+- **Post Detail View** - Shareable post URLs with full comment thread
+- **Breed Communities** - Browse/join breed-based communities with breed-filtered feeds
 - **Dog-friendly Places** - Map with dog parks, vets, pet stores (Leaflet + OpenStreetMap)
 - **Dog Park Check-in** - Check in at places, see who's there
-- **CDN for images** - Serve images through CloudFront at `cdn.woofapp.fi` instead of direct S3 URLs
-- **Notifications** - Like/comment/follow notifications
-- **Video posts** - Short video support
-- **Stories** - 24h ephemeral content
+- **CDN + image processing** - CloudFront at `cdn.woofapp.fi`, Sharp for resize/compress/WebP
 
 ## License
 

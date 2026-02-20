@@ -1,7 +1,7 @@
 # Woof - Claude Code Instructions
 
-**Last Updated:** 2026-02-18
-**Status:** Phase 3 in progress (3.1, 3.2, 3.6 complete). See [ROADMAP.md](/ROADMAP.md) for full product roadmap.
+**Last Updated:** 2026-02-19
+**Status:** Phase 3 complete (all 3.1-3.9 done). See [ROADMAP.md](/ROADMAP.md) for full product roadmap.
 
 ## Project Overview
 
@@ -12,8 +12,8 @@ Woof is a dog-centric social network (Instagram for dogs). Dogs are the primary 
 - **Frontend source**: `src-refactored/` is the active directory (SPA, single entry point: `index.html` → `app-spa.js`)
 - **Tech stack**: Vite + vanilla JS (frontend), Express + PostgreSQL (backend)
 - **Hosting**: S3 (frontend), Elastic Beanstalk (backend), both in eu-north-1
-- **Frontend URL**: http://woof-app-frontend-2026.s3-website.eu-north-1.amazonaws.com/
-- **Backend URL**: http://woof-prod.eba-pz3gawvp.eu-north-1.elasticbeanstalk.com
+- **Frontend URL**: https://woofapp.fi (S3 behind Cloudflare)
+- **Backend URL**: https://api.woofapp.fi (Elastic Beanstalk behind Cloudflare)
 
 ## Development
 
@@ -136,46 +136,56 @@ Write tests alongside each refactor - not retroactively.
 - Like count displayed next to heart icon
 - Fixed EB deployment: `.ebignore` includes `dist/`, build locally before `eb deploy`
 
-## Phase 3: UX Polish + Core Social Features ← IN PROGRESS
+## Phase 3: UX Polish + Core Social Features ✅ COMPLETE
 
 See [ROADMAP.md](/ROADMAP.md) for the full product roadmap with competitor analysis, visual audit findings, and detailed implementation plan.
 
 ### 3.1 - Form styling overhaul ✅
 - Universal form element styles scoped to `.modal` (inputs, textareas, selects, file inputs)
-- `.form-group` spacing (16px), label styling (14px, 600 weight)
-- Focus states: blue border + `box-shadow` glow ring using `--color-primary`
-- `.modal-header`, `.modal-close`, `.modal-body` structure styles
-- Auth tab switcher (`.auth-tabs`, `.auth-tab`) matching feed tab design
-- Backdrop blur (`backdrop-filter: blur(4px)`) on modal overlay
-- File inputs with dashed border and hover highlight
-- Custom select dropdown arrow via SVG `background-image`
-- iOS zoom prevention (`font-size: 16px` on mobile inputs)
-- Updated `--radius-sm` from 3px to 6px (cascades to all existing uses)
-- Added `--radius-lg: 12px` design token
-- Removed redundant `#create-post-form` input styles (now handled universally)
+- Focus states, backdrop blur, auth tab switcher, iOS zoom prevention
 - CSS-only change, single file: `styles.css`
 
 ### 3.2 - Post timestamps ✅
-- `timeAgo()` utility in `utils.js` with full-word format ("2 days ago", "45 minutes ago")
-- Timestamp displayed below caption on every post (Instagram-style)
-- Click-to-toggle: relative time ↔ full date/time (`February 17, 2026 at 2:33 PM`)
-- `<time>` semantic element with `datetime` attribute, `cursor: pointer`
-- CSS: 10px uppercase muted text in `.post-timestamp-container`
+- `timeAgo()` utility with click-to-toggle relative time ↔ full date
+- `<time>` semantic element with `datetime` attribute
+
+### 3.3 - Comments system ✅
+- Backend: `comments` table (migration 010), `commentController.ts`, `routes/comments.ts`
+- `commentCount` included in feed and dog posts responses
+- Frontend: inline comment section, "View all X comments" link, comment input
+- Comments hidden from non-authenticated users; comment button opens login modal for logged-out users
+- Files: backend routes/controllers/migration/tests, frontend `posts.js`, `styles.css`
+
+### 3.4 - Mobile bottom navigation ✅
+- Instagram-style fixed bottom nav bar on mobile (≤768px), hidden on desktop
+- 5 tabs: Home, Search, Create (+), Activity (placeholder), Profile
+- Dynamic profile tab based on auth state, active state tracks current route
+- Files: `index.html`, `styles.css`, `navigation.js`, `router.js`, `search.js`
+
+### 3.5 - Search / Explore ✅
+- Backend: `GET /api/dogs/search?q=query` searches by name and breed
+- Frontend: search panel on desktop + mobile, results link to dog profiles
 
 ### 3.6 - Profile Posts tab ✅
-- Backend: `GET /api/posts/dog/:dogId` endpoint with cursor-based pagination, `optionalAuth` for `likedByUser`
-- `DogIdParamSchema` Zod validation, `getPostsByDog` controller in `postController.ts`
-- Frontend: `getDogPosts()` in `api.js`, `loadProfilePosts()` in `profile.js`
-- Instagram-style 3-column grid (`posts-grid`) with hover overlay showing like count
-- Fallback SVG for broken images, empty state for no posts
+- Backend: `GET /api/posts/dog/:dogId` with cursor-based pagination, `optionalAuth` for `likedByUser`
+- Frontend: 3-column grid with hover overlay showing like count
 
-**Remaining Phase 3 tasks:**
-1. Mobile bottom navigation bar
-3. Comments system (backend + frontend)
-4. Search / Explore page
-5. Loading skeletons
-6. Image aspect ratio standardization
-7. Misc UX fixes (default avatar, remove placeholder buttons)
+### Additional improvements (not in original roadmap) ✅
+- **HTTPS / Custom Domain**: `woofapp.fi` via Cloudflare free tier (SSL, DNS, HSTS)
+- **Password requirements**: Backend validation (8+ chars, uppercase, lowercase, number) + frontend real-time checklist in register form
+- **XSS fix**: `escapeHTML()` applied to dog names/photos in `navigation.js` innerHTML
+- **CORS update**: Backend allows `https://woofapp.fi` origin
+
+### 3.7 - Loading skeletons ✅
+- CSS shimmer animation, `showFeedSkeleton()` / `showProfileSkeleton()` in `ui.js`
+- Skeleton HTML in `index.html` for initial load
+
+### 3.8 - Image aspect ratio ✅
+- Portrait images capped at 4:5 via container queries (`max-height: calc(100cqi * 1.25)`)
+
+### 3.9 - Misc UX fixes ✅
+- Share button uses Web Share API with clipboard fallback
+- Like counts hidden when 0
 
 ---
 
@@ -205,13 +215,16 @@ See [ROADMAP.md](/ROADMAP.md) for the full product roadmap with competitor analy
 | ~~Profile always shows nelli-1 regardless of URL~~ | `ProfileView.js` wrong params destructuring | ✅ Done |
 | ~~`getMyDogs` missing slug in response~~ | `dogController.ts` + `Dog.ts` missing slug | ✅ Done |
 | ~~Navigation shows `nelli-undefined` slug~~ | `getMyDogs` + `toPublicProfile` missing slug | ✅ Done |
-| Default avatar image 404 | `/assets/images/dog_profile_pic.jpg` missing from S3 | Open |
+| ~~Default avatar image 404~~ | Fixed path references + image exists at `/assets/images/dog_profile_pic.jpg` | ✅ Done |
 | ~~Unstyled form inputs in all modals~~ | Universal `.modal` form styles in `styles.css` | ✅ Done (Phase 3.1) |
 | ~~No post timestamps in feed~~ | `posts.js` — relative time + click-to-toggle | ✅ Done (Phase 3.2) |
-| Mobile header nav wraps/overflows | No bottom nav, no hamburger menu | Open (Phase 3.4) |
+| ~~Mobile header nav wraps/overflows~~ | Bottom nav added, sidebar hidden on mobile | ✅ Done (Phase 3.4) |
 | ~~Profile Posts tab empty~~ | 3-column grid with `GET /api/posts/dog/:dogId` | ✅ Done (Phase 3.6) |
-| Search button non-functional | Header search icon navigates to `#` | Open (Phase 3.5) |
-| Comment button non-functional | Action bar button, no backend/frontend | Open (Phase 3.3) |
+| ~~Search button non-functional~~ | Fixed HTML ID mismatch, search works on desktop + mobile bottom nav | ✅ Done (Phase 3.4) |
+| ~~Comment button non-functional~~ | Full comment system with backend API | ✅ Done (Phase 3.3) |
+| ~~XSS in navigation.js~~ | `escapeHTML()` on dog names/photos in innerHTML | ✅ Done |
+| ~~Weak password policy~~ | Backend + frontend validation (8+ chars, upper, lower, number) | ✅ Done |
+| ~~HTTP only (no HTTPS)~~ | Cloudflare free tier + custom domain woofapp.fi | ✅ Done |
 | Share button non-functional | Action bar button, no implementation | Open (Phase 4+) |
 | Messages icon non-functional | Header icon, no backend/frontend | Open (Phase 5) |
 | Notifications icon non-functional | Header bell icon, no backend/frontend | Open (Phase 4) |
@@ -222,4 +235,7 @@ See [ROADMAP.md](/ROADMAP.md) for the full product roadmap with competitor analy
 - File uploads: Validate type and size before upload
 - Auth: JWT-based, 7-day expiry, Bearer token header
 - Admin endpoints: Protected by `x-admin-secret` header
+- HTTPS: Cloudflare free tier with SSL termination (Flexible mode)
+- Passwords: bcrypt hashed (salt rounds 10), require 8+ chars with uppercase, lowercase, and number
+- CORS: Only allows `https://woofapp.fi` origin
 - NEVER commit `.env` files or secrets

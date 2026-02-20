@@ -9,6 +9,7 @@ import { isAuthenticated } from './auth.js';
 import { createDog, uploadImage } from './api.js';
 import { updateProfileNavigation } from './navigation.js';
 import { openAuthModal } from './auth-modal.js';
+import { pushModalState, popModalState } from './modals.js';
 
 /**
  * Initialize create dog modal
@@ -123,8 +124,9 @@ export function initCreateDogModal() {
  */
 export function closeCreateDogModal() {
     const modal = document.getElementById('create-dog-modal');
-    if (!modal) return;
+    if (!modal || modal.style.display === 'none') return;
 
     modal.style.display = 'none';
     toggleBodyScroll(false);
+    popModalState();
 }

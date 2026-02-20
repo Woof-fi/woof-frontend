@@ -3,6 +3,8 @@
  * Handles shopping cart drawer and cart state management
  */
 
+import { pushModalState, popModalState } from './modals.js';
+
 /**
  * Initialize cart modal
  */
@@ -48,6 +50,7 @@ function openCartDrawer() {
 
     drawer.classList.add('open');
     drawer.removeAttribute('aria-hidden');
+    pushModalState();
 }
 
 /**
@@ -55,10 +58,11 @@ function openCartDrawer() {
  */
 export function closeCartDrawer() {
     const drawer = document.getElementById('cart-drawer');
-    if (!drawer) return;
+    if (!drawer || !drawer.classList.contains('open')) return;
 
     drawer.classList.remove('open');
     drawer.setAttribute('aria-hidden', 'true');
+    popModalState();
 }
 
 /**

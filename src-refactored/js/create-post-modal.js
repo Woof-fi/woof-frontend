@@ -9,6 +9,7 @@ import { trapFocus, showToast } from './utils.js';
 import { isAuthenticated } from './auth.js';
 import { getMyDogs } from './api.js';
 import { openAuthModal } from './auth-modal.js';
+import { pushModalState, popModalState } from './modals.js';
 
 /**
  * Initialize create post modal
@@ -80,16 +81,37 @@ export function initCreatePostModal() {
         });
     }
 
-    // Image preview
-    const imageInput = document.getElementById('post-image');
-    if (imageInput) {
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                previewImage(file);
-            }
-        });
+    // Image source buttons
+    const cameraBtn = document.getElementById('post-image-camera');
+    const galleryBtn = document.getElementById('post-image-gallery');
+    const cameraInput = document.getElementById('post-image');
+    const galleryInput = document.getElementById('post-image-gallery-input');
+
+    if (cameraBtn && cameraInput) {
+        cameraBtn.addEventListener('click', () => cameraInput.click());
     }
+    if (galleryBtn && galleryInput) {
+        galleryBtn.addEventListener('click', () => galleryInput.click());
+    }
+
+    // When gallery input gets a file, copy it to the main input's form data
+    // and show preview
+    function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // If selected from gallery input, sync to camera input so FormData picks it up
+        if (e.target === galleryInput && cameraInput) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            cameraInput.files = dt.files;
+        }
+
+        previewImage(file);
+    }
+
+    if (cameraInput) cameraInput.addEventListener('change', handleFileSelect);
+    if (galleryInput) galleryInput.addEventListener('change', handleFileSelect);
 }
 
 /**
@@ -117,6 +139,7 @@ async function openCreatePostModal() {
             const createDogModal = document.getElementById('create-dog-modal');
             if (createDogModal) {
                 createDogModal.style.display = 'block';
+                pushModalState();
             }
             return;
         }
@@ -146,8 +169,9 @@ async function openCreatePostModal() {
     }
 
     modal.style.display = 'block';
-    modal.removeAttribute('aria-hidden'); // Don't set aria-hidden on visible modal
+    modal.removeAttribute('aria-hidden');
     toggleBodyScroll(true);
+    pushModalState();
 
     // Focus first input
     setTimeout(() => {
@@ -164,11 +188,12 @@ async function openCreatePostModal() {
  */
 export function closeCreatePostModal() {
     const modal = document.getElementById('create-post-modal');
-    if (!modal) return;
+    if (!modal || modal.style.display === 'none') return;
 
     modal.style.display = 'none';
     modal.setAttribute('aria-hidden', 'true');
     toggleBodyScroll(false);
+    popModalState();
 
     // Reset form
     const form = document.getElementById('create-post-form');

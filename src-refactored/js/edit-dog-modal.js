@@ -7,6 +7,7 @@ import { toggleBodyScroll } from './ui.js';
 import { showToast } from './utils.js';
 import { updateDog, uploadImage } from './api.js';
 import { initProfile } from './profile.js';
+import { pushModalState, popModalState } from './modals.js';
 
 // Store callback to refresh profile after edit
 let onSaveCallback = null;
@@ -140,6 +141,7 @@ export function openEditDogModal(dog, callback = null) {
 
     modal.style.display = 'block';
     toggleBodyScroll(true);
+    pushModalState();
 }
 
 /**
@@ -147,9 +149,10 @@ export function openEditDogModal(dog, callback = null) {
  */
 export function closeEditDogModal() {
     const modal = document.getElementById('edit-dog-modal');
-    if (!modal) return;
+    if (!modal || modal.style.display === 'none') return;
 
     modal.style.display = 'none';
     toggleBodyScroll(false);
     onSaveCallback = null;
+    popModalState();
 }

@@ -6,6 +6,7 @@
 import { getAllDogs } from './api.js';
 import { debounce, escapeHTML } from './utils.js';
 import { toggleBodyScroll, focusFirstElement } from './ui.js';
+import { pushModalState, popModalState } from './modals.js';
 
 let searchCache = [];
 
@@ -87,6 +88,7 @@ export function openSearchPanel() {
     searchPanel.classList.add('active');
     searchPanel.setAttribute('aria-hidden', 'false');
     toggleBodyScroll(true);
+    pushModalState();
 
     if (searchInput) {
         setTimeout(() => searchInput.focus(), 100);
@@ -98,11 +100,12 @@ export function openSearchPanel() {
  */
 function closeSearchPanel() {
     const searchPanel = document.getElementById('search-panel');
-    if (!searchPanel) return;
+    if (!searchPanel || !searchPanel.classList.contains('active')) return;
 
     searchPanel.classList.remove('active');
     searchPanel.setAttribute('aria-hidden', 'true');
     toggleBodyScroll(false);
+    popModalState();
 
     // Clear search input
     const searchInput = document.getElementById('mobile-search-input');

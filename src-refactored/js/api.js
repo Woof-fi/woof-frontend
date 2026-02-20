@@ -337,6 +337,24 @@ export async function getFollowStatus(dogId) {
     return apiRequest(`/api/follows/status/${dogId}`);
 }
 
+/**
+ * Get followers of a dog
+ * @param {string} dogId - ID of the dog
+ * @returns {Promise<object[]>} List of follower dogs
+ */
+export async function getFollowers(dogId) {
+    return apiRequest(`/api/follows/${dogId}/followers`);
+}
+
+/**
+ * Get dogs that a dog is following
+ * @param {string} dogId - ID of the dog
+ * @returns {Promise<object[]>} List of followed dogs
+ */
+export async function getFollowing(dogId) {
+    return apiRequest(`/api/follows/${dogId}/following`);
+}
+
 // ============================================================================
 // LIKES API
 // ============================================================================

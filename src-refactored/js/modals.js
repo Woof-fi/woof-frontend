@@ -1,7 +1,7 @@
 /**
  * Modal Coordinator
  * Initializes all modals and provides shared close-all functionality.
- * Individual modal logic lives in dedicated modules.
+ * Manages browser history so the back button closes modals on mobile.
  */
 
 import { initAuthModal, openAuthModal, updateUIForAuth, closeAuthModal } from './auth-modal.js';
@@ -14,6 +14,49 @@ import { toggleBodyScroll } from './ui.js';
 
 // Re-export for existing consumers (posts.js, modals.test.ts)
 export { openAuthModal, updateUIForAuth };
+
+// Track whether a modal pushed a history state
+let modalStateActive = false;
+// Prevent close from triggering history.back() when popstate already fired
+let closingFromPopstate = false;
+
+/**
+ * Push a history state when opening a modal.
+ * Call this from each modal/panel open function.
+ */
+export function pushModalState() {
+    if (!modalStateActive) {
+        history.pushState({ modal: true }, '', window.location.pathname + window.location.search);
+        modalStateActive = true;
+    }
+}
+
+/**
+ * Pop the modal history state when closing programmatically (close button, overlay click).
+ * Call this from each modal/panel close function.
+ */
+export function popModalState() {
+    if (modalStateActive && !closingFromPopstate) {
+        modalStateActive = false;
+        history.back();
+    }
+    closingFromPopstate = false;
+}
+
+/**
+ * Check if popstate should be handled as a modal close.
+ * Called from the router's popstate handler.
+ * @returns {boolean} true if a modal was closed (router should skip routing)
+ */
+export function handleModalPopstate() {
+    if (modalStateActive) {
+        modalStateActive = false;
+        closingFromPopstate = true;
+        closeAllModals();
+        return true;
+    }
+    return false;
+}
 
 /**
  * Initialize all modals
@@ -39,6 +82,13 @@ export function initModals() {
  * Close all open modals
  */
 function closeAllModals() {
+    // Pop history state if closing via Escape key (not from popstate)
+    if (!closingFromPopstate && modalStateActive) {
+        modalStateActive = false;
+        history.back();
+    }
+    closingFromPopstate = false;
+
     closeCreatePostModal();
     closeCreateDogModal();
     closeEditDogModal();
@@ -49,6 +99,7 @@ function closeAllModals() {
     const searchPanel = document.getElementById('search-panel');
     if (searchPanel && searchPanel.classList.contains('active')) {
         searchPanel.classList.remove('active');
+        searchPanel.setAttribute('aria-hidden', 'true');
         toggleBodyScroll(false);
     }
 }
