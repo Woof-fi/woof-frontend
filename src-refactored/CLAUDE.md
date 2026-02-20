@@ -53,32 +53,43 @@ Unit tests are in `src/__tests__/`. They use `happy-dom` as the DOM environment.
 ### E2E Tests (Playwright)
 ```bash
 npm run test:e2e          # Run all E2E tests (headless)
-npm run test:e2e:headed   # Run with visible Chrome browser
+npm run test:e2e:headed   # Run with visible Chrome browser (preferred)
 npm run test:e2e:auth     # Auth tests only
 npm run test:e2e:dog      # Dog CRUD tests only
 ```
-E2E tests are in `e2e/`. They run against production (`https://woofapp.fi`) by default, override with `E2E_BASE_URL` env var. Tests create real Cognito users and clean them up after each test using `aws cognito-idp admin-delete-user`.
+E2E tests are in `e2e/`. They run against production (`https://woofapp.fi`) by default, override with `E2E_BASE_URL` env var. **Always run E2E tests in headed mode** (`npm run test:e2e:headed`) so you can see what's happening in the browser.
 
 **Test helpers:**
 - `e2e/helpers/cognito.ts` - Cognito admin operations (confirm, delete users via AWS CLI)
 - `e2e/helpers/auth.ts` - Register + login shortcut for tests that need an authenticated user
 
-**How auth E2E tests work:**
-1. Register via UI form (creates UNCONFIRMED Cognito user)
-2. `admin-confirm-sign-up` via AWS CLI (bypasses email verification)
-3. Login via UI form
-4. Test features
-5. `admin-delete-user` in afterEach cleanup
+**How E2E tests work:**
+1. `beforeEach`: Create a unique test user object (`e2e-test-<timestamp>@test.woofapp.fi`)
+2. Register via UI form (creates UNCONFIRMED Cognito user)
+3. `admin-confirm-sign-up` via AWS CLI (bypasses email verification)
+4. Login via UI form (calls `POST /api/auth/sync` → creates DB user record)
+5. Test features (create dogs, posts, etc.)
+6. `afterEach` cleanup — **deletes everything in this order:**
+   - `DELETE /api/auth/me` — deletes DB user record, which cascades to all dogs, posts, comments, likes, follows, health records via PostgreSQL `ON DELETE CASCADE`
+   - `admin-delete-user` via AWS CLI — deletes the Cognito user
+
+**Important cleanup notes:**
+- If a test logs out before `afterEach`, localStorage is cleared and the auth token is lost. The auth test handles this by saving the token to a variable (`savedAuthToken`) before the logout step.
+- The `DELETE /api/auth/me` endpoint handles all DB cleanup via cascade — no need to individually delete dogs or posts.
+- If cleanup fails, orphaned data will remain in production. Check with SSM (see backend CLAUDE.md).
+
+**Selector note:** The `.auth-link` class is used by both the header Login/Logout link and the sidebar "Add a Pet" link. E2E tests must use `.header-icons .auth-link` to target the header auth link specifically.
 
 **Requirements:** AWS CLI configured with credentials that can manage the Cognito User Pool.
 
 ## Workflow
 1. Make code changes
 2. Run unit tests: `npm test`
-3. Build and deploy: `npm run deploy`
-4. Run E2E tests in headed mode: `npm run test:e2e:headed`
-5. Verify all tests pass
-6. Commit to git
+3. If backend changes: build and deploy backend first (`cd woof-backend && npm run build && eb deploy`)
+4. Build and deploy frontend: `npm run deploy`
+5. Run E2E tests in headed mode: `npm run test:e2e:headed`
+6. Verify all tests pass and no test data remains in production
+7. Commit to git and push
 
 ## Environment Variables
 Create `.env` for local development:
