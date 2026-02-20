@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createTestUser, adminConfirmUser, adminDeleteUser } from './helpers/cognito';
+import { createTestUser, adminDeleteUser } from './helpers/cognito';
 import { registerAndLogin } from './helpers/auth';
 import type { TestUser } from './helpers/cognito';
 import path from 'path';
@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEST_IMAGE = path.join(__dirname, 'fixtures', 'test-dog.png');
+const API_BASE = 'https://api.woofapp.fi';
 
 let testUser: TestUser;
 
@@ -15,12 +16,50 @@ test.beforeEach(() => {
 });
 
 test.afterEach(async ({ page }) => {
+  // Clean up all dogs (and their posts) created by this test user
+  try {
+    const token = await page.evaluate(() => localStorage.getItem('auth_token'));
+    if (token) {
+      // Get all dogs owned by this user
+      const dogsRes = await page.request.get(`${API_BASE}/api/dogs/my/dogs`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      if (dogsRes.ok()) {
+        const dogsData = await dogsRes.json();
+        const dogs = Array.isArray(dogsData) ? dogsData : (dogsData.dogs || []);
+        for (const dog of dogs) {
+          // Delete all posts by this dog first
+          const postsRes = await page.request.get(`${API_BASE}/api/posts?dogId=${dog.id}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          if (postsRes.ok()) {
+            const postsData = await postsRes.json();
+            const posts = postsData.posts || postsData;
+            if (Array.isArray(posts)) {
+              for (const post of posts) {
+                await page.request.delete(`${API_BASE}/api/posts/${post.id}`, {
+                  headers: { 'Authorization': `Bearer ${token}` },
+                });
+              }
+            }
+          }
+          // Delete the dog
+          await page.request.delete(`${API_BASE}/api/dogs/${dog.id}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Cleanup failed:', e);
+  }
+
+  // Always delete the Cognito user
   adminDeleteUser(testUser.email);
 });
 
 test.describe('Dog CRUD', () => {
   test('create a dog profile and verify it appears', async ({ page }) => {
-    // Login
     testUser = await registerAndLogin(page, testUser);
 
     // After login with no dogs, nav should show "Add a Pet"
@@ -56,20 +95,5 @@ test.describe('Dog CRUD', () => {
     // Profile page should show the dog's info
     await expect(page.locator('body')).toContainText('E2E TestDog', { timeout: 10_000 });
     await expect(page.locator('body')).toContainText('Test Breed');
-
-    // Clean up: delete the dog via API
-    const dogId = page.url().split('/dog/')[1];
-    if (dogId) {
-      const token = await page.evaluate(() => localStorage.getItem('auth_token'));
-      if (token) {
-        const baseUrl = await page.evaluate(() => {
-          // Read the API base URL from the page context
-          return (window as any).__WOOF_CONFIG__?.API_BASE_URL || 'https://api.woofapp.fi';
-        });
-        await page.request.delete(`https://api.woofapp.fi/api/dogs/${dogId}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-      }
-    }
   });
 });
