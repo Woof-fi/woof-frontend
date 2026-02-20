@@ -1,13 +1,28 @@
 /**
  * Authentication Module
- * Handles user authentication, token management, and user state
+ * Handles user authentication via AWS Cognito and user state management
  */
 
+import {
+    CognitoUserPool,
+    CognitoUser,
+    AuthenticationDetails,
+    CognitoUserAttribute
+} from 'amazon-cognito-identity-js';
 import { showToast } from './utils.js';
 import { CONFIG } from './config.js';
 
-// Token management
-export function saveToken(token) {
+const userPool = new CognitoUserPool({
+    UserPoolId: CONFIG.COGNITO.USER_POOL_ID,
+    ClientId: CONFIG.COGNITO.CLIENT_ID,
+});
+
+function getCognitoUser(email) {
+    return new CognitoUser({ Username: email, Pool: userPool });
+}
+
+// Token management — store ID token for synchronous access
+function saveToken(token) {
     try {
         localStorage.setItem('auth_token', token);
     } catch (error) {
@@ -24,7 +39,7 @@ export function getToken() {
     }
 }
 
-export function clearToken() {
+function clearToken() {
     try {
         localStorage.removeItem('auth_token');
     } catch (error) {
@@ -66,62 +81,189 @@ export function clearCurrentUser() {
     }
 }
 
-// Check if user is logged in
 export function isAuthenticated() {
     return !!getToken();
 }
 
-// Logout
+/**
+ * Register — calls Cognito signUp.
+ * Does NOT auto-login; user must verify email first.
+ */
+export async function register(email, password, name) {
+    const attributes = [
+        new CognitoUserAttribute({ Name: 'email', Value: email }),
+        new CognitoUserAttribute({ Name: 'name', Value: name }),
+    ];
+
+    return new Promise((resolve, reject) => {
+        userPool.signUp(email, password, attributes, null, (err, result) => {
+            if (err) {
+                showToast(err.message || 'Registration failed', 'error');
+                reject(err);
+                return;
+            }
+            showToast('Account created! Check your email for a verification code.', 'success');
+            resolve(result);
+        });
+    });
+}
+
+/**
+ * Confirm registration with the verification code sent via email
+ */
+export async function confirmRegistration(email, code) {
+    const cognitoUser = getCognitoUser(email);
+
+    return new Promise((resolve, reject) => {
+        cognitoUser.confirmRegistration(code, true, (err, result) => {
+            if (err) {
+                showToast(err.message || 'Verification failed', 'error');
+                reject(err);
+                return;
+            }
+            showToast('Email verified! You can now log in.', 'success');
+            resolve(result);
+        });
+    });
+}
+
+/**
+ * Resend the verification code to the user's email
+ */
+export async function resendConfirmationCode(email) {
+    const cognitoUser = getCognitoUser(email);
+
+    return new Promise((resolve, reject) => {
+        cognitoUser.resendConfirmationCode((err, result) => {
+            if (err) {
+                showToast(err.message || 'Failed to resend code', 'error');
+                reject(err);
+                return;
+            }
+            showToast('Verification code resent! Check your email.', 'success');
+            resolve(result);
+        });
+    });
+}
+
+/**
+ * Login — authenticates with Cognito, then syncs user record to backend
+ */
+export async function login(email, password) {
+    const authDetails = new AuthenticationDetails({
+        Username: email,
+        Password: password,
+    });
+    const cognitoUser = getCognitoUser(email);
+
+    const session = await new Promise((resolve, reject) => {
+        cognitoUser.authenticateUser(authDetails, {
+            onSuccess: (session) => resolve(session),
+            onFailure: (err) => {
+                showToast(err.message || 'Login failed', 'error');
+                reject(err);
+            },
+        });
+    });
+
+    // Store ID token for synchronous getToken() access
+    const idToken = session.getIdToken().getJwtToken();
+    saveToken(idToken);
+
+    // Sync user to backend (creates DB record if first login)
+    try {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/sync`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${idToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        if (response.ok) {
+            setCurrentUser(data.user);
+        }
+    } catch (error) {
+        console.error('User sync failed:', error);
+    }
+
+    showToast('Logged in successfully!', 'success');
+    return session;
+}
+
+/**
+ * Initiate forgot-password flow — sends reset code to email
+ */
+export async function forgotPassword(email) {
+    const cognitoUser = getCognitoUser(email);
+
+    return new Promise((resolve, reject) => {
+        cognitoUser.forgotPassword({
+            onSuccess: (data) => {
+                showToast('Password reset code sent! Check your email.', 'success');
+                resolve(data);
+            },
+            onFailure: (err) => {
+                showToast(err.message || 'Failed to send reset code', 'error');
+                reject(err);
+            },
+        });
+    });
+}
+
+/**
+ * Confirm new password using the reset code
+ */
+export async function confirmNewPassword(email, code, newPassword) {
+    const cognitoUser = getCognitoUser(email);
+
+    return new Promise((resolve, reject) => {
+        cognitoUser.confirmPassword(code, newPassword, {
+            onSuccess: () => {
+                showToast('Password reset successful! You can now log in.', 'success');
+                resolve();
+            },
+            onFailure: (err) => {
+                showToast(err.message || 'Password reset failed', 'error');
+                reject(err);
+            },
+        });
+    });
+}
+
+/**
+ * Logout — signs out of Cognito and clears local state
+ */
 export function logout() {
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser) {
+        cognitoUser.signOut();
+    }
     clearToken();
     clearCurrentUser();
     showToast('Logged out successfully', 'success');
-
-    // Reload page to clear all state
     window.location.href = '/';
 }
 
-// API calls
-async function authRequest(endpoint, data) {
-    const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+/**
+ * Refresh the Cognito session and update stored token.
+ * Call on app init to keep the token fresh.
+ * @returns {Promise<boolean>} true if session is valid
+ */
+export async function refreshSession() {
+    const cognitoUser = userPool.getCurrentUser();
+    if (!cognitoUser) return false;
+
+    return new Promise((resolve) => {
+        cognitoUser.getSession((err, session) => {
+            if (err || !session || !session.isValid()) {
+                clearToken();
+                clearCurrentUser();
+                resolve(false);
+                return;
+            }
+            saveToken(session.getIdToken().getJwtToken());
+            resolve(true);
+        });
     });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.error || 'Request failed');
-    }
-
-    return result;
-}
-
-export async function register(email, password, name) {
-    try {
-        const result = await authRequest('/api/auth/register', { email, password, name });
-        saveToken(result.token);
-        setCurrentUser(result.user);
-        showToast('Account created successfully!', 'success');
-        return result;
-    } catch (error) {
-        showToast(error.message, 'error');
-        throw error;
-    }
-}
-
-export async function login(email, password) {
-    try {
-        const result = await authRequest('/api/auth/login', { email, password });
-        saveToken(result.token);
-        setCurrentUser(result.user);
-        showToast('Logged in successfully!', 'success');
-        return result;
-    } catch (error) {
-        showToast(error.message, 'error');
-        throw error;
-    }
 }

@@ -927,6 +927,23 @@ header {
     border-bottom-color: var(--color-text);
 }
 
+.auth-secondary-action {
+    text-align: center;
+    margin-top: 12px;
+    margin-bottom: 0;
+    font-size: 13px;
+}
+
+.auth-secondary-action a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.auth-secondary-action a:hover {
+    color: var(--color-text);
+    text-decoration: underline;
+}
+
 /* Create post form layout */
 #create-post-form {
     display: flex;

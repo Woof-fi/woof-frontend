@@ -12,9 +12,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "npx playwright test",
+    "test:e2e:auth": "npx playwright test e2e/auth.spec.ts",
+    "test:e2e:dog": "npx playwright test e2e/dog.spec.ts",
+    "test:e2e:headed": "npx playwright test --headed"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/node": "^22.10.5",
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "^4.0.18",
@@ -25,5 +30,8 @@
     "vitest": "^4.0.18"
   },
   "author": "Tommi Kivisaari",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "amazon-cognito-identity-js": "^6.3.16"
+  }
 }

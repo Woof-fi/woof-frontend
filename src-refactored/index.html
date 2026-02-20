@@ -174,11 +174,11 @@
                     <button class="auth-tab" data-tab="register">Register</button>
                 </div>
                 <form id="auth-form">
-                    <div class="form-group">
+                    <div class="form-group" id="auth-email-group">
                         <label for="auth-email">Email</label>
                         <input type="email" id="auth-email" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="auth-password-group">
                         <label for="auth-password">Password</label>
                         <input type="password" id="auth-password" required>
                         <ul id="password-requirements" class="password-requirements" style="display: none;" aria-live="polite">
@@ -186,13 +186,38 @@
                             <li id="req-uppercase">An uppercase letter</li>
                             <li id="req-lowercase">A lowercase letter</li>
                             <li id="req-number">A number</li>
+                            <li id="req-symbol">A special character</li>
                         </ul>
                     </div>
                     <div class="form-group" id="auth-name-group" style="display: none;">
                         <label for="auth-name">Name</label>
                         <input type="text" id="auth-name">
                     </div>
+                    <div class="form-group" id="auth-verify-group" style="display: none;">
+                        <label for="auth-verify-code">Verification Code</label>
+                        <input type="text" id="auth-verify-code" placeholder="Enter 6-digit code" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+                    </div>
+                    <div class="form-group" id="auth-new-password-group" style="display: none;">
+                        <label for="auth-new-password">New Password</label>
+                        <input type="password" id="auth-new-password">
+                        <ul id="new-password-requirements" class="password-requirements" aria-live="polite">
+                            <li id="new-req-length">At least 8 characters</li>
+                            <li id="new-req-uppercase">An uppercase letter</li>
+                            <li id="new-req-lowercase">A lowercase letter</li>
+                            <li id="new-req-number">A number</li>
+                            <li id="new-req-symbol">A special character</li>
+                        </ul>
+                    </div>
                     <button type="submit" class="btn-primary" id="auth-submit">Sign In</button>
+                    <p id="auth-forgot-link" class="auth-secondary-action" style="display: none;">
+                        <a href="#" id="forgot-password-btn">Forgot password?</a>
+                    </p>
+                    <p id="auth-resend-group" class="auth-secondary-action" style="display: none;">
+                        <a href="#" id="resend-code-btn">Resend verification code</a>
+                    </p>
+                    <p id="auth-back-group" class="auth-secondary-action" style="display: none;">
+                        <a href="#" id="back-to-login-btn">&larr; Back to login</a>
+                    </p>
                 </form>
             </div>
         </div>

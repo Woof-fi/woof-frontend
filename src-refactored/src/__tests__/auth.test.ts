@@ -1,12 +1,12 @@
 /**
  * Authentication Tests
+ * Tests token/user state management (public API only).
+ * Cognito SDK interactions are NOT tested here — those are covered by E2E tests.
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  saveToken,
   getToken,
-  clearToken,
   setCurrentUser,
   getCurrentUser,
   clearCurrentUser,
@@ -15,26 +15,17 @@ import {
 
 describe('Authentication Module', () => {
   beforeEach(() => {
-    // Clear both localStorage and in-memory cache
     localStorage.clear();
-    clearToken();
     clearCurrentUser();
   });
 
   describe('Token Management', () => {
-    it('should save and retrieve token', () => {
-      const testToken = 'test-jwt-token';
-      saveToken(testToken);
-      expect(getToken()).toBe(testToken);
+    it('should return token from localStorage', () => {
+      localStorage.setItem('auth_token', 'test-jwt-token');
+      expect(getToken()).toBe('test-jwt-token');
     });
 
     it('should return null when no token exists', () => {
-      expect(getToken()).toBeNull();
-    });
-
-    it('should clear token', () => {
-      saveToken('test-token');
-      clearToken();
       expect(getToken()).toBeNull();
     });
   });
@@ -61,15 +52,25 @@ describe('Authentication Module', () => {
       const testUser = { id: '123', email: 'test@example.com' };
       setCurrentUser(testUser);
 
-      // Verify data is in localStorage
       const retrieved = JSON.parse(localStorage.getItem('current_user') || 'null');
       expect(retrieved).toEqual(testUser);
+    });
+
+    it('should restore user from localStorage when in-memory cache is empty', () => {
+      const testUser = { id: '123', email: 'test@example.com' };
+      localStorage.setItem('current_user', JSON.stringify(testUser));
+
+      // clearCurrentUser wipes in-memory cache, but we re-set localStorage after
+      clearCurrentUser();
+      localStorage.setItem('current_user', JSON.stringify(testUser));
+
+      expect(getCurrentUser()).toEqual(testUser);
     });
   });
 
   describe('Authentication Status', () => {
     it('should return true when token exists', () => {
-      saveToken('test-token');
+      localStorage.setItem('auth_token', 'test-token');
       expect(isAuthenticated()).toBe(true);
     });
 
@@ -77,9 +78,9 @@ describe('Authentication Module', () => {
       expect(isAuthenticated()).toBe(false);
     });
 
-    it('should return false after clearing token', () => {
-      saveToken('test-token');
-      clearToken();
+    it('should return false after removing token', () => {
+      localStorage.setItem('auth_token', 'test-token');
+      localStorage.removeItem('auth_token');
       expect(isAuthenticated()).toBe(false);
     });
   });

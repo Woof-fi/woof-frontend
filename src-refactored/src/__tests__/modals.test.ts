@@ -9,6 +9,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 vi.mock('../../js/auth.js', () => ({
   login: vi.fn(),
   register: vi.fn(),
+  confirmRegistration: vi.fn(),
+  resendConfirmationCode: vi.fn(),
+  forgotPassword: vi.fn(),
+  confirmNewPassword: vi.fn(),
   isAuthenticated: vi.fn(),
   logout: vi.fn(),
   getCurrentUser: vi.fn(),
@@ -21,6 +25,11 @@ vi.mock('../../js/navigation.js', () => ({
 vi.mock('../../js/ui.js', () => ({
   toggleBodyScroll: vi.fn(),
   focusFirstElement: vi.fn(),
+}));
+
+vi.mock('../../js/modals.js', () => ({
+  pushModalState: vi.fn(),
+  popModalState: vi.fn(),
 }));
 
 import { updateUIForAuth } from '../../js/auth-modal.js';

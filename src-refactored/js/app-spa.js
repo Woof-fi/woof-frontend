@@ -15,6 +15,7 @@ import ProfileView from './views/ProfileView.js';
 import PostDetailView from './views/PostDetailView.js';
 import MessagesView from './views/MessagesView.js';
 import { initNavigation } from './navigation.js';
+import { refreshSession } from './auth.js';
 
 // Create view manager
 const viewManager = new ViewManager('#app');
@@ -24,6 +25,9 @@ const viewManager = new ViewManager('#app');
  */
 async function initApp() {
     console.log('Initializing Woof SPA...');
+
+    // Refresh Cognito session (updates stored token if valid)
+    await refreshSession();
 
     // Check API health
     try {
