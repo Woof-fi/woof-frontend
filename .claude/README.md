@@ -280,6 +280,7 @@ See [ROADMAP.md](/ROADMAP.md) for the full product roadmap with competitor analy
   - `adminDeleteUser(email)` — deletes a Cognito user
   - `adminLoginOnly(page, user)` — admin-creates user + logs in via UI (in `e2e/helpers/auth.ts`)
   - `registerAndLogin(page, user)` — registers via UI (sends email) + admin-confirm + login
+- **IAM requirement**: The IAM user (e.g. `woof-deployer`) needs the `CognitoE2ETestAdmin` inline policy with `cognito-idp:AdminCreateUser`, `cognito-idp:AdminSetUserPassword`, and `cognito-idp:AdminDeleteUser` on the User Pool.
 - **Mock auth** (`VITE_MOCK_AUTH=true` / `MOCK_COGNITO=true`): For local development without AWS. Frontend generates `mock-cognito-{email}` tokens, backend accepts them as valid cognito_user_id. Never enable in production.
 
 ## Security Notes
