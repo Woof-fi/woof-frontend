@@ -29,7 +29,7 @@ A social network where dogs are the main users. Live at [woofapp.fi](https://woo
 - **Search** - Search dogs by name/breed
 - **Follow/Unfollow** - Follow dogs, following feed tab
 - **Messaging** - Dog-to-dog DMs with conversation list, polling-based
-- **Auth** - JWT-based register/login/logout with password requirements
+- **Auth** - AWS Cognito (email verification, password reset, MFA-ready)
 - **SPA Routing** - `/dog/:slug`, `/post/:id`, `/messages`, deep linking
 - **Mobile** - Instagram-style bottom nav, responsive layout
 - **Loading Skeletons** - Shimmer cards during feed/profile loading
@@ -62,7 +62,7 @@ cd ../woof-backend
 npm install
 npm run dev          # Express dev server with ts-node
 npm run build        # Compile TypeScript to dist/
-npm test             # Jest (183 tests)
+npm test             # Jest (185 tests)
 eb deploy            # Deploy to Elastic Beanstalk
 ```
 
@@ -108,8 +108,9 @@ woof-backend/
 
 | Method | Path | Auth | Purpose |
 |--------|------|------|---------|
-| POST | `/api/auth/register` | - | Register |
-| POST | `/api/auth/login` | - | Login |
+| POST | `/api/auth/sync` | Cognito token | Sync Cognito user to DB |
+| GET | `/api/auth/me` | required | Get current user |
+| DELETE | `/api/auth/me` | required | Delete account |
 | GET | `/api/posts/feed` | optional | Feed (For You / Following) |
 | GET | `/api/posts/:id` | optional | Single post |
 | GET | `/api/posts/dog/:dogId` | optional | Dog's posts |
@@ -128,7 +129,7 @@ woof-backend/
 
 ## Tests
 
-- **Backend:** 183 tests across 11 suites (Jest) - auth, posts, dogs, comments, likes, follows, health records, messaging, uploads
+- **Backend:** 185 tests across 11 suites (Jest) - auth, posts, dogs, comments, likes, follows, health records, messaging, admin, slugs
 - **Frontend:** Vitest with happy-dom
 
 ## Next Up
@@ -136,7 +137,7 @@ woof-backend/
 See [ROADMAP.md](ROADMAP.md) for the full product roadmap with build vs buy decisions, database schemas, and cost projections.
 
 **Phase 5 — Trust & Safety** (current):
-- Migrate auth to AWS Cognito (email verification, password reset, MFA)
+- ~~Migrate auth to AWS Cognito~~ (done — email verification, password reset)
 - Content moderation (profanity filter + AWS Rekognition for images)
 - Reporting system + admin review queue
 - Sentry error tracking

@@ -1,6 +1,7 @@
 /**
  * Authentication Module
- * Handles user authentication via AWS Cognito and user state management
+ * Handles user authentication via AWS Cognito and user state management.
+ * When VITE_MOCK_AUTH=true, bypasses Cognito for local development.
  */
 
 import {
@@ -12,7 +13,12 @@ import {
 import { showToast } from './utils.js';
 import { CONFIG } from './config.js';
 
-const userPool = new CognitoUserPool({
+const MOCK_AUTH = import.meta.env.VITE_MOCK_AUTH === 'true';
+
+// In mock mode, store registered users in memory
+const mockUsers = MOCK_AUTH ? new Map() : null;
+
+const userPool = MOCK_AUTH ? null : new CognitoUserPool({
     UserPoolId: CONFIG.COGNITO.USER_POOL_ID,
     ClientId: CONFIG.COGNITO.CLIENT_ID,
 });
@@ -90,6 +96,12 @@ export function isAuthenticated() {
  * Does NOT auto-login; user must verify email first.
  */
 export async function register(email, password, name) {
+    if (MOCK_AUTH) {
+        mockUsers.set(email, { email, password, name });
+        showToast('Account created! (mock mode — no email sent)', 'success');
+        return { user: { username: email } };
+    }
+
     const attributes = [
         new CognitoUserAttribute({ Name: 'email', Value: email }),
         new CognitoUserAttribute({ Name: 'name', Value: name }),
@@ -112,6 +124,11 @@ export async function register(email, password, name) {
  * Confirm registration with the verification code sent via email
  */
 export async function confirmRegistration(email, code) {
+    if (MOCK_AUTH) {
+        showToast('Email verified! (mock mode)', 'success');
+        return 'SUCCESS';
+    }
+
     const cognitoUser = getCognitoUser(email);
 
     return new Promise((resolve, reject) => {
@@ -131,6 +148,11 @@ export async function confirmRegistration(email, code) {
  * Resend the verification code to the user's email
  */
 export async function resendConfirmationCode(email) {
+    if (MOCK_AUTH) {
+        showToast('Verification code resent! (mock mode)', 'success');
+        return {};
+    }
+
     const cognitoUser = getCognitoUser(email);
 
     return new Promise((resolve, reject) => {
@@ -150,6 +172,31 @@ export async function resendConfirmationCode(email) {
  * Login — authenticates with Cognito, then syncs user record to backend
  */
 export async function login(email, password) {
+    if (MOCK_AUTH) {
+        const fakeToken = `mock-cognito-${email}`;
+        saveToken(fakeToken);
+
+        // Sync user to backend
+        try {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/auth/sync`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${fakeToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setCurrentUser(data.user);
+            }
+        } catch (error) {
+            console.error('User sync failed:', error);
+        }
+
+        showToast('Logged in successfully! (mock mode)', 'success');
+        return { getIdToken: () => ({ getJwtToken: () => fakeToken }) };
+    }
+
     const authDetails = new AuthenticationDetails({
         Username: email,
         Password: password,
@@ -195,6 +242,11 @@ export async function login(email, password) {
  * Initiate forgot-password flow — sends reset code to email
  */
 export async function forgotPassword(email) {
+    if (MOCK_AUTH) {
+        showToast('Password reset code sent! (mock mode)', 'success');
+        return {};
+    }
+
     const cognitoUser = getCognitoUser(email);
 
     return new Promise((resolve, reject) => {
@@ -215,6 +267,11 @@ export async function forgotPassword(email) {
  * Confirm new password using the reset code
  */
 export async function confirmNewPassword(email, code, newPassword) {
+    if (MOCK_AUTH) {
+        showToast('Password reset successful! (mock mode)', 'success');
+        return;
+    }
+
     const cognitoUser = getCognitoUser(email);
 
     return new Promise((resolve, reject) => {
@@ -235,9 +292,11 @@ export async function confirmNewPassword(email, code, newPassword) {
  * Logout — signs out of Cognito and clears local state
  */
 export function logout() {
-    const cognitoUser = userPool.getCurrentUser();
-    if (cognitoUser) {
-        cognitoUser.signOut();
+    if (!MOCK_AUTH) {
+        const cognitoUser = userPool.getCurrentUser();
+        if (cognitoUser) {
+            cognitoUser.signOut();
+        }
     }
     clearToken();
     clearCurrentUser();
@@ -251,6 +310,10 @@ export function logout() {
  * @returns {Promise<boolean>} true if session is valid
  */
 export async function refreshSession() {
+    if (MOCK_AUTH) {
+        return !!getToken();
+    }
+
     const cognitoUser = userPool.getCurrentUser();
     if (!cognitoUser) return false;
 

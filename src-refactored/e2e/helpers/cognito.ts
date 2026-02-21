@@ -44,6 +44,35 @@ export function adminDeleteUser(email: string): void {
   }
 }
 
+/**
+ * Admin-create a Cognito user with a permanent password (no email sent).
+ * Uses --message-action SUPPRESS to skip the verification email.
+ * Sets the password as permanent via admin-set-user-password.
+ */
+export function adminCreateUser(user: TestUser): void {
+  // Create the user with SUPPRESS (no email triggered)
+  execSync(
+    `aws cognito-idp admin-create-user ` +
+    `--user-pool-id ${USER_POOL_ID} ` +
+    `--username "${user.email}" ` +
+    `--user-attributes Name=email,Value="${user.email}" Name=email_verified,Value=true Name=name,Value="${user.name}" ` +
+    `--message-action SUPPRESS ` +
+    `--region ${REGION}`,
+    { stdio: 'pipe' }
+  );
+
+  // Set a permanent password (moves from FORCE_CHANGE_PASSWORD to CONFIRMED)
+  execSync(
+    `aws cognito-idp admin-set-user-password ` +
+    `--user-pool-id ${USER_POOL_ID} ` +
+    `--username "${user.email}" ` +
+    `--password "${user.password}" ` +
+    `--permanent ` +
+    `--region ${REGION}`,
+    { stdio: 'pipe' }
+  );
+}
+
 /** Check if a Cognito user exists and return their status */
 export function adminGetUser(email: string): { status: string } | null {
   try {

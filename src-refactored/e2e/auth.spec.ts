@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { createTestUser, adminConfirmUser, adminDeleteUser, adminGetUser } from './helpers/cognito';
+import { createTestUser, adminConfirmUser, adminCreateUser, adminDeleteUser, adminGetUser } from './helpers/cognito';
 import type { TestUser } from './helpers/cognito';
 
 let testUser: TestUser;
@@ -103,22 +103,16 @@ test.describe('Auth flow', () => {
   });
 
   test('login with wrong password shows error', async ({ page }) => {
-    // Create and confirm a user first
+    // Create user via admin API (no email sent)
+    adminCreateUser(testUser);
+
     await page.goto('/');
     await waitForAppReady(page);
     await page.click(AUTH_LINK);
-    await page.click('.auth-tab[data-tab="register"]');
-    await page.fill('#auth-email', testUser.email);
-    await page.fill('#auth-password', testUser.password);
-    await page.fill('#auth-name', testUser.name);
-    await page.click('#auth-submit');
-    await expect(page.locator('#auth-modal-title')).toHaveText('Verify Email', { timeout: 15_000 });
-    adminConfirmUser(testUser.email);
 
-    // Go back to login and try wrong password
-    await page.click('#back-to-login-btn');
+    // Try login with wrong password
     await page.fill('#auth-email', testUser.email);
-    await page.fill('#auth-password', 'WrongPass1');
+    await page.fill('#auth-password', 'WrongPass1!');
     await page.click('#auth-submit');
 
     // Should show error toast
@@ -126,20 +120,14 @@ test.describe('Auth flow', () => {
   });
 
   test('register with existing email shows error', async ({ page }) => {
-    // Register the user first
+    // Create the user via admin API (no email sent)
+    adminCreateUser(testUser);
+
     await page.goto('/');
     await waitForAppReady(page);
     await page.click(AUTH_LINK);
-    await page.click('.auth-tab[data-tab="register"]');
-    await page.fill('#auth-email', testUser.email);
-    await page.fill('#auth-password', testUser.password);
-    await page.fill('#auth-name', testUser.name);
-    await page.click('#auth-submit');
-    await expect(page.locator('#auth-modal-title')).toHaveText('Verify Email', { timeout: 15_000 });
-    adminConfirmUser(testUser.email);
 
-    // Try to register again with the same email
-    await page.click('#back-to-login-btn');
+    // Try to register with the same email via UI
     await page.click('.auth-tab[data-tab="register"]');
     await page.fill('#auth-email', testUser.email);
     await page.fill('#auth-password', testUser.password);

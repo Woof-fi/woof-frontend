@@ -1,7 +1,7 @@
 # Woof - Claude Code Instructions
 
 **Last Updated:** 2026-02-21
-**Status:** Phase 5A complete (Cognito + SES + Onboarding UX). Next: Phase 5B (Content Moderation). See [ROADMAP.md](/ROADMAP.md).
+**Status:** Phase 5A complete (Cognito + Onboarding UX). Email via Cognito default (50/day); SES setup preserved for future use. Next: Phase 5B (Content Moderation). See [ROADMAP.md](/ROADMAP.md).
 
 ## Project Overview
 
@@ -30,8 +30,8 @@ cd woof-frontend/src-refactored && npm install
 # 3. Install backend dependencies + create .env
 cd ../../woof-backend && npm install
 # Copy .env from 1Password / another machine. Required vars:
-# DATABASE_URL, JWT_SECRET, AWS_REGION, COGNITO_USER_POOL_ID,
-# COGNITO_CLIENT_ID, SES_FROM_EMAIL, S3_BUCKET, ADMIN_SECRET
+# DATABASE_URL, AWS_REGION, COGNITO_USER_POOL_ID,
+# COGNITO_CLIENT_ID, S3_BUCKET
 
 # 4. Set up local databases (for backend tests)
 createdb woof && createdb woof_test
@@ -59,11 +59,15 @@ npm run dev
 
 # Tests
 npm test          # Frontend: Vitest (from src-refactored/)
-npm test          # Backend: Jest, 183 tests (from woof-backend/)
+npm test          # Backend: Jest, 185 tests (from woof-backend/)
 
 # E2E tests (Playwright, from src-refactored/)
 npm run test:e2e                                        # Against https://woofapp.fi
 E2E_BASE_URL=http://localhost:5173 npm run test:e2e    # Against local dev server
+
+# Local dev with mock auth (no Cognito/AWS needed)
+# Frontend: VITE_MOCK_AUTH=true is set in .env.development (auto-used by npm run dev)
+# Backend:  MOCK_COGNITO=true npm run dev
 
 # Build + deploy
 npm run build     # Vite build to dist/ (from src-refactored/)
@@ -265,6 +269,18 @@ See [ROADMAP.md](/ROADMAP.md) for the full product roadmap with competitor analy
 | Share button non-functional | Action bar button, no implementation | Open (Phase 4+) |
 | Messages icon non-functional | Header icon, no backend/frontend | Open (Phase 5) |
 | Notifications icon non-functional | Header bell icon, no backend/frontend | Open (Phase 4) |
+
+## Email & Auth Testing
+
+- **Email provider**: Cognito default (50 emails/day from `no-reply@verificationemail.com`). SES integration (`noreply@woofapp.fi`, DKIM verified) is preserved but inactive — AWS account needs billing history for SES production access in eu-north-1.
+- **E2E tests**: Consume ~1 email per full run. Tests that need an authenticated user use `adminCreateUser()` (no email sent). Only the registration flow test triggers a real `signUp` email.
+- **E2E helpers** (`e2e/helpers/cognito.ts`):
+  - `adminCreateUser(user)` — creates CONFIRMED user via admin API, no email sent
+  - `adminConfirmUser(email)` — admin-confirms an UNCONFIRMED user
+  - `adminDeleteUser(email)` — deletes a Cognito user
+  - `adminLoginOnly(page, user)` — admin-creates user + logs in via UI (in `e2e/helpers/auth.ts`)
+  - `registerAndLogin(page, user)` — registers via UI (sends email) + admin-confirm + login
+- **Mock auth** (`VITE_MOCK_AUTH=true` / `MOCK_COGNITO=true`): For local development without AWS. Frontend generates `mock-cognito-{email}` tokens, backend accepts them as valid cognito_user_id. Never enable in production.
 
 ## Security Notes
 

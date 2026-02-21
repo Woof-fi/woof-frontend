@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { createTestUser, adminDeleteUser } from './helpers/cognito';
-import { registerAndLogin } from './helpers/auth';
+import { adminLoginOnly } from './helpers/auth';
 import type { TestUser } from './helpers/cognito';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -34,7 +34,7 @@ test.afterEach(async ({ page }) => {
 
 test.describe('Dog CRUD', () => {
   test('create a dog profile and verify it appears', async ({ page }) => {
-    testUser = await registerAndLogin(page, testUser);
+    testUser = await adminLoginOnly(page, testUser);
 
     // After login with no dogs, nav should show "Add a Pet"
     const addPetLink = page.locator('#add-pet-link, #profile-nav-item a:has-text("Add a Pet")');
