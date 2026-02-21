@@ -1,48 +1,85 @@
 # Woof - Claude Code Instructions
 
-**Last Updated:** 2026-02-19
-**Status:** Phase 3 complete (all 3.1-3.9 done). See [ROADMAP.md](/ROADMAP.md) for full product roadmap.
+**Last Updated:** 2026-02-21
+**Status:** Phase 5A complete (Cognito + SES + Onboarding UX). Next: Phase 5B (Content Moderation). See [ROADMAP.md](/ROADMAP.md).
 
 ## Project Overview
 
 Woof is a dog-centric social network (Instagram for dogs). Dogs are the primary users.
 
-- **Frontend repo**: `/Users/tommikivisaari/Documents/Personal/Projects/Woof` (GitHub: Woof-fi/woof-frontend)
-- **Backend repo**: `/Users/tommikivisaari/Documents/Personal/Projects/woof-backend` (GitHub: Woof-fi/woof-backend)
+- **Frontend repo**: `woof-frontend/` (GitHub: Woof-fi/woof-frontend)
+- **Backend repo**: `woof-backend/` (GitHub: Woof-fi/woof-backend)
 - **Frontend source**: `src-refactored/` is the active directory (SPA, single entry point: `index.html` → `app-spa.js`)
 - **Tech stack**: Vite + vanilla JS (frontend), Express + PostgreSQL (backend)
 - **Hosting**: S3 (frontend), Elastic Beanstalk (backend), both in eu-north-1
 - **Frontend URL**: https://woofapp.fi (S3 behind Cloudflare)
 - **Backend URL**: https://api.woofapp.fi (Elastic Beanstalk behind Cloudflare)
 
+## Multi-Device Setup
+
+When picking up this project on a new machine (MacBook, PC, etc.):
+
+```bash
+# 1. Clone both repos (if not already present)
+git clone https://github.com/Woof-fi/woof-frontend.git
+git clone https://github.com/Woof-fi/woof-backend.git
+
+# 2. Install frontend dependencies
+cd woof-frontend/src-refactored && npm install
+
+# 3. Install backend dependencies + create .env
+cd ../../woof-backend && npm install
+# Copy .env from 1Password / another machine. Required vars:
+# DATABASE_URL, JWT_SECRET, AWS_REGION, COGNITO_USER_POOL_ID,
+# COGNITO_CLIENT_ID, SES_FROM_EMAIL, S3_BUCKET, ADMIN_SECRET
+
+# 4. Set up local databases (for backend tests)
+createdb woof && createdb woof_test
+npm run db:migrate && npm run db:migrate:test
+
+# 5. Configure AWS CLI (needed for npm run deploy and eb deploy)
+aws configure  # use woof-deployer credentials from 1Password
+
+# 6. MCP (Playwright): .mcp.json is committed — works after npx installs @playwright/mcp
+#    On macOS: npx playwright install chromium  (first time only)
+```
+
+**Always push to GitHub after committing** — this is the handoff point between devices.
+
+---
+
 ## Development
 
 ```bash
-# Frontend dev server
-cd /Users/tommikivisaari/Documents/Personal/Projects/Woof/src-refactored
+# Frontend dev server (from woof-frontend/src-refactored/)
 npm run dev
 
-# Backend dev server
-cd /Users/tommikivisaari/Documents/Personal/Projects/woof-backend
+# Backend dev server (from woof-backend/)
 npm run dev
 
 # Tests
-cd src-refactored && npm test          # Frontend (Vitest, 36 tests)
-cd woof-backend && npm test            # Backend (Jest, 120 tests)
+npm test          # Frontend: Vitest (from src-refactored/)
+npm test          # Backend: Jest, 183 tests (from woof-backend/)
 
-# Build
-cd src-refactored && npm run build     # Vite build to dist/
+# E2E tests (Playwright, from src-refactored/)
+npm run test:e2e                                        # Against https://woofapp.fi
+E2E_BASE_URL=http://localhost:5173 npm run test:e2e    # Against local dev server
+
+# Build + deploy
+npm run build     # Vite build to dist/ (from src-refactored/)
+npm run deploy    # Build + sync to S3 (requires AWS CLI configured)
+eb deploy         # Deploy backend to Elastic Beanstalk (from woof-backend/)
 ```
 
 ## MCP Tools Available
 
-- **Playwright MCP**: Browser automation for visual validation. Configured in `Projects/.mcp.json` (moved from `Woof/.mcp.json` so it loads when running from the Projects directory). Use `browser_navigate`, `browser_snapshot`, `browser_click` etc. to verify the app works in a real browser.
+- **Playwright MCP**: Browser automation for visual validation. Configured in `woof-frontend/.mcp.json` (also copied to the parent workspace root so it loads from either location). Use `browser_navigate`, `browser_snapshot`, `browser_click` etc. to verify the app works in a real browser.
 
 ## Git Workflow
 
 - Always push to GitHub after commits. Both repos have remotes configured.
-- Frontend: `git push origin main` from `/Users/tommikivisaari/Documents/Personal/Projects/Woof`
-- Backend: `git push origin main` from `/Users/tommikivisaari/Documents/Personal/Projects/woof-backend`
+- Frontend: `git push origin main` from `woof-frontend/`
+- Backend: `git push origin main` from `woof-backend/`
 - CI runs on push (GitHub Actions: type-check, tests, build)
 
 ---
@@ -233,9 +270,9 @@ See [ROADMAP.md](/ROADMAP.md) for the full product roadmap with competitor analy
 
 - XSS: Use `escapeHTML()` for innerHTML; DOM methods (textContent, createTextNode) are inherently safe
 - File uploads: Validate type and size before upload
-- Auth: JWT-based, 7-day expiry, Bearer token header
-- Admin endpoints: Protected by `x-admin-secret` header
+- Auth: AWS Cognito (ID tokens). Backend verifies via `aws-jwt-verify` + JWKS. Frontend uses `amazon-cognito-identity-js` SDK.
+- Admin endpoints: Protected by `requireRole('admin')` middleware (Cognito role claim)
 - HTTPS: Cloudflare free tier with SSL termination (Flexible mode)
-- Passwords: bcrypt hashed (salt rounds 10), require 8+ chars with uppercase, lowercase, and number
+- Passwords: Managed by Cognito (SRP protocol). Requirements enforced in Cognito User Pool policy.
 - CORS: Only allows `https://woofapp.fi` origin
 - NEVER commit `.env` files or secrets
