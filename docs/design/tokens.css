@@ -1,0 +1,351 @@
+/**
+ * Woof Design System — CSS Custom Properties (Design Tokens)
+ *
+ * Usage: Import this file at the root of your application.
+ * All tokens use the --woof- prefix to avoid conflicts.
+ *
+ * Generated from: Woof Design System v2.0
+ * Last updated: 2026-02-21
+ */
+
+:root {
+  /* ===================================================
+   * BRAND COLORS
+   * =================================================== */
+
+  --woof-color-brand-primary:       #EF4621;
+  --woof-color-brand-primary-light: #F5865A;
+  --woof-color-brand-primary-dark:  #CC3615;
+  --woof-color-brand-primary-subtle:#FEF0EC;
+
+  /* Brand gradient: warm orange → golden amber */
+  --woof-color-brand-gradient: linear-gradient(135deg, #EF4621, #F5A623);
+
+  /* ===================================================
+   * NEUTRAL PALETTE
+   * =================================================== */
+
+  --woof-color-neutral-0:    #FFFFFF;
+  --woof-color-neutral-50:   #FAFAF8;
+  --woof-color-neutral-100:  #F5F5F3;
+  --woof-color-neutral-200:  #EBEBEB;
+  --woof-color-neutral-300:  #D1D1D1;
+  --woof-color-neutral-400:  #A8A8A8;
+  --woof-color-neutral-500:  #737373;
+  --woof-color-neutral-600:  #5C5C5C;
+  --woof-color-neutral-700:  #3D3D3D;
+  --woof-color-neutral-800:  #2E2E2E;
+  --woof-color-neutral-900:  #1A1A1A;
+  --woof-color-neutral-950:  #111111;
+  --woof-color-neutral-1000: #000000;
+
+  /* ===================================================
+   * SEMANTIC COLORS
+   * =================================================== */
+
+  --woof-color-like:         #FF4757;
+  --woof-color-like-bg:      #FFF0EF;
+  --woof-color-success:      #34C759;
+  --woof-color-warning:      #FF9500;
+  --woof-color-error:        #FF3B30;
+  --woof-color-info:         #007AFF;
+
+  /* ===================================================
+   * SURFACE COLORS
+   * =================================================== */
+
+  --woof-surface-primary:     #FFFFFF;
+  --woof-surface-secondary:   #F5F5F3;
+  --woof-surface-overlay:     rgba(0, 0, 0, 0.4);
+  --woof-surface-nav:         #FFFFFF;
+  --woof-surface-nav-blur:    rgba(255, 255, 255, 0.95);
+  --woof-surface-story-ring:  linear-gradient(135deg, #EF4621, #F5A623);
+  --woof-surface-story-seen:  #D1D1D1;
+
+  /* ===================================================
+   * TYPOGRAPHY — FONT FAMILIES
+   * =================================================== */
+
+  --woof-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --woof-font-family-mono: "SF Mono", "Fira Code", Menlo, monospace;
+
+  /* ===================================================
+   * TYPOGRAPHY — FONT SIZES
+   * =================================================== */
+
+  --woof-text-display:        34px;
+  --woof-text-title-1:        28px;
+  --woof-text-title-2:        22px;
+  --woof-text-title-3:        20px;
+  --woof-text-headline:       17px;
+  --woof-text-body:           16px;
+  --woof-text-callout:        15px;
+  --woof-text-subheadline:    15px;
+  --woof-text-footnote:       13px;
+  --woof-text-caption-1:      12px;
+  --woof-text-caption-2:      11px;
+
+  /* ===================================================
+   * TYPOGRAPHY — LINE HEIGHTS
+   * =================================================== */
+
+  --woof-lh-display:          41px;
+  --woof-lh-title-1:          34px;
+  --woof-lh-title-2:          28px;
+  --woof-lh-title-3:          25px;
+  --woof-lh-headline:         22px;
+  --woof-lh-body:             22px;
+  --woof-lh-callout:          20px;
+  --woof-lh-footnote:         18px;
+  --woof-lh-caption:          16px;
+
+  /* ===================================================
+   * TYPOGRAPHY — FONT WEIGHTS
+   * =================================================== */
+
+  --woof-font-weight-regular:   400;
+  --woof-font-weight-medium:    500;
+  --woof-font-weight-semibold:  600;
+  --woof-font-weight-bold:      700;
+  --woof-font-weight-heavy:     800;
+
+  /* ===================================================
+   * SPACING
+   * =================================================== */
+
+  --woof-space-1:   4px;
+  --woof-space-2:   8px;
+  --woof-space-3:   12px;
+  --woof-space-4:   16px;
+  --woof-space-5:   20px;
+  --woof-space-6:   24px;
+  --woof-space-7:   28px;
+  --woof-space-8:   32px;
+  --woof-space-10:  40px;
+  --woof-space-12:  48px;
+  --woof-space-16:  64px;
+
+  /* ===================================================
+   * BORDER RADIUS
+   * =================================================== */
+
+  --woof-radius-xs:   4px;
+  --woof-radius-sm:   8px;
+  --woof-radius-md:   12px;
+  --woof-radius-lg:   16px;
+  --woof-radius-xl:   24px;
+  --woof-radius-2xl:  32px;
+  --woof-radius-full: 9999px;
+
+  /* ===================================================
+   * ELEVATION / SHADOWS
+   * =================================================== */
+
+  --woof-shadow-xs:    0 1px 2px rgba(0, 0, 0, 0.06);
+  --woof-shadow-sm:    0 2px 8px rgba(0, 0, 0, 0.08);
+  --woof-shadow-md:    0 4px 16px rgba(0, 0, 0, 0.10);
+  --woof-shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.14);
+  --woof-shadow-xl:    0 16px 48px rgba(0, 0, 0, 0.20);
+  --woof-shadow-brand: 0 4px 16px rgba(232, 67, 28, 0.35);
+  --woof-shadow-nav:   0 -1px 0 rgba(0, 0, 0, 0.06), 0 -4px 16px rgba(0, 0, 0, 0.04);
+
+  /* ===================================================
+   * ANIMATION — DURATIONS
+   * =================================================== */
+
+  --woof-duration-instant: 100ms;
+  --woof-duration-fast:    200ms;
+  --woof-duration-normal:  300ms;
+  --woof-duration-slow:    400ms;
+  --woof-duration-slower:  600ms;
+
+  /* ===================================================
+   * ANIMATION — EASING
+   * =================================================== */
+
+  --woof-ease-default: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --woof-ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --woof-ease-out:     cubic-bezier(0, 0, 0.2, 1);
+  --woof-ease-bounce:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --woof-ease-spring:  cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* ===================================================
+   * COMPONENT TOKENS — AVATAR SIZES
+   * =================================================== */
+
+  --woof-avatar-xs:   28px;
+  --woof-avatar-sm:   36px;
+  --woof-avatar-md:   44px;
+  --woof-avatar-lg:   56px;
+  --woof-avatar-xl:   80px;
+  --woof-avatar-2xl: 100px;
+
+  /* ===================================================
+   * COMPONENT TOKENS — BUTTONS
+   * =================================================== */
+
+  --woof-btn-height-sm:     36px;
+  --woof-btn-height-md:     44px;
+  --woof-btn-height-lg:     52px;
+  --woof-btn-padding-x:     20px;
+  --woof-btn-font-size:     var(--woof-text-headline);
+  --woof-btn-font-weight:   var(--woof-font-weight-semibold);
+  --woof-btn-radius:        var(--woof-radius-full);
+
+  /* ===================================================
+   * COMPONENT TOKENS — NAVIGATION BAR
+   * Flat white bar (Collaction style) with top border shadow
+   * =================================================== */
+
+  --woof-nav-height:         64px;
+  --woof-nav-safe-area:      34px;
+  --woof-nav-bg:             var(--woof-surface-nav);
+  --woof-nav-icon-size:      24px;
+  --woof-nav-icon-stroke:    1.8;
+  --woof-nav-icon-active:    var(--woof-color-brand-primary);
+  --woof-nav-icon-inactive:  var(--woof-color-neutral-400);
+  --woof-nav-center-size:    56px;
+  --woof-nav-center-radius:  18px;
+
+  --woof-nav-radius:         0px;
+
+  /* ===================================================
+   * COMPONENT TOKENS — STORY RING
+   * Squarish thumbnails (18px radius) in purple-pink gradient ring
+   * =================================================== */
+
+  --woof-story-size:              56px;
+  --woof-story-thumb-radius:      18px;
+  --woof-story-ring-width:        2px;
+  --woof-story-ring-gap:          2px;
+  --woof-story-ring-gradient:     linear-gradient(135deg, #EF4621, #F5A623);
+
+  /* ===================================================
+   * COMPONENT TOKENS — TAGS / CHIPS
+   * =================================================== */
+
+  --woof-tag-padding:        4px 10px;
+  --woof-tag-radius:         var(--woof-radius-full);
+  --woof-tag-font-size:      var(--woof-text-caption-1);
+  --woof-tag-font-weight:    var(--woof-font-weight-medium);
+  --woof-tag-bg-overlay:     rgba(0, 0, 0, 0.35);
+  --woof-tag-bg-surface:     var(--woof-color-neutral-100);
+
+  /* ===================================================
+   * COMPONENT TOKENS — ICONS
+   * Thin-stroke SVG outline style (Collaction style)
+   * =================================================== */
+
+  --woof-icon-stroke-width:  1.8;
+  --woof-icon-stroke-cap:    round;
+  --woof-icon-stroke-join:   round;
+  --woof-icon-size:          24px;
+
+  /* ===================================================
+   * LAYOUT
+   * =================================================== */
+
+  --woof-screen-margin:      16px;
+  --woof-card-padding:       16px;
+  --woof-card-radius:        var(--woof-radius-md);
+  --woof-touch-target:       44px;
+}
+
+/* ===================================================
+ * UTILITY CLASSES
+ * =================================================== */
+
+/* Typography */
+.woof-text-display     { font-size: var(--woof-text-display);    line-height: var(--woof-lh-display);  font-weight: var(--woof-font-weight-bold); }
+.woof-text-title-1     { font-size: var(--woof-text-title-1);    line-height: var(--woof-lh-title-1);  font-weight: var(--woof-font-weight-bold); }
+.woof-text-title-2     { font-size: var(--woof-text-title-2);    line-height: var(--woof-lh-title-2);  font-weight: var(--woof-font-weight-bold); }
+.woof-text-headline    { font-size: var(--woof-text-headline);   line-height: var(--woof-lh-headline); font-weight: var(--woof-font-weight-semibold); }
+.woof-text-body        { font-size: var(--woof-text-body);       line-height: var(--woof-lh-body);     font-weight: var(--woof-font-weight-regular); }
+.woof-text-callout     { font-size: var(--woof-text-callout);    line-height: var(--woof-lh-callout);  font-weight: var(--woof-font-weight-regular); }
+.woof-text-footnote    { font-size: var(--woof-text-footnote);   line-height: var(--woof-lh-footnote); font-weight: var(--woof-font-weight-regular); }
+.woof-text-caption     { font-size: var(--woof-text-caption-1);  line-height: var(--woof-lh-caption);  font-weight: var(--woof-font-weight-regular); }
+
+/* Brand text */
+.woof-brand-text {
+  color: var(--woof-color-brand-primary);
+  font-weight: var(--woof-font-weight-bold);
+}
+
+/* Brand gradient text */
+.woof-brand-gradient-text {
+  background: var(--woof-color-brand-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===================================================
+ * SKELETON SHIMMER ANIMATION
+ * =================================================== */
+
+@keyframes woof-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.woof-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--woof-color-neutral-100) 25%,
+    var(--woof-color-neutral-200) 50%,
+    var(--woof-color-neutral-100) 75%
+  );
+  background-size: 800px 100%;
+  animation: woof-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--woof-radius-sm);
+}
+
+/* ===================================================
+ * LIKE HEART ANIMATION
+ * =================================================== */
+
+@keyframes woof-like-pop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.8); }
+  60%  { transform: scale(1.3); }
+  80%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.woof-like-active {
+  animation: woof-like-pop var(--woof-duration-slow) var(--woof-ease-bounce);
+}
+
+/* ===================================================
+ * LIKE BUBBLE ANIMATION
+ * =================================================== */
+
+@keyframes woof-bubble-rise {
+  0%   { opacity: 0; transform: translateY(20px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  70%  { opacity: 1; transform: translateY(-50px); }
+  100% { opacity: 0; transform: translateY(-70px); }
+}
+
+.woof-like-bubble {
+  animation: woof-bubble-rise 2.5s var(--woof-ease-out) forwards;
+  background: var(--woof-color-like-bg);
+  border: 1px solid rgba(255, 71, 87, 0.15);
+  border-radius: var(--woof-radius-full);
+  padding: 6px 12px;
+  font-size: var(--woof-text-callout);
+  font-weight: var(--woof-font-weight-semibold);
+  box-shadow: var(--woof-shadow-md);
+  pointer-events: none;
+  white-space: nowrap;
+}

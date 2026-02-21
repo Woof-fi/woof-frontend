@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Woof Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────────── */
+    :root {
+      --brand:          #EF4621;
+      --brand-light:    #F5865A;
+      --brand-dark:     #CC3615;
+      --brand-subtle:   #FEF0EC;
+      --brand-gradient: linear-gradient(135deg, #EF4621, #F5A623);
+      --brand-pink:     #F5A623;
+
+      --n0:    #FFFFFF;
+      --n50:   #FAFAF8;
+      --n100:  #F5F5F3;
+      --n200:  #EBEBEB;
+      --n300:  #D1D1D1;
+      --n400:  #A8A8A8;
+      --n500:  #737373;
+      --n600:  #636366;
+      --n700:  #3D3D3D;
+      --n800:  #2E2E2E;
+      --n900:  #1A1A1A;
+
+      --like:       #FF4757;
+      --like-bg:    #FFF0EF;
+      --success:    #34C759;
+
+      --shadow-sm:    0 2px 8px rgba(0,0,0,0.08);
+      --shadow-md:    0 4px 16px rgba(0,0,0,0.10);
+      --shadow-lg:    0 8px 32px rgba(0,0,0,0.14);
+      --shadow-brand: 0 4px 16px rgba(239,70,33,0.35);
+      --shadow-nav:   0 -1px 0 rgba(0,0,0,0.06), 0 -4px 16px rgba(0,0,0,0.04);
+
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ── RESET & BASE ───────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--n50);
+      color: var(--n900);
+      line-height: 1.5;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────── */
+    .page { display: flex; min-height: 100vh; }
+
+    /* ── SIDEBAR ─────────────────────────────────────── */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: var(--n900);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 0 32px;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 24px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-logo .paw { font-size: 20px; }
+    .sidebar-logo .name {
+      font-size: 20px;
+      font-weight: 800;
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+    }
+    .sidebar-logo .version {
+      font-size: 11px;
+      color: var(--n500);
+      margin-top: 2px;
+    }
+    .sidebar-nav { padding: 16px 0; }
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--n600);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 16px 24px 6px;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 8px 24px;
+      font-size: 14px;
+      color: var(--n400);
+      text-decoration: none;
+      transition: color 0.15s, background 0.15s;
+      border-left: 2px solid transparent;
+    }
+    .sidebar-nav a:hover {
+      color: var(--n0);
+      background: rgba(255,255,255,0.05);
+      border-left-color: var(--brand);
+    }
+    .sidebar-nav a.active {
+      color: var(--brand-light);
+      background: rgba(239,70,33,0.10);
+      border-left-color: var(--brand);
+    }
+
+    /* ── MAIN ────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 48px;
+      max-width: 960px;
+    }
+
+    /* ── SECTIONS ────────────────────────────────────── */
+    section { margin-bottom: 80px; scroll-margin-top: 32px; }
+    .section-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--n900);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--n500);
+      margin-bottom: 32px;
+    }
+    .subsection { margin-bottom: 48px; }
+    .subsection-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--n500);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--n200);
+    }
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #1A1A1A 0%, #2D1B4E 60%, #3D1A5C 100%);
+      border-radius: 20px;
+      padding: 48px;
+      margin-bottom: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      background: var(--brand);
+      opacity: 0.18;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: 80px;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: var(--brand-pink);
+      opacity: 0.12;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239,70,33,0.20);
+      border: 1px solid rgba(239,70,33,0.40);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--brand-light);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .hero h1 span {
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 16px;
+      color: var(--n400);
+      max-width: 480px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 32px;
+    }
+    .hero-stat-num {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .hero-stat-label {
+      font-size: 12px;
+      color: var(--n500);
+    }
+
+    /* ── COLOR GRID ──────────────────────────────────── */
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .color-swatch {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      background: var(--n0);
+    }
+    .swatch-block { height: 72px; }
+    .swatch-info { padding: 10px 12px; }
+    .swatch-name { font-size: 12px; font-weight: 600; color: var(--n800); }
+    .swatch-hex  { font-size: 11px; color: var(--n500); font-family: 'SF Mono', Menlo, monospace; margin-top: 2px; }
+
+    .color-row { display: flex; gap: 4px; margin-bottom: 20px; }
+    .color-row .swatch-block { flex: 1; height: 48px; border-radius: 8px; cursor: pointer; position: relative; transition: transform 0.15s; }
+    .color-row .swatch-block:hover { transform: scaleY(1.3); transform-origin: bottom; z-index: 1; }
+
+    /* ── TYPE SCALE ──────────────────────────────────── */
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--n100);
+    }
+    .type-meta {
+      width: 160px;
+      flex-shrink: 0;
+    }
+    .type-token { font-size: 11px; font-weight: 600; color: var(--brand); font-family: monospace; }
+    .type-spec   { font-size: 11px; color: var(--n500); margin-top: 2px; }
+    .type-sample { color: var(--n900); }
+
+    /* ── SPACING SCALE ───────────────────────────────── */
+    .spacing-rows { display: flex; flex-direction: column; gap: 12px; }
+    .spacing-row { display: flex; align-items: center; gap: 16px; }
+    .spacing-bar-wrap { display: flex; align-items: center; flex: 1; gap: 12px; }
+    .spacing-bar {
+      background: var(--brand-gradient);
+      height: 24px;
+      border-radius: 6px;
+      min-width: 4px;
+    }
+    .spacing-meta { font-size: 12px; font-weight: 600; color: var(--n700); width: 80px; flex-shrink: 0; }
+    .spacing-token { font-size: 11px; font-family: monospace; color: var(--brand); width: 140px; flex-shrink: 0; }
+    .spacing-value { font-size: 11px; color: var(--n500); width: 40px; flex-shrink: 0; }
+
+    /* ── RADIUS ──────────────────────────────────────── */
+    .radius-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+    .radius-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .radius-box {
+      width: 80px;
+      height: 80px;
+      background: var(--brand-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radius-label { font-size: 11px; color: var(--n500); text-align: center; }
+    .radius-token { font-size: 10px; font-family: monospace; color: var(--brand); }
+
+    /* ── SHADOW ──────────────────────────────────────── */
+    .shadow-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+    .shadow-box {
+      width: 120px;
+      height: 80px;
+      background: var(--n0);
+      border-radius: 12px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 12px;
+    }
+    .shadow-name { font-size: 11px; font-weight: 600; color: var(--n600); }
+
+    /* ── BUTTONS ─────────────────────────────────────── */
+    .btn-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0 20px;
+      height: 52px;
+      font-family: var(--font);
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+      min-width: 220px;
+    }
+    .btn-primary:hover { background: var(--brand-dark); box-shadow: var(--shadow-brand); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-arrow {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .btn-follow {
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0 32px;
+      height: 44px;
+      font-family: var(--font);
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-follow:hover { background: var(--brand-dark); }
+
+    .btn-following {
+      background: var(--n100);
+      color: var(--n900);
+      border: 1px solid var(--n200);
+      border-radius: 999px;
+      padding: 0 32px;
+      height: 44px;
+      font-family: var(--font);
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--n100);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: background 0.15s;
+    }
+    .btn-icon:hover { background: var(--n200); }
+
+    /* Create button: squarish with brand gradient, 18px radius */
+    .btn-create {
+      width: 56px;
+      height: 56px;
+      background: var(--brand-gradient);
+      border: none;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(239,70,33,0.45);
+      transition: transform 0.15s;
+    }
+    .btn-create:hover { transform: scale(1.06); }
+
+    /* ── AVATARS ─────────────────────────────────────── */
+    .avatar-row { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+    .avatar {
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F5865A, var(--brand));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .avatar.with-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid var(--brand);
+    }
+    .avatar.with-ring-seen::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid var(--n300);
+    }
+    .avatar-label { font-size: 11px; color: var(--n500); text-align: center; margin-top: 6px; }
+
+    /* ── POST CARD ───────────────────────────────────── */
+    .post-card {
+      background: var(--n0);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      max-width: 380px;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+    }
+    .post-header-info { flex: 1; }
+    .post-username { font-size: 15px; font-weight: 600; color: var(--n900); }
+    .post-handle  { font-size: 12px; color: var(--n500); }
+    .post-options { font-size: 18px; color: var(--n400); cursor: pointer; letter-spacing: 1px; }
+    .post-image {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(160deg, #2d5a4a 0%, #4a7c59 40%, #d4826a 80%, #e8a87c 100%);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+    }
+    .post-image-overlay {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.55));
+    }
+    .post-caption { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 8px; }
+    .post-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .post-tag {
+      background: rgba(0,0,0,0.35);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    /* Collaction-style engagement row: heart / comment / repost / bookmark */
+    .post-engagement {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--n100);
+    }
+    .post-engagement-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      color: var(--n700);
+      cursor: pointer;
+    }
+    .post-engagement-item .heart-icon { color: var(--like); }
+    .post-engagement-item .liked { color: var(--like); font-weight: 600; }
+    .post-bookmark { margin-left: auto; font-size: 16px; color: var(--n400); }
+
+    /* ── STORIES ROW ─────────────────────────────────── */
+    .stories-row {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      background: var(--n0);
+      border-radius: 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      box-shadow: var(--shadow-sm);
+    }
+    .stories-row::-webkit-scrollbar { display: none; }
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .story-avatar-wrap { position: relative; }
+
+    /* Squarish story thumbnail (Dogger style, 18px radius) */
+    .story-ring {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #F5865A, var(--brand));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+    }
+    /* Gradient ring: unseen uses a gradient border trick via box-shadow / outline-gradient */
+    .story-ring.unseen {
+      box-shadow: 0 0 0 2.5px #EF4621, 0 0 0 5px transparent;
+      outline: 2.5px solid transparent;
+      outline-offset: 2px;
+      /* Gradient ring rendered via wrapper below in the demo */
+    }
+    .story-ring.seen {
+      outline: 2.5px solid var(--n300);
+      outline-offset: 2px;
+    }
+
+    /* Gradient ring wrapper */
+    .story-ring-gradient-wrap {
+      padding: 2.5px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #EF4621, #F5A623);
+      display: inline-flex;
+    }
+    .story-ring-gradient-wrap .story-ring-inner {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #F5865A, var(--brand));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 2px solid #fff;
+    }
+
+    /* Create / My story button: squarish with brand gradient */
+    .story-add {
+      width: 64px;
+      height: 64px;
+      background: var(--brand-gradient);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(239,70,33,0.40);
+    }
+    .story-name { font-size: 11px; color: var(--n800); font-weight: 500; }
+
+    /* ── TAGS / CHIPS ────────────────────────────────── */
+    .tags-demo { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .chip-surface { background: var(--n100); color: var(--n800); }
+    .chip-brand   { background: var(--brand-subtle); color: var(--brand); }
+    .chip-dark    { background: rgba(0,0,0,0.7); color: #fff; }
+
+    /* ── PROFILE CARD (Collaction style) ─────────────── */
+    .profile-card {
+      background: var(--n0);
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 380px;
+      box-shadow: var(--shadow-md);
+    }
+    .profile-hero {
+      height: 160px;
+      background: linear-gradient(160deg, #6a4c9c 0%, #a78bfa 50%, #F5A623 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      position: relative;
+    }
+    .back-btn {
+      position: absolute;
+      top: 12px; left: 12px;
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    /* Avatar overlaps hero from below (Collaction style) */
+    .profile-avatar-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: -44px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .profile-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F5865A, var(--brand));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+      border: 4px solid #fff;
+      box-shadow: var(--shadow-sm);
+    }
+    .profile-body { padding: 0 20px 20px; }
+    /* Centered name layout */
+    .profile-name-centered {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .profile-name { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+    .breed-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--brand);
+      margin-bottom: 10px;
+    }
+    /* Thin divider after breed badge */
+    .profile-divider {
+      border: none;
+      border-top: 1px solid var(--n200);
+      margin: 10px 0 14px;
+    }
+    /* Circular action buttons row (Collaction style) */
+    .profile-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .profile-action-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .profile-action-btn.primary {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: var(--shadow-brand);
+    }
+    .profile-action-btn.primary:hover { background: var(--brand-dark); }
+    .profile-action-btn.secondary {
+      background: var(--n100);
+      color: var(--n900);
+    }
+    .profile-action-btn.secondary:hover { background: var(--n200); }
+    .profile-stats {
+      display: flex;
+      border-top: 1px solid var(--n200);
+      border-bottom: 1px solid var(--n200);
+      padding: 16px 0;
+      margin-bottom: 16px;
+    }
+    .profile-stat {
+      flex: 1;
+      text-align: center;
+    }
+    .profile-stat + .profile-stat {
+      border-left: 1px solid var(--n200);
+    }
+    .stat-num   { font-size: 20px; font-weight: 800; color: var(--n900); }
+    .stat-label { font-size: 11px; color: var(--n500); margin-top: 2px; }
+    .profile-bio { font-size: 14px; color: var(--n700); line-height: 1.5; margin-bottom: 16px; }
+    .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; border-radius: 12px; overflow: hidden; margin-bottom: 0; }
+    .photo-cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    /* ── NAVIGATION BAR (flat white, Collaction style) ── */
+    .nav-demo {
+      background: #FFFFFF;
+      border-radius: 0;
+      padding: 12px 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 32px;
+      box-shadow: var(--shadow-nav);
+      border-top: 1px solid rgba(0,0,0,0.06);
+      width: 100%;
+      justify-content: center;
+    }
+    .nav-icon { font-size: 22px; cursor: pointer; opacity: 0.35; transition: opacity 0.15s; }
+    .nav-icon:hover { opacity: 0.7; }
+    .nav-icon.active { opacity: 1; color: var(--brand); }
+    /* Center nav button: squarish with brand gradient */
+    .nav-create-btn {
+      width: 52px;
+      height: 52px;
+      background: var(--brand-gradient);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(239,70,33,0.45);
+      transition: transform 0.15s;
+    }
+    .nav-create-btn:hover { transform: scale(1.08); }
+
+    /* ── LIKE BUBBLE ─────────────────────────────────── */
+    .like-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--like-bg);
+      border: 1px solid rgba(255,71,87,0.15);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--n900);
+      box-shadow: var(--shadow-md);
+    }
+    .like-bubble .heart { color: var(--like); font-size: 14px; }
+    .like-bubbles { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+
+    /* ── INPUT ───────────────────────────────────────── */
+    .input-demo { display: flex; flex-direction: column; gap: 12px; max-width: 340px; }
+    .woof-input {
+      height: 44px;
+      background: var(--n100);
+      border: 1.5px solid transparent;
+      border-radius: 999px;
+      padding: 0 18px;
+      font-family: var(--font);
+      font-size: 15px;
+      color: var(--n900);
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+      width: 100%;
+    }
+    .woof-input::placeholder { color: var(--n400); }
+    .woof-input:focus {
+      background: var(--n0);
+      border-color: var(--brand);
+    }
+
+    /* ── TOKEN TABLE ─────────────────────────────────── */
+    .token-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .token-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--n500);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--n200);
+    }
+    .token-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--n100);
+      vertical-align: middle;
+    }
+    .token-table tr:last-child td { border-bottom: none; }
+    .token-table tr:hover td { background: var(--n50); }
+    .tt-token  { font-family: monospace; font-size: 12px; color: var(--brand); }
+    .tt-val    { font-family: monospace; font-size: 12px; color: var(--n700); }
+    .tt-desc   { color: var(--n600); }
+    .tt-swatch {
+      width: 20px; height: 20px;
+      border-radius: 6px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .tt-grad {
+      width: 20px; height: 20px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #EF4621, #F5A623);
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    /* ── MOTION DEMO ─────────────────────────────────── */
+    .motion-demos { display: flex; flex-wrap: wrap; gap: 16px; }
+    .motion-box {
+      background: var(--n0);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      min-width: 140px;
+    }
+    .motion-box .label { font-size: 12px; color: var(--n500); margin-top: 8px; }
+    .motion-heart {
+      font-size: 32px;
+      display: inline-block;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .motion-box:hover .motion-heart { transform: scale(1.4); }
+
+    .duration-bar-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .duration-row { display: flex; align-items: center; gap: 12px; }
+    .duration-label { font-size: 12px; font-weight: 600; color: var(--n700); width: 80px; flex-shrink: 0; font-family: monospace; }
+    .duration-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: var(--brand-gradient);
+    }
+    .duration-ms { font-size: 11px; color: var(--n500); width: 40px; flex-shrink: 0; }
+
+    /* ── PHONE FRAME ─────────────────────────────────── */
+    .phone-frame {
+      width: 280px;
+      height: 560px;
+      background: var(--n50);
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.25), 0 0 0 6px var(--n800), 0 0 0 8px var(--n700);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .phone-screen-top {
+      height: 240px;
+      background: linear-gradient(160deg, #FEF0EC 0%, #FAFAF8 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mini-post-card {
+      width: 220px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+      transform: rotate(-2deg);
+      position: absolute;
+      top: 20px;
+    }
+    .mini-post-img {
+      height: 100px;
+      background: linear-gradient(160deg, #6a4c9c 0%, #a78bfa 50%, #F5A623 100%);
+      display: flex;
+      align-items: flex-end;
+      padding: 8px;
+    }
+    .mini-caption { font-size: 9px; font-weight: 600; color: #fff; }
+    .mini-post-footer { padding: 8px 10px; display: flex; gap: 8px; align-items: center; }
+    .mini-like-badge {
+      position: absolute;
+      right: 10px;
+      top: 40px;
+      background: var(--like-bg);
+      border: 1px solid rgba(255,71,87,0.2);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--n900);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .phone-screen-bottom {
+      padding: 24px 20px 28px;
+    }
+    .phone-brand { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .phone-brand-name {
+      font-size: 16px;
+      font-weight: 800;
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .phone-headline { font-size: 22px; font-weight: 800; color: var(--n900); line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.3px; }
+    .phone-body { font-size: 12px; color: var(--n500); margin-bottom: 20px; line-height: 1.5; }
+    .phone-cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0 16px;
+      height: 44px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+    }
+    .phone-cta-arrow {
+      width: 28px; height: 28px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+
+    /* ── UTILITY ─────────────────────────────────────── */
+    .row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+    .col { flex: 1; min-width: 280px; }
+    .card {
+      background: var(--n0);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .badge {
+      display: inline-flex;
+      background: var(--brand-subtle);
+      color: var(--brand);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--n200);
+      margin: 40px 0;
+    }
+
+    /* ── GRADIENT DEMO SWATCH ────────────────────────── */
+    .gradient-swatch {
+      height: 72px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #EF4621, #F5A623);
+      margin-bottom: 8px;
+    }
+
+    /* ── SCROLLBAR ───────────────────────────────────── */
+    .main::-webkit-scrollbar { width: 6px; }
+    .main::-webkit-scrollbar-track { background: transparent; }
+    .main::-webkit-scrollbar-thumb { background: var(--n200); border-radius: 3px; }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    .footer {
+      margin-top: 64px;
+      padding: 32px 0;
+      border-top: 1px solid var(--n200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      background: var(--brand-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .footer-meta { font-size: 12px; color: var(--n400); }
+
+    @keyframes like-pop {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(0.8); }
+      60%  { transform: scale(1.35); }
+      80%  { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+    .heart-anim { animation: like-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    /* Nav demo wrapper to show full-width flat bar */
+    .nav-demo-wrapper {
+      background: var(--n50);
+      border-radius: 16px;
+      overflow: hidden;
+      padding-bottom: 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-demo-content {
+      padding: 24px 20px;
+      font-size: 13px;
+      color: var(--n500);
+      text-align: center;
+      border-bottom: 1px solid var(--n200);
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────── -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <span class="paw">🐾</span>
+      <div>
+        <div class="name">Woof</div>
+        <div class="version">Design System v2.0</div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section-label">Overview</div>
+      <a href="#overview" class="active">Introduction</a>
+      <a href="#screens">Screen Preview</a>
+
+      <div class="sidebar-section-label">Foundations</div>
+      <a href="#colors">Colors</a>
+      <a href="#typography">Typography</a>
+      <a href="#spacing">Spacing</a>
+      <a href="#radius">Border Radius</a>
+      <a href="#elevation">Elevation</a>
+
+      <div class="sidebar-section-label">Components</div>
+      <a href="#buttons">Buttons</a>
+      <a href="#avatars">Avatars & Stories</a>
+      <a href="#post-card">Post Card</a>
+      <a href="#profile">Profile Card</a>
+      <a href="#nav-bar">Navigation Bar</a>
+      <a href="#tags">Tags & Chips</a>
+      <a href="#like-bubble">Like Bubble</a>
+      <a href="#inputs">Inputs</a>
+
+      <div class="sidebar-section-label">Motion</div>
+      <a href="#motion">Animation</a>
+
+      <div class="sidebar-section-label">Tokens</div>
+      <a href="#tokens">Token Reference</a>
+    </div>
+  </nav>
+
+  <!-- ── MAIN ──────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- HERO -->
+    <div class="hero" id="overview">
+      <div class="hero-tag">🐾 Design System</div>
+      <h1>Every dog has<br><span>its day.</span></h1>
+      <p>A playful, community-first design system for Woof — a social platform for dogs and their humans. Orange primary, warm cream background, thin-stroke icons, flat white nav.</p>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">1</div>
+          <div class="hero-stat-label">Brand color</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">11</div>
+          <div class="hero-stat-label">Type styles</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">13</div>
+          <div class="hero-stat-label">Components</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">60+</div>
+          <div class="hero-stat-label">Tokens</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN PREVIEW -->
+    <section id="screens">
+      <div class="badge">Preview</div>
+      <div class="section-title">Screen Preview</div>
+      <div class="section-subtitle">The design system in action — Woof's onboarding screen.</div>
+      <div class="row" style="align-items:center;">
+        <div class="phone-frame">
+          <div class="phone-screen-top">
+            <div class="mini-post-card">
+              <div class="mini-post-img">
+                <div class="mini-caption">On a walk</div>
+              </div>
+              <div class="mini-post-footer">
+                <span style="font-size:9px;color:#737373;">❤ 214 Likes &nbsp; 💬 12 Comments</span>
+              </div>
+            </div>
+            <div class="mini-like-badge">❤ +2 likes</div>
+          </div>
+          <div class="phone-screen-bottom">
+            <div class="phone-brand">
+              <span style="font-size:14px;">🐾</span>
+              <span class="phone-brand-name">Woof</span>
+            </div>
+            <div class="phone-headline">Every dog has its day</div>
+            <div class="phone-body">Join the community and share moments with your four-legged best friend</div>
+            <button class="phone-cta">
+              Become a member
+              <div class="phone-cta-arrow">→</div>
+            </button>
+          </div>
+        </div>
+        <div class="col" style="min-width:200px;">
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="card">
+              <div style="font-size:12px;font-weight:700;color:var(--n500);margin-bottom:4px;">PRIMARY COLOR</div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:36px;height:36px;background:var(--brand);border-radius:10px;"></div>
+                <div>
+                  <div style="font-weight:700;font-size:15px;color:var(--n900);">Woof Orange</div>
+                  <div style="font-family:monospace;font-size:12px;color:var(--n500);">#EF4621</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div style="font-size:12px;font-weight:700;color:var(--n500);margin-bottom:4px;">BRAND GRADIENT</div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:36px;height:36px;background:linear-gradient(135deg,#EF4621,#F5A623);border-radius:10px;"></div>
+                <div>
+                  <div style="font-weight:700;font-size:15px;color:var(--n900);">Orange → Amber</div>
+                  <div style="font-family:monospace;font-size:12px;color:var(--n500);">#EF4621 → #F5A623</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div style="font-size:12px;font-weight:700;color:var(--n500);margin-bottom:4px;">HEADLINE FONT</div>
+              <div style="font-size:20px;font-weight:800;letter-spacing:-0.3px;">Inter / SF Pro</div>
+              <div style="font-size:12px;color:var(--n500);">System font stack</div>
+            </div>
+            <div class="card">
+              <div style="font-size:12px;font-weight:700;color:var(--n500);margin-bottom:4px;">VIBE</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+                <span class="chip chip-brand">Orange</span>
+                <span class="chip chip-brand">Playful</span>
+                <span class="chip chip-brand">iOS-native</span>
+                <span class="chip chip-brand">Community</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLORS -->
+    <section id="colors">
+      <div class="badge">Foundations</div>
+      <div class="section-title">Colors</div>
+      <div class="section-subtitle">Woof's palette: Woof Orange as the primary brand, a warm sandy cream background, and an orange-to-amber gradient for story rings and the center nav button.</div>
+
+      <div class="subsection">
+        <div class="subsection-title">Brand</div>
+        <div class="color-grid">
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#EF4621;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary</div>
+              <div class="swatch-hex">#EF4621</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#F5865A;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary Light</div>
+              <div class="swatch-hex">#F5865A</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#CC3615;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary Dark</div>
+              <div class="swatch-hex">#CC3615</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#FEF0EC;border:1px solid #e9e7ef;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary Subtle</div>
+              <div class="swatch-hex">#FEF0EC</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:linear-gradient(135deg,#EF4621,#F5A623);"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Brand Gradient</div>
+              <div class="swatch-hex">Orange → Amber</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Neutral Scale</div>
+        <div class="color-row">
+          <div class="swatch-block" style="background:#FFFFFF;border:1px solid #e9e7ef;" title="#FFFFFF — neutral-0"></div>
+          <div class="swatch-block" style="background:#FAFAF8;" title="#FAFAF8 — neutral-50 (warm cream bg)"></div>
+          <div class="swatch-block" style="background:#F5F5F3;" title="#F5F5F3 — neutral-100 (light cream)"></div>
+          <div class="swatch-block" style="background:#EBEBEB;" title="#EBEBEB — neutral-200"></div>
+          <div class="swatch-block" style="background:#D1D1D1;" title="#D1D1D1 — neutral-300"></div>
+          <div class="swatch-block" style="background:#A8A8A8;" title="#A8A8A8 — neutral-400"></div>
+          <div class="swatch-block" style="background:#737373;" title="#737373 — neutral-500"></div>
+          <div class="swatch-block" style="background:#636366;" title="#636366 — neutral-600"></div>
+          <div class="swatch-block" style="background:#3D3D3D;" title="#3D3D3D — neutral-700"></div>
+          <div class="swatch-block" style="background:#2E2E2E;" title="#2E2E2E — neutral-800"></div>
+          <div class="swatch-block" style="background:#1A1A1A;" title="#1A1A1A — neutral-900"></div>
+          <div class="swatch-block" style="background:#111111;" title="#111111 — neutral-950"></div>
+          <div class="swatch-block" style="background:#000000;" title="#000000 — neutral-1000"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--n400);font-family:monospace;margin-top:4px;">
+          <span>0</span><span>50</span><span>100</span><span>200</span><span>300</span><span>400</span><span>500</span><span>600</span><span>700</span><span>800</span><span>900</span><span>950</span><span>1000</span>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Semantic</div>
+        <div class="color-grid">
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#FF4757;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Like / Heart</div>
+              <div class="swatch-hex">#FF4757</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#FFF0EF;border:1px solid #e9e7ef;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Like Background</div>
+              <div class="swatch-hex">#FFF0EF</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#34C759;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Success</div>
+              <div class="swatch-hex">#34C759</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#FF9500;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Warning</div>
+              <div class="swatch-hex">#FF9500</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#FF3B30;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Error</div>
+              <div class="swatch-hex">#FF3B30</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TYPOGRAPHY -->
+    <section id="typography">
+      <div class="badge">Foundations</div>
+      <div class="section-title">Typography</div>
+      <div class="section-subtitle">iOS-style type scale using the system font (SF Pro on iOS, Inter on web).</div>
+
+      <div class="card">
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">display</div><div class="type-spec">34px / 41px · 700</div></div>
+          <div class="type-sample" style="font-size:34px;font-weight:700;letter-spacing:-0.5px;line-height:41px;">Every dog has its day</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">title-1</div><div class="type-spec">28px / 34px · 700</div></div>
+          <div class="type-sample" style="font-size:28px;font-weight:700;letter-spacing:-0.3px;">Cheddar</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">title-2</div><div class="type-spec">22px / 28px · 700</div></div>
+          <div class="type-sample" style="font-size:22px;font-weight:700;">Woof</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">title-3</div><div class="type-spec">20px / 25px · 600</div></div>
+          <div class="type-sample" style="font-size:20px;font-weight:600;">Section Heading</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">headline</div><div class="type-spec">17px / 22px · 600</div></div>
+          <div class="type-sample" style="font-size:17px;font-weight:600;">Flash</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">body</div><div class="type-spec">16px / 22px · 400</div></div>
+          <div class="type-sample" style="font-size:16px;font-weight:400;">Join the community and share moments with your four-legged best friend.</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">callout</div><div class="type-spec">15px / 20px · 400</div></div>
+          <div class="type-sample" style="font-size:15px;font-weight:400;">689 Likes · 23 Comments</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">footnote</div><div class="type-spec">13px / 18px · 400</div></div>
+          <div class="type-sample" style="font-size:13px;color:var(--n500);">@super_flash · 2 hours ago</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-token">caption-1</div><div class="type-spec">12px / 16px · 400</div></div>
+          <div class="type-sample" style="font-size:12px;color:var(--n500);">goldensweet · Adriana · Sebastian</div>
+        </div>
+        <div class="type-row" style="border-bottom:none;">
+          <div class="type-meta"><div class="type-token">caption-2</div><div class="type-spec">11px / 13px · 400</div></div>
+          <div class="type-sample" style="font-size:11px;color:var(--n500);">VERY SMALL LABEL</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPACING -->
+    <section id="spacing">
+      <div class="badge">Foundations</div>
+      <div class="section-title">Spacing</div>
+      <div class="section-subtitle">8px base grid. 4px micro-grid for fine adjustments. Screen margin: 16px.</div>
+      <div class="card">
+        <div class="spacing-rows">
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-1</div>
+            <div class="spacing-value">4px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:4px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-2</div>
+            <div class="spacing-value">8px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:8px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-3</div>
+            <div class="spacing-value">12px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:12px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-4</div>
+            <div class="spacing-value">16px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:16px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-5</div>
+            <div class="spacing-value">20px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:20px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-6</div>
+            <div class="spacing-value">24px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:24px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-8</div>
+            <div class="spacing-value">32px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:32px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-10</div>
+            <div class="spacing-value">40px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:40px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-12</div>
+            <div class="spacing-value">48px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:48px;"></div></div>
+          </div>
+          <div class="spacing-row">
+            <div class="spacing-token">--woof-space-16</div>
+            <div class="spacing-value">64px</div>
+            <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:64px;"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BORDER RADIUS -->
+    <section id="radius">
+      <div class="badge">Foundations</div>
+      <div class="section-title">Border Radius</div>
+      <div class="section-subtitle">From tight xs (4px) to fully circular. Story thumbnails use 18px (squarish Dogger style).</div>
+      <div class="card">
+        <div class="radius-grid">
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:4px;"></div>
+            <div class="radius-token">--radius-xs</div>
+            <div class="radius-label">4px</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:8px;"></div>
+            <div class="radius-token">--radius-sm</div>
+            <div class="radius-label">8px · Tags</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:12px;"></div>
+            <div class="radius-token">--radius-md</div>
+            <div class="radius-label">12px · Cards</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:16px;"></div>
+            <div class="radius-token">--radius-lg</div>
+            <div class="radius-label">16px · Sheets</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:18px;"></div>
+            <div class="radius-token">story-thumb</div>
+            <div class="radius-label">18px · Stories</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:24px;"></div>
+            <div class="radius-token">--radius-xl</div>
+            <div class="radius-label">24px · CTA btn</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:32px;"></div>
+            <div class="radius-token">--radius-2xl</div>
+            <div class="radius-label">32px · Modal</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:9999px;"></div>
+            <div class="radius-token">--radius-full</div>
+            <div class="radius-label">∞ · Avatars, pills</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ELEVATION -->
+    <section id="elevation">
+      <div class="badge">Foundations</div>
+      <div class="section-title">Elevation</div>
+      <div class="section-subtitle">Subtle, layered shadows that create depth without heaviness. Brand shadow uses Woof Orange.</div>
+      <div class="shadow-grid">
+        <div>
+          <div class="shadow-box" style="box-shadow:0 1px 2px rgba(0,0,0,0.06);">
+            <span class="shadow-name">shadow-xs</span>
+          </div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <span class="shadow-name">shadow-sm</span>
+          </div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow:0 4px 16px rgba(0,0,0,0.10);">
+            <span class="shadow-name">shadow-md</span>
+          </div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow:0 8px 32px rgba(0,0,0,0.14);">
+            <span class="shadow-name">shadow-lg</span>
+          </div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow:0 16px 48px rgba(0,0,0,0.20);">
+            <span class="shadow-name">shadow-xl</span>
+          </div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow:0 4px 16px rgba(239,70,33,0.35);">
+            <span class="shadow-name">shadow-brand</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUTTONS -->
+    <section id="buttons">
+      <div class="badge">Components</div>
+      <div class="section-title">Buttons</div>
+      <div class="section-subtitle">Every interactive state, from the signature full-width CTA to the squarish gradient create button.</div>
+
+      <div class="subsection">
+        <div class="subsection-title">Primary CTA</div>
+        <div class="btn-row">
+          <button class="btn-primary" style="width:280px;">
+            Become a member
+            <div class="btn-arrow">→</div>
+          </button>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" style="width:280px;background:var(--brand-dark);">
+            Become a member
+            <div class="btn-arrow">→</div>
+          </button>
+          <span style="font-size:12px;color:var(--n500);">Pressed state</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" style="width:280px;background:var(--n300);cursor:not-allowed;">
+            Become a member
+            <div class="btn-arrow" style="background:rgba(255,255,255,0.4);">→</div>
+          </button>
+          <span style="font-size:12px;color:var(--n500);">Disabled state</span>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Follow Button</div>
+        <div class="btn-row">
+          <button class="btn-follow">Follow</button>
+          <button class="btn-following">Following</button>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Icon Buttons</div>
+        <div class="btn-row">
+          <div>
+            <button class="btn-icon">←</button>
+            <div style="font-size:11px;color:var(--n500);margin-top:4px;text-align:center;">Back</div>
+          </div>
+          <div>
+            <button class="btn-create">+</button>
+            <div style="font-size:11px;color:var(--n500);margin-top:4px;text-align:center;">Create</div>
+          </div>
+          <div>
+            <button class="btn-icon">🔖</button>
+            <div style="font-size:11px;color:var(--n500);margin-top:4px;text-align:center;">Bookmark</div>
+          </div>
+          <div>
+            <button class="btn-icon">···</button>
+            <div style="font-size:11px;color:var(--n500);margin-top:4px;text-align:center;">Options</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--n500);margin-top:8px;">Create button: 56px, <code style="font-family:monospace;color:var(--brand);">border-radius: 18px</code>, brand gradient background.</div>
+      </div>
+    </section>
+
+    <!-- AVATARS & STORIES -->
+    <section id="avatars">
+      <div class="badge">Components</div>
+      <div class="section-title">Avatars & Stories</div>
+      <div class="section-subtitle">Circular avatars across 6 sizes. Story thumbnails are squarish rounded rectangles (18px radius) with an orange-amber gradient ring.</div>
+
+      <div class="subsection">
+        <div class="subsection-title">Avatar Sizes</div>
+        <div class="avatar-row">
+          <div style="text-align:center;">
+            <div class="avatar" style="width:28px;height:28px;font-size:13px;">🐕</div>
+            <div class="avatar-label">XS · 28px</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="avatar" style="width:36px;height:36px;font-size:16px;">🐕</div>
+            <div class="avatar-label">SM · 36px</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="avatar" style="width:44px;height:44px;font-size:20px;">🐕</div>
+            <div class="avatar-label">MD · 44px</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="avatar" style="width:56px;height:56px;font-size:26px;">🐕</div>
+            <div class="avatar-label">LG · 56px</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="avatar" style="width:80px;height:80px;font-size:36px;">🐕</div>
+            <div class="avatar-label">XL · 80px</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="avatar" style="width:100px;height:100px;font-size:48px;">🐕</div>
+            <div class="avatar-label">2XL · 100px</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Story Ring States</div>
+        <div class="avatar-row">
+          <div style="text-align:center;">
+            <div class="avatar with-ring" style="width:56px;height:56px;font-size:26px;">🐕</div>
+            <div class="avatar-label" style="margin-top:10px;">Unseen<br><span style="color:var(--brand);">Orange ring</span></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="avatar with-ring-seen" style="width:56px;height:56px;font-size:26px;">🐕</div>
+            <div class="avatar-label" style="margin-top:10px;">Seen<br><span style="color:var(--n400);">Gray ring</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Stories Row — Squarish Thumbnails (18px radius) with Gradient Ring</div>
+        <div class="stories-row">
+          <div class="story-item">
+            <div class="story-add">+</div>
+            <div class="story-name">My story</div>
+          </div>
+          <div class="story-item">
+            <div class="story-ring-gradient-wrap">
+              <div class="story-ring-inner">🐕</div>
+            </div>
+            <div class="story-name">Uno</div>
+          </div>
+          <div class="story-item">
+            <div class="story-ring-gradient-wrap">
+              <div class="story-ring-inner">🐩</div>
+            </div>
+            <div class="story-name">Adriana</div>
+          </div>
+          <div class="story-item">
+            <div class="story-ring seen" style="border-radius:18px;outline-color:var(--n300);">🦮</div>
+            <div class="story-name">Sebastian</div>
+          </div>
+          <div class="story-item">
+            <div class="story-ring seen" style="border-radius:18px;outline-color:var(--n300);">🐶</div>
+            <div class="story-name">Poppy</div>
+          </div>
+          <div class="story-item">
+            <div class="story-ring seen" style="border-radius:18px;outline-color:var(--n300);">🐾</div>
+            <div class="story-name">Flash</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- POST CARD -->
+    <section id="post-card">
+      <div class="badge">Components</div>
+      <div class="section-title">Post Card</div>
+      <div class="section-subtitle">Primary feed content unit. Engagement row follows Collaction style: heart / comment / repost / bookmark with counts.</div>
+      <div class="post-card">
+        <div class="post-header">
+          <div class="avatar" style="width:44px;height:44px;font-size:20px;flex-shrink:0;">🐕</div>
+          <div class="post-header-info">
+            <div class="post-username">Flash</div>
+            <div class="post-handle">@super_flash</div>
+          </div>
+          <div class="post-options">···</div>
+        </div>
+        <div class="post-image">
+          <div class="post-image-overlay">
+            <div class="post-caption">Enjoying the sunset</div>
+            <div class="post-tags">
+              <span class="post-tag">mountain trip</span>
+              <span class="post-tag">sunset</span>
+              <span class="post-tag">best time together</span>
+            </div>
+          </div>
+        </div>
+        <div class="post-engagement">
+          <div class="post-engagement-item" id="likeBtn" onclick="toggleLike()">
+            <span class="heart-icon" id="heartIcon">❤</span>
+            <span class="liked" id="likeCount">689</span>
+          </div>
+          <div class="post-engagement-item">
+            <span>💬</span>
+            <span style="color:var(--n500);">23</span>
+          </div>
+          <div class="post-engagement-item">
+            <span style="font-size:14px;color:var(--n500);">↺</span>
+            <span style="color:var(--n500);">5</span>
+          </div>
+          <div class="post-bookmark">🔖</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--n400);margin-top:12px;">Click the heart to see the like animation.</div>
+    </section>
+
+    <!-- PROFILE CARD -->
+    <section id="profile">
+      <div class="badge">Components</div>
+      <div class="section-title">Profile Card</div>
+      <div class="section-subtitle">Collaction-style: avatar overlaps the hero image, centered name + breed divider, circular action buttons row, stats, bio, photo grid.</div>
+      <div class="profile-card">
+        <div class="profile-hero">
+          <div class="back-btn">←</div>
+        </div>
+        <!-- Avatar overlapping hero -->
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar">🐕</div>
+        </div>
+        <div class="profile-body">
+          <div class="profile-name-centered">
+            <div class="profile-name">Cheddar</div>
+          </div>
+          <div class="breed-badge">🐾 goldensweet</div>
+          <hr class="profile-divider" />
+          <!-- Circular action buttons (Collaction style) -->
+          <div class="profile-actions">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <button class="profile-action-btn primary">♥</button>
+              <span style="font-size:10px;color:var(--n500);">Follow</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <button class="profile-action-btn secondary">💬</button>
+              <span style="font-size:10px;color:var(--n500);">Message</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+              <button class="profile-action-btn secondary">···</button>
+              <span style="font-size:10px;color:var(--n500);">More</span>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="profile-stat">
+              <div class="stat-num">454</div>
+              <div class="stat-label">Posts</div>
+            </div>
+            <div class="profile-stat">
+              <div class="stat-num">229</div>
+              <div class="stat-label">Followers</div>
+            </div>
+            <div class="profile-stat">
+              <div class="stat-num">101</div>
+              <div class="stat-label">Following</div>
+            </div>
+          </div>
+          <div class="profile-bio">Sharing life through the eyes of my Golden: 10% training, 90% chasing tennis balls, and 100% unconditional love!</div>
+          <div class="photo-grid">
+            <div class="photo-cell" style="background:linear-gradient(135deg,#7ab89a,#4a7c59);">🏞️</div>
+            <div class="photo-cell" style="background:linear-gradient(135deg,#d4c4a0,#b8a480);">🌅</div>
+            <div class="photo-cell" style="background:linear-gradient(135deg,#a0c4d4,#6a9cb8);">🏊</div>
+            <div class="photo-cell" style="background:linear-gradient(135deg,#d4a07a,#b87a50);font-size:18px;color:rgba(255,255,255,0.7);">+12</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NAVIGATION BAR -->
+    <section id="nav-bar">
+      <div class="badge">Components</div>
+      <div class="section-title">Navigation Bar</div>
+      <div class="section-subtitle">Flat white bottom nav (Collaction style) with a subtle top border. Center button is squarish (18px radius) with the brand gradient. All icons use thin-stroke outlines.</div>
+      <div class="nav-demo-wrapper">
+        <div class="nav-demo-content">Feed content above the nav bar</div>
+        <div class="nav-demo">
+          <div class="nav-icon active" title="Home">🏠</div>
+          <div class="nav-icon" title="Search">🔍</div>
+          <div class="nav-create-btn" title="Create">+</div>
+          <div class="nav-icon" title="Activity">🤍</div>
+          <div class="nav-icon" title="Profile">🐾</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--n500);margin-top:16px;display:flex;flex-wrap:wrap;gap:20px;">
+        <span>Background: <code style="font-family:monospace;color:var(--brand);">#FFFFFF (flat white)</code></span>
+        <span>Top border: <code style="font-family:monospace;color:var(--brand);">1px solid rgba(0,0,0,0.06)</code></span>
+        <span>Center btn: <code style="font-family:monospace;color:var(--brand);">56px, 18px radius, gradient</code></span>
+        <span>Active icon: <code style="font-family:monospace;color:var(--brand);">#EF4621</code></span>
+        <span>Icon style: <code style="font-family:monospace;color:var(--brand);">thin-stroke outline, stroke 1.8</code></span>
+      </div>
+    </section>
+
+    <!-- TAGS & CHIPS -->
+    <section id="tags">
+      <div class="badge">Components</div>
+      <div class="section-title">Tags & Chips</div>
+      <div class="section-subtitle">Pill-shaped chips for hashtags, breeds, and content labels.</div>
+      <div class="card">
+        <div class="subsection-title">On Surface (Below Image)</div>
+        <div class="tags-demo" style="margin-bottom:24px;">
+          <span class="chip chip-surface">neighborhood</span>
+          <span class="chip chip-surface">walk with justin</span>
+          <span class="chip chip-surface">best time</span>
+          <span class="chip chip-surface">mountain trip</span>
+        </div>
+        <div class="subsection-title">Brand / Highlighted</div>
+        <div class="tags-demo" style="margin-bottom:24px;">
+          <span class="chip chip-brand">goldensweet</span>
+          <span class="chip chip-brand">corgi</span>
+          <span class="chip chip-brand">border collie</span>
+        </div>
+        <div class="subsection-title">On Image Overlay</div>
+        <div style="background:linear-gradient(135deg,#6a4c9c,#2d1b4e);border-radius:12px;padding:20px;">
+          <div class="tags-demo">
+            <span class="chip chip-dark">mountain trip</span>
+            <span class="chip chip-dark">sunset</span>
+            <span class="chip chip-dark">best time together</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIKE BUBBLE -->
+    <section id="like-bubble">
+      <div class="badge">Components</div>
+      <div class="section-title">Like Bubble</div>
+      <div class="section-subtitle">Floating notification that appears when someone likes a post. Rises and fades out over 2.5s.</div>
+      <div class="card" style="display:flex;align-items:flex-start;gap:40px;flex-wrap:wrap;">
+        <div class="like-bubbles">
+          <div class="like-bubble"><span class="heart">❤</span> +1 like</div>
+          <div class="like-bubble"><span class="heart">❤</span> +2 likes</div>
+          <div class="like-bubble"><span class="heart">❤</span> +3 likes</div>
+        </div>
+        <div style="font-size:13px;color:var(--n500);line-height:1.8;padding-top:4px;">
+          Background: <code style="font-family:monospace;color:var(--brand);">#FFF0EF</code><br>
+          Border: <code style="font-family:monospace;color:var(--brand);">rgba(255,71,87,0.15)</code><br>
+          Like color: <code style="font-family:monospace;color:var(--brand);">#FF4757</code><br>
+          Radius: <code style="font-family:monospace;color:var(--brand);">999px (full)</code><br>
+          Font: <code style="font-family:monospace;color:var(--brand);">15px / 600</code><br>
+          Padding: <code style="font-family:monospace;color:var(--brand);">7px 14px</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- INPUTS -->
+    <section id="inputs">
+      <div class="badge">Components</div>
+      <div class="section-title">Inputs</div>
+      <div class="section-subtitle">Clean, rounded inputs that feel at home on iOS. Focus ring uses Woof Orange.</div>
+      <div class="card">
+        <div class="input-demo">
+          <input class="woof-input" type="text" placeholder="Search dogs..." />
+          <input class="woof-input" type="text" placeholder="Write a caption..." />
+          <input class="woof-input" type="email" placeholder="Email address" />
+        </div>
+        <div style="font-size:13px;color:var(--n500);margin-top:16px;">
+          Click an input to see the <span style="color:var(--brand);font-weight:600;">orange focus ring</span>.
+        </div>
+      </div>
+    </section>
+
+    <!-- MOTION -->
+    <section id="motion">
+      <div class="badge">Motion</div>
+      <div class="section-title">Animation</div>
+      <div class="section-subtitle">Spring-based, snappy, and warm. Fast interactions with spring physics for delight.</div>
+
+      <div class="subsection">
+        <div class="subsection-title">Duration Scale</div>
+        <div class="card">
+          <div class="duration-bar-wrap">
+            <div class="duration-row">
+              <div class="duration-label">instant</div>
+              <div class="duration-ms">100ms</div>
+              <div class="duration-bar" style="width:30px;"></div>
+            </div>
+            <div class="duration-row">
+              <div class="duration-label">fast</div>
+              <div class="duration-ms">200ms</div>
+              <div class="duration-bar" style="width:60px;"></div>
+            </div>
+            <div class="duration-row">
+              <div class="duration-label">normal</div>
+              <div class="duration-ms">300ms</div>
+              <div class="duration-bar" style="width:90px;"></div>
+            </div>
+            <div class="duration-row">
+              <div class="duration-label">slow</div>
+              <div class="duration-ms">400ms</div>
+              <div class="duration-bar" style="width:120px;"></div>
+            </div>
+            <div class="duration-row">
+              <div class="duration-label">slower</div>
+              <div class="duration-ms">600ms</div>
+              <div class="duration-bar" style="width:180px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Interactive Demos — Hover to animate</div>
+        <div class="motion-demos">
+          <div class="motion-box">
+            <div class="motion-heart">❤</div>
+            <div class="label">Like Spring<br><code style="font-size:10px;font-family:monospace;color:var(--brand);">ease-bounce</code></div>
+          </div>
+          <div class="motion-box" onclick="this.querySelector('.spin-icon').classList.add('spinning')" onanimationend="this.querySelector('.spin-icon').classList.remove('spinning')">
+            <div style="font-size:32px;transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275);" class="spin-icon">🐾</div>
+            <div class="label">Tap bounce<br><code style="font-size:10px;font-family:monospace;color:var(--brand);">ease-spring</code></div>
+          </div>
+          <div class="motion-box">
+            <div style="font-size:32px;transition:transform 0.2s cubic-bezier(0.25,0.1,0.25,1);" class="motion-heart">+</div>
+            <div class="label">Follow pulse<br><code style="font-size:10px;font-family:monospace;color:var(--brand);">ease-default</code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOKEN REFERENCE -->
+    <section id="tokens">
+      <div class="badge">Tokens</div>
+      <div class="section-title">Token Reference</div>
+      <div class="section-subtitle">All tokens available as CSS custom properties (<code style="font-family:monospace;">tokens.css</code>) and JSON (<code style="font-family:monospace;">tokens.json</code>). Prefix: <code style="font-family:monospace;color:var(--brand);">--woof-</code></div>
+
+      <div class="subsection">
+        <div class="subsection-title">Color Tokens</div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="token-table">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Value</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="tt-token">--woof-color-brand-primary</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#EF4621;"></span>#EF4621</td>
+                <td class="tt-desc">Woof Orange — primary brand, CTAs, active states</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-brand-primary-light</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#F5865A;"></span>#F5865A</td>
+                <td class="tt-desc">Hover and tint states</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-brand-primary-dark</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#CC3615;"></span>#CC3615</td>
+                <td class="tt-desc">Pressed/active state</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-brand-primary-subtle</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#FEF0EC;border:1px solid #e9e7ef;"></span>#FEF0EC</td>
+                <td class="tt-desc">Background tints, badge bg</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-brand-gradient</td>
+                <td class="tt-val"><span class="tt-grad"></span>linear-gradient(135deg, #EF4621, #F5A623)</td>
+                <td class="tt-desc">Story rings, center nav button</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-neutral-50</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#FAFAF8;border:1px solid #e9e7ef;"></span>#FAFAF8</td>
+                <td class="tt-desc">App background (warm cream)</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-neutral-100</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#F5F5F3;border:1px solid #e9e7ef;"></span>#F5F5F3</td>
+                <td class="tt-desc">Section/input bg (light cream)</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-neutral-900</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#1A1A1A;"></span>#1A1A1A</td>
+                <td class="tt-desc">Primary text (warm near-black)</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-like</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#FF4757;"></span>#FF4757</td>
+                <td class="tt-desc">Heart icon, like count</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-surface-nav</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#FFFFFF;border:1px solid #e9e7ef;"></span>#FFFFFF</td>
+                <td class="tt-desc">Nav bar — flat white (Collaction style)</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-surface-story-ring</td>
+                <td class="tt-val"><span class="tt-grad"></span>gradient #EF4621 → #F5A623</td>
+                <td class="tt-desc">Unviewed story ring (orange-amber gradient)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Files</div>
+        <div class="row">
+          <div class="card col" style="border-left:3px solid var(--brand);">
+            <div style="font-size:13px;font-weight:700;color:var(--n900);margin-bottom:4px;">tokens.css</div>
+            <div style="font-size:13px;color:var(--n500);margin-bottom:12px;">CSS custom properties with <code style="font-family:monospace;color:var(--brand);">--woof-</code> prefix. Import at root level.</div>
+            <code style="font-family:monospace;font-size:12px;color:var(--n700);background:var(--n100);padding:8px 12px;border-radius:8px;display:block;">@import './tokens.css';</code>
+          </div>
+          <div class="card col" style="border-left:3px solid var(--brand);">
+            <div style="font-size:13px;font-weight:700;color:var(--n900);margin-bottom:4px;">tokens.json</div>
+            <div style="font-size:13px;color:var(--n500);margin-bottom:12px;">W3C Design Token format. Compatible with Style Dictionary, Figma Tokens, and Token Studio.</div>
+            <code style="font-family:monospace;font-size:12px;color:var(--n700);background:var(--n100);padding:8px 12px;border-radius:8px;display:block;">{ "color": { "brand": { ... } } }</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="footer-brand">🐾 Woof Design System v2.0</div>
+      <div class="footer-meta">Generated 2026 · docs/design/</div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Active nav highlighting
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Like button toggle
+  let liked = true;
+  function toggleLike() {
+    liked = !liked;
+    const icon = document.getElementById('heartIcon');
+    const count = document.getElementById('likeCount');
+    icon.textContent = liked ? '❤' : '🤍';
+    count.textContent = liked ? '689' : '688';
+    icon.classList.remove('heart-anim');
+    void icon.offsetWidth; // reflow
+    icon.classList.add('heart-anim');
+  }
+</script>
+</body>
+</html>

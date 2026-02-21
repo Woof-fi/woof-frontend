@@ -1,20 +1,25 @@
 /* Design tokens */
+@import './tokens.css';
+
 :root {
-    --color-bg: #fafafa;
-    --color-bg-alt: #f5f5f5;
-    --color-surface: #ffffff;
-    --color-border: #dbdbdb;
-    --color-text: #262626;
-    --color-text-secondary: #65676b;
-    --color-text-muted: #8e8e8e;
-    --color-primary: #0095f6;
-    --color-primary-hover: #0081d6;
-    --color-like: #ed4956;
-    --color-overlay: rgba(0,0,0,0.4);
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    /* Layout */
     --header-height: 60px;
+
+    /* Aliases: old names → new --woof- design system tokens */
+    --color-bg:             var(--woof-color-neutral-50);
+    --color-bg-alt:         var(--woof-color-neutral-100);
+    --color-surface:        var(--woof-surface-primary);
+    --color-border:         #DBDBDB;
+    --color-text:           var(--woof-color-neutral-900);
+    --color-text-secondary: var(--woof-color-neutral-500);
+    --color-text-muted:     var(--woof-color-neutral-400);
+    --color-primary:        var(--woof-color-brand-primary);
+    --color-primary-hover:  var(--woof-color-brand-primary-dark);
+    --color-like:           var(--woof-color-like);
+    --color-overlay:        var(--woof-surface-overlay);
+    --radius-sm:            var(--woof-radius-sm);
+    --radius-md:            var(--woof-radius-md);
+    --radius-lg:            var(--woof-radius-lg);
 }
 
 /* Keyboard focus indicator for interactive elements */
@@ -1336,7 +1341,7 @@ header {
     padding: 6px 20px;
     border: none;
     border-radius: 8px;
-    background: var(--color-primary, #0095f6);
+    background: var(--color-primary);
     color: #fff;
     font-size: 14px;
     font-weight: 600;
@@ -1346,7 +1351,7 @@ header {
 }
 
 .follow-btn:hover {
-    background: #0081d6;
+    background: var(--color-primary-hover);
 }
 
 .follow-btn.following {
