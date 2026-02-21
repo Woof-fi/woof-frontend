@@ -7,6 +7,10 @@ import { execSync } from 'child_process';
 
 const USER_POOL_ID = 'eu-north-1_99e6Bvwmy';
 const REGION = 'eu-north-1';
+// Use full path on Windows since AWSCLIV2 may not be on cmd.exe PATH
+const AWS = process.platform === 'win32'
+  ? '"C:\\Program Files\\Amazon\\AWSCLIV2\\aws.exe"'
+  : 'aws';
 
 export interface TestUser {
   email: string;
@@ -27,7 +31,7 @@ export function createTestUser(): TestUser {
 /** Admin-confirm a Cognito user (bypasses email verification) */
 export function adminConfirmUser(email: string): void {
   execSync(
-    `aws cognito-idp admin-confirm-sign-up --user-pool-id ${USER_POOL_ID} --username "${email}" --region ${REGION}`,
+    `${AWS} cognito-idp admin-confirm-sign-up --user-pool-id ${USER_POOL_ID} --username "${email}" --region ${REGION}`,
     { stdio: 'pipe' }
   );
 }
@@ -36,7 +40,7 @@ export function adminConfirmUser(email: string): void {
 export function adminDeleteUser(email: string): void {
   try {
     execSync(
-      `aws cognito-idp admin-delete-user --user-pool-id ${USER_POOL_ID} --username "${email}" --region ${REGION}`,
+      `${AWS} cognito-idp admin-delete-user --user-pool-id ${USER_POOL_ID} --username "${email}" --region ${REGION}`,
       { stdio: 'pipe' }
     );
   } catch {
@@ -52,7 +56,7 @@ export function adminDeleteUser(email: string): void {
 export function adminCreateUser(user: TestUser): void {
   // Create the user with SUPPRESS (no email triggered)
   execSync(
-    `aws cognito-idp admin-create-user ` +
+    `${AWS} cognito-idp admin-create-user ` +
     `--user-pool-id ${USER_POOL_ID} ` +
     `--username "${user.email}" ` +
     `--user-attributes Name=email,Value="${user.email}" Name=email_verified,Value=true Name=name,Value="${user.name}" ` +
@@ -63,7 +67,7 @@ export function adminCreateUser(user: TestUser): void {
 
   // Set a permanent password (moves from FORCE_CHANGE_PASSWORD to CONFIRMED)
   execSync(
-    `aws cognito-idp admin-set-user-password ` +
+    `${AWS} cognito-idp admin-set-user-password ` +
     `--user-pool-id ${USER_POOL_ID} ` +
     `--username "${user.email}" ` +
     `--password "${user.password}" ` +
@@ -77,7 +81,7 @@ export function adminCreateUser(user: TestUser): void {
 export function adminGetUser(email: string): { status: string } | null {
   try {
     const output = execSync(
-      `aws cognito-idp admin-get-user --user-pool-id ${USER_POOL_ID} --username "${email}" --region ${REGION} --query "UserStatus" --output text`,
+      `${AWS} cognito-idp admin-get-user --user-pool-id ${USER_POOL_ID} --username "${email}" --region ${REGION} --query "UserStatus" --output text`,
       { stdio: 'pipe' }
     );
     return { status: output.toString().trim() };
