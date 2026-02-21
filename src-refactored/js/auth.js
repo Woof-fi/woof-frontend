@@ -27,6 +27,35 @@ function getCognitoUser(email) {
     return new CognitoUser({ Username: email, Pool: userPool });
 }
 
+/**
+ * Map Cognito error codes to safe, user-friendly messages.
+ * Avoids leaking whether an email/account exists in the system.
+ */
+function sanitizeAuthError(err) {
+    switch (err.code) {
+        case 'UserNotFoundException':
+        case 'NotAuthorizedException':
+            return 'Incorrect email or password.';
+        case 'UsernameExistsException':
+            return 'Registration failed. Please try again.';
+        case 'InvalidPasswordException':
+            return 'Password does not meet the requirements.';
+        case 'CodeMismatchException':
+            return 'Invalid verification code.';
+        case 'ExpiredCodeException':
+            return 'Verification code has expired. Please request a new one.';
+        case 'LimitExceededException':
+        case 'TooManyRequestsException':
+            return 'Too many attempts. Please try again later.';
+        case 'InvalidParameterException':
+            return 'Please check your input and try again.';
+        case 'UserNotConfirmedException':
+            return 'Please verify your email before logging in.';
+        default:
+            return 'Something went wrong. Please try again.';
+    }
+}
+
 // Token management — store ID token for synchronous access
 function saveToken(token) {
     try {
@@ -94,6 +123,11 @@ export function isAuthenticated() {
 /**
  * Register — calls Cognito signUp.
  * Does NOT auto-login; user must verify email first.
+ *
+ * If the email already exists as an unconfirmed user (e.g. previous failed
+ * attempt), we silently resend the confirmation code instead of showing an
+ * error. The user sees the same "check your email" message either way, which
+ * also prevents account-enumeration attacks.
  */
 export async function register(email, password, name) {
     if (MOCK_AUTH) {
@@ -108,9 +142,30 @@ export async function register(email, password, name) {
     ];
 
     return new Promise((resolve, reject) => {
-        userPool.signUp(email, password, attributes, null, (err, result) => {
+        userPool.signUp(email, password, attributes, null, async (err, result) => {
             if (err) {
-                showToast(err.message || 'Registration failed', 'error');
+                if (err.code === 'UsernameExistsException') {
+                    // User exists — try to resend verification code.
+                    // If the account is unconfirmed this lets them complete signup.
+                    // If already confirmed, resend will fail silently and the user
+                    // can use "forgot password" from the login screen.
+                    try {
+                        const cognitoUser = getCognitoUser(email);
+                        await new Promise((res, rej) => {
+                            cognitoUser.resendConfirmationCode((resendErr) => {
+                                resendErr ? rej(resendErr) : res();
+                            });
+                        });
+                    } catch {
+                        // Resend failed (user already confirmed, or other issue).
+                        // Show the same generic message to avoid leaking info.
+                    }
+                    showToast('Check your email for a verification code.', 'success');
+                    resolve({ user: { username: email } });
+                    return;
+                }
+
+                showToast(sanitizeAuthError(err), 'error');
                 reject(err);
                 return;
             }
@@ -134,7 +189,7 @@ export async function confirmRegistration(email, code) {
     return new Promise((resolve, reject) => {
         cognitoUser.confirmRegistration(code, true, (err, result) => {
             if (err) {
-                showToast(err.message || 'Verification failed', 'error');
+                showToast(sanitizeAuthError(err), 'error');
                 reject(err);
                 return;
             }
@@ -158,7 +213,7 @@ export async function resendConfirmationCode(email) {
     return new Promise((resolve, reject) => {
         cognitoUser.resendConfirmationCode((err, result) => {
             if (err) {
-                showToast(err.message || 'Failed to resend code', 'error');
+                showToast(sanitizeAuthError(err), 'error');
                 reject(err);
                 return;
             }
@@ -207,7 +262,7 @@ export async function login(email, password) {
         cognitoUser.authenticateUser(authDetails, {
             onSuccess: (session) => resolve(session),
             onFailure: (err) => {
-                showToast(err.message || 'Login failed', 'error');
+                showToast(sanitizeAuthError(err), 'error');
                 reject(err);
             },
         });
@@ -252,11 +307,17 @@ export async function forgotPassword(email) {
     return new Promise((resolve, reject) => {
         cognitoUser.forgotPassword({
             onSuccess: (data) => {
-                showToast('Password reset code sent! Check your email.', 'success');
+                showToast('If an account exists for this email, a reset code has been sent.', 'success');
                 resolve(data);
             },
             onFailure: (err) => {
-                showToast(err.message || 'Failed to send reset code', 'error');
+                if (err.code === 'UserNotFoundException') {
+                    // Don't reveal that the account doesn't exist
+                    showToast('If an account exists for this email, a reset code has been sent.', 'success');
+                    resolve({});
+                    return;
+                }
+                showToast(sanitizeAuthError(err), 'error');
                 reject(err);
             },
         });
@@ -281,7 +342,7 @@ export async function confirmNewPassword(email, code, newPassword) {
                 resolve();
             },
             onFailure: (err) => {
-                showToast(err.message || 'Password reset failed', 'error');
+                showToast(sanitizeAuthError(err), 'error');
                 reject(err);
             },
         });
