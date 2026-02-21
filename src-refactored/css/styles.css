@@ -1277,6 +1277,177 @@ header {
     }
 }
 
+/* ============================================================================
+   PROFILE PAGE — Big-picture layout (bigpictureprofile.png)
+   ============================================================================ */
+
+/* Break out of content padding so hero is edge-to-edge */
+.profile-page {
+    margin: -20px;
+    min-height: 100vh;
+}
+
+/* Full-bleed hero photo */
+.profile-hero {
+    width: 100%;
+    height: 48vh;
+    min-height: 240px;
+    max-height: 380px;
+    overflow: hidden;
+    background: var(--woof-color-neutral-200);
+    position: relative;
+}
+
+.profile-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+}
+
+/* White sheet card slides up over the hero */
+.profile-sheet {
+    background: var(--woof-surface-primary);
+    border-radius: var(--woof-radius-2xl) var(--woof-radius-2xl) 0 0;
+    margin-top: -28px;
+    position: relative;
+    z-index: 1;
+    padding: 24px 20px 120px;
+    min-height: 60vh;
+}
+
+/* Name + breed row */
+.profile-sheet-namerow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.profile-sheet-name {
+    font-size: var(--woof-text-title-1);
+    font-weight: var(--woof-font-weight-bold);
+    color: var(--woof-color-neutral-900);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+.profile-sheet-breed {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-brand-primary);
+    font-weight: var(--woof-font-weight-semibold);
+    margin-top: 6px;
+}
+
+/* Stats row */
+.profile-sheet-stats {
+    display: flex;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--woof-color-neutral-100);
+}
+
+.profile-sheet-stat {
+    flex: 1;
+    padding-right: 16px;
+    margin-right: 16px;
+    border-right: 1px solid var(--woof-color-neutral-200);
+}
+
+.profile-sheet-stat:last-child {
+    border-right: none;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+.profile-sheet-stat-num {
+    font-size: var(--woof-text-title-2);
+    font-weight: var(--woof-font-weight-heavy);
+    color: var(--woof-color-neutral-900);
+    line-height: 1;
+}
+
+.profile-sheet-stat-label {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    margin-top: 3px;
+}
+
+/* Bio */
+.profile-sheet-bio {
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-700);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+/* 2-column posts grid for profile */
+.posts-grid-2col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+}
+
+/* Sticky follow/message bar at screen bottom (non-owner) */
+.profile-follow-sticky {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 20px 16px;
+    background: linear-gradient(to top, rgba(255,255,255,1) 55%, rgba(255,255,255,0));
+    z-index: 50;
+    pointer-events: none;
+}
+
+.profile-follow-sticky:empty {
+    display: none;
+}
+
+.profile-follow-actions {
+    display: flex;
+    gap: 12px;
+    max-width: 640px;
+    margin: 0 auto;
+    pointer-events: all;
+}
+
+.profile-follow-actions .follow-btn {
+    flex: 1;
+    height: var(--woof-btn-height-lg);
+    font-size: var(--woof-text-headline);
+    font-weight: var(--woof-font-weight-semibold);
+}
+
+.profile-follow-actions .message-profile-btn.icon-only {
+    width: var(--woof-btn-height-lg);
+    height: var(--woof-btn-height-lg);
+    padding: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* On mobile, account for bottom nav height */
+@media (max-width: 768px) {
+    .profile-page {
+        margin: -20px 0 0;
+    }
+    .profile-follow-sticky {
+        bottom: 56px;
+        padding-bottom: 12px;
+    }
+}
+
+/* ============================================================================
+   LEGACY profile styles (kept for any remaining references)
+   ============================================================================ */
+
 /* Updated styles for the profile page */
 .profile-header {
     display: flex;

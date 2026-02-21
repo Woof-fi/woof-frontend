@@ -55,87 +55,88 @@ function renderProfile(dog, container, slugOrId) {
     // Security: Escape all user-generated content
     const name = escapeHTML(dog.name);
     const breed = escapeHTML(dog.breed);
-    const location = dog.location ? escapeHTML(dog.location) : 'Unknown';
-    const bio = dog.bio ? escapeHTML(dog.bio) : 'No bio yet';
+    const bio = dog.bio ? escapeHTML(dog.bio) : null;
 
     const profilePhoto = dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
 
-    // Build action button HTML
-    let nameRowAction = '';
-    let profileActionsHtml = '';
-    if (dog.isOwner) {
-        nameRowAction = `
-            <button class="edit-profile-btn" id="edit-profile-btn">
-                <i class="fas fa-edit"></i> Edit Profile
-            </button>
-        `;
-    } else {
-        // Follow + Message on their own row below the header
-        profileActionsHtml = `
-            <div class="profile-actions">
-                <button class="follow-btn" id="follow-btn" data-dog-id="${dog.id}" disabled>
-                    <i class="fas fa-user-plus"></i> Follow
-                </button>
-                <button class="message-profile-btn" id="message-profile-btn" data-dog-id="${dog.id}">
-                    <i class="fas fa-envelope"></i> Message
-                </button>
-            </div>
+    // --- Hero image (full-bleed, outside the sheet card) ---
+    const heroEl = document.getElementById('profile-hero');
+    if (heroEl) {
+        heroEl.innerHTML = `
+            <img src="${profilePhoto}"
+                 alt="${name}"
+                 class="profile-hero-img"
+                 onerror="if(this.src!=='/assets/images/dog_profile_pic.jpg') this.src='/assets/images/dog_profile_pic.jpg'">
         `;
     }
 
-    // Follower count
-    const statsHtml = `
-        <div class="profile-stats" id="profile-stats">
-            <span><strong id="follower-count">-</strong> followers</span>
-        </div>
-    `;
+    // --- Name row right-side action ---
+    // Owner: small Edit button; non-owner: nothing here (Follow is sticky at bottom)
+    const nameRowAction = dog.isOwner
+        ? `<button class="edit-profile-btn" id="edit-profile-btn"><i class="fas fa-edit"></i> Edit</button>`
+        : '';
 
+    // --- Sheet card content (name / breed / stats / bio) ---
     container.innerHTML = `
-        <section class="profile">
-            <div class="profile-header">
-                <img src="${profilePhoto}"
-                     alt="${name}'s Profile Picture"
-                     class="profile-pic-large"
-                     onerror="if(this.src!=='/assets/images/dog_profile_pic.jpg') this.src='/assets/images/dog_profile_pic.jpg'">
-                <div class="profile-info">
-                    <div class="profile-name-row">
-                        <h3>${name}</h3>
-                        ${nameRowAction}
-                    </div>
-                    ${statsHtml}
-                    <p><strong>Breed:</strong> ${breed}</p>
-                    <p><strong>Age:</strong> ${dog.age} years</p>
-                    <p><strong>Location:</strong> ${location}</p>
-                </div>
+        <div class="profile-sheet-namerow">
+            <div>
+                <div class="profile-sheet-name">${name}</div>
+                <div class="profile-sheet-breed"><i class="fas fa-paw"></i> ${breed}</div>
             </div>
-            ${profileActionsHtml}
-            <div class="profile-details">
-                <h3>About</h3>
-                <p>${bio}</p>
+            ${nameRowAction}
+        </div>
+        <div class="profile-sheet-stats">
+            <div class="profile-sheet-stat">
+                <div class="profile-sheet-stat-num" id="post-count">—</div>
+                <div class="profile-sheet-stat-label">Posts</div>
             </div>
-        </section>
+            <div class="profile-sheet-stat">
+                <div class="profile-sheet-stat-num" id="follower-count">—</div>
+                <div class="profile-sheet-stat-label">Followers</div>
+            </div>
+            <div class="profile-sheet-stat">
+                <div class="profile-sheet-stat-num" id="following-count">—</div>
+                <div class="profile-sheet-stat-label">Following</div>
+            </div>
+        </div>
+        ${bio ? `<p class="profile-sheet-bio">${bio}</p>` : ''}
     `;
 
-    // Wire up edit button
+    // Wire up edit button (owner only)
     if (dog.isOwner) {
         const editBtn = document.getElementById('edit-profile-btn');
         if (editBtn) {
-            editBtn.addEventListener('click', () => {
-                openEditDogModal(dog, () => initProfile(slugOrId));
-            });
+            editBtn.addEventListener('click', () => openEditDogModal(dog, () => initProfile(slugOrId)));
         }
     }
 
-    // Always load follower count
+    // Non-owner: render Follow + Message in sticky footer
+    if (!dog.isOwner) {
+        const stickyEl = document.getElementById('profile-follow-sticky');
+        if (stickyEl) {
+            stickyEl.innerHTML = `
+                <div class="profile-follow-actions">
+                    <button class="follow-btn" id="follow-btn" data-dog-id="${dog.id}" disabled>
+                        <i class="fas fa-user-plus"></i> Follow
+                    </button>
+                    <button class="message-profile-btn icon-only" id="message-profile-btn"
+                            data-dog-id="${dog.id}" title="Message" aria-label="Message">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // Load async counts
     if (dog.id) {
         loadFollowerCount(dog.id);
     }
 
-    // Wire up follow button and load follow status
+    // Wire up follow + message (non-owner)
     if (!dog.isOwner && dog.id) {
         loadFollowStatus(dog.id);
 
-        // Wire up message button
         const messageBtn = document.getElementById('message-profile-btn');
         if (messageBtn) {
             messageBtn.addEventListener('click', async () => {
@@ -168,9 +169,27 @@ async function loadFollowerCount(dogId) {
 
     try {
         const status = await getFollowStatus(dogId);
-        followerCountEl.textContent = status.followerCount;
+        followerCountEl.textContent = status.followerCount ?? '—';
     } catch (error) {
         console.error('Failed to load follower count:', error);
+    }
+}
+
+/**
+ * Load following count for the current profile dog.
+ * Called from ProfileView.onMount after initProfile sets currentDog.
+ * TODO: backend could return followingCount on the dog object to avoid this extra call.
+ */
+export async function loadFollowingCount() {
+    const el = document.getElementById('following-count');
+    if (!el || !currentDog?.id) return;
+
+    try {
+        const following = await getFollowing(currentDog.id);
+        el.textContent = following.length;
+    } catch (error) {
+        console.error('Failed to load following count:', error);
+        el.textContent = '0';
     }
 }
 
@@ -380,6 +399,8 @@ export async function loadProfilePosts() {
         const result = await getDogPosts(currentDog.id);
 
         if (!result.posts || result.posts.length === 0) {
+            const postCountEl = document.getElementById('post-count');
+            if (postCountEl) postCountEl.textContent = '0';
             const isOwner = currentDog && currentDog.isOwner;
             postsGrid.innerHTML = `
                 <div class="empty-state">
@@ -389,6 +410,10 @@ export async function loadProfilePosts() {
             `;
             return;
         }
+
+        // Update post count in the stats row
+        const postCountEl = document.getElementById('post-count');
+        if (postCountEl) postCountEl.textContent = result.posts.length;
 
         postsGrid.innerHTML = '';
         result.posts.forEach(post => {

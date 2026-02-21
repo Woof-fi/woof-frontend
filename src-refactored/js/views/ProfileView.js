@@ -3,7 +3,7 @@
  * Dog profile page (handles any dog slug)
  */
 
-import { initProfile, initProfileTabs, loadProfilePosts, loadFriends, loadHealthRecords } from '../profile.js';
+import { initProfile, initProfileTabs, loadProfilePosts, loadFriends, loadHealthRecords, loadFollowingCount } from '../profile.js';
 
 export class ProfileView {
     constructor() {
@@ -20,45 +20,42 @@ export class ProfileView {
         this.currentSlug = data.params?.slug || 'nelli-1';
 
         return `
-            <main>
-                <!-- Profile content will be loaded by profile.js -->
-                <div class="profile-container" data-dog-slug="${this.currentSlug}">
-                    <!-- Profile skeleton/loading will be shown initially -->
-                </div>
+            <div class="profile-page">
+                <!-- Full-bleed hero photo — filled by profile.js -->
+                <div class="profile-hero" id="profile-hero"></div>
 
-                <!-- Profile Tabs -->
-                <div class="profile-tabs" role="tablist">
-                    <button class="tab-link active" data-tab="posts" role="tab" aria-selected="true">
-                        <i class="fas fa-th"></i>
-                        Posts
-                    </button>
-                    <button class="tab-link" data-tab="friends" role="tab" aria-selected="false">
-                        <i class="fas fa-user-friends"></i>
-                        Friends
-                    </button>
-                    <button class="tab-link" data-tab="health" role="tab" aria-selected="false">
-                        <i class="fas fa-heartbeat"></i>
-                        Health
-                    </button>
-                </div>
+                <!-- White sheet card sliding up over hero -->
+                <div class="profile-sheet">
+                    <!-- Name / breed / stats / bio — filled by profile.js -->
+                    <div class="profile-container" data-dog-slug="${this.currentSlug}"></div>
 
-                <!-- Tab Content -->
-                <div class="tab-content active" id="posts" role="tabpanel" aria-hidden="false">
-                    <div class="posts-grid">
-                        <!-- Posts will be loaded here -->
+                    <!-- Tabs -->
+                    <div class="profile-tabs" role="tablist">
+                        <button class="tab-link active" data-tab="posts" role="tab" aria-selected="true">
+                            <i class="fas fa-th"></i> Posts
+                        </button>
+                        <button class="tab-link" data-tab="friends" role="tab" aria-selected="false">
+                            <i class="fas fa-user-friends"></i> Friends
+                        </button>
+                        <button class="tab-link" data-tab="health" role="tab" aria-selected="false">
+                            <i class="fas fa-heartbeat"></i> Health
+                        </button>
+                    </div>
+
+                    <!-- Tab content -->
+                    <div class="tab-content active" id="posts" role="tabpanel" aria-hidden="false">
+                        <div class="posts-grid posts-grid-2col"></div>
+                    </div>
+                    <div class="tab-content" id="friends" role="tabpanel" aria-hidden="true">
+                        <div class="friend-list"></div>
+                    </div>
+                    <div class="tab-content" id="health" role="tabpanel" aria-hidden="true">
                     </div>
                 </div>
 
-                <div class="tab-content" id="friends" role="tabpanel" aria-hidden="true">
-                    <div class="friend-list">
-                        <!-- Friends will be loaded here -->
-                    </div>
-                </div>
-
-                <div class="tab-content" id="health" role="tabpanel" aria-hidden="true">
-                    <!-- Health records will be loaded here -->
-                </div>
-            </main>
+                <!-- Sticky follow/message bar (non-owner only) — filled by profile.js -->
+                <div class="profile-follow-sticky" id="profile-follow-sticky"></div>
+            </div>
         `;
     }
 
@@ -74,10 +71,11 @@ export class ProfileView {
         await initProfile(slug);
         initProfileTabs();
 
-        // Load tab content
+        // Load tab content and async stat counts
         loadProfilePosts();
         loadFriends(slug);
         loadHealthRecords(slug);
+        loadFollowingCount();
     }
 
     /**

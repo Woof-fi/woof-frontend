@@ -453,41 +453,116 @@
     </div>
   </div>
 
-  <!-- ── PROFILE CARD ─────────────────────────── -->
+  <!-- ── PROFILE PAGE (big-picture layout) ──────── -->
   <div class="preview-section">
-    <div class="preview-label">Profile Card</div>
-    <div class="mock-profile-card">
-      <div class="mock-profile-hero">
-        <div class="mock-profile-avatar">🐕</div>
+    <div class="preview-label">Profile Page — Big Picture Layout</div>
+
+    <!-- Simulated phone frame at max-width 390px -->
+    <div style="max-width: 390px; border: 1px solid var(--woof-color-neutral-200); border-radius: var(--woof-radius-xl); overflow: hidden; box-shadow: var(--woof-shadow-lg); position: relative;">
+
+      <!-- Hero photo -->
+      <div style="width:100%; height:260px; overflow:hidden; background: var(--woof-color-neutral-200); position:relative;">
+        <div style="width:100%; height:100%; background: linear-gradient(160deg, #b8856a 0%, #e8c49a 40%, #c9a87c 80%, #d4a574 100%); display:flex; align-items:center; justify-content:center; font-size:80px;">🐕</div>
       </div>
-      <div class="mock-profile-body">
-        <div class="mock-profile-name">Nelli</div>
-        <div class="mock-profile-breed">🐾 Finnish Lapphund</div>
-        <div class="mock-profile-stats">
-          <div class="mock-stat">
-            <div class="mock-stat-num">42</div>
-            <div class="mock-stat-label">Posts</div>
+
+      <!-- White sheet card -->
+      <div class="profile-sheet" style="margin-top:-28px; padding-bottom: 80px;">
+
+        <!-- Name + breed -->
+        <div class="profile-sheet-namerow">
+          <div>
+            <div class="profile-sheet-name">Nelli</div>
+            <div class="profile-sheet-breed"><i class="fas fa-paw"></i> Finnish Lapphund</div>
           </div>
-          <div class="mock-stat">
-            <div class="mock-stat-num">318</div>
-            <div class="mock-stat-label">Followers</div>
+          <!-- Owner would show Edit button here -->
+        </div>
+
+        <!-- Stats -->
+        <div class="profile-sheet-stats">
+          <div class="profile-sheet-stat">
+            <div class="profile-sheet-stat-num">42</div>
+            <div class="profile-sheet-stat-label">Posts</div>
           </div>
-          <div class="mock-stat">
-            <div class="mock-stat-num">207</div>
-            <div class="mock-stat-label">Following</div>
+          <div class="profile-sheet-stat">
+            <div class="profile-sheet-stat-num">318</div>
+            <div class="profile-sheet-stat-label">Followers</div>
+          </div>
+          <div class="profile-sheet-stat">
+            <div class="profile-sheet-stat-num">207</div>
+            <div class="profile-sheet-stat-label">Following</div>
           </div>
         </div>
-        <div class="profile-actions">
-          <button class="follow-btn">Follow</button>
-          <button class="message-profile-btn">Message</button>
-        </div>
-      </div>
-      <div style="border-top: 1px solid var(--woof-color-neutral-200);">
-        <div class="profile-tabs" style="position: static;">
+
+        <!-- Bio -->
+        <p class="profile-sheet-bio">Living life one sniff at a time 🐾 Finnish Lapphund from Helsinki, loves the snow and long walks in the forest.</p>
+
+        <!-- Tabs -->
+        <div class="profile-tabs" style="position:static; margin: 0 -20px; padding: 0 20px;">
           <button class="tab-link active"><i class="fas fa-th"></i> Posts</button>
-          <button class="tab-link"><i class="fas fa-users"></i> Friends</button>
-          <button class="tab-link"><i class="fas fa-heart"></i> Health</button>
+          <button class="tab-link"><i class="fas fa-user-friends"></i> Friends</button>
+          <button class="tab-link"><i class="fas fa-heartbeat"></i> Health</button>
         </div>
+
+        <!-- 2-col post grid mock -->
+        <div class="posts-grid posts-grid-2col" style="margin-top: 4px;">
+          <div class="posts-grid-item" style="aspect-ratio:1;">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8c49a,#c9a87c);display:flex;align-items:center;justify-content:center;font-size:32px;">🐕</div>
+            <div class="posts-grid-overlay"><span><i class="fas fa-heart"></i> 42</span></div>
+          </div>
+          <div class="posts-grid-item" style="aspect-ratio:1;">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#c9a87c,#a0785a);display:flex;align-items:center;justify-content:center;font-size:32px;">🌿</div>
+            <div class="posts-grid-overlay"><span><i class="fas fa-heart"></i> 31</span></div>
+          </div>
+          <div class="posts-grid-item" style="aspect-ratio:1;">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#87ceeb,#5ba3d0);display:flex;align-items:center;justify-content:center;font-size:32px;">❄️</div>
+            <div class="posts-grid-overlay"><span><i class="fas fa-heart"></i> 88</span></div>
+          </div>
+          <div class="posts-grid-item" style="aspect-ratio:1;">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#90ee90,#3cb371);display:flex;align-items:center;justify-content:center;font-size:32px;">🌳</div>
+            <div class="posts-grid-overlay"><span><i class="fas fa-heart"></i> 55</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky follow bar (shown inline in preview) -->
+      <div style="padding: 12px 20px 16px; background: linear-gradient(to top, rgba(255,255,255,1) 55%, rgba(255,255,255,0)); position:sticky; bottom:0;">
+        <div class="profile-follow-actions">
+          <button class="follow-btn" style="flex:1; height: var(--woof-btn-height-lg);">
+            <i class="fas fa-user-plus"></i> Follow
+          </button>
+          <button class="message-profile-btn icon-only" style="width: var(--woof-btn-height-lg); height: var(--woof-btn-height-lg); padding:0; display:flex; align-items:center; justify-content:center; font-size:18px;">
+            <i class="fas fa-envelope"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Owner view (Edit button instead of Follow) -->
+    <div style="max-width: 390px; margin-top: 24px; border: 1px solid var(--woof-color-neutral-200); border-radius: var(--woof-radius-xl); overflow: hidden; box-shadow: var(--woof-shadow-lg);">
+      <div style="width:100%; height:180px; background: linear-gradient(160deg, #b8856a 0%, #e8c49a 60%, #c9a87c 100%); display:flex; align-items:center; justify-content:center; font-size:60px;">🐕</div>
+      <div class="profile-sheet" style="margin-top:-28px; padding-bottom: 24px;">
+        <div class="profile-sheet-namerow">
+          <div>
+            <div class="profile-sheet-name">Nelli</div>
+            <div class="profile-sheet-breed"><i class="fas fa-paw"></i> Finnish Lapphund</div>
+          </div>
+          <button class="edit-profile-btn"><i class="fas fa-edit"></i> Edit</button>
+        </div>
+        <div class="profile-sheet-stats">
+          <div class="profile-sheet-stat">
+            <div class="profile-sheet-stat-num">42</div>
+            <div class="profile-sheet-stat-label">Posts</div>
+          </div>
+          <div class="profile-sheet-stat">
+            <div class="profile-sheet-stat-num">318</div>
+            <div class="profile-sheet-stat-label">Followers</div>
+          </div>
+          <div class="profile-sheet-stat">
+            <div class="profile-sheet-stat-num">207</div>
+            <div class="profile-sheet-stat-label">Following</div>
+          </div>
+        </div>
+        <p class="profile-sheet-bio">Living life one sniff at a time 🐾</p>
       </div>
     </div>
   </div>
