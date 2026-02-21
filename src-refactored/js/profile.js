@@ -435,7 +435,7 @@ const HEALTH_TYPE_CONFIG = {
     vet_visit: { icon: 'fa-stethoscope', label: 'Vet Visit', color: '#3b82f6' },
     vaccination: { icon: 'fa-syringe', label: 'Vaccination', color: '#10b981' },
     medication: { icon: 'fa-pills', label: 'Medication', color: '#f59e0b' },
-    weight: { icon: 'fa-weight', label: 'Weight', color: '#8b5cf6' },
+    weight: { icon: 'fa-weight', label: 'Weight', color: '#EF4621' },
     note: { icon: 'fa-sticky-note', label: 'Note', color: '#6b7280' },
 };
 

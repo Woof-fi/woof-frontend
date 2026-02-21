@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Woof — Design Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+  <style>
+    /* Preview-only layout */
+    .preview-root {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 120px;
+    }
+    .preview-section {
+      margin-bottom: 56px;
+    }
+    .preview-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--woof-color-neutral-400);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--woof-color-neutral-200);
+    }
+    .preview-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    /* Mock header bar */
+    .mock-header {
+      background: var(--woof-surface-primary);
+      border-bottom: 1px solid var(--woof-color-neutral-200);
+      padding: 0 20px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      box-shadow: var(--woof-shadow-xs);
+    }
+    .mock-header .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--woof-color-brand-primary);
+      letter-spacing: -0.5px;
+    }
+    .mock-header .header-icons {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      color: var(--woof-color-neutral-900);
+      font-size: 20px;
+    }
+    /* Mock bottom nav */
+    .mock-bottom-nav {
+      background: var(--woof-surface-nav);
+      border-top: 1px solid var(--woof-color-neutral-200);
+      box-shadow: var(--woof-shadow-nav);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0;
+      max-width: 400px;
+    }
+    .mock-bottom-nav a {
+      text-decoration: none;
+      color: var(--woof-color-neutral-400);
+      font-size: 22px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mock-bottom-nav a.active {
+      color: var(--woof-color-brand-primary);
+    }
+    .mock-bottom-nav .create-btn {
+      width: 56px;
+      height: 56px;
+      background: var(--woof-color-brand-gradient);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(239,70,33,0.45);
+    }
+    /* Mock post image placeholder */
+    .mock-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(160deg, #c9a87c 0%, #e8c49a 40%, #b8856a 80%, #d4a574 100%);
+      display: block;
+    }
+    .mock-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--woof-color-brand-primary-light), var(--woof-color-brand-primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    /* Mock profile hero */
+    .mock-profile-hero {
+      background: linear-gradient(160deg, #c9a87c 0%, #e8c49a 60%, #b8856a 100%);
+      height: 160px;
+      border-radius: var(--woof-radius-lg) var(--woof-radius-lg) 0 0;
+      position: relative;
+    }
+    .mock-profile-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: linear-gradient(135deg, var(--woof-color-brand-primary-light), var(--woof-color-brand-primary));
+      position: absolute;
+      bottom: -44px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      box-shadow: var(--woof-shadow-sm);
+    }
+    .mock-profile-card {
+      background: var(--woof-surface-primary);
+      border-radius: var(--woof-radius-lg);
+      border: 1px solid var(--woof-color-neutral-200);
+      overflow: hidden;
+      max-width: 400px;
+      box-shadow: var(--woof-shadow-sm);
+    }
+    .mock-profile-body {
+      padding: 56px 20px 20px;
+      text-align: center;
+    }
+    .mock-profile-name {
+      font-size: var(--woof-text-title-1);
+      font-weight: var(--woof-font-weight-bold);
+      color: var(--woof-color-neutral-900);
+      margin-bottom: 4px;
+    }
+    .mock-profile-breed {
+      font-size: var(--woof-text-caption-1);
+      color: var(--woof-color-brand-primary);
+      font-weight: var(--woof-font-weight-semibold);
+      margin-bottom: 16px;
+    }
+    .mock-profile-stats {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid var(--woof-color-neutral-200);
+      border-bottom: 1px solid var(--woof-color-neutral-200);
+      margin-bottom: 16px;
+    }
+    .mock-stat {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      border-right: 1px solid var(--woof-color-neutral-200);
+    }
+    .mock-stat:last-child { border-right: none; }
+    .mock-stat-num {
+      font-size: var(--woof-text-title-2);
+      font-weight: var(--woof-font-weight-heavy);
+      color: var(--woof-color-neutral-900);
+    }
+    .mock-stat-label {
+      font-size: var(--woof-text-caption-1);
+      color: var(--woof-color-neutral-500);
+    }
+    /* Story row */
+    .mock-stories {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      background: var(--woof-surface-primary);
+      padding: 12px;
+      border-radius: var(--woof-radius-lg);
+      box-shadow: var(--woof-shadow-sm);
+      border: 1px solid var(--woof-color-neutral-200);
+      scrollbar-width: none;
+    }
+    .mock-stories::-webkit-scrollbar { display: none; }
+    .mock-story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .mock-story-ring {
+      padding: 2.5px;
+      border-radius: 20px;
+      background: var(--woof-color-brand-gradient);
+      display: inline-flex;
+    }
+    .mock-story-ring-inner {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #e8c49a, #c9a87c);
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .mock-story-ring.seen {
+      background: var(--woof-color-neutral-300);
+    }
+    .mock-story-add {
+      width: 57px;
+      height: 57px;
+      background: var(--woof-color-brand-gradient);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(239,70,33,0.40);
+    }
+    .mock-story-label {
+      font-size: 11px;
+      color: var(--woof-color-neutral-800);
+      font-weight: 500;
+      max-width: 60px;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* Health icon circle */
+    .health-icon-vet      { background: #3b82f6; }
+    .health-icon-vaccine  { background: #10b981; }
+    .health-icon-med      { background: #f59e0b; }
+    .health-icon-weight   { background: var(--woof-color-brand-primary); }
+    .health-icon-note     { background: #6b7280; }
+
+    /* Unread conv highlight */
+    .mock-conv-unread {
+      background: var(--woof-color-brand-primary-subtle);
+    }
+    /* Chip demos */
+    .chip-demo {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      border-radius: var(--woof-radius-full);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .chip-surface { background: var(--woof-color-neutral-100); color: var(--woof-color-neutral-800); }
+    .chip-brand   { background: var(--woof-color-brand-primary-subtle); color: var(--woof-color-brand-primary); }
+  </style>
+</head>
+<body style="background: var(--woof-color-neutral-50); font-family: var(--woof-font-family);">
+
+<div class="preview-root">
+
+  <div style="margin-bottom: 40px;">
+    <h1 style="font-size: 28px; font-weight: 800; color: var(--woof-color-neutral-900); letter-spacing: -0.5px; margin-bottom: 4px;">
+      Woof — Design System Preview
+    </h1>
+    <p style="color: var(--woof-color-neutral-500); font-size: 14px;">All components with mock data. Font: Inter.</p>
+  </div>
+
+  <!-- ── NAVIGATION ───────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Navigation — Header</div>
+    <div class="mock-header">
+      <span class="logo-text">🐾 Woof</span>
+      <div class="header-icons">
+        <i class="fas fa-search"></i>
+        <i class="fas fa-bell"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <div class="preview-label">Navigation — Bottom Nav (mobile)</div>
+    <div class="mock-bottom-nav">
+      <a class="active"><i class="fas fa-home"></i></a>
+      <a><i class="fas fa-search"></i></a>
+      <a class="create-btn"><i class="fas fa-plus"></i></a>
+      <a><i class="fas fa-heart"></i></a>
+      <a><i class="fas fa-user-circle"></i></a>
+    </div>
+  </div>
+
+  <!-- ── BUTTONS ──────────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Buttons</div>
+    <div class="preview-row" style="margin-bottom: 12px;">
+      <button class="btn-primary">Post</button>
+      <button class="btn-primary">Add Pet</button>
+      <button class="btn-primary">Save Changes</button>
+      <button class="btn-primary">Sign In</button>
+    </div>
+    <div class="preview-row">
+      <button class="btn-secondary">Cancel</button>
+      <button class="follow-btn">Follow</button>
+      <button class="follow-btn following" style="background: var(--woof-color-neutral-100); color: var(--woof-color-neutral-900); border: 1px solid var(--woof-color-neutral-200);">Following</button>
+      <button class="edit-profile-btn">Edit Profile</button>
+      <button class="message-profile-btn">Message</button>
+    </div>
+  </div>
+
+  <!-- ── TABS ─────────────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Feed Tabs</div>
+    <div class="feed-tabs" style="position: static; max-width: 400px; margin-bottom: 0;">
+      <button class="feed-tab active">For You</button>
+      <button class="feed-tab">Following</button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <div class="preview-label">Auth Tabs</div>
+    <div class="auth-tabs" style="max-width: 360px;">
+      <button class="auth-tab active">Login</button>
+      <button class="auth-tab">Register</button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <div class="preview-label">Profile Tabs</div>
+    <div class="profile-tabs" style="position: static; max-width: 400px;">
+      <button class="tab-link active"><i class="fas fa-th"></i> Posts</button>
+      <button class="tab-link"><i class="fas fa-users"></i> Friends</button>
+      <button class="tab-link"><i class="fas fa-heart"></i> Health</button>
+    </div>
+  </div>
+
+  <!-- ── STORIES ROW ──────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Stories Row</div>
+    <div class="mock-stories">
+      <div class="mock-story-item">
+        <div class="mock-story-add"><i class="fas fa-plus"></i></div>
+        <span class="mock-story-label">My story</span>
+      </div>
+      <div class="mock-story-item">
+        <div class="mock-story-ring">
+          <div class="mock-story-ring-inner">🐕</div>
+        </div>
+        <span class="mock-story-label">Nelli</span>
+      </div>
+      <div class="mock-story-item">
+        <div class="mock-story-ring">
+          <div class="mock-story-ring-inner">🐶</div>
+        </div>
+        <span class="mock-story-label">Cheddar</span>
+      </div>
+      <div class="mock-story-item">
+        <div class="mock-story-ring seen">
+          <div class="mock-story-ring-inner">🦮</div>
+        </div>
+        <span class="mock-story-label">Rex</span>
+      </div>
+      <div class="mock-story-item">
+        <div class="mock-story-ring">
+          <div class="mock-story-ring-inner">🐩</div>
+        </div>
+        <span class="mock-story-label">Poppy</span>
+      </div>
+      <div class="mock-story-item">
+        <div class="mock-story-ring seen">
+          <div class="mock-story-ring-inner">🐾</div>
+        </div>
+        <span class="mock-story-label">Bruno</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FEED POSTS ───────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Feed Posts</div>
+
+    <!-- Post 1 -->
+    <div class="post" style="max-width: 500px; margin-bottom: 16px;">
+      <div class="post-header">
+        <a class="post-author-link">
+          <div class="mock-avatar">🐕</div>
+          <div style="margin-left: 10px;">
+            <strong style="font-size: 14px;">Nelli</strong>
+            <span style="font-size: 12px; color: var(--woof-color-neutral-500); display: block;">@nelli_the_lapphund</span>
+          </div>
+        </a>
+        <span style="margin-left: auto; color: var(--woof-color-neutral-400); font-size: 18px; letter-spacing: 2px;">···</span>
+      </div>
+      <div class="post-image">
+        <div class="mock-img" style="aspect-ratio: 4/3; background: linear-gradient(160deg, #c9a87c 0%, #e8c49a 50%, #b8856a 100%);"></div>
+      </div>
+      <div class="post-actions">
+        <button class="like-button liked"><i class="fas fa-heart" style="color: var(--woof-color-like);"></i></button>
+        <span class="like-count">142</span>
+        <button><i class="far fa-comment"></i></button>
+        <span class="comment-count">23</span>
+      </div>
+      <div class="post-caption">
+        <strong>Nelli</strong> Enjoying the autumn forest walk 🍂 best day ever with my humans
+      </div>
+      <div class="post-timestamp-container">
+        <span class="post-timestamp">2 hours ago</span>
+      </div>
+    </div>
+
+    <!-- Post 2 -->
+    <div class="post" style="max-width: 500px;">
+      <div class="post-header">
+        <a class="post-author-link">
+          <div class="mock-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">🐶</div>
+          <div style="margin-left: 10px;">
+            <strong style="font-size: 14px;">Cheddar</strong>
+            <span style="font-size: 12px; color: var(--woof-color-neutral-500); display: block;">@cheddar_goldenboy</span>
+          </div>
+        </a>
+        <span style="margin-left: auto; color: var(--woof-color-neutral-400); font-size: 18px; letter-spacing: 2px;">···</span>
+      </div>
+      <div class="post-image">
+        <div style="width: 100%; aspect-ratio: 1; background: linear-gradient(160deg, #a78bfa 0%, #818cf8 40%, #6366f1 100%);"></div>
+      </div>
+      <div class="post-actions">
+        <button class="like-button"><i class="far fa-heart"></i></button>
+        <span class="like-count">89</span>
+        <button><i class="far fa-comment"></i></button>
+        <span class="comment-count">7</span>
+      </div>
+      <div class="post-caption">
+        <strong>Cheddar</strong> Zoomies at the beach! 🌊
+      </div>
+      <div class="post-timestamp-container">
+        <span class="post-timestamp">5 hours ago</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROFILE CARD ─────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Profile Card</div>
+    <div class="mock-profile-card">
+      <div class="mock-profile-hero">
+        <div class="mock-profile-avatar">🐕</div>
+      </div>
+      <div class="mock-profile-body">
+        <div class="mock-profile-name">Nelli</div>
+        <div class="mock-profile-breed">🐾 Finnish Lapphund</div>
+        <div class="mock-profile-stats">
+          <div class="mock-stat">
+            <div class="mock-stat-num">42</div>
+            <div class="mock-stat-label">Posts</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-num">318</div>
+            <div class="mock-stat-label">Followers</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-num">207</div>
+            <div class="mock-stat-label">Following</div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="follow-btn">Follow</button>
+          <button class="message-profile-btn">Message</button>
+        </div>
+      </div>
+      <div style="border-top: 1px solid var(--woof-color-neutral-200);">
+        <div class="profile-tabs" style="position: static;">
+          <button class="tab-link active"><i class="fas fa-th"></i> Posts</button>
+          <button class="tab-link"><i class="fas fa-users"></i> Friends</button>
+          <button class="tab-link"><i class="fas fa-heart"></i> Health</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HEALTH RECORDS ───────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Health Records</div>
+
+    <div class="health-filters" style="margin-bottom: 16px;">
+      <button class="health-filter-btn active"><i class="fas fa-list"></i> All</button>
+      <button class="health-filter-btn"><i class="fas fa-stethoscope"></i> Vet Visit</button>
+      <button class="health-filter-btn"><i class="fas fa-syringe"></i> Vaccination</button>
+      <button class="health-filter-btn"><i class="fas fa-pills"></i> Medication</button>
+      <button class="health-filter-btn"><i class="fas fa-weight"></i> Weight</button>
+    </div>
+
+    <div class="health-timeline">
+      <div class="health-card">
+        <div class="health-card-icon health-icon-vet"><i class="fas fa-stethoscope"></i></div>
+        <div class="health-card-body">
+          <div class="health-card-header">
+            <span class="health-card-type">Vet Visit</span>
+            <span class="health-card-date">2026-02-10</span>
+          </div>
+          <p class="health-card-desc">Annual check-up</p>
+          <p class="health-card-notes">All clear, next visit in 12 months</p>
+        </div>
+      </div>
+      <div class="health-card">
+        <div class="health-card-icon health-icon-weight"><i class="fas fa-weight"></i></div>
+        <div class="health-card-body">
+          <div class="health-card-header">
+            <span class="health-card-type">Weight</span>
+            <span class="health-card-date">2026-01-28</span>
+          </div>
+          <p class="health-card-desc">Monthly weigh-in</p>
+          <span class="health-value">18.5 kg</span>
+        </div>
+      </div>
+      <div class="health-card">
+        <div class="health-card-icon health-icon-vaccine"><i class="fas fa-syringe"></i></div>
+        <div class="health-card-body">
+          <div class="health-card-header">
+            <span class="health-card-type">Vaccination</span>
+            <span class="health-card-date">2025-11-05</span>
+          </div>
+          <p class="health-card-desc">Rabies booster</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MESSAGING ────────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Messages — Conversation List</div>
+    <div style="border: 1px solid var(--woof-color-neutral-200); border-radius: var(--woof-radius-lg); overflow: hidden; max-width: 380px; background: var(--woof-surface-primary);">
+      <!-- unread -->
+      <div class="conv-item unread">
+        <div class="mock-avatar">🐕</div>
+        <div class="conv-info">
+          <div class="conv-name-row">
+            <span class="conv-name">Nelli</span>
+            <span class="conv-time">2m</span>
+          </div>
+          <div class="conv-preview">Wanna go to the dog park?</div>
+        </div>
+        <div class="conv-badge">3</div>
+      </div>
+      <!-- read -->
+      <div class="conv-item">
+        <div class="mock-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">🐶</div>
+        <div class="conv-info">
+          <div class="conv-name-row">
+            <span class="conv-name">Cheddar</span>
+            <span class="conv-time">1h</span>
+          </div>
+          <div class="conv-preview">See you at the park!</div>
+        </div>
+      </div>
+      <!-- read -->
+      <div class="conv-item">
+        <div class="mock-avatar" style="background: linear-gradient(135deg, #10b981, #047857);">🦮</div>
+        <div class="conv-info">
+          <div class="conv-name-row">
+            <span class="conv-name">Rex</span>
+            <span class="conv-time">3h</span>
+          </div>
+          <div class="conv-preview">Bow wow 🐾</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MESSAGE BUBBLES ──────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Message Bubbles</div>
+    <div class="thread-messages" style="height: auto; border: 1px solid var(--woof-color-neutral-200); border-radius: var(--woof-radius-lg); padding: 16px; max-width: 380px; background: var(--woof-surface-primary);">
+      <div class="msg-bubble msg-theirs">
+        <div class="msg-content">Wanna go to the dog park tomorrow? 🐕</div>
+        <span class="msg-time">10:21</span>
+      </div>
+      <div class="msg-bubble msg-mine">
+        <div class="msg-content">Yes! Nelli would love that 🐾</div>
+        <span class="msg-time">10:23</span>
+      </div>
+      <div class="msg-bubble msg-theirs">
+        <div class="msg-content">Great, see you at 3pm!</div>
+        <span class="msg-time">10:24</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHIPS / TAGS ─────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Chips &amp; Tags</div>
+    <div class="preview-row">
+      <span class="chip-demo chip-surface">Finnish Lapphund</span>
+      <span class="chip-demo chip-brand">🐾 goldensweet</span>
+      <span class="chip-demo chip-surface">Helsinki</span>
+      <span class="chip-demo chip-brand">#dogpark</span>
+      <span class="chip-demo" style="background: rgba(0,0,0,0.7); color: #fff;">mountain trip</span>
+    </div>
+  </div>
+
+  <!-- ── WELCOME / INVITE CARDS ──────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Welcome &amp; Invite Cards</div>
+    <div class="welcome-card" style="max-width: 480px;">
+      <div class="welcome-card-icon"><i class="fas fa-paw"></i></div>
+      <h2>Welcome to Woof!</h2>
+      <p>Create your dog's profile and connect with the pack.</p>
+      <button class="btn-primary welcome-card-btn"><i class="fas fa-plus"></i> Add your first pet</button>
+    </div>
+
+    <div class="invite-card" style="max-width: 480px; margin-top: 16px;">
+      <div class="invite-card-icon"><i class="fas fa-envelope-open-text"></i></div>
+      <p class="invite-card-heading">Invite your friends!</p>
+      <p class="invite-card-desc">The more dogs the merrier. Share Woof with your dog-parent friends.</p>
+      <div class="invite-card-actions">
+        <button class="btn-primary invite-card-btn">Share link</button>
+        <button class="btn-secondary invite-card-btn">Copy link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FORMS / INPUTS ───────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Auth Modal (inline)</div>
+    <div class="modal-content" style="position: static; margin: 0; max-width: 400px; display: block;">
+      <div class="modal-header">
+        <h2>Login</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-tabs">
+          <button class="auth-tab active">Login</button>
+          <button class="auth-tab">Register</button>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="••••••••" />
+        </div>
+        <button class="btn-primary" style="width: 100%;">Sign In</button>
+        <p class="auth-secondary-action"><a href="#">Forgot password?</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SKELETON ──────────────────────────────── -->
+  <div class="preview-section">
+    <div class="preview-label">Skeleton Loading</div>
+    <div class="post-skeleton" style="max-width: 500px;">
+      <div class="post-header-skeleton">
+        <div class="skeleton skeleton-circle"></div>
+        <div class="skeleton skeleton-text"></div>
+      </div>
+      <div class="skeleton skeleton-image"></div>
+      <div class="post-actions-skeleton">
+        <div class="skeleton skeleton-text"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

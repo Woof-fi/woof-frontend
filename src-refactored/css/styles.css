@@ -34,7 +34,7 @@ select:focus-visible {
 body, html {
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--woof-font-family);
     background-color: var(--color-bg);
     overflow-x: hidden;
 }
@@ -202,7 +202,7 @@ header {
 }
 
 .tab-link.active {
-    color: #000;
+    color: var(--color-primary);
 }
 
 .tab-link::before {
@@ -218,7 +218,7 @@ header {
 }
 
 .tab-link.active::before {
-    background-color: var(--color-text);
+    background-color: var(--color-primary);
 }
 
 .tab-content {
@@ -260,17 +260,19 @@ header {
 }
 
 .feed-tab.active {
-    color: var(--color-text);
-    border-bottom-color: var(--color-text);
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
 }
 
 .post {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     margin: 0 auto 20px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--woof-radius-lg);
     max-width: 500px;
     width: 100%;
+    overflow: hidden;
+    box-shadow: var(--woof-shadow-sm);
 }
 
 .post-header {
@@ -466,7 +468,7 @@ header {
 .product-category h2 {
     margin-bottom: 20px;
     font-size: 24px;
-    color: #333;
+    color: var(--color-text);
 }
 
 .product-grid {
@@ -493,13 +495,13 @@ header {
 .product-item h3 {
     margin-bottom: 10px;
     font-size: 18px;
-    color: #555;
+    color: var(--color-text);
 }
 
 .product-item p {
     margin-bottom: 15px;
     font-size: 16px;
-    color: #888;
+    color: var(--color-text-secondary);
 }
 
 .add-to-cart {
@@ -727,12 +729,12 @@ header {
     max-width: 500px;
     max-height: 85vh;
     overflow-y: auto;
-    border-radius: var(--radius-md);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border-radius: var(--woof-radius-lg);
+    box-shadow: var(--woof-shadow-lg);
 }
 
 .close {
-    color: #aaa;
+    color: var(--color-text-muted);
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -741,7 +743,7 @@ header {
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: var(--color-text);
     text-decoration: none;
     cursor: pointer;
 }
@@ -815,7 +817,7 @@ header {
 }
 
 .password-requirements li.met {
-    color: #00a86b;
+    color: var(--woof-color-success);
 }
 
 .password-requirements li.met::before {
@@ -858,7 +860,7 @@ header {
 .modal select:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 149, 246, 0.15);
+    box-shadow: 0 0 0 3px rgba(239, 70, 33, 0.15);
     background-color: var(--color-surface);
 }
 
@@ -892,7 +894,7 @@ header {
 
 .modal input[type="file"]:hover {
     border-color: var(--color-primary);
-    background-color: rgba(0, 149, 246, 0.03);
+    background-color: rgba(239, 70, 33, 0.03);
 }
 
 .modal input[type="file"]:focus {
@@ -932,8 +934,8 @@ header {
 }
 
 .auth-tab.active {
-    color: var(--color-text);
-    border-bottom-color: var(--color-text);
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
 }
 
 .auth-secondary-action {
@@ -995,7 +997,7 @@ header {
 .image-source-btn:hover {
     border-color: var(--color-primary);
     color: var(--color-primary);
-    background: rgba(0, 149, 246, 0.05);
+    background: rgba(239, 70, 33, 0.05);
 }
 
 .image-source-btn i {
@@ -1311,7 +1313,7 @@ header {
 .profile-info h3 {
     font-size: 24px;
     margin: 0;
-    color: #333;
+    color: var(--color-text);
 }
 
 .profile-stats {
@@ -1319,13 +1321,13 @@ header {
     gap: 16px;
     margin-bottom: 8px;
     font-size: 14px;
-    color: #555;
+    color: var(--color-text-secondary);
 }
 
 .edit-profile-btn {
     padding: 6px 16px;
     border: 1px solid var(--color-border);
-    border-radius: 8px;
+    border-radius: var(--woof-btn-radius);
     background: var(--color-surface);
     font-size: 14px;
     font-weight: 600;
@@ -1340,7 +1342,7 @@ header {
 .follow-btn {
     padding: 6px 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--woof-btn-radius);
     background: var(--color-primary);
     color: #fff;
     font-size: 14px;
@@ -1373,7 +1375,7 @@ header {
 
 .profile-info p {
     font-size: 16px;
-    color: #555;
+    color: var(--color-text-secondary);
 }
 
 .profile-details, .private-details {
@@ -1383,19 +1385,19 @@ header {
 .profile-details h3, .private-details h3 {
     font-size: 20px;
     margin-bottom: 10px;
-    color: #333;
+    color: var(--color-text);
 }
 
 .profile-details p, .private-details p {
     font-size: 16px;
     margin-bottom: 10px;
-    color: #555;
+    color: var(--color-text-secondary);
 }
 
 .private-profile {
-    background-color: #f7f7f7;
+    background-color: var(--color-bg-alt);
     padding: 20px;
-    border-radius: 8px;
+    border-radius: var(--woof-radius-md);
     margin-top: 40px;
 }
 
@@ -1412,7 +1414,7 @@ header {
 .timeline ul li {
     font-size: 16px;
     padding: 5px 0;
-    border-bottom: 1px solid #dbdbdb;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .timeline ul li:last-child {
@@ -1597,7 +1599,7 @@ header {
 }
 
 .conv-item.unread {
-    background-color: #f0f7ff;
+    background-color: var(--woof-color-brand-primary-subtle);
 }
 
 .conv-item.unread .conv-name {
@@ -1879,7 +1881,7 @@ header {
 .message-profile-btn {
     padding: 8px 16px;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--woof-btn-radius);
     background: var(--color-surface);
     color: var(--color-text);
     font-size: 14px;
@@ -1969,7 +1971,7 @@ header {
 }
 
 .profile-tabs .tab-link.active {
-    color: var(--color-text);
+    color: var(--color-primary);
 }
 
 .profile-tabs .tab-link::after {
@@ -1984,7 +1986,7 @@ header {
 }
 
 .profile-tabs .tab-link.active::after {
-    background-color: var(--color-text);
+    background-color: var(--color-primary);
 }
 
 /* Friend List Styles */
@@ -2136,9 +2138,9 @@ header {
 }
 
 .health-filter-btn.active {
-    background: var(--color-text);
-    color: var(--color-surface);
-    border-color: var(--color-text);
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
 }
 
 .health-timeline {
@@ -2220,11 +2222,11 @@ header {
     display: inline-block;
     margin-top: 4px;
     padding: 2px 8px;
-    background: #f3f0ff;
-    border-radius: 12px;
+    background: var(--woof-color-brand-primary-subtle);
+    border-radius: var(--woof-radius-full);
     font-size: 13px;
     font-weight: 600;
-    color: #8b5cf6;
+    color: var(--color-primary);
 }
 
 .health-card-actions {
@@ -2320,9 +2322,9 @@ header {
 }
 
 .health-type-tab.active {
-    background: var(--color-text);
-    color: var(--color-surface);
-    border-color: var(--color-text);
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
 }
 
 .health-type-tab i {
@@ -2385,11 +2387,15 @@ header {
 .btn-secondary {
     padding: 12px 24px;
     border: none;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
+    border-radius: var(--woof-btn-radius);
+    font-weight: var(--woof-font-weight-semibold);
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 14px;
+    font-size: var(--woof-text-headline);
+    height: var(--woof-btn-height-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-primary {
@@ -2400,13 +2406,14 @@ header {
 .btn-primary:hover {
     background-color: var(--color-primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    box-shadow: var(--woof-shadow-brand);
 }
 
 .btn-secondary {
     background-color: transparent;
     color: var(--color-text);
     border: 1px solid var(--color-border);
+    padding: 11px 24px; /* compensate for 1px border */
 }
 
 .btn-secondary:hover {
@@ -2427,11 +2434,11 @@ header {
    ============================================================================ */
 
 .invite-card {
-    background: linear-gradient(135deg, #f8f9ff 0%, #fff5f5 100%);
-    border: 1px solid var(--color-border);
+    background: linear-gradient(135deg, var(--woof-color-brand-primary-subtle) 0%, var(--woof-color-neutral-50) 100%);
+    border: 1px solid rgba(239, 70, 33, 0.12);
     border-left: 4px solid var(--color-primary);
     margin-bottom: 20px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--woof-radius-md);
     padding: 24px;
     text-align: center;
 }
@@ -2652,9 +2659,9 @@ header {
 
 /* ── Welcome Card ── */
 .welcome-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--woof-color-brand-primary-subtle) 0%, var(--woof-color-neutral-100) 100%);
+    border: 1px solid rgba(239, 70, 33, 0.12);
+    border-radius: var(--woof-radius-lg);
     padding: 32px 24px;
     text-align: center;
     margin-bottom: 16px;

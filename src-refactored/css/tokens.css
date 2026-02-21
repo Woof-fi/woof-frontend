@@ -66,8 +66,8 @@
    * TYPOGRAPHY — FONT FAMILIES
    * =================================================== */
 
-  --woof-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-    "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --woof-font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   --woof-font-family-mono: "SF Mono", "Fira Code", Menlo, monospace;
 
   /* ===================================================
