@@ -15,6 +15,25 @@ A social network where dogs are the main users. Live at [woofapp.fi](https://woo
 | `Woof/src-refactored/` | Frontend SPA |
 | `woof-backend/` | REST API |
 
+## Design System
+
+A comprehensive design system lives at [`docs/design/`](docs/design/):
+
+| File | Purpose |
+|------|---------|
+| `index.html` | Interactive reference — all components, tokens, motion |
+| `tokens.css` | Production token file (60+ `--woof-` CSS custom properties) |
+| `tokens.json` | W3C Design Token format (Figma/Style Dictionary compatible) |
+| `components.md` | Component reference |
+| `foundations.md` | Color, typography, spacing |
+| `motion.md` | Animation guidelines |
+| `patterns.md` | Layout and UX patterns |
+
+**Brand:** Woof Orange `#EF4621` · Warm cream `#FAFAF8` · `--woof-*` token namespace
+The CSS layer uses aliased variables (`--color-primary` → `--woof-color-brand-primary`) so no component CSS had to change.
+
+---
+
 ## Features
 
 ### Working
@@ -69,9 +88,15 @@ eb deploy            # Deploy to Elastic Beanstalk
 ## Project Structure
 
 ```
+docs/design/                # Design system reference (open index.html in browser)
+├── index.html              # Interactive component/token reference
+├── tokens.css              # Canonical token source (also copied to css/)
+└── *.md                    # Foundations, components, motion, patterns
+
 Woof/src-refactored/
 ├── index.html              # Main SPA entry point
-├── css/styles.css          # All styles
+├── css/tokens.css          # Design tokens (60+ --woof-* properties, Woof Orange brand)
+├── css/styles.css          # All styles (imports tokens.css, aliases --woof-* to --color-*)
 ├── js/
 │   ├── app-spa.js          # SPA bootstrap + route registration
 │   ├── router.js           # Client-side router
@@ -138,7 +163,8 @@ See [ROADMAP.md](ROADMAP.md) for the full product roadmap with build vs buy deci
 
 **Phase 5 — Trust & Safety** (current):
 - ~~Migrate auth to AWS Cognito~~ (done — email verification, password reset)
-- Content moderation (profanity filter + AWS Rekognition for images)
+- ~~Design system + visual rebrand~~ (done — Woof Orange, warm cream, token architecture)
+- Content moderation (Perspective API hate speech filter + AWS Rekognition for images)
 - Reporting system + admin review queue
 - Sentry error tracking
 

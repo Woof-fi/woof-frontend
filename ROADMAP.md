@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-02-20
-**Current Phase:** Phase 5A Complete (Cognito + SES + Onboarding UX)
+**Last Updated:** 2026-02-21
+**Current Phase:** Phase 5A Complete (Cognito + SES + Onboarding UX + Design System)
 **Next Phase:** Phase 5B (Content Moderation)
 
 ---
@@ -50,7 +50,7 @@ Every feature evaluated: build custom, use a managed service, or use an open-sou
 
 **Why first:** You cannot responsibly grow without moderation and proper auth. One inappropriate post on a dog app is devastating. Users who forget their password are lost forever.
 
-### 5A. Migrate Auth to AWS Cognito + Data Reset (COMPLETE)
+### 5A. Migrate Auth to AWS Cognito + Data Reset + Design System (COMPLETE)
 
 **Decision: Buy (AWS Cognito)**
 
@@ -111,6 +111,15 @@ role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'))
 - Create dog modal: placeholders, body scroll lock, navigate to profile after creation
 - Profile onboarding tour: 3-step carousel (Welcome, Sharing, Health Diary) shown once for new owners
 - Improved empty states: Posts tab shows "Share your first photo!" for owners, Health tab has "Add First Record" button
+
+**Design System (added 2026-02-21):**
+- 60+ `--woof-*` CSS custom properties: color, radius, shadow, typography, spacing, animation easing
+- Brand color migrated from Instagram Blue (`#0095F6`) to Woof Orange (`#EF4621`)
+- Warm cream neutral palette (`#FAFAF8` bg, `#1A1A1A` text)
+- Border radii increased: sm 8px, md 12px, lg 16px
+- Alias layer: old `--color-*` names point to `--woof-*` tokens — zero component regressions
+- Design reference at `docs/design/index.html` (interactive, opens in any browser)
+- `docs/design/tokens.json` — W3C Design Token format for Figma/Style Dictionary
 
 ### 5B. Content Moderation
 
