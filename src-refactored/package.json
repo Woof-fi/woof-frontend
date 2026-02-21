@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && aws s3 sync dist/ s3://woofapp.fi/ --delete --exclude '.DS_Store'",
+    "deploy": "npm run build && \"C:/Program Files/Amazon/AWSCLIV2/aws.exe\" s3 sync dist/ s3://woofapp.fi/ --delete --exclude '.DS_Store'",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
