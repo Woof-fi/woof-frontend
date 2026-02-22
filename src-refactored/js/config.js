@@ -14,20 +14,6 @@ export const CONFIG = {
         CLIENT_ID: import.meta.env.VITE_COGNITO_CLIENT_ID || '2mr6ff413juuaeffjdramib5dk',
     },
 
-    // Known Dog IDs (from seed data)
-    DOGS: {
-        NELLI: '10000000-0000-0000-0000-000000000001',
-        LUNA: '10000000-0000-0000-0000-000000000002',
-        MAX: '10000000-0000-0000-0000-000000000003'
-    },
-
-    // Known User IDs (from seed data)
-    USERS: {
-        TOMMI: '11111111-1111-1111-1111-111111111111',
-        USER2: '22222222-2222-2222-2222-222222222222',
-        USER3: '33333333-3333-3333-3333-333333333333'
-    },
-
     // UI Configuration
     RESPONSIVE_BREAKPOINT: 768, // Mobile breakpoint in pixels
     MODAL_ANIMATION_DURATION: 300, // ms
@@ -44,6 +30,4 @@ export const CONFIG = {
 // Freeze config to prevent accidental modifications
 Object.freeze(CONFIG);
 Object.freeze(CONFIG.COGNITO);
-Object.freeze(CONFIG.DOGS);
-Object.freeze(CONFIG.USERS);
 Object.freeze(CONFIG.FEATURES);
