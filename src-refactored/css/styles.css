@@ -52,7 +52,7 @@ html {
 header {
     background-color: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
-    padding: 0 20px;
+    padding: 0 20px 0 240px; /* 240 = 220px panel + 20px content padding */
     height: var(--header-height);
     box-sizing: border-box;
     display: flex;
@@ -1227,7 +1227,15 @@ button.view-all-comments:hover {
         display: none;
     }
 
+    header {
+        padding-left: 80px; /* 60px panel + 20px padding */
+    }
+
     .main-container {
+        padding-left: 60px;
+    }
+
+    .profile-follow-sticky {
         padding-left: 60px;
     }
 
@@ -1269,7 +1277,15 @@ button.view-all-comments:hover {
         display: none;
     }
 
+    header {
+        padding-left: 20px;
+    }
+
     .main-container {
+        padding-left: 0;
+    }
+
+    .profile-follow-sticky {
         padding-left: 0;
     }
 
@@ -1470,6 +1486,7 @@ button.view-all-comments:hover {
     bottom: 0;
     left: 0;
     right: 0;
+    padding-left: 220px; /* align with main content on desktop */
     padding: 12px 20px 16px;
     background: linear-gradient(to top, rgba(255,255,255,1) 55%, rgba(255,255,255,0));
     z-index: 50;
