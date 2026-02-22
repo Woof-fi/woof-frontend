@@ -241,7 +241,9 @@
     class="modal"
     style:display={visible ? 'block' : 'none'}
     onclick={handleOverlayClick}
+    onkeydown={(e) => e.key === 'Escape' && close()}
     role="dialog"
+    tabindex="-1"
     aria-modal="true"
     aria-labelledby="auth-modal-title"
 >
@@ -352,25 +354,25 @@
 
                 {#if cfg.forgotLink}
                     <p id="auth-forgot-link" class="auth-secondary-action">
-                        <a href="#" id="forgot-password-btn" onclick={(e) => { e.preventDefault(); mode = 'forgot'; }}>
+                        <button type="button" id="forgot-password-btn" class="link-btn" onclick={() => mode = 'forgot'}>
                             Forgot password?
-                        </a>
+                        </button>
                     </p>
                 {/if}
 
                 {#if cfg.resendLink}
                     <p id="auth-resend-group" class="auth-secondary-action">
-                        <a href="#" id="resend-code-btn" onclick={handleResend}>
+                        <button type="button" id="resend-code-btn" class="link-btn" onclick={handleResend}>
                             Resend verification code
-                        </a>
+                        </button>
                     </p>
                 {/if}
 
                 {#if cfg.backLink}
                     <p id="auth-back-group" class="auth-secondary-action">
-                        <a href="#" id="back-to-login-btn" onclick={(e) => { e.preventDefault(); mode = 'login'; }}>
+                        <button type="button" id="back-to-login-btn" class="link-btn" onclick={() => mode = 'login'}>
                             &larr; Back to login
-                        </a>
+                        </button>
                     </p>
                 {/if}
             </form>

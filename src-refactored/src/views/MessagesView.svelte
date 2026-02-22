@@ -6,12 +6,14 @@
     let { params = {}, onopenAuthModal = null } = $props();
 
     let conversations = $state([]);
+    // svelte-ignore state_referenced_locally
     let selectedId = $state(params.id || null);
     let messages = $state([]);
     let messageInput = $state('');
     let otherDogName = $state('');
     let loading = $state(true);
     let myDogId = $state(null);
+    // svelte-ignore state_referenced_locally
     let threadActive = $state(!!params.id);
 
     async function loadConversations() {
@@ -222,6 +224,7 @@
                         />
                         <button
                             id="send-message-btn"
+                            aria-label="Send message"
                             disabled={!messageInput.trim()}
                             onclick={handleSend}
                         >

@@ -19,7 +19,9 @@
     } = $props();
 
     // --- Like state ---
+    // svelte-ignore state_referenced_locally
     let liked = $state(likedByUser);
+    // svelte-ignore state_referenced_locally
     let likes = $state(likeCount);
     let likeInFlight = $state(false);
 
@@ -28,6 +30,7 @@
     let comments = $state([]);
     let commentsLoaded = $state(false);
     let commentsVisible = $state(false);
+    // svelte-ignore state_referenced_locally
     let commentCount_ = $state(commentCount);
     let submittingComment = $state(false);
 
@@ -121,6 +124,7 @@
     }
 
     // --- Timestamp ---
+    // svelte-ignore state_referenced_locally
     const createdDate = createdAt ? new Date(createdAt) : null;
     function formattedTimestamp() {
         if (!createdDate) return '';
@@ -197,13 +201,13 @@
     <div class="post-comments-section">
         {#if isAuthenticated()}
             {#if commentCount_ > 0 && id}
-                <a class="view-all-comments" href="#" onclick={handleViewComments}>
+                <button class="view-all-comments" onclick={handleViewComments}>
                     {commentsVisible
                         ? 'Hide comments'
                         : commentCount_ === 1
                             ? 'View 1 comment'
                             : `View all ${commentCount_} comments`}
-                </a>
+                </button>
             {/if}
 
             {#if commentsVisible}

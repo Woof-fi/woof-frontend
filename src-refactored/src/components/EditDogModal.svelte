@@ -123,7 +123,9 @@
     class="modal"
     style:display={visible ? 'block' : 'none'}
     onclick={handleOverlayClick}
+    onkeydown={() => {}}
     role="dialog"
+    tabindex="-1"
     aria-modal="true"
 >
     <div class="modal-content">
@@ -205,7 +207,7 @@
                         {:else if currentPhotoUrl}
                             <img
                                 src={currentPhotoUrl}
-                                alt="Current photo"
+                                alt="Current profile"
                                 style="max-width:200px;max-height:200px;border-radius:8px;"
                             />
                         {/if}

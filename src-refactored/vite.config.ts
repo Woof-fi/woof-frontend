@@ -56,7 +56,7 @@ export default defineConfig({
     // Proxy API requests to backend
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://api.woofapp.fi',
         changeOrigin: true,
         secure: false
       }

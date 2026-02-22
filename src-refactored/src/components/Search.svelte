@@ -107,14 +107,14 @@
         </div>
         <button class="close-search" aria-label="Close search" onclick={close}>Cancel</button>
     </div>
-    <ul id="search-results" class="search-results">
+    <ul id="search-results" class="search-results" role="listbox">
         {#if query.trim() && results.length === 0}
             <li class="search-no-results">
                 <span>No results found for "{query}"</span>
             </li>
         {:else}
             {#each results as result (result.id)}
-                <li class="search-result-item" onclick={handleResultClick}>
+                <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
                     <a
                         href="/dog/{result.slug || result.id}"
                         data-link

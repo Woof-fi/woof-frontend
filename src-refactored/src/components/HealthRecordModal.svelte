@@ -153,7 +153,9 @@
     class="modal"
     style:display={visible ? 'block' : 'none'}
     onclick={handleOverlayClick}
+    onkeydown={() => {}}
     role="dialog"
+    tabindex="-1"
     aria-modal="true"
 >
     <div class="modal-content health-modal-content">

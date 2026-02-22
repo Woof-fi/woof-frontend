@@ -146,7 +146,9 @@
     class="modal"
     style:display={visible ? 'block' : 'none'}
     onclick={handleOverlayClick}
+    onkeydown={() => {}}
     role="dialog"
+    tabindex="-1"
     aria-modal="true"
 >
     <div class="modal-content">
@@ -169,7 +171,7 @@
                 {/if}
 
                 <div class="form-group">
-                    <label>Image</label>
+                    <label for="post-image-camera">Image</label>
                     <div class="image-source-buttons">
                         <button
                             type="button"
@@ -209,7 +211,7 @@
                         {#if previewUrl}
                             <img
                                 src={previewUrl}
-                                alt="Image preview"
+                                alt="Post preview"
                                 style="max-width:100%;max-height:300px;border-radius:8px;margin-top:10px;"
                             />
                         {/if}

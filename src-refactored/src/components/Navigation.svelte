@@ -150,9 +150,9 @@
             <a href="/" data-link><i class="fas fa-home"></i> Home</a>
         </li>
         <li>
-            <a href="#" id="create-post-link" onclick={handleCreatePost}>
+            <button type="button" id="create-post-link" class="nav-btn" onclick={handleCreatePost}>
                 <i class="fas fa-plus-square"></i> Create
-            </a>
+            </button>
         </li>
         {#if authed}
             <li id="messages-nav-item">
@@ -175,13 +175,13 @@
         {/if}
         <li id="profile-nav-item">
             {#if !authed}
-                <a href="#" class="auth-link" onclick={handleAddPetUnauthenticated}>
+                <button type="button" class="nav-btn auth-link" onclick={handleAddPetUnauthenticated}>
                     <i class="fas fa-plus"></i> Add a Pet
-                </a>
+                </button>
             {:else if myDogsLoaded && dogs.length === 0}
-                <a href="#" id="add-pet-link" onclick={handleAddPetAuthenticated}>
+                <button type="button" id="add-pet-link" class="nav-btn" onclick={handleAddPetAuthenticated}>
                     <i class="fas fa-plus"></i> Add a Pet
-                </a>
+                </button>
             {:else if myDogsLoaded && dogs.length === 1}
                 <a href="/dog/{getSlug(dogs[0])}" data-link>
                     <img
@@ -205,12 +205,12 @@
     <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item" class:active={isHomeActive()}>
         <i class="fas fa-home"></i>
     </a>
-    <a href="#" id="bottom-nav-search" class="bottom-nav-item" onclick={handleSearchOpen}>
+    <button type="button" id="bottom-nav-search" class="bottom-nav-item" aria-label="Search" onclick={handleSearchOpen}>
         <i class="fas fa-search"></i>
-    </a>
-    <a href="#" id="create-post-link-mobile" class="bottom-nav-item" onclick={handleCreatePost}>
+    </button>
+    <button type="button" id="create-post-link-mobile" class="bottom-nav-item" aria-label="Create post" onclick={handleCreatePost}>
         <i class="fas fa-plus-square"></i>
-    </a>
+    </button>
     {#if authed}
         <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" class:active={isMessagesActive()}>
             <i class="fas fa-envelope"></i>
@@ -227,11 +227,12 @@
         </a>
     {/if}
     <a
-        href={authed && dogs.length > 0 ? `/dog/${getSlug(dogs[0])}` : '#'}
+        href={authed && dogs.length > 0 ? `/dog/${getSlug(dogs[0])}` : '/'}
         id="bottom-nav-profile"
         class="bottom-nav-item"
+        aria-label="Profile"
         class:active={isProfileActive()}
-        data-link={authed && dogs.length > 0 ? '' : undefined}
+        data-link
         onclick={!authed ? handleAddPetUnauthenticated : authed && dogs.length === 0 ? handleAddPetAuthenticated : undefined}
     >
         {#if authed && dogs.length === 1}
