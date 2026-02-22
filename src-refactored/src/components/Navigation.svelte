@@ -130,16 +130,16 @@
             <img src="/assets/images/logo.png" alt="Woof Logo">
         </a>
         <div class="header-icons">
-            <a href="#" id="desktop-search-button" aria-label="Search" onclick={handleSearchOpen}>
+            <button type="button" id="desktop-search-button" class="header-icon-btn" aria-label="Search" onclick={handleSearchOpen}>
                 <i class="fas fa-search"></i>
-            </a>
-            <a href="#" class="auth-link" aria-label={authed ? 'Logout' : 'Login'} onclick={handleAuthLink}>
+            </button>
+            <button type="button" class="header-icon-btn auth-link" aria-label={authed ? 'Logout' : 'Login'} onclick={handleAuthLink}>
                 {#if authed}
                     <i class="fas fa-sign-out-alt"></i> Logout
                 {:else}
                     <i class="fas fa-user-circle"></i> Login
                 {/if}
-            </a>
+            </button>
         </div>
     </div>
 </header>
@@ -202,7 +202,7 @@
 </nav>
 
 <nav class="bottom-nav" aria-label="Mobile navigation">
-    <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item" class:active={isHomeActive()}>
+    <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item" aria-label="Home" class:active={isHomeActive()}>
         <i class="fas fa-home"></i>
     </a>
     <button type="button" id="bottom-nav-search" class="bottom-nav-item" aria-label="Search" onclick={handleSearchOpen}>
