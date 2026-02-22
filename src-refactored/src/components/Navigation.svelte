@@ -127,7 +127,7 @@
 <header>
     <div class="header-content">
         <a href="/" data-link class="logo">
-            <img src="/assets/images/logo.png" alt="Woof Logo">
+            <img src="/images/logo.png" alt="Woof Logo">
         </a>
         <div class="header-icons">
             <button type="button" id="desktop-search-button" class="header-icon-btn" aria-label="Search" onclick={handleSearchOpen}>
@@ -185,10 +185,10 @@
             {:else if myDogsLoaded && dogs.length === 1}
                 <a href="/dog/{getSlug(dogs[0])}" data-link>
                     <img
-                        src={dogs[0].profilePhoto || '/assets/images/dog_profile_pic.jpg'}
+                        src={dogs[0].profilePhoto || '/images/dog_profile_pic.jpg'}
                         alt={dogs[0].name}
                         class="profile-pic"
-                        onerror={(e) => { e.target.src = '/assets/images/dog_profile_pic.jpg'; }}
+                        onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
                     />
                     {dogs[0].name}
                 </a>
@@ -237,10 +237,10 @@
     >
         {#if authed && dogs.length === 1}
             <img
-                src={dogs[0].profilePhoto || '/assets/images/dog_profile_pic.jpg'}
+                src={dogs[0].profilePhoto || '/images/dog_profile_pic.jpg'}
                 alt={dogs[0].name}
                 class="profile-pic"
-                onerror={(e) => { e.target.src = '/assets/images/dog_profile_pic.jpg'; }}
+                onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
             />
         {:else if authed && dogs.length > 1}
             <i class="fas fa-paw"></i>

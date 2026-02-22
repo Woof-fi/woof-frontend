@@ -65,7 +65,7 @@ function renderProfile(dog, container, slugOrId) {
     const breed = escapeHTML(dog.breed);
     const bio = dog.bio ? escapeHTML(dog.bio) : null;
 
-    const profilePhoto = dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
+    const profilePhoto = dog.profilePhoto || '/images/dog_profile_pic.jpg';
 
     const heroEl = document.getElementById('profile-hero');
     if (heroEl) {
@@ -73,7 +73,7 @@ function renderProfile(dog, container, slugOrId) {
             <img src="${profilePhoto}"
                  alt="${name}"
                  class="profile-hero-img"
-                 onerror="if(this.src!=='/assets/images/dog_profile_pic.jpg') this.src='/assets/images/dog_profile_pic.jpg'">
+                 onerror="if(this.src!=='/images/dog_profile_pic.jpg') this.src='/images/dog_profile_pic.jpg'">
         `;
     }
 

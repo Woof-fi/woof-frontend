@@ -54,12 +54,12 @@ export async function loadFriends(dogId) {
             link.className = 'friend-link';
 
             const img = document.createElement('img');
-            img.src = dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
+            img.src = dog.profilePhoto || '/images/dog_profile_pic.jpg';
             img.alt = escapeHTML(dog.name);
             img.className = 'friend-avatar';
             img.loading = 'lazy';
             img.onerror = function() {
-                this.src = '/assets/images/dog_profile_pic.jpg';
+                this.src = '/images/dog_profile_pic.jpg';
             };
 
             const info = document.createElement('div');

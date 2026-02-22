@@ -192,12 +192,12 @@ function renderSearchResults(results, container, query) {
         link.className = 'search-result-link';
 
         const img = document.createElement('img');
-        img.src = result.profilePhoto || '/assets/images/dog_profile_pic.jpg';
+        img.src = result.profilePhoto || '/images/dog_profile_pic.jpg';
         img.alt = escapeHTML(result.name);
         img.className = 'search-result-avatar';
         img.loading = 'lazy';
         img.onerror = function() {
-            this.src = '/assets/images/dog_profile_pic.jpg';
+            this.src = '/images/dog_profile_pic.jpg';
         };
 
         const textContainer = document.createElement('div');

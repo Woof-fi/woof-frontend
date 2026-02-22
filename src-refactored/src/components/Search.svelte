@@ -121,11 +121,11 @@
                         class="search-result-link"
                     >
                         <img
-                            src={result.profilePhoto || '/assets/images/dog_profile_pic.jpg'}
+                            src={result.profilePhoto || '/images/dog_profile_pic.jpg'}
                             alt={result.name}
                             class="search-result-avatar"
                             loading="lazy"
-                            onerror={(e) => { e.target.src = '/assets/images/dog_profile_pic.jpg'; }}
+                            onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
                         />
                         <div class="search-result-text">
                             <span class="search-result-name">{result.name}</span>

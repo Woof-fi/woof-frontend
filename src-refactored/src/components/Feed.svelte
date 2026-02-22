@@ -205,7 +205,7 @@
         {:else}
             <PostCard
                 id={item.id}
-                profilePic={item.dogPhoto || '/assets/images/dog_profile_pic.jpg'}
+                profilePic={item.dogPhoto || '/images/dog_profile_pic.jpg'}
                 username={item.dogName || 'Unknown Dog'}
                 imageUrl={item.imageUrl}
                 caption={item.caption || ''}

@@ -113,7 +113,7 @@ export async function updateProfileNavigation() {
         } else if (dogs.length === 1) {
             // One dog - show dog's name and profile pic
             const dog = dogs[0];
-            const profilePhoto = dog.profilePhoto || '/assets/images/dog_profile_pic.jpg';
+            const profilePhoto = dog.profilePhoto || '/images/dog_profile_pic.jpg';
             const slug = dog.slug || `${dog.name.toLowerCase()}-${dog.displayId}`;
 
             if (profileNavItem) {
@@ -122,7 +122,7 @@ export async function updateProfileNavigation() {
                         <img src="${escapeHTML(profilePhoto)}"
                              alt="${escapeHTML(dog.name)}"
                              class="profile-pic"
-                             onerror="this.src='/assets/images/dog_profile_pic.jpg'">
+                             onerror="this.src='/images/dog_profile_pic.jpg'">
                         ${escapeHTML(dog.name)}
                     </a>
                 `;
@@ -134,7 +134,7 @@ export async function updateProfileNavigation() {
                     <img src="${escapeHTML(profilePhoto)}"
                          alt="${escapeHTML(dog.name)}"
                          class="profile-pic"
-                         onerror="this.src='/assets/images/dog_profile_pic.jpg'">
+                         onerror="this.src='/images/dog_profile_pic.jpg'">
                 `;
                 bottomNavProfile.href = `/dog/${slug}`;
                 bottomNavProfile.setAttribute('data-link', '');

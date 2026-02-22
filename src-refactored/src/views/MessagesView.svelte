@@ -160,9 +160,9 @@
                             >
                                 <img
                                     class="conv-avatar"
-                                    src={conv.otherDog.photo || '/assets/images/dog_profile_pic.jpg'}
+                                    src={conv.otherDog.photo || '/images/dog_profile_pic.jpg'}
                                     alt={conv.otherDog.name}
-                                    onerror={(e) => { if (e.target.src !== '/assets/images/dog_profile_pic.jpg') e.target.src = '/assets/images/dog_profile_pic.jpg'; }}
+                                    onerror={(e) => { if (e.target.src !== '/images/dog_profile_pic.jpg') e.target.src = '/images/dog_profile_pic.jpg'; }}
                                 />
                                 <div class="conv-info">
                                     <div class="conv-name-row">

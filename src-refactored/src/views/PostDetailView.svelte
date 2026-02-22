@@ -46,7 +46,7 @@
         {:else if post}
             <PostCard
                 id={post.id}
-                profilePic={post.dogPhoto || '/assets/images/dog_profile_pic.jpg'}
+                profilePic={post.dogPhoto || '/images/dog_profile_pic.jpg'}
                 username={post.dogName || 'Unknown Dog'}
                 imageUrl={post.imageUrl}
                 caption={post.caption || ''}
