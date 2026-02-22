@@ -40,16 +40,19 @@
     },
 
     /* Vite-specific */
-    "types": ["vite/client"]
+    "types": ["vite/client", "svelte"]
   },
   "include": [
     "js/**/*.ts",
     "js/**/*.d.ts",
     "types/**/*.ts",
-    "vite.config.ts"
+    "vite.config.ts",
+    "src/**/*.svelte",
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/__tests__"
   ]
 }

@@ -237,7 +237,7 @@ async function updateUnreadBadges() {
 function startUnreadPolling() {
     stopUnreadPolling();
     updateUnreadBadges();
-    unreadPollInterval = setInterval(updateUnreadBadges, 30000);
+    unreadPollInterval = setInterval(updateUnreadBadges, 60000);
 }
 
 /**

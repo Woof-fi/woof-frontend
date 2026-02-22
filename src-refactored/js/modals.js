@@ -1,18 +1,16 @@
 /**
- * Modal Coordinator
- * Initializes all modals and provides shared close-all functionality.
- * Manages browser history so the back button closes modals on mobile.
+ * Modal Coordinator (legacy shim)
+ * The push/pop/handle functions are the canonical implementations.
+ * All Svelte modal components now use js/modal-history.js directly.
+ * This file is kept for backwards compatibility with:
+ *   - js/auth-modal.js (still used by modals.test.ts)
+ *   - js/search.js (still used by search.test.ts)
  */
 
 import { initAuthModal, openAuthModal, updateUIForAuth, closeAuthModal } from './auth-modal.js';
-import { initCreatePostModal, closeCreatePostModal } from './create-post-modal.js';
-import { initCreateDogModal, closeCreateDogModal } from './create-dog-modal.js';
-import { initCartModal, closeCartDrawer } from './cart-modal.js';
-import { initEditDogModal, closeEditDogModal } from './edit-dog-modal.js';
-import { initHealthRecordModal, closeHealthRecordModal } from './health-record-modal.js';
 import { toggleBodyScroll } from './ui.js';
 
-// Re-export for existing consumers (posts.js, modals.test.ts)
+// Re-export for existing consumers (auth-modal.js imports these back from us)
 export { openAuthModal, updateUIForAuth };
 
 // Track whether a modal pushed a history state
@@ -68,14 +66,9 @@ export function handleModalPopstate() {
 }
 
 /**
- * Initialize all modals
+ * Initialize legacy modals (auth modal only — others are now Svelte components)
  */
 export function initModals() {
-    initCreatePostModal();
-    initCreateDogModal();
-    initEditDogModal();
-    initCartModal();
-    initHealthRecordModal();
     initAuthModal();
     updateUIForAuth();
 
@@ -99,12 +92,10 @@ function closeAllModals() {
     }
     closingFromPopstate = false;
 
-    closeCreatePostModal();
-    closeCreateDogModal();
-    closeEditDogModal();
-    closeCartDrawer();
-    closeHealthRecordModal();
     closeAuthModal();
+
+    // Dispatch event so all Svelte modals close themselves
+    window.dispatchEvent(new CustomEvent('close-all-modals'));
 
     const searchPanel = document.getElementById('search-panel');
     if (searchPanel && searchPanel.classList.contains('active')) {
