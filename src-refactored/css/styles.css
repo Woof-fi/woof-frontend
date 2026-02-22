@@ -167,6 +167,8 @@ button.view-all-comments:hover {
     justify-content: center;
     max-width: 100%;
     overflow-x: hidden; /* Prevent overflow issues */
+    /* Push content area right of the 220px fixed left panel on desktop */
+    padding-left: 220px;
 }
 
 .left-panel {
@@ -227,9 +229,7 @@ button.view-all-comments:hover {
     padding: 20px;
     max-width: 640px;
     width: 100%;
-    /* On desktop push content right of the 220px fixed left panel */
-    margin-left: 220px;
-    margin-right: auto;
+    margin: 0 auto;
     box-sizing: border-box;
 }
 
@@ -1227,9 +1227,12 @@ button.view-all-comments:hover {
         display: none;
     }
 
+    .main-container {
+        padding-left: 60px;
+    }
+
     .content {
-        margin-left: 60px;
-        margin-right: auto;
+        margin: 0 auto;
     }
 
     .search-panel {
@@ -1266,8 +1269,12 @@ button.view-all-comments:hover {
         display: none;
     }
 
+    .main-container {
+        padding-left: 0;
+    }
+
     .content {
-        margin-left: 0;
+        margin: 0 auto;
         padding-bottom: 70px;
     }
 

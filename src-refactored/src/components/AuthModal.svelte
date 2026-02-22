@@ -277,6 +277,7 @@
                         <input
                             type="email"
                             id="auth-email"
+                            autocomplete="email"
                             required={cfg.email}
                             bind:value={email}
                         />
@@ -289,6 +290,7 @@
                         <input
                             type="password"
                             id="auth-password"
+                            autocomplete={mode === 'login' ? 'current-password' : 'new-password'}
                             required={cfg.password}
                             bind:value={password}
                         />
@@ -307,7 +309,7 @@
                 {#if cfg.name}
                     <div class="form-group" id="auth-name-group">
                         <label for="auth-name">Name</label>
-                        <input type="text" id="auth-name" bind:value={name} />
+                        <input type="text" id="auth-name" autocomplete="name" bind:value={name} />
                     </div>
                 {/if}
 
@@ -333,6 +335,7 @@
                         <input
                             type="password"
                             id="auth-new-password"
+                            autocomplete="new-password"
                             required={cfg.newPassword}
                             bind:value={newPassword}
                         />
