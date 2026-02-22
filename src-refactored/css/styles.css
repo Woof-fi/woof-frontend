@@ -227,7 +227,9 @@ button.view-all-comments:hover {
     padding: 20px;
     max-width: 640px;
     width: 100%;
-    margin: 0 auto;
+    /* On desktop push content right of the 220px fixed left panel */
+    margin-left: 220px;
+    margin-right: auto;
     box-sizing: border-box;
 }
 
@@ -1227,6 +1229,7 @@ button.view-all-comments:hover {
 
     .content {
         margin-left: 60px;
+        margin-right: auto;
     }
 
     .search-panel {
@@ -1376,6 +1379,8 @@ button.view-all-comments:hover {
     z-index: 1;
     padding: 24px 20px 120px;
     min-height: 60vh;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Name + breed row */

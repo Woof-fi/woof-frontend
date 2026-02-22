@@ -13,12 +13,12 @@
             await initProfile(currentSlug);
             initProfileTabs();
             loadProfilePosts();
-            loadFriends(currentSlug);
             loadFollowingCount();
 
-            // loadHealthRecords expects dog object (needs .id and .isOwner)
+            // getCurrentDog() is populated by initProfile above
             const dog = getCurrentDog();
             if (dog) {
+                loadFriends(dog.id);
                 loadHealthRecords(dog);
             }
         })();

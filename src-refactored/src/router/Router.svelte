@@ -82,12 +82,14 @@
     });
 </script>
 
-{#if matched.component === HomeView}
-    <HomeView onopenAuthModal={onopenAuthModal} />
-{:else if matched.component === ProfileView}
-    <ProfileView params={matched.params} onopenAuthModal={onopenAuthModal} />
-{:else if matched.component === PostDetailView}
-    <PostDetailView params={matched.params} onopenAuthModal={onopenAuthModal} />
-{:else if matched.component === MessagesView}
-    <MessagesView params={matched.params} onopenAuthModal={onopenAuthModal} />
-{/if}
+<div class="content">
+    {#if matched.component === HomeView}
+        <HomeView onopenAuthModal={onopenAuthModal} />
+    {:else if matched.component === ProfileView}
+        <ProfileView params={matched.params} onopenAuthModal={onopenAuthModal} />
+    {:else if matched.component === PostDetailView}
+        <PostDetailView params={matched.params} onopenAuthModal={onopenAuthModal} />
+    {:else if matched.component === MessagesView}
+        <MessagesView params={matched.params} onopenAuthModal={onopenAuthModal} />
+    {/if}
+</div>
