@@ -109,11 +109,8 @@
             init();
         }
 
-        function handleFeedRefresh(e) {
-            const newPost = e.detail;
-            if (newPost) {
-                posts = [newPost, ...posts];
-            }
+        function handleFeedRefresh() {
+            init();
         }
 
         window.addEventListener('auth-state-changed', handleAuthChange);
