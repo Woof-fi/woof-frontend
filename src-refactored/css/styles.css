@@ -88,18 +88,58 @@ header {
 }
 
 .header-icons a,
-.header-icons i {
+.header-icons button {
     font-size: 24px;
     color: var(--color-text);
     cursor: pointer;
     text-decoration: none;
     margin-left: 15px;
     transition: color 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
 }
 
 .header-icons a:hover,
+.header-icons button:hover,
 .header-icons i:hover {
     color: var(--color-text-muted);
+}
+
+/* Unstyled button that renders like a text link */
+.link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--color-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    display: inline;
+}
+
+.link-btn:hover {
+    color: var(--color-primary-dark, var(--color-primary));
+    opacity: 0.85;
+}
+
+/* view-all-comments button (PostCard) */
+button.view-all-comments {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+button.view-all-comments:hover {
+    color: var(--color-text);
 }
 
 .auth-link {
@@ -151,15 +191,23 @@ header {
     margin-bottom: 15px;
 }
 
-.left-panel ul li a {
+.left-panel ul li a,
+.left-panel ul li button {
     color: var(--color-text);
     text-decoration: none;
     font-size: 16px;
     display: flex;
     align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    cursor: pointer;
+    width: 100%;
 }
 
-.left-panel ul li a i {
+.left-panel ul li a i,
+.left-panel ul li button i {
     margin-right: 10px;
     width: 20px;
 }
@@ -678,7 +726,8 @@ header {
     z-index: 1000;
 }
 
-.bottom-nav a {
+.bottom-nav a,
+.bottom-nav button {
     color: var(--color-text);
     text-decoration: none;
     font-size: 24px;
@@ -686,13 +735,19 @@ header {
     flex: 1;
     position: relative;
     text-align: center;
+    background: none;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
 }
 
-.bottom-nav a.active {
+.bottom-nav a.active,
+.bottom-nav button.active {
     color: var(--color-primary);
 }
 
-.bottom-nav a i {
+.bottom-nav a i,
+.bottom-nav button i {
     display: block;
     line-height: 1;
 }
@@ -1243,16 +1298,22 @@ header {
         align-items: center;
     }
 
-    .bottom-nav a {
+    .bottom-nav a,
+    .bottom-nav button {
         color: var(--color-text);
         text-decoration: none;
         font-size: 24px;
         padding: 10px 0;
         flex: 1;
         text-align: center;
+        background: none;
+        border: none;
+        font-family: inherit;
+        cursor: pointer;
     }
 
-    .bottom-nav a .profile-pic {
+    .bottom-nav a .profile-pic,
+    .bottom-nav button .profile-pic {
         width: 24px;
         height: 24px;
         border-radius: 50%;

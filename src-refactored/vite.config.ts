@@ -12,6 +12,11 @@ export default defineConfig({
   root: '.',
   publicDir: 'assets',
 
+  // Polyfill Node's `global` for browser-targeting packages (e.g. amazon-cognito-identity-js)
+  define: {
+    global: 'globalThis',
+  },
+
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
