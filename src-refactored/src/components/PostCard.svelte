@@ -2,6 +2,7 @@
     import { likePost, unlikePost, createComment, getComments } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { timeAgo, showToast } from '../../js/utils.js';
+    import { openPostOptionsSheet } from '../../js/modal-store.svelte.js';
 
     let {
         id = '',
@@ -11,6 +12,8 @@
         location = '',
         imageUrl = '',
         dogSlug = '',
+        dogId = '',
+        isOwnPost = false,
         likeCount = 0,
         commentCount = 0,
         likedByUser = false,
@@ -160,6 +163,15 @@
         {/if}
         {#if location}
             <span class="post-location">{location}</span>
+        {/if}
+        {#if id}
+            <button
+                class="post-options-btn"
+                aria-label="Post options"
+                onclick={() => openPostOptionsSheet({ postId: id, dogId, dogSlug, isOwnPost })}
+            >
+                <i class="fas fa-ellipsis-h"></i>
+            </button>
         {/if}
     </div>
 

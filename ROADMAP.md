@@ -1,8 +1,8 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-02-23
-**Current Phase:** Phase 5B Complete (Svelte 5 Migration + Architectural Refactor + UI Polish + Color Palette)
-**Next Phase:** Phase 5C (Content Moderation)
+**Current Phase:** Phase 5C/5D Complete (Post Options Sheet + Reports + Bookmarks + Admin Panel)
+**Next Phase:** Phase 5C-content (Perspective API + Rekognition content moderation)
 
 ---
 
@@ -143,7 +143,49 @@ role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'))
 - New artisan palette tokens: gold (`#C3A84E`), butter (`#F0CA78`), slate-dark (`#4A5A6B`), slate-mid (`#799FAE`), ice blue (`#C8DAE4`)
 - Design system docs updated: `docs/design/index.html`, `foundations.md`, `README.md`
 
-### 5C. Content Moderation
+### 5C/5D. Post Options Sheet + Reporting + Bookmarks + Admin Panel (COMPLETE 2026-02-23)
+
+**Post Options Sheet (Instagram-style bottom action sheet):**
+- Three-dot "..." button on every PostCard (top-right)
+- Own post menu: Delete post, Go to post, Share, Copy link
+- Others' post menu: Report, Follow/Unfollow, Add/Remove favourites, Go to post, Share, Copy link, Visit profile
+- Unauthenticated: limited menu, Report/Follow prompt login
+- Delete confirmation view (no browser confirm() dialog) with "Delete" / "Keep post" styled buttons
+- Multi-view sheet: `options` → `report` → `confirm-delete` — transitions via Svelte `fly`/`fade`
+
+**Reporting system:**
+- `014_reports.sql` migration: reports table with UNIQUE(reporter, target_type, target_id), status lifecycle
+- `POST /api/reports` — authenticated, 409 on duplicate
+- `GET /api/reports` — admin/moderator only, cursor-paginated, joins post content (caption, image, dog name)
+- `PATCH /api/reports/:id/status` — admin/moderator only
+- Reason picker in sheet: inappropriate_content, spam, harassment, not_a_dog, violence, other
+
+**Bookmarks (Favourites):**
+- `015_post_bookmarks.sql` migration: post_bookmarks table with composite PK
+- `POST /api/bookmarks/:postId/toggle` — toggle on/off, returns `{ bookmarked: boolean }`, 404 on FK violation
+- `GET /api/bookmarks/:postId/status` — returns current status
+
+**Admin panel (`/admin` route):**
+- Accessible to `admin` and `moderator` roles only (gated in both Navigation + AdminView)
+- Filter tabs: Pending / Reviewed / Actioned / Dismissed / All
+- Report cards: post image, reason badge, status badge, caption, dog name/link, reporter email + timeAgo
+- Actions: Delete post + action, Mark reviewed, Dismiss
+- `store.authUser.role` populated from `syncUser()` response on app init
+- Navigation shows "Moderation" link only for admin/moderator users
+
+**Bug fixes during implementation:**
+- `Cache-Control: public, max-age=60` on feed caused stale data after post mutations — fixed with `cache: 'no-store'` in `apiRequest`
+- `response.json()` on 204 No Content threw error — fixed with `response.text()` + conditional parse
+- Toast CSS was entirely missing — added complete toast styles
+- Svelte `fly` transition requires `y: number` (pixels), not `'100%'` string
+
+**Tests added:**
+- Backend: `reports.test.ts` (21 tests), `bookmarks.test.ts` (13 tests)
+- Frontend unit: `AdminView.test.ts` (9 tests), updated `PostCard.test.ts` (+2 tests for "..." button)
+- E2E: `posts.spec.ts` (3 tests: delete own post via sheet, report sheet for others' posts, bookmark toggle)
+- Totals: backend 219 tests, frontend 45 unit tests
+
+### 5C-content. Content Moderation
 
 **Hate speech filter — Buy: Google Perspective API**
 
@@ -638,9 +680,10 @@ When you need funnels, retention analysis, and session recordings, add a managed
 
 | # | File | Phase | Feature |
 |---|------|-------|---------|
-| 013 | moderation.sql | 5C | Content moderation status on posts |
-| 014 | reports.sql | 5D | Reporting system |
-| 015 | notifications.sql | 7A | In-app notifications |
+| 013 | performance_indexes.sql | 5B | Performance indexes on core tables |
+| 014 | reports.sql | 5C/5D | Reporting system (COMPLETE) |
+| 015 | post_bookmarks.sql | 5C/5D | Post bookmarks/favourites (COMPLETE) |
+| 016 | notifications.sql | 7A | In-app notifications |
 | 016 | hashtags.sql | 7B | Hashtags |
 | 017 | breeds.sql | 7C | Breed normalization + communities |
 | 018 | video_support.sql | 9A | Video posts (media_type, thumbnail_url) |

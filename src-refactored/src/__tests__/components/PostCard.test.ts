@@ -11,6 +11,9 @@ vi.mock('../../../js/api.js', () => ({
 vi.mock('../../../js/auth.js', () => ({
     isAuthenticated: vi.fn().mockReturnValue(true),
 }));
+vi.mock('../../../js/modal-store.svelte.js', () => ({
+    openPostOptionsSheet: vi.fn(),
+}));
 
 const baseProps = {
     id: 'post-1',
@@ -61,5 +64,28 @@ describe('PostCard', () => {
         const { container } = render(PostCard, { props: { ...baseProps, onopenAuthModal: handler } });
         await fireEvent.click(container.querySelector('.like-button')!);
         expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders the post options "..." button', () => {
+        const { container } = render(PostCard, {
+            props: { ...baseProps, dogId: 'dog-123', dogSlug: 'nelli-1' },
+        });
+        const optionsBtn = container.querySelector('.post-options-btn');
+        expect(optionsBtn).not.toBeNull();
+    });
+
+    it('opens post options sheet when "..." is clicked', async () => {
+        const modalModule = await import('../../../js/modal-store.svelte.js');
+        const { container } = render(PostCard, {
+            props: { ...baseProps, dogId: 'dog-123', dogSlug: 'nelli-1', isOwnPost: true },
+        });
+        const optionsBtn = container.querySelector('.post-options-btn')!;
+        await fireEvent.click(optionsBtn);
+        expect(modalModule.openPostOptionsSheet).toHaveBeenCalledWith({
+            postId: 'post-1',
+            dogId: 'dog-123',
+            dogSlug: 'nelli-1',
+            isOwnPost: true,
+        });
     });
 });

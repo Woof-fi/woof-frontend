@@ -4,6 +4,7 @@
     import ProfileView from '../views/ProfileView.svelte';
     import PostDetailView from '../views/PostDetailView.svelte';
     import MessagesView from '../views/MessagesView.svelte';
+    import AdminView from '../views/AdminView.svelte';
 
     let { onopenAuthModal = null } = $props();
 
@@ -26,6 +27,7 @@
         { path: '/post/:id',     component: PostDetailView, paramNames: ['id'] },
         { path: '/messages',     component: MessagesView,   paramNames: [] },
         { path: '/messages/:id', component: MessagesView,   paramNames: ['id'] },
+        { path: '/admin',        component: AdminView,      paramNames: [] },
     ];
 
     const compiledRoutes = routes.map(r => ({
@@ -100,5 +102,7 @@
         <PostDetailView params={matched.params} onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === MessagesView}
         <MessagesView params={matched.params} onopenAuthModal={onopenAuthModal} />
+    {:else if matched.component === AdminView}
+        <AdminView />
     {/if}
 </div>

@@ -183,6 +183,8 @@
                 caption={item.caption || ''}
                 location={item.dogLocation || ''}
                 dogSlug={item.dogSlug || ''}
+                dogId={item.dogId || ''}
+                isOwnPost={myDogs.some(d => d.id === item.dogId)}
                 likeCount={item.likeCount || 0}
                 commentCount={item.commentCount || 0}
                 likedByUser={item.likedByUser || false}

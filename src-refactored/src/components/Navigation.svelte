@@ -128,6 +128,7 @@
     }
 
     let badgeDisplay = $derived(unreadCount > 0 ? (unreadCount > 99 ? '99+' : String(unreadCount)) : null);
+    let isAdmin = $derived(store.authUser?.role === 'admin' || store.authUser?.role === 'moderator');
 </script>
 
 <header>
@@ -176,6 +177,13 @@
                 <a href="/messages" data-link>
                     <i class="fas fa-envelope"></i> Messages
                     <span class="nav-badge" id="messages-badge" style="display:none">0</span>
+                </a>
+            </li>
+        {/if}
+        {#if isAdmin}
+            <li>
+                <a href="/admin" data-link class:active={activePath.startsWith('/admin')}>
+                    <i class="fas fa-shield-alt"></i> Moderation
                 </a>
             </li>
         {/if}

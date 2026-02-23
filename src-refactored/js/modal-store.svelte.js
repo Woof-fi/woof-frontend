@@ -16,6 +16,8 @@ export let modals = $state({
     healthRecordModalOpen: false,
     healthRecordData: null,     // { dogId, record }
     searchPanelOpen: false,
+    postOptionsSheetOpen: false,
+    postOptionsSheetData: null, // { postId, dogId, dogSlug, isOwnPost }
 });
 
 export function openAuthModal() { modals.authModalOpen = true; }
@@ -33,6 +35,8 @@ export function openHealthRecordModal(dogId, record) {
 export function closeHealthRecordModal() { modals.healthRecordModalOpen = false; modals.healthRecordData = null; }
 export function openSearchPanel() { modals.searchPanelOpen = true; }
 export function closeSearchPanel() { modals.searchPanelOpen = false; }
+export function openPostOptionsSheet(data) { modals.postOptionsSheetData = data; modals.postOptionsSheetOpen = true; }
+export function closePostOptionsSheet() { modals.postOptionsSheetOpen = false; modals.postOptionsSheetData = null; }
 export function closeAllModals() {
     modals.authModalOpen = false;
     modals.createPostModalOpen = false;
@@ -42,4 +46,6 @@ export function closeAllModals() {
     modals.healthRecordModalOpen = false;
     modals.healthRecordData = null;
     modals.searchPanelOpen = false;
+    modals.postOptionsSheetOpen = false;
+    modals.postOptionsSheetData = null;
 }

@@ -36,6 +36,7 @@ async function apiRequest(endpoint, options = {}) {
     try {
         const response = await fetch(url, {
             ...options,
+            cache: 'no-store',
             signal: controller.signal,
             headers: {
                 'Content-Type': 'application/json',
@@ -46,12 +47,13 @@ async function apiRequest(endpoint, options = {}) {
 
         clearTimeout(timeout);
 
-        // Parse response
-        const data = await response.json();
+        // Parse response — handle empty body (e.g. 204 No Content)
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
 
         if (!response.ok) {
             throw new APIError(
-                data.error || 'API request failed',
+                (data && data.error) || 'API request failed',
                 response.status,
                 data
             );
@@ -613,6 +615,79 @@ export async function syncUser() {
         console.error('User sync failed:', error);
         return null;
     }
+}
+
+// ============================================================================
+// REPORTS API
+// ============================================================================
+
+/**
+ * Report a post, comment, or dog
+ * @param {string} targetType - 'post' | 'comment' | 'dog'
+ * @param {string} targetId - UUID of the target
+ * @param {string} reason - Report reason
+ * @param {string} [description] - Optional description
+ * @returns {Promise<{report: object}>}
+ */
+export async function reportContent(targetType, targetId, reason, description) {
+    return apiRequest('/api/reports', {
+        method: 'POST',
+        body: JSON.stringify({ target_type: targetType, target_id: targetId, reason, description })
+    });
+}
+
+/**
+ * Delete a post (owner only)
+ * @param {string} postId - Post ID
+ * @returns {Promise<void>}
+ */
+export async function deletePost(postId) {
+    return apiRequest(`/api/posts/${postId}`, { method: 'DELETE' });
+}
+
+/**
+ * Toggle bookmark on a post
+ * @param {string} postId - Post ID
+ * @returns {Promise<{bookmarked: boolean}>}
+ */
+export async function toggleBookmark(postId) {
+    return apiRequest(`/api/bookmarks/${postId}/toggle`, { method: 'POST' });
+}
+
+/**
+ * Get bookmark status for a post
+ * @param {string} postId - Post ID
+ * @returns {Promise<{bookmarked: boolean}>}
+ */
+export async function getBookmarkStatus(postId) {
+    return apiRequest(`/api/bookmarks/${postId}/status`);
+}
+
+/**
+ * Get reports (admin/moderator only)
+ * @param {object} [opts] - { status, cursor, limit }
+ * @returns {Promise<{reports: object[], nextCursor: string|null}>}
+ */
+export async function getReports({ status, cursor, limit } = {}) {
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    if (cursor) params.set('cursor', cursor);
+    if (limit)  params.set('limit', String(limit));
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return apiRequest(`/api/reports${qs}`);
+}
+
+/**
+ * Update a report's status (admin/moderator only)
+ * @param {string} reportId
+ * @param {string} status - 'pending' | 'reviewed' | 'actioned' | 'dismissed'
+ * @returns {Promise<{report: object}>}
+ */
+export async function updateReportStatus(reportId, status) {
+    return apiRequest(`/api/reports/${reportId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+    });
 }
 
 // Export APIError for use in other modules
