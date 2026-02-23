@@ -1,8 +1,8 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-02-23
-**Current Phase:** Phase 5C/5D Complete (Post Options Sheet + Reports + Bookmarks + Admin Panel)
-**Next Phase:** Phase 5C-content (Perspective API + Rekognition content moderation)
+**Current Phase:** Phase 6 In Progress (6A/6B/6C code complete — CDN infrastructure pending)
+**Next Phase:** Set up CloudFront + Lambda, add PWA icons, then deploy
 
 ---
 
@@ -185,35 +185,7 @@ role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'))
 - E2E: `posts.spec.ts` (3 tests: delete own post via sheet, report sheet for others' posts, bookmark toggle)
 - Totals: backend 219 tests, frontend 45 unit tests
 
-### 5C-content. Content Moderation
-
-**Hate speech filter — Buy: Google Perspective API**
-
-Filter racist and toxic content while allowing normal language including swear words. Perspective API supports Finnish and English, and distinguishes between general profanity (allowed) and identity attacks/hate speech (blocked).
-
-**Backend changes:**
-- `src/services/perspectiveService.ts` — new service wrapping Perspective API `AnalyzeComment`
-- Check `IDENTITY_ATTACK` and `THREAT` attributes (not `TOXICITY` or `PROFANITY` — those catch swearing)
-- Apply to: `POST /api/comments`, `POST /api/posts`, `POST /api/messages`, `POST /api/dogs`, `PUT /api/dogs/:id`
-- Behavior: reject with 400 error + clear message if identity attack score > threshold
-- Pass `languages: ['fi', 'en']` based on detected content language
-
-**Image moderation — Buy: AWS Rekognition**
-
-Screen every uploaded image for inappropriate content.
-
-**Backend changes:**
-- `src/services/moderationService.ts` — new service wrapping Rekognition `DetectModerationLabels`
-- `src/controllers/uploadController.ts` — call moderation after S3 upload, before returning URL
-- Async pattern: upload succeeds immediately, moderation runs async, flag/hide if inappropriate
-- Store moderation status on posts table: `moderation_status` column ('approved', 'pending', 'rejected')
-
-**Database:**
-```sql
--- 013_moderation.sql
-ALTER TABLE posts ADD COLUMN moderation_status VARCHAR(20) DEFAULT 'approved';
-CREATE INDEX idx_posts_moderation ON posts(moderation_status);
-```
+### 5C-content. Content Moderation *(deferred → implemented as Phase 6D)*
 
 ### 5D. Reporting System
 
@@ -277,12 +249,7 @@ Moderators also see a flag/shield icon on posts in the normal feed for quick mod
 
 **Admin approach:** Built into the main app as `/admin/*` routes, not a separate subdomain. Separate to `admin.woofapp.fi` only if admin grows beyond ~10 pages or external moderators are hired.
 
-### 5E. Error Tracking
-
-**Decision: Buy (Sentry free tier)**
-
-**Backend:** Add `@sentry/node` SDK, initialize in `app.ts`, add error handler middleware.
-**Frontend:** Add `@sentry/browser` SDK, initialize in `app-spa.js`, catch unhandled errors.
+### 5E. Error Tracking *(deferred → implemented as Phase 6E)*
 
 ---
 
@@ -290,58 +257,130 @@ Moderators also see a flag/shield icon on posts in the normal feed for quick mod
 
 **Why second:** Make what you have fast and reliable before adding more features.
 
+**Execution order: 6A → 6C → 6B** (PWA before caching — higher user-visible value, fully independent)
+
 ### 6A. Image CDN + Optimization
 
-**Decision: Build (Sharp + CloudFront)**
+**Decision: Build (Lambda + Sharp + CloudFront)**
 
-**At upload time**, resize images to 3 variants using Sharp:
+Resize uploaded images to 3 variants for fast loading across all contexts.
 
 | Variant | Width | Use case |
 |---------|-------|----------|
 | thumb | 150px | Profile pics, grid thumbnails |
 | medium | 600px | Feed posts, post detail |
-| original | as-is | Full-screen view |
+| original | as-is | Full-screen / download |
+
+**How it works — Lambda trigger, not synchronous backend processing:**
+
+The current upload flow is `browser → presigned URL → S3 directly`. The backend never sees the file, so Sharp cannot run in `uploadController.ts`. Instead:
+
+1. Browser uploads original to S3 at key `photos/{uuid}.jpg` (unchanged)
+2. S3 triggers a Lambda on `ObjectCreated` events under `photos/`
+3. Lambda reads the original, resizes to thumb + medium using Sharp, writes back to S3:
+   - `photos/{uuid}.jpg` — original (already there)
+   - `photos/{uuid}_medium.jpg`
+   - `photos/{uuid}_thumb.jpg`
+4. All three are served via `cdn.woofapp.fi/{key}`
 
 **Backend changes:**
-- Add `sharp` dependency
-- `src/services/imageService.ts` — resize pipeline
-- `src/controllers/uploadController.ts` — generate variants after S3 upload
-- Store variant URLs or use naming convention: `{id}/thumb.jpg`, `{id}/medium.jpg`, `{id}/original.jpg`
+- `src/controllers/uploadController.ts` — return a structured key (`photos/{uuid}.jpg`) alongside the presigned upload URL. API responses derive CDN URLs from the key rather than storing full S3 URLs.
+- All API endpoints that return `image_url` / `profile_image_url` construct the CDN URL: `https://cdn.woofapp.fi/{key}`
+- Feed and dog profile responses return `image_url_medium` and `image_url_thumb` fields alongside `image_url` (original)
+
+**Frontend changes (Svelte):**
+- Svelte components use `image_url_medium` in `PostCard.svelte` and `Feed.svelte` (feed display)
+- `ProfileView.svelte` uses `image_url_thumb` for the profile avatar
+- Fall back to `image_url` if medium/thumb variant is not yet available (Lambda async delay on first upload)
+- No changes to `api.js` — CDN URLs come from API responses, components just bind `src`
 
 **Infrastructure:**
-- CloudFront distribution for S3 bucket → `cdn.woofapp.fi`
-- Cache-Control headers on S3 objects: `public, max-age=31536000, immutable`
-- Update all image URLs in API responses to use CDN domain
+- CloudFront distribution pointing at `woof-prod-photos` S3 bucket → `cdn.woofapp.fi`
+- S3 object Cache-Control: `public, max-age=31536000, immutable` (images never change — new upload = new UUID key)
+- Lambda function in eu-north-1, triggered by S3 `ObjectCreated`, IAM role with `s3:GetObject` + `s3:PutObject` on `woof-prod-photos`
 
-### 6B. HTTP Caching & Client-Side Cache
+### 6B. Selective HTTP Caching
 
-**Backend:**
-- Add `Cache-Control` headers to API responses:
-  - Feed: `private, max-age=60` (1 minute)
-  - Dog profiles: `public, max-age=300` (5 minutes)
-  - Static data (breeds): `public, max-age=3600` (1 hour)
-- Add `ETag` support for conditional requests
+**Why not a client-side JS cache layer:**
 
-**Frontend:**
-- Client-side cache layer in `api.js`:
-  - In-memory cache with TTL per endpoint type
-  - Stale-while-revalidate pattern for profiles and feed
-  - Cache invalidation on mutations (post created → clear feed cache)
+The Svelte 5 architecture uses version signals (`feedVersion`, `dogVersion`, `profileVersion` in `svelte-store.svelte.js`) as the cache invalidation mechanism. Components watch these in `$effect` and re-fetch when they bump. Adding a separate TTL-based in-memory cache in `api.js` would create two competing invalidation systems — a mutation would bump the version signal and trigger a re-fetch, but `api.js` would serve stale cached data. This is the same class of bug that was already hit and fixed with `cache: 'no-store'` in Phase 5C/5D.
+
+The version signal + reactive re-fetch pattern is already doing what SWR provides conceptually: components render from existing `$state` immediately while a re-fetch runs in the background. No additional layer needed.
+
+**Backend — add Cache-Control to stable endpoints only:**
+
+| Endpoint | Header | Rationale |
+|----------|--------|-----------|
+| `GET /api/dogs/:id` | `public, max-age=300` | Dog profiles change infrequently |
+| `GET /api/dogs/slug/:slug` | `public, max-age=300` | Same |
+| `GET /api/follows/status/:dogId` | `public, max-age=60` | Follow counts change but tolerate 1 min stale |
+| `GET /api/posts/feed` | none | Mutations are frequent; version signals drive re-fetches |
+| `GET /api/messages/*` | none | Real-time; polling requires fresh responses |
+
+Add `ETag` support to `GET /api/dogs/:id` — reduces bandwidth for unchanged profiles on return visits (304 Not Modified).
+
+**Frontend — make `cache` opt-in per call, not global `no-store`:**
+
+`apiRequest()` currently hardcodes `cache: 'no-store'` globally. Change it to accept a `cache` option (default `'no-store'` to preserve existing behaviour), then pass `cache: 'default'` on stable read calls:
+
+```js
+// api.js — only these callers change; everything else stays no-store
+getDog(id)         → apiRequest(`/api/dogs/${id}`,        { cache: 'default' })
+getDogBySlug(slug) → apiRequest(`/api/dogs/slug/${slug}`, { cache: 'default' })
+getFollowStatus()  → apiRequest(`/api/follows/status/…`,  { cache: 'default' })
+```
+
+The browser then honours the `Cache-Control` headers the backend sets, and the version signal bumps in the Svelte store remain the single source of truth for invalidation.
 
 ### 6C. PWA Foundation
 
-**Decision: Build (standard patterns + Vite PWA plugin)**
+**Decision: Build (vite-plugin-pwa)**
 
-- `manifest.json` — app name, icons, theme color, display: standalone
-- Service worker — cache app shell (HTML, CSS, JS), offline fallback page
-- Add `vite-plugin-pwa` for automatic service worker generation
-- Meta tags: `<link rel="manifest">`, `<meta name="theme-color">`
+`vite-plugin-pwa` integrates directly with the Vite + Svelte 5 build and generates the service worker automatically from `vite.config.ts`. No manual service worker authoring needed.
 
-This enables "Add to Home Screen" on Android and iOS. Not a native app, but feels like one.
+**Changes:**
+- Add `vite-plugin-pwa` to `devDependencies`
+- Configure in `vite.config.ts`: app name, icons, theme color (`--woof-color-brand-primary` = `#C9403F`), `display: standalone`, `start_url: /`
+- Service worker strategy: `generateSW` with `precacheAndRoute` for the app shell (HTML, JS, CSS bundles). Runtime caching for CDN images (`cdn.woofapp.fi`) with `CacheFirst`, `max-age: 7 days`
+- Offline fallback page: served from precache when network is unavailable
+- Add `<meta name="theme-color" content="#C9403F">` and Apple touch icon meta tags to `index.html`
 
-### 6D. Token Refresh
+This enables "Add to Home Screen" on Android and iOS and gives the app a native feel without Capacitor.
 
-If auth migrated to Cognito (Phase 5A), this is handled automatically — Cognito SDK manages refresh tokens. If still on custom JWT, add a `/api/auth/refresh` endpoint with refresh token rotation.
+**Note:** Token Refresh (old 6D) is removed — Cognito SDK handles refresh tokens automatically (Phase 5A complete).
+
+### 6D. Content Moderation (Perspective API + Rekognition)
+
+**Hate speech filter — Buy: Google Perspective API**
+
+Filter racist and toxic content while allowing normal language including swearing. Perspective API supports Finnish and English and distinguishes identity attacks/hate speech (blocked) from general profanity (allowed).
+
+**Backend changes:**
+- `src/services/perspectiveService.ts` — wraps Perspective API `AnalyzeComment`
+- Check `IDENTITY_ATTACK` and `THREAT` attributes only (not `TOXICITY` / `PROFANITY` — those catch normal swearing)
+- Apply to: `POST /api/comments`, `POST /api/posts`, `POST /api/messages`, `POST /api/dogs`, `PUT /api/dogs/:id`
+- Reject with 400 + clear user-facing message if score exceeds threshold
+- Pass `languages: ['fi', 'en']`
+
+**Image moderation — Buy: AWS Rekognition**
+
+Screen every uploaded image for inappropriate content at post creation time (not at upload, since the presigned URL flow means the backend never touches the file directly). Rekognition can call S3 directly given an object key.
+
+**Backend changes:**
+- `src/services/moderationService.ts` — wraps Rekognition `DetectModerationLabels` using the S3 key
+- Call from `postController.ts` `createPost()` — after the image URL is received, before the DB insert
+- Synchronous check: if flagged, reject with 400 before the post is created
+- `moderation_status` column already exists on posts table from `001_initial_schema.sql` (default `'approved'`). No new migration needed.
+- Admin panel already shows `moderation_status` — no frontend changes needed for admin
+- Feed query: add `WHERE p.moderation_status != 'rejected'` filter
+
+### 6E. Error Tracking (Sentry)
+
+**Decision: Buy (Sentry free tier — 5K errors/month)**
+
+**Backend:** Add `@sentry/node`, initialize in `src/app.ts`, add Sentry error handler middleware after all routes.
+
+**Frontend:** Add `@sentry/sveltekit` (works with Vite/Svelte 5), initialize in `src/main.ts`. Captures unhandled promise rejections and component errors.
 
 ---
 

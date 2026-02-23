@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { VitePWA } from 'vite-plugin-pwa';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -8,7 +9,60 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
-  plugins: [svelte()],
+  plugins: [
+    svelte(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      // Include icon files from assets/icons/ in the service worker precache
+      includeAssets: ['icons/*.png', 'favicon.png'],
+      manifest: {
+        name: 'Woof',
+        short_name: 'Woof',
+        description: 'The social network for dogs',
+        theme_color: '#C9403F',
+        background_color: '#FAFAF8',
+        display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        icons: [
+          {
+            src: '/icons/icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icons/icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: '/icons/icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ]
+      },
+      workbox: {
+        // Precache app shell (JS/CSS bundles handled automatically)
+        globPatterns: ['**/*.{js,css,html}'],
+        // Runtime cache for CDN images — cache-first, 7 day max-age
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/cdn\.woofapp\.fi\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'woof-images',
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              }
+            }
+          }
+        ]
+      }
+    })
+  ],
   root: '.',
   publicDir: 'assets',
 

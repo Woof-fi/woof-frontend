@@ -29,14 +29,19 @@ async function apiRequest(endpoint, options = {}) {
     const url = `${CONFIG.API_BASE_URL}${endpoint}`;
     const token = getToken();
 
+    // cache defaults to 'no-store' to prevent stale data after mutations.
+    // Pass cache: 'default' for stable read-only endpoints (dog profiles, follow counts)
+    // so the browser can honour Cache-Control headers from the server.
+    const { cache = 'no-store', ...restOptions } = options;
+
     // Add timeout
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
 
     try {
         const response = await fetch(url, {
-            ...options,
-            cache: 'no-store',
+            ...restOptions,
+            cache,
             signal: controller.signal,
             headers: {
                 'Content-Type': 'application/json',
@@ -113,7 +118,7 @@ export async function getMyDogs() {
  */
 export async function getDog(id) {
     try {
-        const data = await apiRequest(`/api/dogs/${id}`);
+        const data = await apiRequest(`/api/dogs/${id}`, { cache: 'default' });
         return data.dog;
     } catch (error) {
         console.error(`Failed to fetch dog ${id}:`, error);
@@ -133,7 +138,7 @@ export async function getDog(id) {
  */
 export async function getDogBySlug(slug) {
     try {
-        const data = await apiRequest(`/api/dogs/slug/${slug}`);
+        const data = await apiRequest(`/api/dogs/slug/${slug}`, { cache: 'default' });
         return data.dog;
     } catch (error) {
         console.error(`Failed to fetch dog ${slug}:`, error);
@@ -336,7 +341,7 @@ export async function unfollowDog(dogId) {
  * @returns {Promise<{isFollowing: boolean, followerCount: number, followingCount: number}>}
  */
 export async function getFollowStatus(dogId) {
-    return apiRequest(`/api/follows/status/${dogId}`);
+    return apiRequest(`/api/follows/status/${dogId}`, { cache: 'default' });
 }
 
 /**
