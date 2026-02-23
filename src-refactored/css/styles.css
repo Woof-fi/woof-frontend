@@ -3024,3 +3024,19 @@ button.view-all-comments:hover {
     color: var(--color-text-muted);
     font-size: 12px;
 }
+
+/* ── Router progress bar ── */
+.route-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0;
+    background: var(--woof-orange, #EF4621);
+    z-index: 10000;
+    transition: none;
+    pointer-events: none;
+}
+.route-progress.active {
+    width: 70%;
+    transition: width 0.3s ease-out;
+}

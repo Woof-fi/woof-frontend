@@ -47,10 +47,6 @@ src-refactored/
 │   ├── modal-history.js    # pushModalState / popModalState / handleModalPopstate
 │   ├── modals.js           # Dispatches window custom events to Svelte modal components
 │   ├── navigation.js       # Auth-link DOM sync helper (Svelte Navigation handles the rest)
-│   ├── profile.js          # DOM-filling for ProfileView (hybrid approach)
-│   ├── profile-follow.js   # Follow/unfollow handlers
-│   ├── profile-health.js   # Health records tab
-│   ├── profile-social.js   # Followers/following tab
 │   ├── search.js           # Dog search (called from Search.svelte)
 │   ├── ui.js               # Skeletons, loading states, animateIn, toggleBodyScroll
 │   └── onboarding-tour.js  # First-dog onboarding tour
@@ -72,7 +68,7 @@ src-refactored/
 │   │   └── Search.svelte           # Search panel
 │   └── views/
 │       ├── HomeView.svelte         # Tabbed feed (For You / Following)
-│       ├── ProfileView.svelte      # Dog profile (hybrid: Svelte scaffold + profile.js fill)
+│       ├── ProfileView.svelte      # Dog profile (full Svelte 5)
 │       ├── PostDetailView.svelte   # Single post view
 │       └── MessagesView.svelte     # Two-panel messaging
 └── package.json

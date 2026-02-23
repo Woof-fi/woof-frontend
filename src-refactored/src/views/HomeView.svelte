@@ -2,7 +2,15 @@
     import Feed from '../components/Feed.svelte';
 
     let { onopenAuthModal = null } = $props();
-    let activeTab = $state('public');
+    let activeTab = $state(
+        new URLSearchParams(window.location.search).get('tab') === 'following'
+            ? 'following' : 'public'
+    );
+
+    $effect(() => {
+        const search = activeTab === 'following' ? '?tab=following' : '';
+        history.replaceState({}, '', window.location.pathname + search);
+    });
 </script>
 
 <main>

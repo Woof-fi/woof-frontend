@@ -35,7 +35,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 
 ### Svelte Views (`src/views/`)
 - `HomeView.svelte` — Tabbed feed (For You / Following); tab switch triggers Feed re-render
-- `ProfileView.svelte` — Hybrid: Svelte scaffold HTML + `profile.js` DOM-fill (intentional; profile.js will be migrated in a future pass)
+- `ProfileView.svelte` — Full Svelte 5: fetches dog, posts, follow status, friends, health records; dispatches window events to EditDogModal/HealthRecordModal
 - `PostDetailView.svelte` — Single post view
 - `MessagesView.svelte` — Two-panel messaging with 10s polling
 
@@ -50,10 +50,6 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `js/modal-history.js` — pushModalState / popModalState / handleModalPopstate (browser history for back-button modal close)
 - `js/modals.js` — Dispatches `window` custom events that Svelte modal components listen to (e.g. `open-auth-modal`)
 - `js/navigation.js` — Auth-link DOM sync helper; Navigation.svelte handles nav rendering
-- `js/profile.js` — DOM-filling for ProfileView (follow, tabs, health records)
-- `js/profile-follow.js` — Follow/unfollow handlers
-- `js/profile-health.js` — Health records tab
-- `js/profile-social.js` — Followers/following tab
 - `js/search.js` — Dog search rendering
 - `js/ui.js` — Skeletons, loading states, animateIn, toggleBodyScroll
 - `js/onboarding-tour.js` — First-dog onboarding tour

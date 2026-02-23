@@ -3,6 +3,7 @@
     import { isAuthenticated } from '../../js/auth.js';
     import PostCard from './PostCard.svelte';
     import InviteCard from './InviteCard.svelte';
+    import { viewport } from '../actions/viewport.ts';
 
     let { type = 'public', onopenAuthModal = null } = $props();
 
@@ -10,7 +11,6 @@
     let nextCursor = $state(null);
     let loading = $state(false);
     let myDogs = $state([]);
-    let sentinelEl = $state(null);
 
     const INVITE_FIRST_POSITION = 5;
     const INVITE_INTERVAL = 20;
@@ -124,20 +124,6 @@
         };
     });
 
-    // Sentinel observer — separate effect so it can react to sentinelEl changes
-    $effect(() => {
-        if (!sentinelEl || !nextCursor) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                loadMore();
-            }
-        }, { rootMargin: '200px' });
-
-        observer.observe(sentinelEl);
-
-        return () => observer.disconnect();
-    });
 </script>
 
 {#if loading && posts.length === 0}
@@ -234,7 +220,7 @@
     {/if}
 
     {#if nextCursor && !showContentGate}
-        <div bind:this={sentinelEl} class="feed-sentinel">
+        <div use:viewport={loadMore} class="feed-sentinel">
             {#if loading}
                 <i class="fas fa-spinner fa-spin"></i>
             {/if}

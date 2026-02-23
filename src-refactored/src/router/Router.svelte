@@ -8,6 +8,7 @@
     let { onopenAuthModal = null } = $props();
 
     let currentPath = $state(window.location.pathname);
+    let navigating = $state(false);
 
     function pathToRegex(path) {
         const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -60,10 +61,17 @@
         if (!a) return;
         e.preventDefault();
         const href = a.getAttribute('href');
+        navigating = true;
         history.pushState({}, '', href);
         currentPath = new URL(href, window.location.origin).pathname;
         window.dispatchEvent(new CustomEvent('routechange'));
     }
+
+    $effect(() => {
+        matched; // track
+        const t = setTimeout(() => { navigating = false; }, 150);
+        return () => clearTimeout(t);
+    });
 
     $effect(() => {
         window.addEventListener('popstate', handlePopstate);
@@ -82,6 +90,7 @@
     });
 </script>
 
+<div class="route-progress" class:active={navigating}></div>
 <div class="content">
     {#if matched.component === HomeView}
         <HomeView onopenAuthModal={onopenAuthModal} />
