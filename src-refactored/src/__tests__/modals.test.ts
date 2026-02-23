@@ -18,23 +18,19 @@ vi.mock('../../js/auth.js', () => ({
   getCurrentUser: vi.fn(),
 }));
 
-vi.mock('../../js/navigation.js', () => ({
-  updateProfileNavigation: vi.fn().mockResolvedValue(undefined),
-}));
-
 vi.mock('../../js/ui.js', () => ({
   toggleBodyScroll: vi.fn(),
   focusFirstElement: vi.fn(),
 }));
 
-vi.mock('../../js/modals.js', () => ({
+vi.mock('../../js/modal-history.js', () => ({
   pushModalState: vi.fn(),
   popModalState: vi.fn(),
+  handleModalPopstate: vi.fn(),
 }));
 
 import { updateUIForAuth } from '../../js/auth-modal.js';
 import { isAuthenticated } from '../../js/auth.js';
-import { updateProfileNavigation } from '../../js/navigation.js';
 
 function setupAuthDOM() {
   document.body.innerHTML = `
@@ -84,14 +80,6 @@ describe('updateUIForAuth', () => {
 
     const messagesLink = document.querySelector('a[aria-label="Messages"]') as HTMLElement;
     expect(messagesLink.style.display).toBe('');
-  });
-
-  it('should delegate profile navigation to navigation.js', async () => {
-    vi.mocked(isAuthenticated).mockReturnValue(true);
-
-    await updateUIForAuth();
-
-    expect(updateProfileNavigation).toHaveBeenCalledOnce();
   });
 
   it('should NOT query for nelli.html selectors', async () => {

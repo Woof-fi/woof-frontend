@@ -3,11 +3,12 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { showToast } from '../../js/utils.js';
+    import { modals, closeEditDogModal as storeClose } from '../../js/modal-store.svelte.js';
+    import { bumpProfileVersion } from '../../js/svelte-store.svelte.js';
 
-    let visible = $state(false);
     let submitting = $state(false);
 
-    // Current dog data
+    // Form fields — populated reactively from modals.editDogData
     let dogId = $state('');
     let dogName = $state('');
     let breed = $state('');
@@ -20,27 +21,36 @@
 
     let photoInputEl = $state(null);
 
-    function open(dog) {
-        dogId = dog.id;
-        dogName = dog.name || '';
-        breed = dog.breed || '';
-        age = dog.age ?? '';
-        location = dog.location || '';
-        bio = dog.bio || '';
-        photoFile = null;
-        currentPhotoUrl = dog.profilePhoto || null;
-        previewUrl = null;
+    // Populate form fields when modal opens with dog data
+    $effect(() => {
+        if (modals.editDogModalOpen && modals.editDogData) {
+            dogId = modals.editDogData.id;
+            dogName = modals.editDogData.name || '';
+            breed = modals.editDogData.breed || '';
+            age = modals.editDogData.age ?? '';
+            location = modals.editDogData.location || '';
+            bio = modals.editDogData.bio || '';
+            photoFile = null;
+            currentPhotoUrl = modals.editDogData.profilePhoto || null;
+            previewUrl = null;
+        }
+    });
 
-        visible = true;
-        pushModalState();
-        toggleBodyScroll(true);
-    }
+    // Manage body scroll + modal history based on store state
+    $effect(() => {
+        if (modals.editDogModalOpen) {
+            pushModalState();
+            toggleBodyScroll(true);
+            return () => {
+                popModalState();
+                toggleBodyScroll(false);
+            };
+        }
+    });
 
     function close() {
-        if (!visible) return;
-        visible = false;
-        popModalState();
-        toggleBodyScroll(false);
+        if (!modals.editDogModalOpen) return;
+        storeClose();
         photoFile = null;
         if (previewUrl) URL.revokeObjectURL(previewUrl);
         previewUrl = null;
@@ -53,22 +63,6 @@
     function handleOverlayClick(e) {
         if (e.target === e.currentTarget) close();
     }
-
-    $effect(() => {
-        function handleOpen(e) {
-            const dog = e.detail;
-            if (dog) open(dog);
-        }
-        function handleCloseAll() { if (visible) close(); }
-
-        window.addEventListener('openEditDogModal', handleOpen);
-        window.addEventListener('close-all-modals', handleCloseAll);
-
-        return () => {
-            window.removeEventListener('openEditDogModal', handleOpen);
-            window.removeEventListener('close-all-modals', handleCloseAll);
-        };
-    });
 
     function handlePhotoChange(e) {
         const file = e.target.files[0];
@@ -106,7 +100,7 @@
             await updateDog(dogId, dogData);
             showToast('Profile updated!', 'success');
             close();
-            window.dispatchEvent(new CustomEvent('profile-refresh'));
+            bumpProfileVersion();
         } catch (err) {
             console.error('Failed to update dog:', err);
             showToast('Failed to update profile. Please try again.', 'error');
@@ -121,7 +115,7 @@
 <div
     id="edit-dog-modal"
     class="modal"
-    style:display={visible ? 'block' : 'none'}
+    style:display={modals.editDogModalOpen ? 'block' : 'none'}
     onclick={handleOverlayClick}
     onkeydown={() => {}}
     role="dialog"

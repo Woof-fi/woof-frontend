@@ -2552,6 +2552,7 @@ button.view-all-comments:hover {
     max-width: 600px;
     width: 90%;
     margin: 8% auto;
+    box-sizing: border-box;
 }
 
 .health-type-tabs {
@@ -2625,15 +2626,25 @@ button.view-all-comments:hover {
 @media (max-width: 480px) {
     .health-modal-content {
         width: 95%;
-        margin: 5% auto;
+        margin: 2vh auto;
         padding: 16px;
     }
 
     .health-type-tabs {
-        gap: 4px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 6px;
+        padding-bottom: 4px;
+    }
+
+    .health-type-tabs::-webkit-scrollbar {
+        display: none;
     }
 
     .health-type-tab {
+        flex-shrink: 0;
         padding: 6px 10px;
         font-size: 12px;
     }

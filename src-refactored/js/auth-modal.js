@@ -14,8 +14,7 @@ import {
     isAuthenticated,
     logout
 } from './auth.js';
-import { updateProfileNavigation } from './navigation.js';
-import { pushModalState, popModalState } from './modals.js';
+import { pushModalState, popModalState } from './modal-history.js';
 
 /**
  * Initialize auth modal
@@ -282,9 +281,7 @@ export function initAuthModal() {
                     await login(email, password);
                     closeAuthModal();
                     authForm.reset();
-                    await updateProfileNavigation();
                     await updateUIForAuth();
-                    window.dispatchEvent(new CustomEvent('auth-state-changed'));
                     break;
                 }
 
@@ -411,6 +408,5 @@ export async function updateUIForAuth() {
         });
     }
 
-    // Profile navigation is handled dynamically by navigation.js
-    await updateProfileNavigation();
+    // Profile navigation handled by Navigation.svelte via svelte-store
 }

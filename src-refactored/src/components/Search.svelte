@@ -3,8 +3,8 @@
     import { debounce } from '../../js/utils.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
+    import { modals, closeSearchPanel as storeClose } from '../../js/modal-store.svelte.js';
 
-    let visible = $state(false);
     let query = $state('');
     let searchCache = $state([]);
     let results = $state([]);
@@ -25,24 +25,28 @@
         }
     }
 
-    function open() {
-        visible = true;
-        pushModalState();
-        toggleBodyScroll(true);
-        setTimeout(() => inputEl?.focus(), 100);
-    }
+    // Manage body scroll + modal history based on store state
+    $effect(() => {
+        if (modals.searchPanelOpen) {
+            pushModalState();
+            toggleBodyScroll(true);
+            setTimeout(() => inputEl?.focus(), 100);
+            return () => {
+                popModalState();
+                toggleBodyScroll(false);
+            };
+        }
+    });
 
     function close() {
-        if (!visible) return;
-        visible = false;
-        popModalState();
-        toggleBodyScroll(false);
+        if (!modals.searchPanelOpen) return;
+        storeClose();
         query = '';
         results = [];
     }
 
     function handleKey(e) {
-        if (e.key === 'Escape' && visible) close();
+        if (e.key === 'Escape' && modals.searchPanelOpen) close();
     }
 
     function handleOverlayClick(e) {
@@ -70,17 +74,7 @@
     });
 
     $effect(() => {
-        function handleOpen() { open(); }
-        function handleCloseAll() { if (visible) close(); }
-
         loadSearchData();
-        window.addEventListener('openSearchPanel', handleOpen);
-        window.addEventListener('close-all-modals', handleCloseAll);
-
-        return () => {
-            window.removeEventListener('openSearchPanel', handleOpen);
-            window.removeEventListener('close-all-modals', handleCloseAll);
-        };
     });
 </script>
 
@@ -89,8 +83,8 @@
 <div
     id="search-panel"
     class="search-panel"
-    class:active={visible}
-    aria-hidden={!visible}
+    class:active={modals.searchPanelOpen}
+    aria-hidden={!modals.searchPanelOpen}
     onclick={handleOverlayClick}
 >
     <div class="search-bar">

@@ -10,8 +10,9 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { showToast } from '../../js/utils.js';
+    import { modals, closeAuthModal as storeClose } from '../../js/modal-store.svelte.js';
+    import { setAuthUser } from '../../js/svelte-store.svelte.js';
 
-    let visible = $state(false);
     let mode = $state('login'); // 'login' | 'register' | 'verify' | 'forgot' | 'reset'
     let pendingEmail = $state('');
 
@@ -117,18 +118,21 @@
     let pwRules = $derived(checkPasswordRules(password));
     let newPwRules = $derived(checkPasswordRules(newPassword));
 
-    function open(tab = null) {
-        visible = true;
-        if (tab) mode = tab;
-        pushModalState();
-        toggleBodyScroll(true);
-    }
+    // Manage body scroll + modal history based on store state
+    $effect(() => {
+        if (modals.authModalOpen) {
+            pushModalState();
+            toggleBodyScroll(true);
+            return () => {
+                popModalState();
+                toggleBodyScroll(false);
+            };
+        }
+    });
 
     function close() {
-        if (!visible) return;
-        visible = false;
-        popModalState();
-        toggleBodyScroll(false);
+        if (!modals.authModalOpen) return;
+        storeClose();
         // Reset form
         email = '';
         password = '';
@@ -146,24 +150,6 @@
         if (e.target === e.currentTarget) close();
     }
 
-    $effect(() => {
-        function handleOpen(e) {
-            const tab = e.detail?.tab || null;
-            open(tab);
-        }
-        function handleCloseAll() {
-            if (visible) close();
-        }
-
-        window.addEventListener('open-auth-modal', handleOpen);
-        window.addEventListener('close-all-modals', handleCloseAll);
-
-        return () => {
-            window.removeEventListener('open-auth-modal', handleOpen);
-            window.removeEventListener('close-all-modals', handleCloseAll);
-        };
-    });
-
     async function handleSubmit(e) {
         e.preventDefault();
         submitting = true;
@@ -174,10 +160,10 @@
                 case 'login': {
                     submitLabel = 'Logging in...';
                     await login(email, password);
+                    setAuthUser({ authenticated: true });
                     close();
                     email = '';
                     password = '';
-                    window.dispatchEvent(new CustomEvent('auth-state-changed'));
                     break;
                 }
                 case 'register': {
@@ -239,7 +225,7 @@
 <div
     id="auth-modal"
     class="modal"
-    style:display={visible ? 'block' : 'none'}
+    style:display={modals.authModalOpen ? 'block' : 'none'}
     onclick={handleOverlayClick}
     onkeydown={(e) => e.key === 'Escape' && close()}
     role="dialog"

@@ -1,6 +1,8 @@
 <script>
     import { getMyDogs, getUnreadCount } from '../../js/api.js';
     import { isAuthenticated, logout } from '../../js/auth.js';
+    import { openCreateDogModal, openSearchPanel } from '../../js/modal-store.svelte.js';
+    import { store, setAuthUser } from '../../js/svelte-store.svelte.js';
 
     let { onopenAuthModal = null, onopenCreatePostModal = null } = $props();
 
@@ -8,7 +10,7 @@
     let unreadCount = $state(0);
     let activePath = $state(window.location.pathname);
     let myDogsLoaded = $state(false);
-    let authed = $state(isAuthenticated());
+    let authed = $derived(store.authUser !== null);
 
     function getSlug(dog) {
         return dog.slug ?? `${dog.name.toLowerCase()}-${dog.displayId}`;
@@ -21,7 +23,7 @@
 
     function handleAddPetAuthenticated(e) {
         e.preventDefault();
-        window.dispatchEvent(new CustomEvent('openCreateDogModal'));
+        openCreateDogModal();
     }
 
     function handleCreatePost(e) {
@@ -31,7 +33,7 @@
 
     function handleSearchOpen(e) {
         e.preventDefault();
-        window.dispatchEvent(new CustomEvent('openSearchPanel'));
+        openSearchPanel();
     }
 
     function handleAuthLink(e) {
@@ -39,6 +41,7 @@
         if (authed) {
             if (confirm('Are you sure you want to logout?')) {
                 logout();
+                setAuthUser(null);
             }
         } else {
             onopenAuthModal?.();
@@ -49,6 +52,7 @@
         e.preventDefault();
         if (confirm('Are you sure you want to logout?')) {
             logout();
+            setAuthUser(null);
         }
     }
 
@@ -63,14 +67,22 @@
     }
 
     $effect(() => {
+        // Re-run when auth state or dog list changes
+        const _auth = store.authUser;
+        const _dv = store.dogVersion;
+
         let interval = null;
+        let active = true;
 
         async function init() {
-            authed = isAuthenticated();
-            if (authed) {
+            const authenticated = isAuthenticated();
+            if (authenticated) {
                 try {
-                    dogs = await getMyDogs();
+                    const fetched = await getMyDogs();
+                    if (!active) return;
+                    dogs = fetched;
                 } catch {
+                    if (!active) return;
                     dogs = [];
                 }
                 myDogsLoaded = true;
@@ -85,21 +97,15 @@
 
         init();
 
-        function handleAuthChange() {
-            if (interval) clearInterval(interval);
-            init();
-        }
-
         function handleRouteChange() {
             activePath = window.location.pathname;
         }
 
-        window.addEventListener('auth-state-changed', handleAuthChange);
         window.addEventListener('routechange', handleRouteChange);
 
         return () => {
+            active = false;
             if (interval) clearInterval(interval);
-            window.removeEventListener('auth-state-changed', handleAuthChange);
             window.removeEventListener('routechange', handleRouteChange);
         };
     });

@@ -4,8 +4,9 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { showToast } from '../../js/utils.js';
+    import { modals, closeCreateDogModal as storeClose, openAuthModal } from '../../js/modal-store.svelte.js';
+    import { bumpDogVersion } from '../../js/svelte-store.svelte.js';
 
-    let visible = $state(false);
     let submitting = $state(false);
 
     // Form fields
@@ -19,17 +20,21 @@
 
     let photoInputEl = $state(null);
 
-    function open() {
-        visible = true;
-        pushModalState();
-        toggleBodyScroll(true);
-    }
+    // Manage body scroll + modal history based on store state
+    $effect(() => {
+        if (modals.createDogModalOpen) {
+            pushModalState();
+            toggleBodyScroll(true);
+            return () => {
+                popModalState();
+                toggleBodyScroll(false);
+            };
+        }
+    });
 
     function close() {
-        if (!visible) return;
-        visible = false;
-        popModalState();
-        toggleBodyScroll(false);
+        if (!modals.createDogModalOpen) return;
+        storeClose();
         resetForm();
     }
 
@@ -52,21 +57,6 @@
         if (e.target === e.currentTarget) close();
     }
 
-    $effect(() => {
-        function handleOpen() { open(); }
-        function handleCloseAll() { if (visible) close(); }
-
-        window.addEventListener('openCreateDogModal', handleOpen);
-        window.addEventListener('open-create-dog-modal', handleOpen);
-        window.addEventListener('close-all-modals', handleCloseAll);
-
-        return () => {
-            window.removeEventListener('openCreateDogModal', handleOpen);
-            window.removeEventListener('open-create-dog-modal', handleOpen);
-            window.removeEventListener('close-all-modals', handleCloseAll);
-        };
-    });
-
     function handlePhotoChange(e) {
         const file = e.target.files[0];
         if (!file) {
@@ -86,7 +76,7 @@
         if (!isAuthenticated()) {
             showToast('Please login to add a pet', 'error');
             close();
-            window.dispatchEvent(new CustomEvent('open-auth-modal'));
+            openAuthModal();
             return;
         }
 
@@ -111,8 +101,7 @@
 
             const createdDog = await createDog(dogData);
             close();
-
-            window.dispatchEvent(new CustomEvent('auth-state-changed'));
+            bumpDogVersion();
 
             if (createdDog && createdDog.slug) {
                 history.pushState({}, '', `/dog/${createdDog.slug}`);
@@ -131,7 +120,7 @@
 <div
     id="create-dog-modal"
     class="modal"
-    style:display={visible ? 'block' : 'none'}
+    style:display={modals.createDogModalOpen ? 'block' : 'none'}
     onclick={handleOverlayClick}
     onkeydown={() => {}}
     role="dialog"

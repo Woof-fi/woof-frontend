@@ -1,7 +1,11 @@
 <script>
     import { refreshSession } from '../js/auth.js';
-    import { healthCheck } from '../js/api.js';
+    import { healthCheck, syncUser } from '../js/api.js';
     import { showToast } from '../js/utils.js';
+    import { openAuthModal, openCreatePostModal } from '../js/modal-store.svelte.js';
+    import { setAuthUser } from '../js/svelte-store.svelte.js';
+    import { isAuthenticated } from '../js/auth.js';
+    import Toast from './components/Toast.svelte';
     import Navigation from './components/Navigation.svelte';
     import Router from './router/Router.svelte';
     import AuthModal from './components/AuthModal.svelte';
@@ -11,17 +15,13 @@
     import HealthRecordModal from './components/HealthRecordModal.svelte';
     import Search from './components/Search.svelte';
 
-    function openAuthModal() {
-        window.dispatchEvent(new CustomEvent('open-auth-modal'));
-    }
-
-    function openCreatePostModal() {
-        window.dispatchEvent(new CustomEvent('openCreatePostModal'));
-    }
-
     $effect(() => {
         (async () => {
             await refreshSession();
+            // If user already has a valid session, ensure they exist in the local DB
+            if (isAuthenticated()) await syncUser();
+            // Sync auth state to store after session refresh
+            setAuthUser(isAuthenticated() ? { authenticated: true } : null);
             try {
                 const healthy = await healthCheck();
                 if (!healthy) showToast('Backend API is unavailable', 'error');
@@ -29,13 +29,6 @@
                 // Ignore health check failures
             }
         })();
-
-        window.WoofApp = {
-            navigate: (path) => {
-                history.pushState({}, '', path);
-                window.dispatchEvent(new CustomEvent('routechange'));
-            }
-        };
     });
 </script>
 
@@ -55,4 +48,4 @@
 <EditDogModal />
 <HealthRecordModal />
 <Search />
-<div id="toast-container" class="toast-container"></div>
+<Toast />

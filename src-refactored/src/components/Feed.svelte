@@ -1,6 +1,8 @@
 <script>
     import { getFeed, getMyDogs, getAllDogs } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
+    import { openCreateDogModal } from '../../js/modal-store.svelte.js';
+    import { store } from '../../js/svelte-store.svelte.js';
     import PostCard from './PostCard.svelte';
     import InviteCard from './InviteCard.svelte';
     import { viewport } from '../actions/viewport.ts';
@@ -62,13 +64,15 @@
     }
 
     function handleAddDog() {
-        window.dispatchEvent(new CustomEvent('openCreateDogModal'));
+        openCreateDogModal();
     }
 
-    // Mount effect — load feed, setup observer, listeners
+    // Mount effect — load feed, re-run on auth/feed version changes
     $effect(() => {
-        // Track type for reactivity
+        // Track type, auth state, and feed version for reactivity
         const currentType = type;
+        const _auth = store.authUser;
+        const _fv = store.feedVersion;
 
         let observer = null;
         let cleanup = false;
@@ -102,25 +106,9 @@
 
         init();
 
-        function handleAuthChange() {
-            posts = [];
-            nextCursor = null;
-            myDogs = [];
-            init();
-        }
-
-        function handleFeedRefresh() {
-            init();
-        }
-
-        window.addEventListener('auth-state-changed', handleAuthChange);
-        window.addEventListener('feed-refresh', handleFeedRefresh);
-
         return () => {
             cleanup = true;
             if (observer) observer.disconnect();
-            window.removeEventListener('auth-state-changed', handleAuthChange);
-            window.removeEventListener('feed-refresh', handleFeedRefresh);
         };
     });
 

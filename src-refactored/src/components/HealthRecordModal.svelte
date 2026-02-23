@@ -3,8 +3,9 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { showToast } from '../../js/utils.js';
+    import { modals, closeHealthRecordModal as storeClose } from '../../js/modal-store.svelte.js';
+    import { bumpHealthVersion } from '../../js/svelte-store.svelte.js';
 
-    let visible = $state(false);
     let submitting = $state(false);
     let isEditMode = $state(false);
     let currentDogId = $state(null);
@@ -53,35 +54,45 @@
 
     let typeConfig = $derived(TYPE_CONFIG[currentType] || TYPE_CONFIG.note);
 
-    function open(dogId, record = null) {
-        currentDogId = dogId;
-        editingRecord = record;
-        isEditMode = !!record;
+    // Populate form fields when modal opens with health record data
+    $effect(() => {
+        if (modals.healthRecordModalOpen && modals.healthRecordData) {
+            currentDogId = modals.healthRecordData.dogId;
+            const record = modals.healthRecordData.record;
+            editingRecord = record;
+            isEditMode = !!record;
 
-        if (record) {
-            currentType = record.type;
-            date = record.date;
-            description = record.description;
-            notes = record.notes || '';
-            weightValue = record.value || '';
-        } else {
-            currentType = 'vet_visit';
-            date = new Date().toISOString().split('T')[0];
-            description = '';
-            notes = '';
-            weightValue = '';
+            if (record) {
+                currentType = record.type;
+                date = record.date;
+                description = record.description;
+                notes = record.notes || '';
+                weightValue = record.value || '';
+            } else {
+                currentType = 'vet_visit';
+                date = new Date().toISOString().split('T')[0];
+                description = '';
+                notes = '';
+                weightValue = '';
+            }
         }
+    });
 
-        visible = true;
-        pushModalState();
-        toggleBodyScroll(true);
-    }
+    // Manage body scroll + modal history based on store state
+    $effect(() => {
+        if (modals.healthRecordModalOpen) {
+            pushModalState();
+            toggleBodyScroll(true);
+            return () => {
+                popModalState();
+                toggleBodyScroll(false);
+            };
+        }
+    });
 
     function close() {
-        if (!visible) return;
-        visible = false;
-        popModalState();
-        toggleBodyScroll(false);
+        if (!modals.healthRecordModalOpen) return;
+        storeClose();
         editingRecord = null;
         currentDogId = null;
     }
@@ -93,22 +104,6 @@
     function handleOverlayClick(e) {
         if (e.target === e.currentTarget) close();
     }
-
-    $effect(() => {
-        function handleOpen(e) {
-            const { dogId, record } = e.detail || {};
-            if (dogId) open(dogId, record || null);
-        }
-        function handleCloseAll() { if (visible) close(); }
-
-        window.addEventListener('openHealthRecordModal', handleOpen);
-        window.addEventListener('close-all-modals', handleCloseAll);
-
-        return () => {
-            window.removeEventListener('openHealthRecordModal', handleOpen);
-            window.removeEventListener('close-all-modals', handleCloseAll);
-        };
-    });
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -135,7 +130,7 @@
                 showToast('Health record added', 'success');
             }
             close();
-            window.dispatchEvent(new CustomEvent('health-refresh'));
+            bumpHealthVersion();
         } catch (err) {
             console.error('Failed to save health record:', err);
             const msg = err.data?.details?.[0]?.message || err.message || 'Failed to save record';
@@ -151,7 +146,7 @@
 <div
     id="health-record-modal"
     class="modal"
-    style:display={visible ? 'block' : 'none'}
+    style:display={modals.healthRecordModalOpen ? 'block' : 'none'}
     onclick={handleOverlayClick}
     onkeydown={() => {}}
     role="dialog"

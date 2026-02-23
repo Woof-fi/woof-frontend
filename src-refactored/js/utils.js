@@ -2,6 +2,7 @@
  * Utility Functions
  * Reusable helper functions for the application
  */
+import { showToast as _showToast } from './toast-store.svelte.js';
 
 /**
  * Sanitize HTML to prevent XSS attacks
@@ -159,27 +160,11 @@ export function trapFocus(element) {
 
 /**
  * Show toast notification
+ * Delegates to toast-store.svelte.js which renders via Toast.svelte component.
  * @param {string} message - Message to show
  * @param {string} type - Type of toast ('success', 'error', 'info')
  */
-export function showToast(message, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-
-    document.body.appendChild(toast);
-
-    // Animate in
-    setTimeout(() => toast.classList.add('toast-show'), 10);
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-        toast.classList.remove('toast-show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
+export function showToast(message, type = 'info') { _showToast(message, type); }
 
 /**
  * Create loading spinner element

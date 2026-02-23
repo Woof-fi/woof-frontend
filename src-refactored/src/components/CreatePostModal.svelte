@@ -4,7 +4,13 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { showToast } from '../../js/utils.js';
+    import {
+        modals, closeCreatePostModal as storeClose,
+        openAuthModal, openCreateDogModal,
+    } from '../../js/modal-store.svelte.js';
+    import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
 
+    // Local visibility — controlled by async open checks
     let visible = $state(false);
     let dogs = $state([]);
     let selectedDogId = $state('');
@@ -17,42 +23,59 @@
     let cameraInputEl = $state(null);
     let galleryInputEl = $state(null);
 
-    async function open() {
-        if (!isAuthenticated()) {
-            showToast('Please login to create a post', 'error');
-            window.dispatchEvent(new CustomEvent('open-auth-modal'));
-            return;
-        }
+    // Watch store state — run async open checks or propagate close
+    $effect(() => {
+        if (modals.createPostModalOpen && !visible) {
+            (async () => {
+                if (!isAuthenticated()) {
+                    showToast('Please login to create a post', 'error');
+                    storeClose();
+                    openAuthModal();
+                    return;
+                }
 
-        try {
-            dogs = await getMyDogs();
-        } catch {
-            showToast('Failed to load your dogs', 'error');
-            return;
-        }
+                let fetchedDogs;
+                try {
+                    fetchedDogs = await getMyDogs();
+                } catch {
+                    showToast('Failed to load your dogs', 'error');
+                    storeClose();
+                    return;
+                }
 
-        if (dogs.length === 0) {
-            showToast('Please add a dog first', 'error');
-            window.dispatchEvent(new CustomEvent('openCreateDogModal'));
-            return;
-        }
+                if (fetchedDogs.length === 0) {
+                    showToast('Please add a dog first', 'error');
+                    storeClose();
+                    openCreateDogModal();
+                    return;
+                }
 
-        if (dogs.length === 1) {
-            selectedDogId = dogs[0].id;
-            showDogSelect = false;
-        } else {
-            selectedDogId = '';
-            showDogSelect = true;
-        }
+                dogs = fetchedDogs;
+                if (dogs.length === 1) {
+                    selectedDogId = dogs[0].id;
+                    showDogSelect = false;
+                } else {
+                    selectedDogId = '';
+                    showDogSelect = true;
+                }
 
-        visible = true;
-        pushModalState();
-        toggleBodyScroll(true);
-    }
+                visible = true;
+                pushModalState();
+                toggleBodyScroll(true);
+            })();
+        } else if (!modals.createPostModalOpen && visible) {
+            // Store requested close (e.g. back button via closeAllModals)
+            visible = false;
+            popModalState();
+            toggleBodyScroll(false);
+            resetForm();
+        }
+    });
 
     function close() {
         if (!visible) return;
         visible = false;
+        storeClose();
         popModalState();
         toggleBodyScroll(false);
         resetForm();
@@ -74,21 +97,6 @@
     function handleOverlayClick(e) {
         if (e.target === e.currentTarget) close();
     }
-
-    $effect(() => {
-        function handleOpen() { open(); }
-        function handleCloseAll() { if (visible) close(); }
-
-        window.addEventListener('openCreatePostModal', handleOpen);
-        window.addEventListener('open-create-post-modal', handleOpen);
-        window.addEventListener('close-all-modals', handleCloseAll);
-
-        return () => {
-            window.removeEventListener('openCreatePostModal', handleOpen);
-            window.removeEventListener('open-create-post-modal', handleOpen);
-            window.removeEventListener('close-all-modals', handleCloseAll);
-        };
-    });
 
     function handleFileSelect(file) {
         if (!file) return;
@@ -128,9 +136,9 @@
         try {
             showToast('Uploading image...', 'info');
             const imageUrl = await uploadImage(selectedFile);
-            const post = await createPost(selectedDogId, imageUrl, caption);
+            await createPost(selectedDogId, imageUrl, caption);
             close();
-            window.dispatchEvent(new CustomEvent('feed-refresh', { detail: post }));
+            bumpFeedVersion();
         } catch (err) {
             console.error('Failed to create post:', err);
         } finally {

@@ -600,5 +600,20 @@ export async function getUnreadCount() {
     return apiRequest('/api/messages/unread-count');
 }
 
+/**
+ * Sync authenticated Cognito user to backend DB (creates record if first login).
+ * Must be called on app init whenever a valid session is already present.
+ * @returns {Promise<object|null>} - User object or null on failure
+ */
+export async function syncUser() {
+    try {
+        const data = await apiRequest('/api/auth/sync', { method: 'POST' });
+        return data.user ?? null;
+    } catch (error) {
+        console.error('User sync failed:', error);
+        return null;
+    }
+}
+
 // Export APIError for use in other modules
 export { APIError };

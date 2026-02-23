@@ -4,7 +4,7 @@
 Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`woofapp.fi`). Uses Svelte 5 runes exclusively — never Svelte 4 patterns. Vanilla JS modules handle auth, API, and utility concerns; Svelte components own the UI.
 
 ## Architecture
-- **Auth**: AWS Cognito via `amazon-cognito-identity-js` SDK. Frontend handles signup, login, verification, password reset directly with Cognito. After login, calls `POST /api/auth/sync` to create/find the backend user record.
+- **Auth**: AWS Cognito via `amazon-cognito-identity-js` SDK. Frontend handles signup, login, verification, password reset directly with Cognito. After login, calls `POST /api/auth/sync` to create/find the backend user record. Also called on app init via `syncUser()` in `App.svelte` whenever a valid session is already present (covers page reloads and returning users).
 - **Token management**: Cognito ID token stored in `localStorage` as `auth_token`. `getToken()` is synchronous (reads from localStorage). `refreshSession()` refreshes via Cognito SDK on app init (called from `src/main.ts`).
 - **API layer**: `js/api.js` — centralized API calls. Injects `Authorization: Bearer` header using `getToken()`. Import directly in Svelte components; never fetch outside this module.
 - **Routing**: `src/router/Router.svelte` — SPA router using path-to-regex matching, popstate, and data-link click interception. Renders view components based on current path.
@@ -31,32 +31,33 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `EditDogModal.svelte` — Dog profile editing
 - `HealthRecordModal.svelte` — Health record add/edit with type-specific fields
 - `InviteCard.svelte` — Invite prompt card for feed
-- `Search.svelte` — Search panel (delegates to `js/search.js` for rendering)
+- `Search.svelte` — Search panel
+- `Toast.svelte` — Renders toast notifications from `js/toast-store.svelte.js`
 
 ### Svelte Views (`src/views/`)
 - `HomeView.svelte` — Tabbed feed (For You / Following); tab switch triggers Feed re-render
-- `ProfileView.svelte` — Full Svelte 5: fetches dog, posts, follow status, friends, health records; dispatches window events to EditDogModal/HealthRecordModal
+- `ProfileView.svelte` — Full Svelte 5: fetches dog, posts, follow status, friends, health records; calls openEditDogModal/openHealthRecordModal from modal-store
 - `PostDetailView.svelte` — Single post view
 - `MessagesView.svelte` — Two-panel messaging with 10s polling
 
-### Vanilla JS (immutable core — never modify these 4)
-- `js/api.js` — All API calls
+### Vanilla JS (stable core — modify only to add new API functions or utility helpers)
+- `js/api.js` — All API calls (add new endpoint functions here; never call fetch directly from components)
 - `js/auth.js` — Cognito token management
 - `js/config.js` — App config + Cognito IDs
 - `js/utils.js` — escapeHTML, timeAgo, isValidFileType, showToast
 
 ### Vanilla JS (support modules)
-- `js/svelte-store.svelte.js` — Svelte 5 `$state` store (cross-component state)
+- `js/svelte-store.svelte.js` — Svelte 5 `$state` store (authUser, unreadCount, currentDog + version signals dogVersion/feedVersion/profileVersion/healthVersion)
+- `js/modal-store.svelte.js` — Svelte 5 `$state` store for all modal/panel visibility and data; open*/close* functions replace old window custom events
 - `js/modal-history.js` — pushModalState / popModalState / handleModalPopstate (browser history for back-button modal close)
-- `js/modals.js` — Dispatches `window` custom events that Svelte modal components listen to (e.g. `open-auth-modal`)
-- `js/navigation.js` — Auth-link DOM sync helper; Navigation.svelte handles nav rendering
-- `js/search.js` — Dog search rendering
+- `js/toast-store.svelte.js` — Svelte 5 `$state` toast list; showToast() used via delegation from utils.js
 - `js/ui.js` — Skeletons, loading states, animateIn, toggleBodyScroll
 - `js/onboarding-tour.js` — First-dog onboarding tour
 
 ### Dead code (descoped, do not import)
 - `js/cart-modal.js` — E-commerce feature, abandoned
 - `js/i18n.js` — i18n stub, English-only
+- `js/auth-modal.js` — Legacy DOM-based auth modal; auth is now fully in `AuthModal.svelte`
 
 ## Auth Modal States
 `src/components/AuthModal.svelte` handles 5 modes via a single `mode` `$state`:
@@ -120,7 +121,7 @@ npm run deploy   # build + S3 sync (s3://woofapp.fi/) — uses full aws path on 
 
 ### Unit Tests (Vitest)
 ```bash
-npm test              # Run all unit tests (44 tests, 6 suites)
+npm test              # Run all unit tests (34 tests, 5 suites)
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage
 ```

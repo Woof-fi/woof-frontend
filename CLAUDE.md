@@ -26,7 +26,7 @@ Always use the skills above instead of running `npm run deploy` directly.
 - **Callback props** — inter-component events use callback props (e.g. `onopenAuthModal = null`), not `createEventDispatcher`.
 - **Auth token** in `localStorage` as `auth_token`; read via `getToken()` from `js/auth.js` (synchronous).
 - **All API calls** go through `js/api.js` — never fetch directly from components.
-- **State sharing** — use `js/svelte-store.svelte.js` (setAuthUser, setUnreadCount, setCurrentDog) from Svelte components; `js/store.js` for legacy vanilla modules.
+- **State sharing** — use `js/svelte-store.svelte.js` (setAuthUser, setUnreadCount, setCurrentDog + bump*Version signals) for auth/feed/profile state; `js/modal-store.svelte.js` for modal visibility.
 - **No `<style>` blocks** — all styles live in `css/styles.css`; design tokens in `css/tokens.css`.
 - **XSS safety** — Svelte escapes template interpolations automatically; use `escapeHTML()` from `utils.js` in any remaining vanilla JS `innerHTML` contexts.
 
@@ -43,11 +43,10 @@ src-refactored/
 │   ├── auth.js             # Cognito token management — never modify
 │   ├── config.js           # Cognito IDs + app constants — never modify
 │   ├── utils.js            # escapeHTML, timeAgo, isValidFileType, showToast
-│   ├── svelte-store.svelte.js  # Svelte 5 $state store (authUser, unreadCount, currentDog)
+│   ├── svelte-store.svelte.js  # Svelte 5 $state store (authUser, unreadCount, currentDog + version signals)
+│   ├── modal-store.svelte.js   # Svelte 5 $state store for all modal/panel open state + data
+│   ├── toast-store.svelte.js   # Svelte 5 $state toast list (used via utils.js showToast)
 │   ├── modal-history.js    # pushModalState / popModalState / handleModalPopstate
-│   ├── modals.js           # Dispatches window custom events to Svelte modal components
-│   ├── navigation.js       # Auth-link DOM sync helper (Svelte Navigation handles the rest)
-│   ├── search.js           # Dog search (called from Search.svelte)
 │   ├── ui.js               # Skeletons, loading states, animateIn, toggleBodyScroll
 │   └── onboarding-tour.js  # First-dog onboarding tour
 ├── src/
@@ -85,7 +84,7 @@ npm run deploy   # build + S3 sync (uses full aws path — see package.json)
 ## Testing
 
 ```bash
-npm test                  # Vitest unit tests (44 tests, 6 suites)
+npm test                  # Vitest unit tests (34 tests, 5 suites)
 npm run test:e2e:headed   # Playwright E2E against production (always headed)
 ```
 

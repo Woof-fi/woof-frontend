@@ -4,6 +4,7 @@
  * Extracted from modals.js so Svelte components can import without
  * pulling in all the vanilla-JS modal initialisation code.
  */
+import { closeAllModals } from './modal-store.svelte.js';
 
 // Track whether a modal pushed a history state
 let modalStateActive = false;
@@ -51,8 +52,7 @@ export function handleModalPopstate() {
     if (modalStateActive) {
         modalStateActive = false;
         closingFromPopstate = true;
-        // Dispatch event so all Svelte modals close themselves
-        window.dispatchEvent(new CustomEvent('close-all-modals'));
+        closeAllModals();
         return true;
     }
     return false;

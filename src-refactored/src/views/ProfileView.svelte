@@ -5,6 +5,8 @@
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast } from '../../js/utils.js';
     import { showOnboardingTour, isOnboardingCompleted } from '../../js/onboarding-tour.js';
+    import { openEditDogModal, openHealthRecordModal } from '../../js/modal-store.svelte.js';
+    import { store } from '../../js/svelte-store.svelte.js';
 
     let { params = {}, onopenAuthModal = null } = $props();
     let slug = $derived(params.slug || 'nelli-1');
@@ -53,9 +55,10 @@
         });
     }
 
-    // Main init — re-runs when slug changes
+    // Main init — re-runs when slug or profileVersion changes
     $effect(() => {
         const s = slug;
+        const _pv = store.profileVersion; // re-runs on bumpProfileVersion()
         // Reset all state synchronously
         dog = null;
         loading = true;
@@ -127,32 +130,10 @@
         }
     });
 
-    // Listen for profile-refresh from EditDogModal
+    // Re-fetch health records when healthVersion bumps (HealthRecordModal calls bumpHealthVersion)
     $effect(() => {
-        async function handleProfileRefresh() {
-            if (!dog) return;
-            try {
-                const refreshedDog = slug.includes('-')
-                    ? await getDogBySlug(slug)
-                    : await getDog(slug);
-                dog = refreshedDog;
-            } catch (e) {
-                console.error('Profile refresh failed:', e);
-            }
-        }
-        window.addEventListener('profile-refresh', handleProfileRefresh);
-        return () => window.removeEventListener('profile-refresh', handleProfileRefresh);
-    });
-
-    // Listen for health-refresh from HealthRecordModal
-    $effect(() => {
-        function handleHealthRefresh() {
-            if (dog?.isOwner && dog?.id) {
-                loadHealth();
-            }
-        }
-        window.addEventListener('health-refresh', handleHealthRefresh);
-        return () => window.removeEventListener('health-refresh', handleHealthRefresh);
+        const _hv = store.healthVersion;
+        if (dog?.isOwner && dog?.id) loadHealth();
     });
 
     async function loadFriends() {
@@ -199,19 +180,15 @@
     }
 
     function handleEditDog() {
-        window.dispatchEvent(new CustomEvent('openEditDogModal', { detail: dog }));
+        openEditDogModal(dog);
     }
 
     function handleAddHealthRecord() {
-        window.dispatchEvent(new CustomEvent('openHealthRecordModal', {
-            detail: { dogId: dog.id, record: null }
-        }));
+        openHealthRecordModal(dog.id, null);
     }
 
     function handleEditHealthRecord(record) {
-        window.dispatchEvent(new CustomEvent('openHealthRecordModal', {
-            detail: { dogId: dog.id, record }
-        }));
+        openHealthRecordModal(dog.id, record);
     }
 
     async function handleDeleteHealthRecord(record) {

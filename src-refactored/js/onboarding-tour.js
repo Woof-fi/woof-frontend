@@ -5,7 +5,7 @@
  */
 
 import { toggleBodyScroll } from './ui.js';
-import { pushModalState, popModalState } from './modals.js';
+import { pushModalState, popModalState } from './modal-history.js';
 
 const ONBOARDING_KEY = 'onboarding_completed';
 
