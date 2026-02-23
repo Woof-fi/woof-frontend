@@ -10,7 +10,9 @@ const AUTH_LINK = '.header-icons .auth-link';
 
 let testUser: TestUser;
 
-/** Log in via UI and return the auth token from localStorage */
+/** Log in via UI and return the auth token from localStorage.
+ *  Also waits for POST /api/auth/sync to complete so the backend user record
+ *  exists before the test makes any API calls (avoids owner_id FK failures). */
 async function loginUser(page: import('@playwright/test').Page, user: TestUser): Promise<string> {
     adminCreateUser(user);
     await page.goto('/');
@@ -25,7 +27,12 @@ async function loginUser(page: import('@playwright/test').Page, user: TestUser):
     await page.click('#auth-submit');
     await expect(page.locator('#auth-modal')).toBeHidden({ timeout: 15_000 });
     await expect(page.locator(AUTH_LINK)).toContainText('Logout');
-    return (await page.evaluate(() => localStorage.getItem('auth_token'))) ?? '';
+    const token = (await page.evaluate(() => localStorage.getItem('auth_token'))) ?? '';
+    // Explicitly sync the user so the backend DB record exists before API calls
+    await page.request.post(`${API_BASE}/api/auth/sync`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return token;
 }
 
 test.beforeEach(() => {
@@ -51,7 +58,7 @@ test.describe('Post options sheet', () => {
         // Create a dog via API
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${token}` },
-            data: { name: 'E2E PostDog', breed: 'Test Breed', age: 2 },
+            data: { name: 'E2E PostDog', breed: 'Test Breed', age: 2, location: 'Helsinki' },
         });
         expect(dogRes.ok()).toBeTruthy();
         const dogData = await dogRes.json();
@@ -60,16 +67,16 @@ test.describe('Post options sheet', () => {
         // Create a post via API
         const postRes = await page.request.post(`${API_BASE}/api/posts`, {
             headers: { Authorization: `Bearer ${token}` },
-            data: { caption: 'E2E delete test post', dog_id: dogId },
+            data: { caption: 'E2E delete test post', dog_id: dogId, image_url: 'https://woofapp.fi/images/logo.png' },
         });
         expect(postRes.ok()).toBeTruthy();
 
         // Reload the page so the feed fetches the new post
         await page.reload();
-        await page.waitForSelector('.post-card', { timeout: 15_000 });
+        await page.waitForSelector('.post', { timeout: 15_000 });
 
         // Find our post by caption
-        const postCard = page.locator('.post-card').filter({ hasText: 'E2E delete test post' }).first();
+        const postCard = page.locator('.post').filter({ hasText: 'E2E delete test post' }).first();
         await expect(postCard).toBeVisible({ timeout: 10_000 });
 
         // Open the options sheet
@@ -101,12 +108,12 @@ test.describe('Post options sheet', () => {
         // Create dog + post as author via API
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${authorToken}` },
-            data: { name: 'E2E AuthorDog', breed: 'Test', age: 1 },
+            data: { name: 'E2E AuthorDog', breed: 'Test', age: 1, location: 'Helsinki' },
         });
         const dogData = await dogRes.json();
         await page.request.post(`${API_BASE}/api/posts`, {
             headers: { Authorization: `Bearer ${authorToken}` },
-            data: { caption: 'E2E report target post', dog_id: dogData.dog.id },
+            data: { caption: 'E2E report target post', dog_id: dogData.dog.id, image_url: 'https://woofapp.fi/images/logo.png' },
         });
 
         // Logout author, login as reporter (testUser)
@@ -117,10 +124,10 @@ test.describe('Post options sheet', () => {
 
         // Reload feed
         await page.reload();
-        await page.waitForSelector('.post-card', { timeout: 15_000 });
+        await page.waitForSelector('.post', { timeout: 15_000 });
 
         // Find the author's post
-        const targetCard = page.locator('.post-card').filter({ hasText: 'E2E report target post' }).first();
+        const targetCard = page.locator('.post').filter({ hasText: 'E2E report target post' }).first();
         await expect(targetCard).toBeVisible({ timeout: 10_000 });
 
         // Open options sheet
@@ -151,12 +158,12 @@ test.describe('Post options sheet', () => {
 
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${authorToken}` },
-            data: { name: 'E2E BookmarkDog', breed: 'Test', age: 1 },
+            data: { name: 'E2E BookmarkDog', breed: 'Test', age: 1, location: 'Helsinki' },
         });
         const dogData = await dogRes.json();
         await page.request.post(`${API_BASE}/api/posts`, {
             headers: { Authorization: `Bearer ${authorToken}` },
-            data: { caption: 'E2E bookmark test post', dog_id: dogData.dog.id },
+            data: { caption: 'E2E bookmark test post', dog_id: dogData.dog.id, image_url: 'https://woofapp.fi/images/logo.png' },
         });
 
         // Log in as reporter (testUser)
@@ -165,9 +172,9 @@ test.describe('Post options sheet', () => {
         const reporterToken = await loginUser(page, testUser);
 
         await page.reload();
-        await page.waitForSelector('.post-card', { timeout: 15_000 });
+        await page.waitForSelector('.post', { timeout: 15_000 });
 
-        const targetCard = page.locator('.post-card').filter({ hasText: 'E2E bookmark test post' }).first();
+        const targetCard = page.locator('.post').filter({ hasText: 'E2E bookmark test post' }).first();
         await expect(targetCard).toBeVisible({ timeout: 10_000 });
 
         // Open options sheet
