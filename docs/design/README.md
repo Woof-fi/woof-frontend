@@ -10,7 +10,7 @@ A playful, community-first design system for the Woof app — a social platform 
 
 Woof's design language is **friendly, bold, and clean**. It draws from two visual references: the **Collaction app** (warm orange primary, clean thin-stroke SVG outline icons, flat white bottom nav, profile avatar overlapping hero) and **Dogger** (squarish story thumbnails with rounded corners). The system is mobile-first, content-forward, and built for community.
 
-The primary brand color is **Woof Orange** (`#EF4621`), paired with a near-white clean background (`#FAFAF8`) and an orange-to-amber gradient (`linear-gradient(135deg, #EF4621, #F5A623)`) for story rings and the center nav button.
+The primary brand color is **Woof Crimson** (`#C9403F`), paired with a near-white clean background (`#FAFAF8`) and a crimson-to-gold gradient (`linear-gradient(135deg, #C9403F, #C3A84E)`) for story rings and the center nav button. A complementary artisan palette — warm gold (`#C3A84E`), straw butter (`#F0CA78`), dark slate (`#4A5A6B`), dusty cerulean (`#799FAE`), and ice blue (`#C8DAE4`) — provides secondary accent and tint colors.
 
 ---
 
@@ -29,8 +29,8 @@ The primary brand color is **Woof Orange** (`#EF4621`), paired with a near-white
 
 ## Core Principles
 
-### 1. Orange Energy
-Woof Orange (`#EF4621`) anchors every primary action and active state. Pair with the brand gradient (orange → golden amber) for story rings and the center create button. Never feel corporate — always feel alive.
+### 1. Artisan Warmth
+Woof Crimson (`#C9403F`) anchors every primary action and active state. Pair with the brand gradient (crimson → khaki gold) for story rings and the center create button. Warm, crafted, alive — never corporate.
 
 ### 2. Content is King
 Dogs are the stars. UI chrome steps back — minimal borders, clean whites and lavenders, and generous imagery space let photos breathe.
@@ -54,7 +54,7 @@ The system closely follows Apple HIG conventions — safe areas, standard touch 
 | Tagline | "Every dog has its day" |
 | Mascot icon | 🐾 paw print |
 | Tone | Playful, warm, community-driven |
-| Primary color | Woof Orange `#EF4621` |
+| Primary color | Woof Crimson `#C9403F` |
 | Background | Warm sandy cream `#FAFAF8` |
-| Brand gradient | `linear-gradient(135deg, #EF4621, #F5A623)` |
+| Brand gradient | `linear-gradient(135deg, #C9403F, #C3A84E)` |
 | Primary market | iOS mobile |

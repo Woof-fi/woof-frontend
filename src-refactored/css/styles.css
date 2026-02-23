@@ -3042,7 +3042,7 @@ button.view-all-comments:hover {
     top: 0; left: 0;
     height: 3px;
     width: 0;
-    background: var(--woof-orange, #EF4621);
+    background: var(--woof-color-brand-primary);
     z-index: 10000;
     transition: none;
     pointer-events: none;

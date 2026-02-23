@@ -1,8 +1,8 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-02-21
-**Current Phase:** Phase 5A Complete (Cognito + SES + Onboarding UX + Design System)
-**Next Phase:** Phase 5B (Content Moderation)
+**Last Updated:** 2026-02-23
+**Current Phase:** Phase 5B Complete (Svelte 5 Migration + Architectural Refactor + UI Polish + Color Palette)
+**Next Phase:** Phase 5C (Content Moderation)
 
 ---
 
@@ -121,7 +121,29 @@ role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'))
 - Design reference at `docs/design/index.html` (interactive, opens in any browser)
 - `docs/design/tokens.json` — W3C Design Token format for Figma/Style Dictionary
 
-### 5B. Content Moderation
+### 5B. Svelte 5 Migration + Architectural Refactor + UI Polish (COMPLETE)
+
+**Svelte 5 Migration (2026-02-22):**
+- Full migration from vanilla JS views to Svelte 5 SPA (`src-refactored/`)
+- 44 component unit tests pass; build: 201 modules, 217.85 kB
+- Runes-only: `$props()`, `$state()`, `$derived()`, `$effect()` — no Svelte 4 patterns
+- Event bus (window custom events) eliminated — replaced by `modal-store.svelte.js` callback props
+- ProfileView fully migrated to Svelte 5; dead JS files deleted
+
+**Architectural Refactor (2026-02-22):**
+- N+1 query fix in postController (LEFT JOIN aggregation)
+- createDog wrapped in transaction; getAllDogs cursor-paginated
+- Cache-Control + ETag headers on feed and profile responses
+- Performance indexes migration (013_performance_indexes.sql)
+- 185/185 backend tests pass
+
+**UI Polish (2026-02-23):**
+- Skeleton shimmer loaders implemented and wired up in Feed.svelte + ProfileView.svelte ✅
+- Brand color palette updated from Woof Orange (`#EF4621`) to Woof Crimson (`#C9403F`)
+- New artisan palette tokens: gold (`#C3A84E`), butter (`#F0CA78`), slate-dark (`#4A5A6B`), slate-mid (`#799FAE`), ice blue (`#C8DAE4`)
+- Design system docs updated: `docs/design/index.html`, `foundations.md`, `README.md`
+
+### 5C. Content Moderation
 
 **Hate speech filter — Buy: Google Perspective API**
 
@@ -151,7 +173,7 @@ ALTER TABLE posts ADD COLUMN moderation_status VARCHAR(20) DEFAULT 'approved';
 CREATE INDEX idx_posts_moderation ON posts(moderation_status);
 ```
 
-### 5C. Reporting System
+### 5D. Reporting System
 
 **Decision: Build (simple CRUD)**
 
@@ -213,7 +235,7 @@ Moderators also see a flag/shield icon on posts in the normal feed for quick mod
 
 **Admin approach:** Built into the main app as `/admin/*` routes, not a separate subdomain. Separate to `admin.woofapp.fi` only if admin grows beyond ~10 pages or external moderators are hired.
 
-### 5D. Error Tracking
+### 5E. Error Tracking
 
 **Decision: Buy (Sentry free tier)**
 
@@ -616,8 +638,8 @@ When you need funnels, retention analysis, and session recordings, add a managed
 
 | # | File | Phase | Feature |
 |---|------|-------|---------|
-| 013 | moderation.sql | 5B | Content moderation status on posts |
-| 014 | reports.sql | 5C | Reporting system |
+| 013 | moderation.sql | 5C | Content moderation status on posts |
+| 014 | reports.sql | 5D | Reporting system |
 | 015 | notifications.sql | 7A | In-app notifications |
 | 016 | hashtags.sql | 7B | Hashtags |
 | 017 | breeds.sql | 7C | Breed normalization + communities |

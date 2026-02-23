@@ -11,14 +11,11 @@
 **Live:** [woofapp.fi](https://woofapp.fi) (S3 + Cloudflare)
 **Backend:** `https://api.woofapp.fi` (Express on EB, see `../woof-backend/CLAUDE.md`)
 
-## Mandatory Skills — Use These, Not Raw Commands
+## Deploy
 
+```bash
+cd src-refactored && npm run deploy   # build + S3 sync (full aws path already in package.json)
 ```
-/endpoint   — look up or scaffold a new API call in api.js
-/deploy     — build + S3 sync (handles full aws path on Windows)
-```
-
-Always use the skills above instead of running `npm run deploy` directly.
 
 ## Key Conventions
 
@@ -28,6 +25,7 @@ Always use the skills above instead of running `npm run deploy` directly.
 - **All API calls** go through `js/api.js` — never fetch directly from components.
 - **State sharing** — use `js/svelte-store.svelte.js` (setAuthUser, setUnreadCount, setCurrentDog + bump*Version signals) for auth/feed/profile state; `js/modal-store.svelte.js` for modal visibility.
 - **No `<style>` blocks** — all styles live in `css/styles.css`; design tokens in `css/tokens.css`.
+- **Design system** — always use `--woof-*` CSS custom properties for all colors, spacing, radius, shadows, and typography. Never hardcode hex values or pixel sizes that have a token equivalent. Brand primary is `--woof-color-brand-primary` (`#C9403F`). Full palette and reference: `docs/design/index.html`.
 - **XSS safety** — Svelte escapes template interpolations automatically; use `escapeHTML()` from `utils.js` in any remaining vanilla JS `innerHTML` contexts.
 
 ## Folder Map
@@ -36,7 +34,7 @@ Always use the skills above instead of running `npm run deploy` directly.
 src-refactored/
 ├── index.html              # SPA entry — <div id="app"> only
 ├── css/
-│   ├── tokens.css          # Design tokens (--woof-* namespace, Woof Orange #EF4621)
+│   ├── tokens.css          # Design tokens (--woof-* namespace, Woof Crimson #C9403F)
 │   └── styles.css          # All styles (no <style> blocks in components)
 ├── js/                     # Vanilla JS modules (immutable core + support)
 │   ├── api.js              # ALL API calls — never modify from components

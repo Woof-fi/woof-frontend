@@ -69,10 +69,11 @@
 
     // Mount effect — load feed, re-run on auth/feed version changes
     $effect(() => {
-        // Track type, auth state, and feed version for reactivity
+        // All three values must be read AND used to prevent DCE and ensure Svelte
+        // registers them as reactive dependencies.
         const currentType = type;
-        const _auth = store.authUser;
-        const _fv = store.feedVersion;
+        const authUser = store.authUser;       // used below: re-fetch on login/logout
+        void store.feedVersion;                // void: preserves reactive read, triggers re-fetch on new post
 
         let observer = null;
         let cleanup = false;
@@ -95,7 +96,7 @@
                 if (!cleanup) loading = false;
             }
 
-            if (!cleanup && isAuthenticated()) {
+            if (!cleanup && authUser) {
                 try {
                     myDogs = await getMyDogs();
                 } catch {

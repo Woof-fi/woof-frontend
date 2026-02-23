@@ -13,13 +13,20 @@
    * BRAND COLORS
    * =================================================== */
 
-  --woof-color-brand-primary:       #EF4621;
-  --woof-color-brand-primary-light: #F5865A;
-  --woof-color-brand-primary-dark:  #CC3615;
-  --woof-color-brand-primary-subtle:#FEF0EC;
+  --woof-color-brand-primary:       #C9403F;
+  --woof-color-brand-primary-light: #D97272;
+  --woof-color-brand-primary-dark:  #A83030;
+  --woof-color-brand-primary-subtle:#FBF0F0;
 
-  /* Brand gradient: warm orange → golden amber */
-  --woof-color-brand-gradient: linear-gradient(135deg, #EF4621, #F5A623);
+  /* Brand gradient: warm crimson → khaki gold */
+  --woof-color-brand-gradient: linear-gradient(135deg, #C9403F, #C3A84E);
+
+  /* New artisan palette */
+  --woof-color-gold:          #C3A84E;  /* warm khaki gold */
+  --woof-color-butter:        #F0CA78;  /* straw yellow */
+  --woof-color-slate-dark:    #4A5A6B;  /* dark navy */
+  --woof-color-slate-mid:     #799FAE;  /* dusty cerulean */
+  --woof-color-slate-light:   #C8DAE4;  /* ice blue */
 
   /* ===================================================
    * NEUTRAL PALETTE
@@ -59,7 +66,7 @@
   --woof-surface-overlay:     rgba(0, 0, 0, 0.4);
   --woof-surface-nav:         #FFFFFF;
   --woof-surface-nav-blur:    rgba(255, 255, 255, 0.95);
-  --woof-surface-story-ring:  linear-gradient(135deg, #EF4621, #F5A623);
+  --woof-surface-story-ring:  linear-gradient(135deg, #C9403F, #C3A84E);
   --woof-surface-story-seen:  #D1D1D1;
 
   /* ===================================================
@@ -147,7 +154,7 @@
   --woof-shadow-md:    0 4px 16px rgba(0, 0, 0, 0.10);
   --woof-shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.14);
   --woof-shadow-xl:    0 16px 48px rgba(0, 0, 0, 0.20);
-  --woof-shadow-brand: 0 4px 16px rgba(232, 67, 28, 0.35);
+  --woof-shadow-brand: 0 4px 16px rgba(201, 64, 63, 0.35);
   --woof-shadow-nav:   0 -1px 0 rgba(0, 0, 0, 0.06), 0 -4px 16px rgba(0, 0, 0, 0.04);
 
   /* ===================================================
@@ -219,7 +226,7 @@
   --woof-story-thumb-radius:      18px;
   --woof-story-ring-width:        2px;
   --woof-story-ring-gap:          2px;
-  --woof-story-ring-gradient:     linear-gradient(135deg, #EF4621, #F5A623);
+  --woof-story-ring-gradient:     linear-gradient(135deg, #C9403F, #C3A84E);
 
   /* ===================================================
    * COMPONENT TOKENS — TAGS / CHIPS

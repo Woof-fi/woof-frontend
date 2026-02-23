@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -10,12 +10,12 @@
   <style>
     /* ── TOKENS ─────────────────────────────────────── */
     :root {
-      --brand:          #EF4621;
-      --brand-light:    #F5865A;
-      --brand-dark:     #CC3615;
-      --brand-subtle:   #FEF0EC;
-      --brand-gradient: linear-gradient(135deg, #EF4621, #F5A623);
-      --brand-pink:     #F5A623;
+      --brand:          #C9403F;
+      --brand-light:    #D97272;
+      --brand-dark:     #A83030;
+      --brand-subtle:   #FBF0F0;
+      --brand-gradient: linear-gradient(135deg, #C9403F, #C3A84E);
+      --brand-pink:     #C3A84E;
 
       --n0:    #FFFFFF;
       --n50:   #FAFAF8;
@@ -36,7 +36,7 @@
       --shadow-sm:    0 2px 8px rgba(0,0,0,0.08);
       --shadow-md:    0 4px 16px rgba(0,0,0,0.10);
       --shadow-lg:    0 8px 32px rgba(0,0,0,0.14);
-      --shadow-brand: 0 4px 16px rgba(239,70,33,0.35);
+      --shadow-brand: 0 4px 16px rgba(201,64,63,0.35);
       --shadow-nav:   0 -1px 0 rgba(0,0,0,0.06), 0 -4px 16px rgba(0,0,0,0.04);
 
       --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -115,7 +115,7 @@
     }
     .sidebar-nav a.active {
       color: var(--brand-light);
-      background: rgba(239,70,33,0.10);
+      background: rgba(201,64,63,0.10);
       border-left-color: var(--brand);
     }
 
@@ -184,8 +184,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(239,70,33,0.20);
-      border: 1px solid rgba(239,70,33,0.40);
+      background: rgba(201,64,63,0.20);
+      border: 1px solid rgba(201,64,63,0.40);
       border-radius: 999px;
       padding: 4px 12px;
       font-size: 12px;
@@ -398,7 +398,7 @@
       cursor: pointer;
       font-size: 24px;
       color: #fff;
-      box-shadow: 0 4px 12px rgba(239,70,33,0.45);
+      box-shadow: 0 4px 12px rgba(201,64,63,0.45);
       transition: transform 0.15s;
     }
     .btn-create:hover { transform: scale(1.06); }
@@ -407,7 +407,7 @@
     .avatar-row { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
     .avatar {
       border-radius: 50%;
-      background: linear-gradient(135deg, #F5865A, var(--brand));
+      background: linear-gradient(135deg, #D97272, var(--brand));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -518,7 +518,7 @@
       width: 64px;
       height: 64px;
       border-radius: 18px;
-      background: linear-gradient(135deg, #F5865A, var(--brand));
+      background: linear-gradient(135deg, #D97272, var(--brand));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -526,7 +526,7 @@
     }
     /* Gradient ring: unseen uses a gradient border trick via box-shadow / outline-gradient */
     .story-ring.unseen {
-      box-shadow: 0 0 0 2.5px #EF4621, 0 0 0 5px transparent;
+      box-shadow: 0 0 0 2.5px #C9403F, 0 0 0 5px transparent;
       outline: 2.5px solid transparent;
       outline-offset: 2px;
       /* Gradient ring rendered via wrapper below in the demo */
@@ -540,14 +540,14 @@
     .story-ring-gradient-wrap {
       padding: 2.5px;
       border-radius: 20px;
-      background: linear-gradient(135deg, #EF4621, #F5A623);
+      background: linear-gradient(135deg, #C9403F, #C3A84E);
       display: inline-flex;
     }
     .story-ring-gradient-wrap .story-ring-inner {
       width: 58px;
       height: 58px;
       border-radius: 16px;
-      background: linear-gradient(135deg, #F5865A, var(--brand));
+      background: linear-gradient(135deg, #D97272, var(--brand));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -567,7 +567,7 @@
       font-size: 28px;
       color: #fff;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(239,70,33,0.40);
+      box-shadow: 0 4px 12px rgba(201,64,63,0.40);
     }
     .story-name { font-size: 11px; color: var(--n800); font-weight: 500; }
 
@@ -593,7 +593,7 @@
     }
     .profile-hero {
       height: 160px;
-      background: linear-gradient(160deg, #6a4c9c 0%, #a78bfa 50%, #F5A623 100%);
+      background: linear-gradient(160deg, #6a4c9c 0%, #a78bfa 50%, #C3A84E 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -626,7 +626,7 @@
       width: 88px;
       height: 88px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #F5865A, var(--brand));
+      background: linear-gradient(135deg, #D97272, var(--brand));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -743,7 +743,7 @@
       font-size: 24px;
       color: #fff;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(239,70,33,0.45);
+      box-shadow: 0 4px 12px rgba(201,64,63,0.45);
       transition: transform 0.15s;
     }
     .nav-create-btn:hover { transform: scale(1.08); }
@@ -819,7 +819,7 @@
     .tt-grad {
       width: 20px; height: 20px;
       border-radius: 6px;
-      background: linear-gradient(135deg, #EF4621, #F5A623);
+      background: linear-gradient(135deg, #C9403F, #C3A84E);
       display: inline-block;
       vertical-align: middle;
       margin-right: 8px;
@@ -867,7 +867,7 @@
     }
     .phone-screen-top {
       height: 240px;
-      background: linear-gradient(160deg, #FEF0EC 0%, #FAFAF8 100%);
+      background: linear-gradient(160deg, #FBF0F0 0%, #FAFAF8 100%);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -886,7 +886,7 @@
     }
     .mini-post-img {
       height: 100px;
-      background: linear-gradient(160deg, #6a4c9c 0%, #a78bfa 50%, #F5A623 100%);
+      background: linear-gradient(160deg, #6a4c9c 0%, #a78bfa 50%, #C3A84E 100%);
       display: flex;
       align-items: flex-end;
       padding: 8px;
@@ -976,7 +976,7 @@
     .gradient-swatch {
       height: 72px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #EF4621, #F5A623);
+      background: linear-gradient(135deg, #C9403F, #C3A84E);
       margin-bottom: 8px;
     }
 
@@ -1140,18 +1140,18 @@
               <div style="display:flex;align-items:center;gap:10px;">
                 <div style="width:36px;height:36px;background:var(--brand);border-radius:10px;"></div>
                 <div>
-                  <div style="font-weight:700;font-size:15px;color:var(--n900);">Woof Orange</div>
-                  <div style="font-family:monospace;font-size:12px;color:var(--n500);">#EF4621</div>
+                  <div style="font-weight:700;font-size:15px;color:var(--n900);">Woof Crimson</div>
+                  <div style="font-family:monospace;font-size:12px;color:var(--n500);">#C9403F</div>
                 </div>
               </div>
             </div>
             <div class="card">
               <div style="font-size:12px;font-weight:700;color:var(--n500);margin-bottom:4px;">BRAND GRADIENT</div>
               <div style="display:flex;align-items:center;gap:10px;">
-                <div style="width:36px;height:36px;background:linear-gradient(135deg,#EF4621,#F5A623);border-radius:10px;"></div>
+                <div style="width:36px;height:36px;background:linear-gradient(135deg,#C9403F,#C3A84E);border-radius:10px;"></div>
                 <div>
-                  <div style="font-weight:700;font-size:15px;color:var(--n900);">Orange → Amber</div>
-                  <div style="font-family:monospace;font-size:12px;color:var(--n500);">#EF4621 → #F5A623</div>
+                  <div style="font-weight:700;font-size:15px;color:var(--n900);">Crimson → Gold</div>
+                  <div style="font-family:monospace;font-size:12px;color:var(--n500);">#C9403F → #C3A84E</div>
                 </div>
               </div>
             </div>
@@ -1184,38 +1184,79 @@
         <div class="subsection-title">Brand</div>
         <div class="color-grid">
           <div class="color-swatch">
-            <div class="swatch-block" style="background:#EF4621;"></div>
+            <div class="swatch-block" style="background:#C9403F;"></div>
             <div class="swatch-info">
               <div class="swatch-name">Primary</div>
-              <div class="swatch-hex">#EF4621</div>
+              <div class="swatch-hex">#C9403F</div>
             </div>
           </div>
           <div class="color-swatch">
-            <div class="swatch-block" style="background:#F5865A;"></div>
+            <div class="swatch-block" style="background:#D97272;"></div>
             <div class="swatch-info">
               <div class="swatch-name">Primary Light</div>
-              <div class="swatch-hex">#F5865A</div>
+              <div class="swatch-hex">#D97272</div>
             </div>
           </div>
           <div class="color-swatch">
-            <div class="swatch-block" style="background:#CC3615;"></div>
+            <div class="swatch-block" style="background:#A83030;"></div>
             <div class="swatch-info">
               <div class="swatch-name">Primary Dark</div>
-              <div class="swatch-hex">#CC3615</div>
+              <div class="swatch-hex">#A83030</div>
             </div>
           </div>
           <div class="color-swatch">
-            <div class="swatch-block" style="background:#FEF0EC;border:1px solid #e9e7ef;"></div>
+            <div class="swatch-block" style="background:#FBF0F0;border:1px solid #e9e7ef;"></div>
             <div class="swatch-info">
               <div class="swatch-name">Primary Subtle</div>
-              <div class="swatch-hex">#FEF0EC</div>
+              <div class="swatch-hex">#FBF0F0</div>
             </div>
           </div>
           <div class="color-swatch">
-            <div class="swatch-block" style="background:linear-gradient(135deg,#EF4621,#F5A623);"></div>
+            <div class="swatch-block" style="background:linear-gradient(135deg,#C9403F,#C3A84E);"></div>
             <div class="swatch-info">
               <div class="swatch-name">Brand Gradient</div>
-              <div class="swatch-hex">Orange → Amber</div>
+              <div class="swatch-hex">Crimson → Gold</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Artisan Palette</div>
+        <div class="color-grid">
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#C3A84E;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Gold</div>
+              <div class="swatch-hex">#C3A84E</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#F0CA78;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Butter</div>
+              <div class="swatch-hex">#F0CA78</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#4A5A6B;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Slate Dark</div>
+              <div class="swatch-hex">#4A5A6B</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#799FAE;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Slate Mid</div>
+              <div class="swatch-hex">#799FAE</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-block" style="background:#C8DAE4;border:1px solid #e9e7ef;"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Ice Blue</div>
+              <div class="swatch-hex">#C8DAE4</div>
             </div>
           </div>
         </div>
@@ -1479,7 +1520,7 @@
           </div>
         </div>
         <div>
-          <div class="shadow-box" style="box-shadow:0 4px 16px rgba(239,70,33,0.35);">
+          <div class="shadow-box" style="box-shadow:0 4px 16px rgba(201,64,63,0.35);">
             <span class="shadow-name">shadow-brand</span>
           </div>
         </div>
@@ -1754,7 +1795,7 @@
         <span>Background: <code style="font-family:monospace;color:var(--brand);">#FFFFFF (flat white)</code></span>
         <span>Top border: <code style="font-family:monospace;color:var(--brand);">1px solid rgba(0,0,0,0.06)</code></span>
         <span>Center btn: <code style="font-family:monospace;color:var(--brand);">56px, 18px radius, gradient</code></span>
-        <span>Active icon: <code style="font-family:monospace;color:var(--brand);">#EF4621</code></span>
+        <span>Active icon: <code style="font-family:monospace;color:var(--brand);">#C9403F</code></span>
         <span>Icon style: <code style="font-family:monospace;color:var(--brand);">thin-stroke outline, stroke 1.8</code></span>
       </div>
     </section>
@@ -1906,28 +1947,53 @@
             <tbody>
               <tr>
                 <td class="tt-token">--woof-color-brand-primary</td>
-                <td class="tt-val"><span class="tt-swatch" style="background:#EF4621;"></span>#EF4621</td>
-                <td class="tt-desc">Woof Orange — primary brand, CTAs, active states</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#C9403F;"></span>#C9403F</td>
+                <td class="tt-desc">Woof Crimson — primary brand, CTAs, active states</td>
               </tr>
               <tr>
                 <td class="tt-token">--woof-color-brand-primary-light</td>
-                <td class="tt-val"><span class="tt-swatch" style="background:#F5865A;"></span>#F5865A</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#D97272;"></span>#D97272</td>
                 <td class="tt-desc">Hover and tint states</td>
               </tr>
               <tr>
                 <td class="tt-token">--woof-color-brand-primary-dark</td>
-                <td class="tt-val"><span class="tt-swatch" style="background:#CC3615;"></span>#CC3615</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#A83030;"></span>#A83030</td>
                 <td class="tt-desc">Pressed/active state</td>
               </tr>
               <tr>
                 <td class="tt-token">--woof-color-brand-primary-subtle</td>
-                <td class="tt-val"><span class="tt-swatch" style="background:#FEF0EC;border:1px solid #e9e7ef;"></span>#FEF0EC</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#FBF0F0;border:1px solid #e9e7ef;"></span>#FBF0F0</td>
                 <td class="tt-desc">Background tints, badge bg</td>
               </tr>
               <tr>
                 <td class="tt-token">--woof-color-brand-gradient</td>
-                <td class="tt-val"><span class="tt-grad"></span>linear-gradient(135deg, #EF4621, #F5A623)</td>
+                <td class="tt-val"><span class="tt-grad"></span>linear-gradient(135deg, #C9403F, #C3A84E)</td>
                 <td class="tt-desc">Story rings, center nav button</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-gold</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#C3A84E;"></span>#C3A84E</td>
+                <td class="tt-desc">Warm khaki gold — secondary CTAs, breed badges, highlighted metadata</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-butter</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#F0CA78;"></span>#F0CA78</td>
+                <td class="tt-desc">Straw yellow — background tints for info/warm states</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-slate-dark</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#4A5A6B;"></span>#4A5A6B</td>
+                <td class="tt-desc">Dark navy — rich dark UI elements, dark mode prep</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-slate-mid</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#799FAE;"></span>#799FAE</td>
+                <td class="tt-desc">Dusty cerulean — info states, secondary accents</td>
+              </tr>
+              <tr>
+                <td class="tt-token">--woof-color-slate-light</td>
+                <td class="tt-val"><span class="tt-swatch" style="background:#C8DAE4;border:1px solid #e9e7ef;"></span>#C8DAE4</td>
+                <td class="tt-desc">Ice blue — very light backgrounds, info tints</td>
               </tr>
               <tr>
                 <td class="tt-token">--woof-color-neutral-50</td>
@@ -1956,8 +2022,8 @@
               </tr>
               <tr>
                 <td class="tt-token">--woof-surface-story-ring</td>
-                <td class="tt-val"><span class="tt-grad"></span>gradient #EF4621 → #F5A623</td>
-                <td class="tt-desc">Unviewed story ring (orange-amber gradient)</td>
+                <td class="tt-val"><span class="tt-grad"></span>gradient #C9403F → #C3A84E</td>
+                <td class="tt-desc">unviewed story ring (crimson-gold gradient)</td>
               </tr>
             </tbody>
           </table>

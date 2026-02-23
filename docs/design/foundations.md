@@ -6,19 +6,33 @@
 
 | Token | Hex | Usage |
 |---|---|---|
-| `--woof-color-brand-primary` | `#EF4621` | Primary CTA buttons, active nav icons, highlights, brand logo |
-| `--woof-color-brand-primary-light` | `#F5865A` | Hover states, light-mode tints |
-| `--woof-color-brand-primary-dark` | `#CC3615` | Pressed states, active states |
-| `--woof-color-brand-primary-subtle` | `#FEF0EC` | Background tints, badge backgrounds |
-| `--woof-color-brand-gradient` | `linear-gradient(135deg, #EF4621, #F5A623)` | Story rings, center nav button, hero accents |
+| `--woof-color-brand-primary` | `#C9403F` | Primary CTA buttons, active nav icons, highlights, brand logo |
+| `--woof-color-brand-primary-light` | `#D97272` | Hover states, light-mode tints |
+| `--woof-color-brand-primary-dark` | `#A83030` | Pressed states, active states |
+| `--woof-color-brand-primary-subtle` | `#FBF0F0` | Background tints, badge backgrounds |
+| `--woof-color-brand-gradient` | `linear-gradient(135deg, #C9403F, #C3A84E)` | Story rings, center nav button, hero accents |
 
-> **Woof Orange** (`#EF4621`) is a warm, vivid orange-red that communicates energy, warmth, and community spirit. The brand gradient sweeps from orange to golden amber and is used for story rings and the center navigation button.
+> **Woof Crimson** (`#C9403F`) is a warm, artisanal crimson-red that communicates craft, warmth, and community spirit. The brand gradient sweeps from warm crimson to khaki gold and is used for story rings and the center navigation button.
+
+---
+
+### Artisan Palette
+
+A complementary set of earthy, warm-cool tones extracted from the brand moodboard. Use as accents, tints, and secondary UI elements.
+
+| Token | Hex | Usage |
+|---|---|---|
+| `--woof-color-gold` | `#C3A84E` | Warm khaki gold — secondary CTA tints, breed badges, highlighted metadata |
+| `--woof-color-butter` | `#F0CA78` | Straw yellow — background tints for info/warm states |
+| `--woof-color-slate-dark` | `#4A5A6B` | Dark navy — rich dark headings, dark mode prep |
+| `--woof-color-slate-mid` | `#799FAE` | Dusty cerulean — info state color, secondary accents |
+| `--woof-color-slate-light` | `#C8DAE4` | Ice blue — very light backgrounds, info tints |
 
 ---
 
 ### Neutral Palette
 
-The neutrals are clean and minimal — predominantly white surfaces with subtle off-white tints, letting the orange accent stand out.
+The neutrals are clean and minimal — predominantly white surfaces with subtle off-white tints, letting the crimson accent stand out.
 
 | Token | Hex | Usage |
 |---|---|---|
@@ -60,15 +74,15 @@ The neutrals are clean and minimal — predominantly white surfaces with subtle 
 | `--woof-surface-overlay` | `rgba(0,0,0,0.4)` | Image overlays, modals |
 | `--woof-surface-nav` | `#FFFFFF` | Bottom navigation bar (flat white, Collaction style) |
 | `--woof-surface-nav-blur` | `rgba(255,255,255,0.95)` | Nav bar with blur |
-| `--woof-surface-story-ring` | `linear-gradient(135deg, #EF4621, #F5A623)` | Unviewed story ring (gradient) |
+| `--woof-surface-story-ring` | `linear-gradient(135deg, #C9403F, #C3A84E)` | Unviewed story ring (gradient) |
 | `--woof-surface-story-ring-seen` | `#D1D1D1` | Viewed story ring |
 
 ---
 
 ### Color Usage Rules
 
-- **Never** use orange as a background for large areas — only for buttons, icons, and small accents
-- The brand gradient (`#EF4621 → #F5A623`) is reserved for story rings and the center nav button
+- **Never** use crimson as a background for large areas — only for buttons, icons, and small accents
+- The brand gradient (`#C9403F → #C3A84E`) is reserved for story rings and the center nav button
 - Always ensure 4.5:1 contrast ratio for text on any surface
 - White text on `--woof-color-brand-primary` passes AA contrast
 - Use `--woof-color-like` exclusively for like/heart interactions
@@ -196,7 +210,7 @@ Woof uses an **8px base grid** with a 4px micro-grid for fine adjustments.
 - **Style:** Clean, **thin-stroke SVG outline** icons (Collaction style). `stroke-width: 1.8`, `stroke-linecap: round`, `stroke-linejoin: round`. Active state may use a slightly bolder stroke or a filled variant; inactive state is always outline.
 - **Size:** 24px standard (tap targets always minimum 44×44px)
 - **Library:** SF Symbols (iOS) / Lucide React or Phosphor Icons (cross-platform) — both support thin-stroke outline variants
-- **Active color:** `--woof-color-brand-primary` (`#EF4621`)
+- **Active color:** `--woof-color-brand-primary` (`#C9403F`)
 - **Inactive color:** `--woof-color-neutral-400`
 - **Do not use** filled/solid icons as the default inactive state; reserve filled for active/selected feedback
 
@@ -224,5 +238,5 @@ Woof uses an **8px base grid** with a 4px micro-grid for fine adjustments.
 - **Corner radius:** Profile images use `--woof-radius-full`; feed post images use `--woof-radius-md` (12px); story thumbnails use 18px (`--woof-story-thumb-radius`)
 - **Overlays:** Use `--woof-surface-overlay` for text-over-image (caption tags, gradient overlays)
 - **Object fit:** `cover` — always fill the container, center crop
-- **Story thumbnails:** 56px squarish rounded rectangles, wrapped in a 2px orange-amber gradient ring (`linear-gradient(135deg, #EF4621, #F5A623)`) with a 2px white gap. Seen stories use a `#D1D1D1` ring.
+- **Story thumbnails:** 56px squarish rounded rectangles, wrapped in a 2px crimson-gold gradient ring (`linear-gradient(135deg, #C9403F, #C3A84E)`) with a 2px white gap. Seen stories use a `#D1D1D1` ring.
 - **Profile hero:** Full-width hero photo; the avatar overlaps downward from the bottom edge of the hero image (Collaction style), centered, with the dog's name and breed displayed below as centered text with a thin divider
