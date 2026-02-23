@@ -115,7 +115,7 @@ onopenAuthModal?.();
 ```bash
 npm run dev      # Vite dev server (needs backend running on :3000 or VITE_API_URL set)
 npm run build    # tsc --noEmit && vite build
-npm run deploy   # build + S3 sync (s3://woofapp.fi/) — uses full aws path on Windows
+npm run deploy   # build + S3 sync (s3://woofapp.fi/)
 ```
 
 ## Testing

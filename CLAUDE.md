@@ -14,7 +14,7 @@
 ## Deploy
 
 ```bash
-cd src-refactored && npm run deploy   # build + S3 sync (full aws path already in package.json)
+cd src-refactored && npm run deploy   # build + S3 sync to s3://woofapp.fi/
 ```
 
 ## Key Conventions
