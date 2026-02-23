@@ -6,7 +6,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 ## Architecture
 - **Auth**: AWS Cognito via `amazon-cognito-identity-js` SDK. Frontend handles signup, login, verification, password reset directly with Cognito. After login, calls `POST /api/auth/sync` to create/find the backend user record. Also called on app init via `syncUser()` in `App.svelte` whenever a valid session is already present (covers page reloads and returning users).
 - **Token management**: Cognito ID token stored in `localStorage` as `auth_token`. `getToken()` is synchronous (reads from localStorage). `refreshSession()` refreshes via Cognito SDK on app init (called from `src/main.ts`).
-- **API layer**: `js/api.js` — centralized API calls. Injects `Authorization: Bearer` header using `getToken()`. Import directly in Svelte components; never fetch outside this module.
+- **API layer**: `js/api.js` — centralized API calls. Injects `Authorization: Bearer` header using `getToken()`. Import directly in Svelte components; never fetch outside this module. Default `cache: 'no-store'`; pass `cache: 'default'` on stable read endpoints (`getDog`, `getDogBySlug`, `getFollowStatus`) to honour backend Cache-Control headers.
 - **Routing**: `src/router/Router.svelte` — SPA router using path-to-regex matching, popstate, and data-link click interception. Renders view components based on current path.
 - **State store**: `js/svelte-store.svelte.js` — Svelte 5 `$state` rune store for cross-component state (authUser, unreadCount, currentDog). Svelte components import from here.
 - **Svelte 5 runes**: Use `$props()`, `$state()`, `$derived()`, `$effect()` exclusively. No `writable`, `createEventDispatcher`, or `$on` — those are Svelte 4.
@@ -118,6 +118,8 @@ npm run build    # tsc --noEmit && vite build
 npm run deploy   # build + S3 sync (s3://woofapp.fi/)
 ```
 
+**PWA:** Configured in `vite.config.ts` via `vite-plugin-pwa` (`generateSW` strategy). Icons in `assets/icons/` (512, 192, apple-touch-icon). Service worker precaches app shell; runtime-caches CDN images with CacheFirst 7 days. Meta tags added to `index.html`.
+
 ## Testing
 
 ### Unit Tests (Vitest)
@@ -143,6 +145,7 @@ npm run test:e2e          # Run all E2E tests (headless)
 npm run test:e2e:headed   # Run with visible Chrome browser (preferred)
 npm run test:e2e:auth     # Auth tests only
 npm run test:e2e:dog      # Dog CRUD tests only
+npx playwright test e2e/posts.spec.ts --headed  # Posts tests only
 ```
 E2E tests run against production (`https://woofapp.fi`) by default. Override with `E2E_BASE_URL`.
 **Always run E2E in headed mode** so you can observe failures.
@@ -152,8 +155,10 @@ E2E tests run against production (`https://woofapp.fi`) by default. Override wit
 - `e2e/helpers/auth.ts` — Register + login shortcut
 
 **afterEach cleanup order:**
-1. `DELETE /api/auth/me` — cascades all DB records
+1. `DELETE /api/auth/me` — cascades all DB records (dogs, posts, etc.)
 2. `admin-delete-user` via AWS CLI — removes Cognito user
+
+**Multi-user tests (e.g. author + viewer):** Use an `extraCleanup` array at describe scope. Push `{ user, token }` immediately after `loginUser()` — before any assertions — so `afterEach` can clean up even when tests fail mid-run. See `e2e/posts.spec.ts` for the pattern.
 
 ## Workflow
 1. Make code changes in `src/`
