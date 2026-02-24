@@ -67,3 +67,4 @@ SESSION_NOTES.md
 !README.md
 !.claude/README.md
 *.png
+!src-refactored/assets/icons/*.png
