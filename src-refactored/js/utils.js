@@ -225,7 +225,8 @@ export function isValidFileSize(file, maxSizeMB = 5) {
  */
 export function imageVariant(url, variant) {
     if (!url || !url.includes('cdn.woofapp.fi')) return url;
+    const lastSlash = url.lastIndexOf('/');
     const dot = url.lastIndexOf('.');
-    if (dot === -1) return url;
+    if (dot === -1 || dot < lastSlash) return url;
     return url.slice(0, dot) + `_${variant}` + url.slice(dot);
 }

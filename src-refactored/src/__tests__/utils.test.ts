@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { escapeHTML, isValidEmail, isValidFileType, isValidFileSize } from '../../js/utils.js';
+import { escapeHTML, isValidEmail, isValidFileType, isValidFileSize, imageVariant } from '../../js/utils.js';
 
 describe('Utility Functions', () => {
   describe('escapeHTML', () => {
@@ -63,6 +63,36 @@ describe('Utility Functions', () => {
 
       expect(isValidFileType(pdfFile)).toBe(false);
       expect(isValidFileType(txtFile)).toBe(false);
+    });
+  });
+
+  describe('imageVariant', () => {
+    const cdnUrl = 'https://cdn.woofapp.fi/posts/user1/1234-photo.jpg';
+
+    it('inserts _medium before the extension', () => {
+      expect(imageVariant(cdnUrl, 'medium')).toBe(
+        'https://cdn.woofapp.fi/posts/user1/1234-photo_medium.jpg'
+      );
+    });
+
+    it('inserts _thumb before the extension', () => {
+      expect(imageVariant(cdnUrl, 'thumb')).toBe(
+        'https://cdn.woofapp.fi/posts/user1/1234-photo_thumb.jpg'
+      );
+    });
+
+    it('returns the original URL unchanged for non-CDN URLs', () => {
+      const s3Url = 'https://woof-prod-photos.s3.eu-north-1.amazonaws.com/posts/user1/1234-photo.jpg';
+      expect(imageVariant(s3Url, 'medium')).toBe(s3Url);
+    });
+
+    it('returns the original URL unchanged for empty input', () => {
+      expect(imageVariant('', 'medium')).toBe('');
+    });
+
+    it('handles URLs without a file extension gracefully', () => {
+      const noExt = 'https://cdn.woofapp.fi/posts/user1/photo';
+      expect(imageVariant(noExt, 'medium')).toBe(noExt);
     });
   });
 

@@ -45,7 +45,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `js/api.js` — All API calls (add new endpoint functions here; never call fetch directly from components)
 - `js/auth.js` — Cognito token management
 - `js/config.js` — App config + Cognito IDs
-- `js/utils.js` — escapeHTML, timeAgo, isValidFileType, showToast
+- `js/utils.js` — escapeHTML, timeAgo, isValidFileType, showToast, imageVariant
 
 ### Vanilla JS (support modules)
 - `js/svelte-store.svelte.js` — Svelte 5 `$state` store (authUser, unreadCount, currentDog + version signals dogVersion/feedVersion/profileVersion/healthVersion)
