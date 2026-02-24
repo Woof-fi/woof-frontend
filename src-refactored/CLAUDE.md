@@ -34,12 +34,14 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `InviteCard.svelte` — Invite prompt card for feed
 - `Search.svelte` — Search panel
 - `Toast.svelte` — Renders toast notifications from `js/toast-store.svelte.js`
+- `PostOptionsSheet.svelte` — Instagram-style bottom action sheet (own post: delete/share; others: report/bookmark/follow); multi-view: options → report → confirm-delete
 
 ### Svelte Views (`src/views/`)
 - `HomeView.svelte` — Tabbed feed (For You / Following); tab switch triggers Feed re-render
 - `ProfileView.svelte` — Full Svelte 5: fetches dog, posts, follow status, friends, health records; calls openEditDogModal/openHealthRecordModal from modal-store
 - `PostDetailView.svelte` — Single post view
 - `MessagesView.svelte` — Two-panel messaging with 10s polling
+- `AdminView.svelte` — Report queue for admin/moderator role; filter tabs (pending/reviewed/actioned/dismissed); delete post, mark reviewed, dismiss actions
 
 ### Vanilla JS (stable core — modify only to add new API functions or utility helpers)
 - `js/api.js` — All API calls (add new endpoint functions here; never call fetch directly from components)
@@ -118,13 +120,13 @@ npm run build    # tsc --noEmit && vite build
 npm run deploy   # build + S3 sync (s3://woofapp.fi/)
 ```
 
-**PWA:** Configured in `vite.config.ts` via `vite-plugin-pwa` (`generateSW` strategy). Icons in `assets/icons/` (512, 192, apple-touch-icon). Service worker precaches app shell; runtime-caches CDN images with CacheFirst 7 days. Meta tags added to `index.html`.
+**PWA:** Configured in `vite.config.ts` via `vite-plugin-pwa` (`generateSW` strategy). Icons committed to `assets/icons/` (apple-touch-icon, icon-192x192, icon-512x512) — these are source-controlled and copied to `dist/icons/` on build. Service worker precaches app shell; runtime-caches CDN images with CacheFirst 7 days. Meta tags added to `index.html`. `.gitignore` has `!src-refactored/assets/icons/*.png` exception to preserve them past the global `*.png` ignore rule.
 
 ## Testing
 
 ### Unit Tests (Vitest)
 ```bash
-npm test              # Run all unit tests (34 tests, 5 suites)
+npm test              # Run all unit tests (45 tests, 6 suites)
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage
 ```

@@ -82,7 +82,7 @@ npm run deploy   # build + S3 sync (uses full aws path — see package.json)
 ## Testing
 
 ```bash
-npm test                  # Vitest unit tests (34 tests, 5 suites)
+npm test                  # Vitest unit tests (45 tests, 6 suites)
 npm run test:e2e:headed   # Playwright E2E against production (always headed)
 ```
 

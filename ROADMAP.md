@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-02-24
-**Current Phase:** Phase 6 In Progress (6A/6B/6C complete — 6D/6E pending)
+**Current Phase:** Phase 6 In Progress (6A/6B/6C/icons complete — 6D/6E pending)
 **Next Phase:** Phase 6D (Content Moderation) or Phase 7 (Engagement & Discovery)
 
 ---
@@ -259,7 +259,7 @@ Moderators also see a flag/shield icon on posts in the normal feed for quick mod
 
 **Execution order: 6A → 6C → 6B** (PWA before caching — higher user-visible value, fully independent)
 
-### 6A. Image CDN + Optimization
+### 6A. Image CDN + Optimization (COMPLETE 2026-02-23)
 
 **Decision: Build (Lambda + Sharp + CloudFront)**
 
@@ -299,7 +299,7 @@ The current upload flow is `browser → presigned URL → S3 directly`. The back
 - S3 object Cache-Control: `public, max-age=31536000, immutable` (images never change — new upload = new UUID key)
 - Lambda function in eu-north-1, triggered by S3 `ObjectCreated`, IAM role with `s3:GetObject` + `s3:PutObject` on `woof-prod-photos`
 
-### 6B. Selective HTTP Caching
+### 6B. Selective HTTP Caching (COMPLETE 2026-02-23)
 
 **Why not a client-side JS cache layer:**
 
@@ -332,7 +332,7 @@ getFollowStatus()  → apiRequest(`/api/follows/status/…`,  { cache: 'default'
 
 The browser then honours the `Cache-Control` headers the backend sets, and the version signal bumps in the Svelte store remain the single source of truth for invalidation.
 
-### 6C. PWA Foundation
+### 6C. PWA Foundation (COMPLETE 2026-02-24)
 
 **Decision: Build (vite-plugin-pwa)**
 
@@ -348,6 +348,13 @@ The browser then honours the `Cache-Control` headers the backend sets, and the v
 This enables "Add to Home Screen" on Android and iOS and gives the app a native feel without Capacitor.
 
 **Note:** Token Refresh (old 6D) is removed — Cognito SDK handles refresh tokens automatically (Phase 5A complete).
+
+**What was built:**
+- `vite-plugin-pwa` installed + configured in `vite.config.ts`
+- `generateSW` service worker: precaches app shell; `CacheFirst` runtime cache for `cdn.woofapp.fi` images (7-day TTL)
+- PWA icons (apple-touch-icon 180px, icon-192x192, icon-512x512) committed to `assets/icons/` and served from S3
+- Meta tags in `index.html`: `theme-color`, `apple-mobile-web-app-capable`, `apple-touch-icon`
+- `.gitignore` updated with `!src-refactored/assets/icons/*.png` exception so icons survive future deploys
 
 ### 6D. Content Moderation (Perspective API + Rekognition)
 
