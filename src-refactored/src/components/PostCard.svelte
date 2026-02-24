@@ -1,7 +1,7 @@
 <script>
     import { likePost, unlikePost, createComment, getComments } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
-    import { timeAgo, showToast } from '../../js/utils.js';
+    import { timeAgo, showToast, imageVariant } from '../../js/utils.js';
     import { openPostOptionsSheet } from '../../js/modal-store.svelte.js';
 
     let {
@@ -179,6 +179,8 @@
     <div class="post-image">
         <img
             src={imageUrl}
+            srcset="{imageVariant(imageUrl, 'medium')} 600w, {imageUrl} 1200w"
+            sizes="(max-width: 540px) 100vw, 500px"
             alt="Post by {username}"
             loading="lazy"
             onerror={(e) => { if (e.target.src !== FALLBACK_POST) e.target.src = FALLBACK_POST; }}

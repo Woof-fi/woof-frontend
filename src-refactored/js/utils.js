@@ -213,3 +213,19 @@ export function isValidFileSize(file, maxSizeMB = 5) {
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
     return file.size <= maxSizeBytes;
 }
+
+/**
+ * Return a CDN image variant URL.
+ * Lambda generates _medium (600px) and _thumb (150px) variants for posts/ images.
+ * Inserts the variant suffix before the file extension: photo.jpg → photo_medium.jpg
+ * Returns the original URL unchanged for non-CDN URLs (e.g. direct S3, dog profile photos).
+ * @param {string} url - Original CDN image URL
+ * @param {'medium'|'thumb'} variant - Desired variant
+ * @returns {string}
+ */
+export function imageVariant(url, variant) {
+    if (!url || !url.includes('cdn.woofapp.fi')) return url;
+    const dot = url.lastIndexOf('.');
+    if (dot === -1) return url;
+    return url.slice(0, dot) + `_${variant}` + url.slice(dot);
+}
