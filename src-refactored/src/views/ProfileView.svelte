@@ -3,7 +3,7 @@
              getFollowing, getFollowers, startConversation,
              getHealthRecords, deleteHealthRecord } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
-    import { showToast } from '../../js/utils.js';
+    import { showToast, imageVariant } from '../../js/utils.js';
     import { showOnboardingTour, isOnboardingCompleted } from '../../js/onboarding-tour.js';
     import { openEditDogModal, openHealthRecordModal } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
@@ -351,7 +351,14 @@
                     <div class="posts-grid posts-grid-2col">
                         {#each posts as post (post.id)}
                             <a href="/post/{post.id}" data-link class="posts-grid-item">
-                                <img src={post.imageUrl} alt={post.caption || 'Post image'} loading="lazy" onerror={fallbackImg} />
+                                <img
+                                    src={post.imageUrl}
+                                    srcset="{imageVariant(post.imageUrl, 'medium')} 600w, {post.imageUrl} 1200w"
+                                    sizes="(max-width: 640px) calc(50vw - 16px), 310px"
+                                    alt={post.caption || 'Post image'}
+                                    loading="lazy"
+                                    onerror={fallbackImg}
+                                />
                                 <div class="posts-grid-overlay">
                                     <span><i class="fas fa-heart"></i> {post.likeCount || 0}</span>
                                 </div>
