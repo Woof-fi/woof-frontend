@@ -85,23 +85,19 @@
             myDogs = [];
 
             try {
-                const result = await getFeed(currentType);
+                const [feedResult, dogsResult] = await Promise.all([
+                    getFeed(currentType),
+                    authUser ? getMyDogs().catch(() => []) : Promise.resolve([]),
+                ]);
                 if (!cleanup) {
-                    posts = result.posts || [];
-                    nextCursor = result.nextCursor;
+                    posts = feedResult.posts || [];
+                    nextCursor = feedResult.nextCursor;
+                    myDogs = dogsResult;
                 }
             } catch (e) {
                 console.error('Failed to load feed:', e);
             } finally {
                 if (!cleanup) loading = false;
-            }
-
-            if (!cleanup && authUser) {
-                try {
-                    myDogs = await getMyDogs();
-                } catch {
-                    myDogs = [];
-                }
             }
         }
 

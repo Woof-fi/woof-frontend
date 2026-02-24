@@ -61,6 +61,18 @@ describe('Feed (contract tests)', () => {
         expect(signUpElements.length).toBeGreaterThan(0);
     });
 
+    it('does not show welcome card when authenticated user has dogs', async () => {
+        const { getFeed, getMyDogs } = await import('../../../js/api.js');
+        vi.mocked(getFeed).mockResolvedValue({
+            posts: [mockPost('p1'), mockPost('p2')],
+            nextCursor: null,
+        });
+        vi.mocked(getMyDogs).mockResolvedValue([{ id: 'dog1', name: 'Nelli' }] as any);
+        const { findAllByRole, queryByText } = render(Feed, { props: { type: 'public' } });
+        await findAllByRole('button', { name: /like/i });
+        expect(queryByText(/add your dog/i)).toBeNull();
+    });
+
     it('shows empty state on following tab with no results', async () => {
         const { getFeed } = await import('../../../js/api.js');
         const { isAuthenticated } = await import('../../../js/auth.js');
