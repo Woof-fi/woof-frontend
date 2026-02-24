@@ -3,7 +3,7 @@
     import { isAuthenticated } from '../../js/auth.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
-    import { showToast } from '../../js/utils.js';
+    import { showToast, isValidFileType, isValidFileSize } from '../../js/utils.js';
     import { modals, closeCreateDogModal as storeClose, openAuthModal } from '../../js/modal-store.svelte.js';
     import { bumpDogVersion } from '../../js/svelte-store.svelte.js';
 
@@ -63,6 +63,16 @@
             if (previewUrl) URL.revokeObjectURL(previewUrl);
             previewUrl = null;
             photoFile = null;
+            return;
+        }
+        if (!isValidFileType(file)) {
+            showToast('Only JPEG, PNG, GIF and WebP images are allowed', 'error');
+            e.target.value = '';
+            return;
+        }
+        if (!isValidFileSize(file, 10)) {
+            showToast('Image must be under 10 MB', 'error');
+            e.target.value = '';
             return;
         }
         photoFile = file;
