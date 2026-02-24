@@ -178,6 +178,6 @@ VITE_COGNITO_CLIENT_ID=2mr6ff413juuaeffjdramib5dk
 Production uses hardcoded defaults in `js/config.js`.
 
 ## Infrastructure Notes
-- **S3 bucket** `woof-prod-photos`: Public read for viewing photos. Uploads via presigned URLs only.
+- **S3 bucket** `woof-prod-photos`: No public access — photos served exclusively via CloudFront CDN (`cdn.woofapp.fi`). Uploads via presigned PUT URLs only.
 - **Source maps**: Disabled in production (`vite.config.ts`: `sourcemap: false`).
 - **SES**: Domain `woofapp.fi` verified in SES (eu-north-1). MAIL FROM: `mail.woofapp.fi`.
