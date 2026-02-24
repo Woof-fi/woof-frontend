@@ -1,8 +1,7 @@
 <script>
     import { getReports, updateReportStatus, deletePost } from '../../js/api.js';
     import { store } from '../../js/svelte-store.svelte.js';
-    import { showToast } from '../../js/utils.js';
-    import { timeAgo } from '../../js/utils.js';
+    import { showToast, timeAgo, imageVariant } from '../../js/utils.js';
 
     const REASON_LABELS = {
         inappropriate_content: 'Inappropriate content',
@@ -150,7 +149,12 @@
                         <!-- Post preview -->
                         {#if report.target_type === 'post' && report.post_image_url}
                             <div class="admin-report-image">
-                                <img src={report.post_image_url} alt="Reported post" />
+                                <img
+                                    src={imageVariant(report.post_image_url, 'thumb')}
+                                    srcset="{imageVariant(report.post_image_url, 'thumb')} 150w, {report.post_image_url} 1200w"
+                                    sizes="96px"
+                                    alt="Reported post"
+                                />
                             </div>
                         {:else if report.target_type === 'post'}
                             <div class="admin-report-image admin-report-image--text-only">
