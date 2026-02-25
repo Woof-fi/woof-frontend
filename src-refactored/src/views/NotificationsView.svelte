@@ -104,53 +104,53 @@
             </p>
         </div>
     {:else}
-        <ul class="notification-list">
-            {#each notifications as notif (notif.id)}
-                <li>
-                <button
-                    type="button"
-                    class="notification-item"
-                    class:unread={!notif.read}
-                    onclick={() => handleNotifClick(notif)}
-                    aria-label="{notif.actorDog?.name ?? 'Someone'} {notifText(notif)}"
-                >
-                    <img
-                        src={notif.actorDog?.profilePhoto || FALLBACK_AVATAR}
-                        alt={notif.actorDog?.name ?? 'User avatar'}
-                        class="notification-avatar"
-                        onerror={(e) => { e.target.src = FALLBACK_AVATAR; }}
-                    />
-
-                    <div class="notification-body">
-                        <span class="notification-text">
-                            <strong>{notif.actorDog?.name ?? 'Someone'}</strong>
-                            {' '}{notifText(notif)}
-                        </span>
-                        <time
-                            class="notification-time"
-                            datetime={new Date(notif.createdAt).toISOString()}
-                        >
-                            {timeAgo(notif.createdAt)}
-                        </time>
-                    </div>
-
-                    {#if notif.postImageUrl && (notif.type === 'like' || notif.type === 'comment')}
+        <div class="notification-list-card">
+            <ul class="notification-list">
+                {#each notifications as notif (notif.id)}
+                    <li>
+                    <button
+                        type="button"
+                        class="notification-item"
+                        class:unread={!notif.read}
+                        onclick={() => handleNotifClick(notif)}
+                        aria-label="{notif.actorDog?.name ?? 'Someone'} {notifText(notif)}"
+                    >
                         <img
-                            src={imageVariant(notif.postImageUrl, 'thumb')}
-                            alt="Post thumbnail"
-                            class="notification-thumb"
-                            onerror={(e) => { e.target.style.display = 'none'; }}
+                            src={notif.actorDog?.profilePhoto || FALLBACK_AVATAR}
+                            alt={notif.actorDog?.name ?? 'User avatar'}
+                            class="notification-avatar"
+                            onerror={(e) => { e.target.src = FALLBACK_AVATAR; }}
                         />
-                    {/if}
-                </button>
-                </li>
-            {/each}
-        </ul>
 
-        {#if nextCursor}
-            <div style="padding: var(--woof-space-4);">
+                        <div class="notification-body">
+                            <span class="notification-text">
+                                <strong>{notif.actorDog?.name ?? 'Someone'}</strong>
+                                {' '}{notifText(notif)}
+                            </span>
+                            <time
+                                class="notification-time"
+                                datetime={new Date(notif.createdAt).toISOString()}
+                            >
+                                {timeAgo(notif.createdAt)}
+                            </time>
+                        </div>
+
+                        {#if notif.postImageUrl && (notif.type === 'like' || notif.type === 'comment')}
+                            <img
+                                src={imageVariant(notif.postImageUrl, 'thumb')}
+                                alt="Post thumbnail"
+                                class="notification-thumb"
+                                onerror={(e) => { e.target.style.display = 'none'; }}
+                            />
+                        {/if}
+                    </button>
+                    </li>
+                {/each}
+            </ul>
+
+            {#if nextCursor}
                 <button
-                    class="admin-load-more"
+                    class="notif-load-more"
                     onclick={loadMore}
                     disabled={loadingMore}
                 >
@@ -160,7 +160,7 @@
                         Load more
                     {/if}
                 </button>
-            </div>
-        {/if}
+            {/if}
+        </div>
     {/if}
 </div>

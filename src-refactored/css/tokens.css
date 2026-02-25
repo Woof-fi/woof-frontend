@@ -58,6 +58,12 @@
   --woof-color-error:        #FF3B30;
   --woof-color-info:         #007AFF;
 
+  /* Status palette for admin badges */
+  --woof-color-amber-light:  #FEF3C7;   /* pending badge background */
+  --woof-color-amber-text:   #92400E;   /* pending badge text */
+  --woof-color-green-light:  #D1FAE5;   /* actioned badge background */
+  --woof-color-green-text:   #065F46;   /* actioned badge text */
+
   /* ===================================================
    * SURFACE COLORS
    * =================================================== */
@@ -138,13 +144,14 @@
    * BORDER RADIUS
    * =================================================== */
 
-  --woof-radius-xs:   4px;
-  --woof-radius-sm:   8px;
-  --woof-radius-md:   12px;
-  --woof-radius-lg:   16px;
-  --woof-radius-xl:   24px;
-  --woof-radius-2xl:  32px;
-  --woof-radius-full: 9999px;
+  --woof-radius-xs:     4px;
+  --woof-radius-sm:     8px;
+  --woof-radius-md:     12px;
+  --woof-radius-lg:     16px;
+  --woof-radius-xl:     24px;
+  --woof-radius-2xl:    32px;
+  --woof-radius-full:   9999px;
+  --woof-radius-bubble: 18px;   /* message bubble corners */
 
   /* ===================================================
    * ELEVATION / SHADOWS

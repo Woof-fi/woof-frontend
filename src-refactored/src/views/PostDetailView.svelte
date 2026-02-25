@@ -29,11 +29,11 @@
 </script>
 
 <main class="post-detail-page">
-    <div class="post-detail-header">
+    <div class="post-detail-nav">
         <button class="back-btn" aria-label="Go back" onclick={() => window.history.back()}>
             <i class="fas fa-arrow-left"></i>
+            Back
         </button>
-        <h2>Post</h2>
     </div>
     <div class="post-detail-container" id="post-detail-container">
         {#if loading}
