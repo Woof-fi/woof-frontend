@@ -1,8 +1,9 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-02-24
-**Current Phase:** Phase 6 In Progress (6A/6B/6C/icons complete — 6D/6E pending)
-**Next Phase:** Phase 6D (Content Moderation) or Phase 7 (Engagement & Discovery)
+**Last Updated:** 2026-02-25
+**Completed:** 3, 4, 5A–5D, 6A–6C, 7A (nav redesign + notifications + comment options + admin/banning)
+**Current Phase:** Phase 6D (Content Moderation) pending
+**Next:** Phase 6D (Perspective API + Rekognition) — or skip to Phase 7B (Hashtags) if 6D is deferred
 
 ---
 
@@ -135,7 +136,7 @@ role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'))
 - createDog wrapped in transaction; getAllDogs cursor-paginated
 - Cache-Control + ETag headers on feed and profile responses
 - Performance indexes migration (013_performance_indexes.sql)
-- 185/185 backend tests pass
+- 237/237 backend tests pass
 
 **UI Polish (2026-02-23):**
 - Skeleton shimmer loaders implemented and wired up in Feed.svelte + ProfileView.svelte ✅
@@ -183,7 +184,7 @@ role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'moderator', 'admin'))
 - Backend: `reports.test.ts` (21 tests), `bookmarks.test.ts` (13 tests)
 - Frontend unit: `AdminView.test.ts` (9 tests), updated `PostCard.test.ts` (+2 tests for "..." button)
 - E2E: `posts.spec.ts` (3 tests: delete own post via sheet, report sheet for others' posts, bookmark toggle)
-- Totals: backend 219 tests, frontend 45 unit tests
+- Totals: backend 237 tests, frontend 57 unit tests
 
 ### 5C-content. Content Moderation *(deferred → implemented as Phase 6D)*
 
@@ -395,47 +396,32 @@ Screen every uploaded image for inappropriate content at post creation time (not
 
 **Why third:** These features increase session time and return visits. Notifications are the #1 retention driver.
 
-### 7A. In-App Notifications
+### 7A. Navigation, Notifications & UI Enhancements (COMPLETE 2026-02-25)
 
-**Decision: Build (PostgreSQL + polling)**
+**Navigation redesign:**
+- Persistent sidebar drawer (280px, fixed on desktop below header) replaced the old `.left-panel`
+- Header: 2-column desktop grid (logo in 280px zone, bell right); 3-column mobile (hamburger+feed-label | logo | bell)
+- Feed tab state (`For You`/`Following`) moved to `store.feedTab`; drawer shows feed toggle on home route only
+- Mobile: slide-in overlay with backdrop; closes on route change, backdrop click, or Escape
+- Messages icon: `fa-envelope` → `fa-comment-dots`
 
-**Database:**
-```sql
--- 015_notifications.sql
-CREATE TABLE notifications (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    recipient_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    actor_dog_id UUID REFERENCES dogs(id) ON DELETE CASCADE,
-    type VARCHAR(30) NOT NULL CHECK (type IN (
-        'like', 'comment', 'follow', 'message'
-    )),
-    target_type VARCHAR(20),
-    target_id UUID,
-    read BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX idx_notifications_recipient ON notifications(recipient_user_id, read, created_at DESC);
-```
+**In-app notifications:**
+- `016_notifications.sql`: notifications table (recipient_user_id, actor_dog_id, type, target_type, target_id, read)
+- Backend: `GET /api/notifications`, `GET /api/notifications/unread-count`, `PUT /api/notifications/read`
+- Fire-and-forget triggers in likeController, commentController, followController (actor ≠ owner guard)
+- Frontend: `NotificationsView.svelte` at `/notifications` — skeleton loaders, mark-all-read on visit
+- Bell: outline `far fa-bell` quiet → solid `fas fa-bell` crimson when unread; polls every 60s
 
-**Backend:**
+**Comment options sheet:**
+- `CommentOptionsSheet.svelte`: own comment → delete with confirm view; others' → report (reuses POST /api/reports)
+- `...` button on each comment row; desktop: opacity-0 default, revealed on parent hover; mobile: always visible
 
-| Method | Path | Auth | Purpose |
-|--------|------|------|---------|
-| GET | `/api/notifications` | required | List notifications (paginated) |
-| PUT | `/api/notifications/read` | required | Mark all as read |
-| GET | `/api/notifications/unread-count` | required | Badge count |
-
-Generate notifications in existing controllers:
-- `likeController.ts` — on like, create notification for post owner
-- `commentController.ts` — on comment, notify post owner
-- `followController.ts` — on follow, notify followed dog's owner
-- `messageController.ts` — on message, notify recipient (if not already in conversation view)
-
-**Frontend:**
-- Notification bell icon in header with unread count badge
-- `js/views/NotificationsView.js` — notification list
-- Poll unread count every 30s (same pattern as messages)
-- Click notification → navigate to relevant content
+**Admin panel enhancements + user banning:**
+- `017_user_bans.sql`: `banned_at TIMESTAMP` column on users
+- `requireNotBanned` middleware: 403 "Your account has been suspended" on POST /api/posts + /api/comments
+- Admin can now delete comments (not just posts) and ban/unban users
+- Admin routes moved to `/api/admin/...`; blanket `requireRole('admin','moderator')` check on all routes
+- `AdminView.svelte`: Post/Comment type badge, comment content display, ban/unban controls (admin-only)
 
 ### 7B. Hashtags
 
@@ -443,7 +429,7 @@ Generate notifications in existing controllers:
 
 **Database:**
 ```sql
--- 016_hashtags.sql
+-- 018_hashtags.sql
 CREATE TABLE hashtags (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     tag VARCHAR(100) NOT NULL UNIQUE,
@@ -478,7 +464,7 @@ CREATE INDEX idx_post_hashtags_hashtag ON post_hashtags(hashtag_id);
 
 **Database:**
 ```sql
--- 017_breeds.sql
+-- 019_breeds.sql
 CREATE TABLE breeds (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL UNIQUE,
@@ -541,6 +527,9 @@ Small but impactful features, all frontend-only:
 | Pull-to-refresh | Touch drag handler at top of feed, triggers feed reload |
 | Post sharing | Web Share API button on posts (fallback: copy URL to clipboard) |
 | Infinite scroll improvements | Intersection Observer, loading skeleton at bottom |
+| Bookmarks feed | `GET /api/bookmarks` + `/bookmarks` view — browse your saved posts (toggle already exists, view does not) |
+| Followers/following lists | Paginated list view accessible from profile page — see who follows your dog and who you follow |
+| Account settings page | UI for: change email, delete account (API exists: `DELETE /api/auth/me`), notification preferences |
 
 ---
 
@@ -726,16 +715,17 @@ When you need funnels, retention analysis, and session recordings, add a managed
 
 | # | File | Phase | Feature |
 |---|------|-------|---------|
-| 013 | performance_indexes.sql | 5B | Performance indexes on core tables |
+| 013 | performance_indexes.sql | 5B | Performance indexes on core tables (COMPLETE) |
 | 014 | reports.sql | 5C/5D | Reporting system (COMPLETE) |
 | 015 | post_bookmarks.sql | 5C/5D | Post bookmarks/favourites (COMPLETE) |
-| 016 | notifications.sql | 7A | In-app notifications |
-| 016 | hashtags.sql | 7B | Hashtags |
-| 017 | breeds.sql | 7C | Breed normalization + communities |
-| 018 | video_support.sql | 9A | Video posts (media_type, thumbnail_url) |
-| 019 | post_images.sql | 9B | Multi-photo posts |
-| 020 | places.sql | 10A | Dog-friendly places + reviews |
-| 021 | checkins.sql | 10B | Dog park check-ins |
+| 016 | notifications.sql | 7A | In-app notifications (COMPLETE) |
+| 017 | user_bans.sql | 7A | User banning (`banned_at` column + `requireNotBanned` middleware) (COMPLETE) |
+| 018 | hashtags.sql | 7B | Hashtags |
+| 019 | breeds.sql | 7C | Breed normalization + communities |
+| 020 | video_support.sql | 9A | Video posts (media_type, thumbnail_url) |
+| 021 | post_images.sql | 9B | Multi-photo posts |
+| 022 | places.sql | 10A | Dog-friendly places + reviews |
+| 023 | checkins.sql | 10B | Dog park check-ins |
 
 Note: Data reset in Phase 5A means `password_hash` column is removed and `role` column is baked into the initial users table definition. No gradual migration needed — clean start with Cognito-native auth.
 
