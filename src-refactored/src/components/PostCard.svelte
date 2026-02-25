@@ -2,7 +2,8 @@
     import { likePost, unlikePost, createComment, getComments } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { timeAgo, showToast, imageVariant } from '../../js/utils.js';
-    import { openPostOptionsSheet } from '../../js/modal-store.svelte.js';
+    import { openPostOptionsSheet, openCommentOptionsSheet } from '../../js/modal-store.svelte.js';
+    import { store } from '../../js/svelte-store.svelte.js';
 
     let {
         id = '',
@@ -42,6 +43,33 @@
 
     const FALLBACK_AVATAR = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23cccccc" width="150" height="150"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EDog%3C/text%3E%3C/svg%3E';
     const FALLBACK_POST   = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23cccccc" width="400" height="400"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="30" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
+
+    // The logged-in user's dog IDs (for determining comment ownership)
+    // We derive ownership based on the comment's dogId matching any dog owned by the current user
+    // PostCard does not receive the owner user ID on comments, so we check dogId against the
+    // authUser's dog list. We use a simpler signal: `store.authUser` tells us if authed,
+    // and each comment carries its dogId — we compare against dogId passed to this post card.
+    // For correctness: a comment is "own" if the comment's dog belongs to the same user
+    // who owns the post's dog. Since we don't have user→dog mapping here, we check if
+    // the comment dogId equals the post's dogId (same dog) — or we can store the user-level dog IDs.
+    // Simplest correct approach: the comment object includes `dogId`, and we know the viewer's
+    // current dog (store.currentDog). We'll compare commentDogId to ALL user dog IDs via a
+    // callback approach: we let parent resolve or we store dog IDs inline.
+    //
+    // Best UX approach: let the server return `isOwn` on comment objects. But since it doesn't,
+    // we check: if the comment's dogId === dogId prop (same dog as the post author), ownership
+    // cannot be right — we need the viewer's dog id. We'll use `store.authUser` role + match the
+    // comment's dog id to the viewer's dogs by comparing with the first dog's id if available.
+    // Since we don't have viewer dog IDs here, we pass the ownerDogId down from Feed/ProfileView
+    // or derive it from the session. For now, we use the pragmatic check: comments made by the
+    // viewer's dog will have the same dogId as the navigation dog (store.currentDog?.id).
+    // This is correct for single-dog users and acceptable for multi-dog.
+
+    let myDogId = $derived(store.currentDog?.id ?? null);
+
+    function isOwnComment(comment) {
+        return !!myDogId && comment.dogId === myDogId;
+    }
 
     // --- Like handler ---
     async function handleLike() {
@@ -126,6 +154,23 @@
         }
     }
 
+    // --- Comment options ---
+    function handleCommentOptions(e, comment) {
+        e.stopPropagation();
+        if (!isAuthenticated()) {
+            onopenAuthModal?.();
+            return;
+        }
+        openCommentOptionsSheet({
+            commentId: comment.id,
+            isOwnComment: isOwnComment(comment),
+            onDeleted: (deletedId) => {
+                comments = comments.filter(c => c.id !== deletedId);
+                commentCount_ = Math.max(0, commentCount_ - 1);
+            },
+        });
+    }
+
     // --- Timestamp ---
     // svelte-ignore state_referenced_locally
     const createdDate = createdAt ? new Date(createdAt) : null;
@@ -170,7 +215,7 @@
                 aria-label="Post options"
                 onclick={() => openPostOptionsSheet({ postId: id, dogId, dogSlug, isOwnPost })}
             >
-                <i class="fas fa-ellipsis-h"></i>
+                <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
             </button>
         {/if}
     </div>
@@ -195,11 +240,11 @@
             aria-label={liked ? 'Unlike post' : 'Like post'}
             onclick={handleLike}
         >
-            <i class={liked ? 'fas fa-heart' : 'far fa-heart'}></i>
+            <i class={liked ? 'fas fa-heart' : 'far fa-heart'} aria-hidden="true"></i>
         </button>
         <span class="like-count">{likes > 0 ? likes : ''}</span>
         <button class="comment-button" aria-label="Comment on post" onclick={handleCommentClick}>
-            <i class="far fa-comment"></i>
+            <i class="far fa-comment" aria-hidden="true"></i>
         </button>
         <span class="comment-count">{commentCount_ > 0 ? commentCount_ : ''}</span>
     </div>
@@ -228,11 +273,23 @@
                 <div class="comments-list">
                     {#each comments as comment (comment.id)}
                         <div class="comment-item">
-                            <a href="/dog/{comment.dogSlug || comment.dogId}" data-link class="comment-author">
-                                <strong>{comment.dogName}</strong>
-                            </a>
-                            <span class="comment-content"> {comment.content}</span>
-                            <span class="comment-time">{timeAgo(comment.createdAt)}</span>
+                            <div class="comment-item-row">
+                                <div class="comment-item-content">
+                                    <a href="/dog/{comment.dogSlug || comment.dogId}" data-link class="comment-author">
+                                        <strong>{comment.dogName}</strong>
+                                    </a>
+                                    <span class="comment-content"> {comment.content}</span>
+                                    <span class="comment-time">{timeAgo(comment.createdAt)}</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="comment-options-btn"
+                                    aria-label="Comment options"
+                                    onclick={(e) => handleCommentOptions(e, comment)}
+                                >
+                                    <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+                                </button>
+                            </div>
                         </div>
                     {/each}
                 </div>

@@ -5,15 +5,14 @@ import type { TestUser } from './helpers/cognito';
 let testUser: TestUser;
 let savedAuthToken: string | null = null;
 
-/** The header auth link (Login/Logout) — specific to avoid sidebar .auth-link */
-const AUTH_LINK = '.header-icons .auth-link';
+/** The nav drawer footer auth button (Login/Logout) */
+const AUTH_LINK = '.nav-drawer-footer .nav-drawer-row';
 
-/** Wait for the Woof app to fully initialize (auth link onclick handler set) */
+/** Wait for the Woof app to fully initialize */
 async function waitForAppReady(page: Page) {
-  // The app is ready when updateUIForAuth() has run — auth link gets an icon
   await page.waitForFunction(() => {
-    const link = document.querySelector('.header-icons .auth-link');
-    return link && link.innerHTML.includes('<i ');
+    const btn = document.querySelector('.nav-drawer-footer .nav-drawer-row');
+    return btn && btn.innerHTML.includes('<i ');
   }, { timeout: 10_000 });
 }
 

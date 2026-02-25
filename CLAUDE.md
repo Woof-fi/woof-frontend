@@ -55,34 +55,31 @@ src-refactored/
 │   ├── components/
 │   │   ├── PostCard.svelte         # Post card with optimistic like + comments
 │   │   ├── Feed.svelte             # Infinite scroll feed + content gate
-│   │   ├── Navigation.svelte       # Header + left panel + bottom nav
+│   │   ├── Navigation.svelte       # Header + fixed sidebar drawer + bottom nav
 │   │   ├── AuthModal.svelte        # 5-state auth modal (login/register/verify/forgot/reset)
 │   │   ├── CreatePostModal.svelte  # Post creation with image upload
 │   │   ├── CreateDogModal.svelte   # Dog creation form
 │   │   ├── EditDogModal.svelte     # Dog profile editing
 │   │   ├── HealthRecordModal.svelte # Health record add/edit
 │   │   ├── InviteCard.svelte       # Invite prompt shown in feed
-│   │   └── Search.svelte           # Search panel
+│   │   ├── Search.svelte           # Search panel
+│   │   ├── Toast.svelte            # Toast notifications
+│   │   ├── PostOptionsSheet.svelte # Bottom action sheet for posts
+│   │   └── CommentOptionsSheet.svelte # Bottom action sheet for comments
 │   └── views/
 │       ├── HomeView.svelte         # Tabbed feed (For You / Following)
 │       ├── ProfileView.svelte      # Dog profile (full Svelte 5)
 │       ├── PostDetailView.svelte   # Single post view
-│       └── MessagesView.svelte     # Two-panel messaging
+│       ├── MessagesView.svelte     # Two-panel messaging
+│       ├── NotificationsView.svelte # Notification feed at /notifications
+│       └── AdminView.svelte        # Report queue (admin/moderator)
 └── package.json
-```
-
-## Deploy
-
-```bash
-cd src-refactored
-npm run build    # tsc + vite build
-npm run deploy   # build + S3 sync (uses full aws path — see package.json)
 ```
 
 ## Testing
 
 ```bash
-npm test                  # Vitest unit tests (45 tests, 6 suites)
+npm test                  # Vitest unit tests (57 tests, 6 suites)
 npm run test:e2e:headed   # Playwright E2E against production (always headed)
 ```
 

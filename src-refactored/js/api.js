@@ -695,5 +695,77 @@ export async function updateReportStatus(reportId, status) {
     });
 }
 
+// ============================================================================
+// NOTIFICATIONS API
+// ============================================================================
+
+/**
+ * Get notifications for the current user
+ * @param {string|null} cursor - Pagination cursor
+ * @param {number} limit - Notifications per page
+ * @returns {Promise<{notifications: object[], nextCursor: string|null}>}
+ */
+export async function getNotifications(cursor = null, limit = 20) {
+    let url = `/api/notifications?limit=${limit}`;
+    if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
+    return apiRequest(url);
+}
+
+/**
+ * Get unread notification count for the current user
+ * @returns {Promise<{unreadCount: number}>}
+ */
+export async function getNotifUnreadCount() {
+    return apiRequest('/api/notifications/unread-count');
+}
+
+/**
+ * Mark all notifications as read
+ * @returns {Promise<null>}
+ */
+export async function markNotificationsRead() {
+    return apiRequest('/api/notifications/read', { method: 'PUT' });
+}
+
+// ============================================================================
+// ADMIN API
+// ============================================================================
+
+/**
+ * Delete any post as admin/moderator (bypasses ownership check)
+ * @param {string} postId
+ * @returns {Promise<void>}
+ */
+export async function adminDeletePost(postId) {
+    return apiRequest(`/api/admin/posts/${postId}`, { method: 'DELETE' });
+}
+
+/**
+ * Delete any comment as admin/moderator (bypasses ownership check)
+ * @param {string} commentId
+ * @returns {Promise<void>}
+ */
+export async function adminDeleteComment(commentId) {
+    return apiRequest(`/api/admin/comments/${commentId}`, { method: 'DELETE' });
+}
+
+/**
+ * Ban a user (admin only)
+ * @param {string} userId
+ * @returns {Promise<{userId: string, banned: boolean}>}
+ */
+export async function banUser(userId) {
+    return apiRequest(`/api/admin/users/${userId}/ban`, { method: 'PUT' });
+}
+
+/**
+ * Unban a user (admin only)
+ * @param {string} userId
+ * @returns {Promise<{userId: string, banned: boolean}>}
+ */
+export async function unbanUser(userId) {
+    return apiRequest(`/api/admin/users/${userId}/unban`, { method: 'PUT' });
+}
+
 // Export APIError for use in other modules
 export { APIError };

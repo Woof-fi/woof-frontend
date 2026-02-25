@@ -6,7 +6,7 @@ import { createTestUser, adminCreateUser, adminDeleteUser } from './helpers/cogn
 import type { TestUser } from './helpers/cognito';
 
 const API_BASE = 'https://api.woofapp.fi';
-const AUTH_LINK = '.header-icons .auth-link';
+const AUTH_LINK = '.nav-drawer-footer .nav-drawer-row';
 
 let testUser: TestUser;
 
@@ -21,8 +21,8 @@ async function loginUser(page: import('@playwright/test').Page, user: TestUser):
     adminCreateUser(user);
     await page.goto('/');
     await page.waitForFunction(() => {
-        const link = document.querySelector('.header-icons .auth-link');
-        return link && link.innerHTML.includes('<i ');
+        const btn = document.querySelector('.nav-drawer-footer .nav-drawer-row');
+        return btn && btn.innerHTML.includes('<i ');
     }, { timeout: 10_000 });
     await page.click(AUTH_LINK);
     await page.fill('#auth-email', user.email);

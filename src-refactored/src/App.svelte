@@ -15,6 +15,7 @@
     import HealthRecordModal from './components/HealthRecordModal.svelte';
     import Search from './components/Search.svelte';
     import PostOptionsSheet from './components/PostOptionsSheet.svelte';
+    import CommentOptionsSheet from './components/CommentOptionsSheet.svelte';
 
     $effect(() => {
         (async () => {
@@ -54,5 +55,8 @@
 <Search />
 {#if modals.postOptionsSheetOpen}
     <PostOptionsSheet />
+{/if}
+{#if modals.commentOptionsSheetOpen}
+    <CommentOptionsSheet />
 {/if}
 <Toast />

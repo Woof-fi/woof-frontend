@@ -25,7 +25,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 ### Svelte Components (`src/components/`)
 - `PostCard.svelte` — Post card with optimistic like toggle (reverts on API error), inline comments, fallback images
 - `Feed.svelte` — Infinite scroll (IntersectionObserver sentinel), content gate (4 posts for unauth), invite cards at positions 5/25/45
-- `Navigation.svelte` — Header + left-panel + bottom nav; 60s unread-count polling; auth-reactive
+- `Navigation.svelte` — Header + nav drawer (fixed sidebar on desktop, slide-in on mobile) + bottom nav; 60s unread-count polling; auth-reactive
 - `AuthModal.svelte` — 5 modes: login / register / verify / forgot / reset. Mode config as const object, `$derived` active config.
 - `CreatePostModal.svelte` — S3 presigned upload, dog select, image preview
 - `CreateDogModal.svelte` — Dog creation form
@@ -35,12 +35,14 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `Search.svelte` — Search panel
 - `Toast.svelte` — Renders toast notifications from `js/toast-store.svelte.js`
 - `PostOptionsSheet.svelte` — Instagram-style bottom action sheet (own post: delete/share; others: report/bookmark/follow); multi-view: options → report → confirm-delete
+- `CommentOptionsSheet.svelte` — Action sheet for comments (own: delete with confirm; others: report)
 
 ### Svelte Views (`src/views/`)
 - `HomeView.svelte` — Tabbed feed (For You / Following); tab switch triggers Feed re-render
 - `ProfileView.svelte` — Full Svelte 5: fetches dog, posts, follow status, friends, health records; calls openEditDogModal/openHealthRecordModal from modal-store
 - `PostDetailView.svelte` — Single post view
 - `MessagesView.svelte` — Two-panel messaging with 10s polling
+- `NotificationsView.svelte` — Notification feed at `/notifications`; marks all read on visit; 60s polling via Navigation bell badge
 - `AdminView.svelte` — Report queue for admin/moderator role; filter tabs (pending/reviewed/actioned/dismissed); delete post, mark reviewed, dismiss actions
 
 ### Vanilla JS (stable core — modify only to add new API functions or utility helpers)
@@ -126,7 +128,7 @@ npm run deploy   # build + S3 sync (s3://woofapp.fi/)
 
 ### Unit Tests (Vitest)
 ```bash
-npm test              # Run all unit tests (45 tests, 6 suites)
+npm test              # Run all unit tests (57 tests, 6 suites)
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage
 ```

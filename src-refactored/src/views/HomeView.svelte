@@ -1,40 +1,26 @@
 <script>
     import Feed from '../components/Feed.svelte';
+    import { store, setFeedTab } from '../../js/svelte-store.svelte.js';
 
     let { onopenAuthModal = null } = $props();
-    let activeTab = $state(
-        new URLSearchParams(window.location.search).get('tab') === 'following'
-            ? 'following' : 'public'
-    );
 
+    // Initialize feed tab from URL on mount (e.g. direct link to /?tab=following)
     $effect(() => {
-        const search = activeTab === 'following' ? '?tab=following' : '';
+        const tab = new URLSearchParams(window.location.search).get('tab');
+        if (tab === 'following') setFeedTab('following');
+    });
+
+    // Keep URL in sync with selected tab
+    $effect(() => {
+        const search = store.feedTab === 'following' ? '?tab=following' : '';
         history.replaceState({}, '', window.location.pathname + search);
     });
 </script>
 
 <main>
-    <div class="feed-tabs" role="tablist">
-        <button
-            class="feed-tab"
-            class:active={activeTab === 'public'}
-            data-feed-type="public"
-            role="tab"
-            aria-selected={activeTab === 'public'}
-            onclick={() => activeTab = 'public'}
-        >For You</button>
-        <button
-            class="feed-tab"
-            class:active={activeTab === 'following'}
-            data-feed-type="following"
-            role="tab"
-            aria-selected={activeTab === 'following'}
-            onclick={() => activeTab = 'following'}
-        >Following</button>
-    </div>
     <section class="feed">
         <div id="feed-container" class="feed-container" role="feed" aria-label="Dog posts feed">
-            <Feed type={activeTab} onopenAuthModal={onopenAuthModal} />
+            <Feed type={store.feedTab} onopenAuthModal={onopenAuthModal} />
         </div>
     </section>
 </main>

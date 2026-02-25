@@ -36,12 +36,12 @@ test.describe('Dog CRUD', () => {
   test('create a dog profile and verify it appears', async ({ page }) => {
     testUser = await adminLoginOnly(page, testUser);
 
-    // After login with no dogs, nav should show "Add a Pet"
-    const addPetLink = page.locator('#add-pet-link, #profile-nav-item a:has-text("Add a Pet")');
-    await expect(addPetLink.first()).toBeVisible({ timeout: 10_000 });
+    // After login with no dogs, nav drawer should show "Add a Pet"
+    const addPetBtn = page.locator('.nav-drawer-links button.nav-btn', { hasText: 'Add a Pet' });
+    await expect(addPetBtn).toBeVisible({ timeout: 10_000 });
 
     // Click "Add a Pet" to open create dog modal
-    await addPetLink.first().click();
+    await addPetBtn.click();
     await expect(page.locator('#create-dog-modal')).toBeVisible();
 
     // Fill the form
@@ -60,11 +60,12 @@ test.describe('Dog CRUD', () => {
     // Modal should close
     await expect(page.locator('#create-dog-modal')).toBeHidden({ timeout: 15_000 });
 
-    // Navigation should now show the dog profile link instead of "Add a Pet"
-    await expect(page.locator('#profile-nav-item')).toContainText('E2E TestDog', { timeout: 10_000 });
+    // Nav drawer should now show the dog's name instead of "Add a Pet"
+    const dogNavLink = page.locator('.nav-drawer-links a', { hasText: 'E2E TestDog' });
+    await expect(dogNavLink).toContainText('E2E TestDog', { timeout: 10_000 });
 
     // Click the dog profile link to view the profile
-    await page.locator('#profile-nav-item a').first().click();
+    await dogNavLink.first().click();
 
     // Profile page should show the dog's info
     await expect(page.locator('body')).toContainText('E2E TestDog', { timeout: 10_000 });

@@ -84,7 +84,7 @@
     id="search-panel"
     class="search-panel"
     class:active={modals.searchPanelOpen}
-    aria-hidden={!modals.searchPanelOpen}
+    inert={!modals.searchPanelOpen || undefined}
     onclick={handleOverlayClick}
 >
     <div class="search-bar">

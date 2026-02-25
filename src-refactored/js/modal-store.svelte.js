@@ -12,12 +12,14 @@ export let modals = $state({
     createPostModalOpen: false,
     createDogModalOpen: false,
     editDogModalOpen: false,
-    editDogData: null,          // dog object
+    editDogData: null,              // dog object
     healthRecordModalOpen: false,
-    healthRecordData: null,     // { dogId, record }
+    healthRecordData: null,         // { dogId, record }
     searchPanelOpen: false,
     postOptionsSheetOpen: false,
-    postOptionsSheetData: null, // { postId, dogId, dogSlug, isOwnPost }
+    postOptionsSheetData: null,     // { postId, dogId, dogSlug, isOwnPost }
+    commentOptionsSheetOpen: false,
+    commentOptionsSheetData: null,  // { commentId, isOwnComment, onDeleted }
 });
 
 export function openAuthModal() { modals.authModalOpen = true; }
@@ -37,6 +39,8 @@ export function openSearchPanel() { modals.searchPanelOpen = true; }
 export function closeSearchPanel() { modals.searchPanelOpen = false; }
 export function openPostOptionsSheet(data) { modals.postOptionsSheetData = data; modals.postOptionsSheetOpen = true; }
 export function closePostOptionsSheet() { modals.postOptionsSheetOpen = false; modals.postOptionsSheetData = null; }
+export function openCommentOptionsSheet(data) { modals.commentOptionsSheetData = data; modals.commentOptionsSheetOpen = true; }
+export function closeCommentOptionsSheet() { modals.commentOptionsSheetOpen = false; modals.commentOptionsSheetData = null; }
 export function closeAllModals() {
     modals.authModalOpen = false;
     modals.createPostModalOpen = false;
@@ -48,4 +52,6 @@ export function closeAllModals() {
     modals.searchPanelOpen = false;
     modals.postOptionsSheetOpen = false;
     modals.postOptionsSheetData = null;
+    modals.commentOptionsSheetOpen = false;
+    modals.commentOptionsSheetData = null;
 }

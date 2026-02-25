@@ -17,6 +17,7 @@
   --woof-color-brand-primary-light: #D97272;
   --woof-color-brand-primary-dark:  #A83030;
   --woof-color-brand-primary-subtle:#FBF0F0;
+  --woof-color-notif-unread-bg:     var(--woof-color-brand-primary-subtle); /* unread notification row bg */
 
   /* Brand gradient: warm crimson → khaki gold */
   --woof-color-brand-gradient: linear-gradient(135deg, #C9403F, #C3A84E);

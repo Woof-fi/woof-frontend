@@ -16,7 +16,9 @@ export let store = $state({
     // Auth — initialized synchronously so Navigation renders correctly on first paint
     authUser: isAuthenticated() ? { authenticated: true } : null,
     unreadCount: 0,
+    notifUnreadCount: 0,
     currentDog: null,
+    feedTab: 'public', // 'public' | 'following'
     // Version signals — bumped after mutations to trigger re-fetch in watchers
     dogVersion: 0,
     feedVersion: 0,
@@ -32,7 +34,9 @@ export const getState = () => store;
 
 export const setAuthUser = (user) => { store.authUser = user; };
 export const setUnreadCount = (count) => { store.unreadCount = count; };
+export const setNotifUnreadCount = (count) => { store.notifUnreadCount = count; };
 export const setCurrentDog = (dog) => { store.currentDog = dog; };
+export const setFeedTab = (tab) => { store.feedTab = tab; };
 
 // Version bumpers — call after successful mutations to signal consumers
 export function bumpDogVersion() { store.dogVersion++; }

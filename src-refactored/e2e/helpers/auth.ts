@@ -7,14 +7,14 @@ import { Page, expect } from '@playwright/test';
 import { createTestUser, adminConfirmUser, adminCreateUser } from './cognito';
 import type { TestUser } from './cognito';
 
-/** The header auth link (Login/Logout) */
-const AUTH_LINK = '.header-icons .auth-link';
+/** The nav drawer footer auth button (Login/Logout) */
+const AUTH_LINK = '.nav-drawer-footer .nav-drawer-row';
 
 /** Wait for the Woof app to fully initialize */
 export async function waitForAppReady(page: Page) {
   await page.waitForFunction(() => {
-    const link = document.querySelector('.auth-link');
-    return link && link.innerHTML.includes('<i ');
+    const btn = document.querySelector('.nav-drawer-footer .nav-drawer-row');
+    return btn && btn.innerHTML.includes('<i ');
   }, { timeout: 10_000 });
 }
 
@@ -50,7 +50,7 @@ export async function registerAndLogin(page: Page, user?: TestUser): Promise<Tes
   await waitForAppReady(page);
 
   // Register
-  await page.click('.auth-link');
+  await page.click(AUTH_LINK);
   await page.click('.auth-tab[data-tab="register"]');
   await page.fill('#auth-email', testUser.email);
   await page.fill('#auth-password', testUser.password);
@@ -67,7 +67,7 @@ export async function registerAndLogin(page: Page, user?: TestUser): Promise<Tes
   await page.fill('#auth-password', testUser.password);
   await page.click('#auth-submit');
   await expect(page.locator('#auth-modal')).toBeHidden({ timeout: 15_000 });
-  await expect(page.locator('.auth-link')).toContainText('Logout');
+  await expect(page.locator(AUTH_LINK)).toContainText('Logout');
 
   return testUser;
 }

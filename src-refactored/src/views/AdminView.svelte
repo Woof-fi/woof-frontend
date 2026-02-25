@@ -1,7 +1,7 @@
 <script>
-    import { getReports, updateReportStatus, deletePost } from '../../js/api.js';
+    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser } from '../../js/api.js';
     import { store } from '../../js/svelte-store.svelte.js';
-    import { showToast, timeAgo, imageVariant } from '../../js/utils.js';
+    import { showToast, timeAgo } from '../../js/utils.js';
 
     const REASON_LABELS = {
         inappropriate_content: 'Inappropriate content',
@@ -20,7 +20,8 @@
         { value: '',          label: 'All' },
     ];
 
-    let isAdmin = $derived(store.authUser?.role === 'admin' || store.authUser?.role === 'moderator');
+    let isAdmin      = $derived(store.authUser?.role === 'admin' || store.authUser?.role === 'moderator');
+    let isAdminRole  = $derived(store.authUser?.role === 'admin');
 
     let statusFilter = $state('pending');
     let reports      = $state([]);
@@ -89,7 +90,7 @@
     async function handleDeletePost(report) {
         busy = { ...busy, [report.id]: true };
         try {
-            await deletePost(report.target_id);
+            await adminDeletePost(report.target_id);
             await updateReportStatus(report.id, 'actioned');
             reports = reports.filter(r => r.id !== report.id);
             showToast('Post deleted and report actioned', 'success');
@@ -100,6 +101,70 @@
                 await updateReportStatus(report.id, 'actioned');
                 reports = reports.filter(r => r.id !== report.id);
             } catch { /* silent */ }
+        } finally {
+            const next = { ...busy };
+            delete next[report.id];
+            busy = next;
+        }
+    }
+
+    async function handleDeleteComment(report) {
+        busy = { ...busy, [report.id]: true };
+        try {
+            await adminDeleteComment(report.target_id);
+            await updateReportStatus(report.id, 'actioned');
+            reports = reports.filter(r => r.id !== report.id);
+            showToast('Comment deleted and report actioned', 'success');
+        } catch (err) {
+            showToast(err?.status === 404 ? 'Comment already deleted' : 'Failed to delete comment', 'error');
+            try {
+                await updateReportStatus(report.id, 'actioned');
+                reports = reports.filter(r => r.id !== report.id);
+            } catch { /* silent */ }
+        } finally {
+            const next = { ...busy };
+            delete next[report.id];
+            busy = next;
+        }
+    }
+
+    async function handleBanUser(report) {
+        const userId = report.post_owner_user_id || report.comment_owner_user_id;
+        if (!userId) return;
+        busy = { ...busy, [report.id]: true };
+        try {
+            await banUser(userId);
+            // Update local ban state on the report
+            reports = reports.map(r => {
+                if (r.id !== report.id) return r;
+                if (r.post_owner_user_id === userId) return { ...r, post_owner_banned_at: new Date().toISOString() };
+                return { ...r, comment_owner_banned_at: new Date().toISOString() };
+            });
+            showToast('User banned', 'success');
+        } catch {
+            showToast('Failed to ban user', 'error');
+        } finally {
+            const next = { ...busy };
+            delete next[report.id];
+            busy = next;
+        }
+    }
+
+    async function handleUnbanUser(report) {
+        const userId = report.post_owner_user_id || report.comment_owner_user_id;
+        if (!userId) return;
+        busy = { ...busy, [report.id]: true };
+        try {
+            await unbanUser(userId);
+            // Clear local ban state on the report
+            reports = reports.map(r => {
+                if (r.id !== report.id) return r;
+                if (r.post_owner_user_id === userId) return { ...r, post_owner_banned_at: null };
+                return { ...r, comment_owner_banned_at: null };
+            });
+            showToast('User unbanned', 'success');
+        } catch {
+            showToast('Failed to unban user', 'error');
         } finally {
             const next = { ...busy };
             delete next[report.id];
@@ -146,30 +211,35 @@
             <div class="admin-report-list">
                 {#each reports as report (report.id)}
                     <div class="admin-report-card" class:busy={busy[report.id]}>
-                        <!-- Post preview -->
+                        <!-- Post preview (post reports only) -->
                         {#if report.target_type === 'post' && report.post_image_url}
-                            <div class="admin-report-image">
+                            <a href="/post/{report.target_id}" data-link class="admin-report-image">
                                 <img
-                                    src={imageVariant(report.post_image_url, 'thumb')}
-                                    srcset="{imageVariant(report.post_image_url, 'thumb')} 150w, {report.post_image_url} 1200w"
-                                    sizes="96px"
+                                    src={report.post_image_url}
                                     alt="Reported post"
                                 />
-                            </div>
+                            </a>
                         {:else if report.target_type === 'post'}
-                            <div class="admin-report-image admin-report-image--text-only">
+                            <a href="/post/{report.target_id}" data-link class="admin-report-image admin-report-image--text-only">
                                 <i class="fas fa-file-alt"></i>
-                            </div>
+                            </a>
                         {/if}
 
                         <div class="admin-report-body">
                             <div class="admin-report-meta">
                                 <span class="admin-reason-badge">{REASON_LABELS[report.reason] ?? report.reason}</span>
+                                <span class="admin-type-badge" class:admin-type-badge--comment={report.target_type === 'comment'}>
+                                    {report.target_type === 'comment' ? 'Comment' : 'Post'}
+                                </span>
                                 <span class="admin-status-badge admin-status-{report.status}">{report.status}</span>
                             </div>
 
-                            {#if report.post_caption}
+                            {#if report.target_type === 'post' && report.post_caption}
                                 <p class="admin-report-caption">"{report.post_caption}"</p>
+                            {/if}
+
+                            {#if report.target_type === 'comment' && report.comment_content}
+                                <blockquote class="admin-report-caption">"{report.comment_content}"</blockquote>
                             {/if}
 
                             {#if report.post_dog_name}
@@ -179,6 +249,21 @@
                                         <a href="/dog/{report.post_dog_slug}" data-link>{report.post_dog_name}</a>
                                     {:else}
                                         {report.post_dog_name}
+                                    {/if}
+                                    · <a href="/post/{report.target_id}" data-link class="admin-view-link">View post</a>
+                                </p>
+                            {/if}
+
+                            {#if report.target_type === 'comment' && report.comment_dog_name}
+                                <p class="admin-report-dog">
+                                    <i class="fas fa-paw"></i>
+                                    {#if report.comment_dog_slug}
+                                        <a href="/dog/{report.comment_dog_slug}" data-link>{report.comment_dog_name}</a>
+                                    {:else}
+                                        {report.comment_dog_name}
+                                    {/if}
+                                    {#if report.comment_post_id}
+                                        · <a href="/post/{report.comment_post_id}" data-link class="admin-view-link">View post</a>
                                     {/if}
                                 </p>
                             {/if}
@@ -201,6 +286,35 @@
                                     >
                                         <i class="fas fa-trash"></i> Delete post
                                     </button>
+                                {/if}
+                                {#if report.target_type === 'comment'}
+                                    <button
+                                        class="admin-action-btn admin-action-btn--danger"
+                                        disabled={!!busy[report.id]}
+                                        onclick={() => handleDeleteComment(report)}
+                                    >
+                                        <i class="fas fa-trash"></i> Delete comment
+                                    </button>
+                                {/if}
+                                {#if isAdminRole && (report.post_owner_user_id || report.comment_owner_user_id)}
+                                    {@const isBanned = !!(report.post_owner_banned_at || report.comment_owner_banned_at)}
+                                    {#if isBanned}
+                                        <button
+                                            class="admin-action-btn admin-action-btn--neutral"
+                                            disabled={!!busy[report.id]}
+                                            onclick={() => handleUnbanUser(report)}
+                                        >
+                                            <i class="fas fa-user-check"></i> Unban user
+                                        </button>
+                                    {:else}
+                                        <button
+                                            class="admin-action-btn admin-action-btn--danger"
+                                            disabled={!!busy[report.id]}
+                                            onclick={() => handleBanUser(report)}
+                                        >
+                                            <i class="fas fa-user-slash"></i> Ban user
+                                        </button>
+                                    {/if}
                                 {/if}
                                 <button
                                     class="admin-action-btn admin-action-btn--neutral"
