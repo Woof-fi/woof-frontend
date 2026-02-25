@@ -276,9 +276,11 @@
                 <div class="comment-form">
                     <input
                         type="text"
+                        name="comment"
                         class="comment-input"
                         placeholder="Add a comment..."
                         maxlength="2200"
+                        autocomplete="off"
                         data-comment-input={id}
                         bind:value={commentInput}
                         onkeydown={handleCommentKeydown}
