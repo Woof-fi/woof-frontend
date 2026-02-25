@@ -24,7 +24,7 @@ cd src-refactored && npm run deploy   # build + S3 sync to s3://woofapp.fi/
 - **Auth token** in `localStorage` as `auth_token`; read via `getToken()` from `js/auth.js` (synchronous).
 - **All API calls** go through `js/api.js` — never fetch directly from components.
 - **State sharing** — use `js/svelte-store.svelte.js` (setAuthUser, setUnreadCount, setCurrentDog + bump*Version signals) for auth/feed/profile state; `js/modal-store.svelte.js` for modal visibility.
-- **No `<style>` blocks** — all styles live in `css/styles.css`; design tokens in `css/tokens.css`.
+- **Component styles** — live in `<style>` blocks in `.svelte` files. Global styles (resets, root vars) in `css/global.css`. `css/styles.css` is being decomposed; do not add new styles there.
 - **Design system** — always use `--woof-*` CSS custom properties for all colors, spacing, radius, shadows, and typography. Never hardcode hex values or pixel sizes that have a token equivalent. Brand primary is `--woof-color-brand-primary` (`#C9403F`). Full palette and reference: `docs/design/index.html`.
 - **XSS safety** — Svelte escapes template interpolations automatically; use `escapeHTML()` from `utils.js` in any remaining vanilla JS `innerHTML` contexts.
 
@@ -35,7 +35,8 @@ src-refactored/
 ├── index.html              # SPA entry — <div id="app"> only
 ├── css/
 │   ├── tokens.css          # Design tokens (--woof-* namespace, Woof Crimson #C9403F)
-│   └── styles.css          # All styles (no <style> blocks in components)
+│   ├── global.css          # Truly global styles: @import tokens, :root aliases, body reset
+│   └── styles.css          # Remaining component styles — being migrated to <style> blocks
 ├── js/                     # Vanilla JS modules (immutable core + support)
 │   ├── api.js              # ALL API calls — never modify from components
 │   ├── auth.js             # Cognito token management — never modify

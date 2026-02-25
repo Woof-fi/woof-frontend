@@ -119,7 +119,7 @@ test.describe('Auth flow', () => {
     await page.click('#auth-submit');
 
     // Should show error toast
-    await expect(page.locator('.toast')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="toast"]')).toBeVisible({ timeout: 10_000 });
   });
 
   test('register with existing email shows error', async ({ page }) => {
@@ -138,7 +138,7 @@ test.describe('Auth flow', () => {
     await page.click('#auth-submit');
 
     // Should show error toast about existing account
-    await expect(page.locator('.toast')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('[data-testid="toast"]')).toBeVisible({ timeout: 10_000 });
   });
 
   test('auth modal UI states are correct', async ({ page }) => {

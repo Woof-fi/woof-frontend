@@ -11,7 +11,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - **State store**: `js/svelte-store.svelte.js` — Svelte 5 `$state` rune store for cross-component state (authUser, unreadCount, currentDog). Svelte components import from here.
 - **Svelte 5 runes**: Use `$props()`, `$state()`, `$derived()`, `$effect()` exclusively. No `writable`, `createEventDispatcher`, or `$on` — those are Svelte 4.
 - **Callback props**: Inter-component events use callback props (e.g., `onopenAuthModal = null` in `$props()`). Call with `onopenAuthModal?.()`.
-- **No `<style>` blocks**: All CSS lives in `css/styles.css`. Design tokens in `css/tokens.css`. Only add `<style>` if a style genuinely can't live in `styles.css`.
+- **Component styles**: Live in `<style>` blocks inside each `.svelte` file (Svelte scopes them at build time). Global styles (resets, tokens, layout root) live in `css/global.css`. `css/styles.css` is being incrementally decomposed — do not add new styles there; add them to the relevant component's `<style>` block instead.
 - **Design system**: Always use `--woof-*` CSS custom properties for all colors, spacing, radius, shadows, and typography. Never hardcode hex values or pixel sizes that have a token equivalent. Brand primary is `--woof-color-brand-primary` (`#C9403F`). Full reference: `docs/design/index.html` and `docs/design/foundations.md`.
 - **Backend**: `https://api.woofapp.fi` (Express on Elastic Beanstalk)
 

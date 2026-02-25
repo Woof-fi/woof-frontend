@@ -82,6 +82,187 @@
     }
 </script>
 
+<style>
+.notifications-view {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: var(--woof-space-4) 0;
+}
+
+.notifications-view-title {
+    font-size: var(--woof-text-title-3);
+    font-weight: var(--woof-font-weight-bold);
+    color: var(--color-text);
+    margin: 0 0 var(--woof-space-4);
+    padding: 0 var(--woof-space-4);
+}
+
+.notification-list-card {
+    border-radius: var(--woof-radius-xl);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    background: var(--color-surface);
+    margin-bottom: var(--woof-space-4);
+}
+
+.notification-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-list li {
+    display: contents; /* Let the button fill the list item visually */
+}
+
+.notification-item {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-3);
+    width: 100%;
+    padding: var(--woof-space-3) var(--woof-space-4);
+    background: var(--color-surface);
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    text-align: left;
+    text-decoration: none;
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: inherit;
+    transition: background var(--woof-duration-fast);
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.notification-list li:last-child .notification-item {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background: var(--color-bg-alt);
+}
+
+.notification-item.unread {
+    background: var(--woof-color-notif-unread-bg);
+}
+
+.notification-item.unread:hover {
+    background: color-mix(in srgb, var(--woof-color-notif-unread-bg) 80%, var(--woof-color-neutral-200));
+}
+
+.notification-avatar {
+    width: var(--woof-avatar-sm);
+    height: var(--woof-avatar-sm);
+    border-radius: var(--woof-radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--woof-color-neutral-200);
+}
+
+.notification-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-text {
+    font-size: var(--woof-text-callout);
+    line-height: 1.4;
+    color: var(--color-text);
+}
+
+.notification-text strong {
+    font-weight: var(--woof-font-weight-semibold);
+}
+
+.notification-time {
+    display: block;
+    font-size: var(--woof-text-footnote);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.notification-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--woof-radius-sm);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--woof-color-neutral-200);
+}
+
+.notifications-empty {
+    text-align: center;
+    padding: var(--woof-space-16) var(--woof-space-4);
+    color: var(--color-text-muted);
+    font-size: var(--woof-text-callout);
+}
+
+.notifications-empty i {
+    font-size: 40px;
+    display: block;
+    margin-bottom: var(--woof-space-3);
+    opacity: 0.4;
+}
+
+.notif-load-more {
+    width: 100%;
+    padding: var(--woof-space-3) var(--woof-space-4);
+    background: none;
+    border: none;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-primary);
+    font-size: var(--woof-text-callout);
+    font-weight: var(--woof-font-weight-medium);
+    cursor: pointer;
+    transition: background var(--woof-duration-fast);
+    font-family: inherit;
+}
+
+.notif-load-more:hover {
+    background: var(--color-bg-alt);
+}
+
+.notif-load-more:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Skeleton rows for notifications loading */
+.notification-skeleton {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-3);
+    padding: var(--woof-space-3) var(--woof-space-4);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.notification-skeleton-avatar {
+    width: var(--woof-avatar-sm);
+    height: var(--woof-avatar-sm);
+    border-radius: var(--woof-radius-full);
+    flex-shrink: 0;
+}
+
+.notification-skeleton-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-2);
+}
+
+.notification-skeleton-line {
+    height: 13px;
+    border-radius: var(--woof-radius-xs);
+}
+
+.notification-skeleton-line.short {
+    width: 40%;
+}
+</style>
+
 <div class="notifications-view">
     <h1 class="notifications-view-title">Notifications</h1>
 

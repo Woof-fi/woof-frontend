@@ -172,7 +172,7 @@ test.describe('Post options sheet', () => {
 
         await page.locator('.action-sheet button').filter({ hasText: 'Add to favourites' }).click();
 
-        await expect(page.locator('.toast')).toBeVisible({ timeout: 5_000 });
-        await expect(page.locator('.toast')).toContainText(/favourites/i);
+        await expect(page.locator('[data-testid="toast"]')).toBeVisible({ timeout: 5_000 });
+        await expect(page.locator('[data-testid="toast"]')).toContainText(/favourites/i);
     });
 });
