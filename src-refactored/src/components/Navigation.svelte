@@ -348,7 +348,7 @@
         <i class="fas fa-plus-square"></i>
     </button>
     {#if authed}
-        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" class:active={isMessagesActive()}>
+        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" class:active={isMessagesActive()} aria-label="Messages">
             <i class="fas fa-comment-dots"></i>
             {#if badgeDisplay}
                 <span class="bottom-nav-badge" id="bottom-messages-badge">{badgeDisplay}</span>
@@ -357,7 +357,7 @@
             {/if}
         </a>
     {:else}
-        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" style="display:none">
+        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" style="display:none" aria-label="Messages">
             <i class="fas fa-comment-dots"></i>
             <span class="bottom-nav-badge" id="bottom-messages-badge" style="display:none">0</span>
         </a>

@@ -462,7 +462,7 @@ button.view-all-comments:hover {
 
 .post-timestamp {
     font-size: 10px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-500);
     text-transform: uppercase;
     letter-spacing: 0.2px;
 }
