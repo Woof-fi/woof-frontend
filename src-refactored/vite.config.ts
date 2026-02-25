@@ -46,6 +46,9 @@ export default defineConfig({
       workbox: {
         // Precache app shell (JS/CSS bundles handled automatically)
         globPatterns: ['**/*.{js,css,html}'],
+        // Serve index.html for all SPA navigation requests (non-API, non-asset)
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
         // Runtime cache for CDN images — cache-first, 7 day max-age
         runtimeCaching: [
           {
