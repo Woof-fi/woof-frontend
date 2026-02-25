@@ -193,7 +193,6 @@ export async function confirmRegistration(email, code) {
                 reject(err);
                 return;
             }
-            showToast('Email verified! You can now log in.', 'success');
             resolve(result);
         });
     });

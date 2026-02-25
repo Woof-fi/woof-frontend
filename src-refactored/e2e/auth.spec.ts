@@ -40,7 +40,11 @@ test.afterEach(async ({ page }) => {
 });
 
 test.describe('Auth flow', () => {
-  test('register → admin confirm → login → logout', async ({ page }) => {
+  // NOTE: The happy path after registration is: enter the real emailed verification code
+  // → confirmRegistration succeeds → auto-login fires → modal closes automatically.
+  // That path cannot be automated (we can't intercept the Cognito email), so this test
+  // exercises the fallback: admin-confirm via CLI + back-to-login button → manual login.
+  test('register → admin confirm (back-to-login fallback) → login → logout', async ({ page }) => {
     await page.goto('/');
     await waitForAppReady(page);
 
@@ -75,7 +79,7 @@ test.describe('Auth flow', () => {
     const userAfter = adminGetUser(testUser.email);
     expect(userAfter!.status).toBe('CONFIRMED');
 
-    // 7. Go back to login
+    // 7. Go back to login (fallback path — real users would enter the code for auto-login)
     await page.click('#back-to-login-btn');
     await expect(page.locator('#auth-modal-title')).toHaveText('Login');
     await expect(page.locator('#auth-email-group')).toBeVisible();

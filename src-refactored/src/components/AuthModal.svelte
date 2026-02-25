@@ -15,6 +15,7 @@
 
     let mode = $state('login'); // 'login' | 'register' | 'verify' | 'forgot' | 'reset'
     let pendingEmail = $state('');
+    let pendingPassword = $state('');
 
     // Form fields
     let email = $state('');
@@ -140,6 +141,7 @@
         verifyCode = '';
         newPassword = '';
         pendingEmail = '';
+        pendingPassword = '';
     }
 
     function handleKey(e) {
@@ -170,6 +172,7 @@
                     submitLabel = 'Registering...';
                     await register(email, password, name);
                     pendingEmail = email;
+                    pendingPassword = password;
                     email = '';
                     password = '';
                     name = '';
@@ -180,7 +183,16 @@
                     submitLabel = 'Verifying...';
                     await confirmRegistration(pendingEmail, verifyCode);
                     verifyCode = '';
-                    mode = 'login';
+                    try {
+                        await login(pendingEmail, pendingPassword);
+                        setAuthUser({ authenticated: true });
+                        pendingPassword = '';
+                        close();
+                    } catch {
+                        pendingPassword = '';
+                        showToast('Email verified! Please sign in.', 'success');
+                        mode = 'login';
+                    }
                     break;
                 }
                 case 'forgot': {
@@ -277,6 +289,9 @@
                             type="password"
                             id="auth-password"
                             autocomplete={mode === 'login' ? 'current-password' : 'new-password'}
+                            passwordrules={mode === 'register'
+                                ? 'minlength: 8; required: upper; required: lower; required: digit; required: special;'
+                                : undefined}
                             required={cfg.password}
                             bind:value={password}
                         />
