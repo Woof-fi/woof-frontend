@@ -44,31 +44,8 @@
     const FALLBACK_AVATAR = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23cccccc" width="150" height="150"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EDog%3C/text%3E%3C/svg%3E';
     const FALLBACK_POST   = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23cccccc" width="400" height="400"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="30" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
 
-    // The logged-in user's dog IDs (for determining comment ownership)
-    // We derive ownership based on the comment's dogId matching any dog owned by the current user
-    // PostCard does not receive the owner user ID on comments, so we check dogId against the
-    // authUser's dog list. We use a simpler signal: `store.authUser` tells us if authed,
-    // and each comment carries its dogId — we compare against dogId passed to this post card.
-    // For correctness: a comment is "own" if the comment's dog belongs to the same user
-    // who owns the post's dog. Since we don't have user→dog mapping here, we check if
-    // the comment dogId equals the post's dogId (same dog) — or we can store the user-level dog IDs.
-    // Simplest correct approach: the comment object includes `dogId`, and we know the viewer's
-    // current dog (store.currentDog). We'll compare commentDogId to ALL user dog IDs via a
-    // callback approach: we let parent resolve or we store dog IDs inline.
-    //
-    // Best UX approach: let the server return `isOwn` on comment objects. But since it doesn't,
-    // we check: if the comment's dogId === dogId prop (same dog as the post author), ownership
-    // cannot be right — we need the viewer's dog id. We'll use `store.authUser` role + match the
-    // comment's dog id to the viewer's dogs by comparing with the first dog's id if available.
-    // Since we don't have viewer dog IDs here, we pass the ownerDogId down from Feed/ProfileView
-    // or derive it from the session. For now, we use the pragmatic check: comments made by the
-    // viewer's dog will have the same dogId as the navigation dog (store.currentDog?.id).
-    // This is correct for single-dog users and acceptable for multi-dog.
-
-    let myDogId = $derived(store.currentDog?.id ?? null);
-
     function isOwnComment(comment) {
-        return !!myDogId && comment.dogId === myDogId;
+        return store.userDogIds.length > 0 && store.userDogIds.includes(comment.dogId);
     }
 
     // --- Like handler ---

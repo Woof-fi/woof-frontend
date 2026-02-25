@@ -18,6 +18,7 @@ export let store = $state({
     unreadCount: 0,
     notifUnreadCount: 0,
     currentDog: null,
+    userDogIds: [], // all dog IDs owned by the authenticated user (for comment ownership checks)
     feedTab: 'public', // 'public' | 'following'
     // Version signals — bumped after mutations to trigger re-fetch in watchers
     dogVersion: 0,
@@ -36,6 +37,7 @@ export const setAuthUser = (user) => { store.authUser = user; };
 export const setUnreadCount = (count) => { store.unreadCount = count; };
 export const setNotifUnreadCount = (count) => { store.notifUnreadCount = count; };
 export const setCurrentDog = (dog) => { store.currentDog = dog; };
+export const setUserDogIds = (ids) => { store.userDogIds = ids; };
 export const setFeedTab = (tab) => { store.feedTab = tab; };
 
 // Version bumpers — call after successful mutations to signal consumers

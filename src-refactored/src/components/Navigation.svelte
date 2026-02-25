@@ -2,7 +2,7 @@
     import { getMyDogs, getUnreadCount, getNotifUnreadCount } from '../../js/api.js';
     import { isAuthenticated, logout } from '../../js/auth.js';
     import { openCreateDogModal, openSearchPanel } from '../../js/modal-store.svelte.js';
-    import { store, setAuthUser, setFeedTab, setNotifUnreadCount } from '../../js/svelte-store.svelte.js';
+    import { store, setAuthUser, setFeedTab, setNotifUnreadCount, setCurrentDog, setUserDogIds } from '../../js/svelte-store.svelte.js';
 
     let { onopenAuthModal = null, onopenCreatePostModal = null } = $props();
 
@@ -107,6 +107,8 @@
                     const fetched = await getMyDogs();
                     if (!active) return;
                     dogs = fetched;
+                    setUserDogIds(fetched.map(d => d.id));
+                    if (fetched.length > 0) setCurrentDog(fetched[0]);
                 } catch {
                     if (!active) return;
                     dogs = [];
@@ -121,6 +123,8 @@
                 myDogsLoaded = true;
                 unreadCount = 0;
                 setNotifUnreadCount(0);
+                setUserDogIds([]);
+                setCurrentDog(null);
             }
         }
 
