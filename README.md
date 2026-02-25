@@ -4,7 +4,7 @@ A social network where dogs are the main users. Live at [woofapp.fi](https://woo
 
 ## Architecture
 
-**Frontend:** Vanilla JS SPA built with Vite, deployed to S3 + Cloudflare (HTTPS, custom domain)
+**Frontend:** Svelte 5 SPA built with Vite, deployed to S3 + Cloudflare (HTTPS, custom domain)
 **Backend:** Express + TypeScript + PostgreSQL, deployed on AWS Elastic Beanstalk
 **Storage:** S3 for image uploads (presigned URL flow)
 
@@ -29,7 +29,7 @@ A comprehensive design system lives at [`docs/design/`](docs/design/):
 | `motion.md` | Animation guidelines |
 | `patterns.md` | Layout and UX patterns |
 
-**Brand:** Woof Orange `#EF4621` · Warm cream `#FAFAF8` · `--woof-*` token namespace
+**Brand:** Woof Crimson `#C9403F` · Warm cream `#FAFAF8` · `--woof-*` token namespace
 The CSS layer uses aliased variables (`--color-primary` → `--woof-color-brand-primary`) so no component CSS had to change.
 
 ---
@@ -52,6 +52,11 @@ The CSS layer uses aliased variables (`--color-primary` → `--woof-color-brand-
 - **SPA Routing** - `/dog/:slug`, `/post/:id`, `/messages`, deep linking
 - **Mobile** - Instagram-style bottom nav, responsive layout
 - **Loading Skeletons** - Shimmer cards during feed/profile loading
+- **Notifications** - Bell icon + `/notifications` feed, unread badge, mark-all-read
+- **Post/Comment Options** - Action sheets for delete, report, bookmark
+- **Moderation** - Admin/moderator report queue at `/admin`, user banning
+- **CDN Images** - CloudFront CDN (`cdn.woofapp.fi`) with `_medium`/`_thumb` variants, responsive srcsets
+- **PWA** - Installable app, service worker with CacheFirst CDN strategy
 
 ### Infrastructure
 
@@ -60,6 +65,9 @@ The CSS layer uses aliased variables (`--color-primary` → `--woof-color-brand-
 - **Backend:** Elastic Beanstalk (eu-north-1)
 - **Database:** RDS PostgreSQL
 - **Images:** S3 presigned URL uploads (`woof-prod-photos` bucket)
+- **CDN:** CloudFront (`cdn.woofapp.fi`) — serves Sharp-resized image variants
+- **Lambda:** `woof-image-processor` — S3-triggered Sharp resize (medium 600px, thumb 150px)
+- **PWA:** Service worker with CacheFirst CDN strategy, installable on mobile/desktop
 
 ## Development
 
@@ -81,7 +89,7 @@ cd ../woof-backend
 npm install
 npm run dev          # Express dev server with ts-node
 npm run build        # Compile TypeScript to dist/
-npm test             # Jest (185 tests)
+npm test             # Jest (237 tests)
 eb deploy            # Deploy to Elastic Beanstalk
 ```
 
@@ -154,8 +162,8 @@ woof-backend/
 
 ## Tests
 
-- **Backend:** 185 tests across 11 suites (Jest) - auth, posts, dogs, comments, likes, follows, health records, messaging, admin, slugs
-- **Frontend:** Vitest with happy-dom
+- **Backend:** 237 tests across 13 suites (Jest) - auth, posts, dogs, comments, likes, follows, health records, messaging, admin, slugs, reports, bookmarks
+- **Frontend:** 57 tests (Vitest)
 
 ## Next Up
 
