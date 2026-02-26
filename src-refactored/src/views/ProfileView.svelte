@@ -504,3 +504,672 @@
         {/if}
     {/if}
 </div>
+
+<style>
+/* ── Big-picture profile layout ── */
+.profile-page {
+    margin: -20px;
+    min-height: 100vh;
+}
+
+.profile-hero {
+    width: 100%;
+    height: 48vh;
+    min-height: 240px;
+    max-height: 380px;
+    overflow: hidden;
+    background: var(--woof-color-neutral-200);
+    position: relative;
+}
+
+.profile-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+}
+
+.profile-sheet {
+    background: var(--woof-surface-primary);
+    border-radius: var(--woof-radius-2xl) var(--woof-radius-2xl) 0 0;
+    margin-top: -28px;
+    position: relative;
+    z-index: 1;
+    padding: 24px 20px 120px;
+    min-height: 60vh;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.profile-sheet-namerow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.profile-sheet-name {
+    font-size: var(--woof-text-title-1);
+    font-weight: var(--woof-font-weight-bold);
+    color: var(--woof-color-neutral-900);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+.profile-sheet-breed {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-brand-primary);
+    font-weight: var(--woof-font-weight-semibold);
+    margin-top: 6px;
+}
+
+.profile-sheet-stats {
+    display: flex;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--woof-color-neutral-100);
+}
+
+.profile-sheet-stat {
+    flex: 1;
+    padding-right: 16px;
+    margin-right: 16px;
+    border-right: 1px solid var(--woof-color-neutral-200);
+}
+
+.profile-sheet-stat:last-child {
+    border-right: none;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+.profile-sheet-stat-num {
+    font-size: var(--woof-text-title-2);
+    font-weight: var(--woof-font-weight-heavy);
+    color: var(--woof-color-neutral-900);
+    line-height: 1;
+}
+
+.profile-sheet-stat-label {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    margin-top: 3px;
+}
+
+.profile-sheet-bio {
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-700);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+/* Sticky follow/message bar */
+.profile-follow-sticky {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 20px 16px 300px;
+    background: linear-gradient(to top, rgba(255,255,255,1) 55%, rgba(255,255,255,0));
+    z-index: 50;
+    pointer-events: none;
+}
+
+.profile-follow-sticky:empty {
+    display: none;
+}
+
+.profile-follow-actions {
+    display: flex;
+    gap: 12px;
+    max-width: 640px;
+    margin: 0 auto;
+    pointer-events: all;
+}
+
+.profile-follow-actions .follow-btn {
+    flex: 1;
+    height: var(--woof-btn-height-lg);
+    font-size: var(--woof-text-headline);
+    font-weight: var(--woof-font-weight-semibold);
+}
+
+.profile-follow-actions .message-profile-btn.icon-only {
+    width: var(--woof-btn-height-lg);
+    height: var(--woof-btn-height-lg);
+    padding: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* Profile tabs */
+.profile-tabs {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 0;
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+    z-index: 10;
+}
+
+.profile-tabs .tab-link {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+}
+
+.profile-tabs .tab-link i {
+    font-size: 14px;
+}
+
+.profile-tabs .tab-link.active {
+    color: var(--color-primary);
+}
+
+.profile-tabs .tab-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+.profile-tabs .tab-link.active::after {
+    background-color: var(--color-primary);
+}
+
+/* Posts grid */
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.posts-grid-2col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+}
+
+.posts-grid-item {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.posts-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.posts-grid-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.posts-grid-item:hover .posts-grid-overlay {
+    opacity: 1;
+}
+
+.posts-grid-overlay span {
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.posts-grid-overlay span i {
+    margin-right: 4px;
+}
+
+/* Friend list */
+.friend-list {
+    list-style-type: none;
+    padding: 8px 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.friend-item {
+    list-style: none;
+}
+
+.friend-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.15s;
+}
+
+.friend-link:hover {
+    background-color: var(--color-hover, rgba(0, 0, 0, 0.03));
+}
+
+.friend-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--woof-radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.friend-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.mutual-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-radius: var(--woof-radius-full);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.friend-breed {
+    display: block;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.friend-relation {
+    display: block;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 1px;
+}
+
+.friends-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-muted);
+}
+
+/* Health records */
+.health-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.health-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.health-add-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 20px;
+}
+
+.health-filters {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--color-border);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.health-filters::-webkit-scrollbar {
+    display: none;
+}
+
+.health-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-surface);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.health-filter-btn i {
+    font-size: 11px;
+}
+
+.health-filter-btn:hover {
+    border-color: var(--color-text-secondary);
+    background: var(--color-bg-alt);
+}
+
+.health-filter-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+
+.health-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.health-loading {
+    text-align: center;
+    padding: 32px;
+    color: var(--color-text-secondary);
+}
+
+.health-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    transition: box-shadow 0.2s;
+}
+
+.health-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.health-card-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--woof-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+.health-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.health-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.health-card-type {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--color-text);
+}
+
+.health-card-date {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.health-card-desc {
+    margin: 0 0 4px;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.health-card-notes {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+.health-value {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 8px;
+    background: var(--woof-color-brand-primary-subtle);
+    border-radius: var(--woof-radius-full);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.health-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.health-card:hover .health-card-actions {
+    opacity: 1;
+}
+
+.health-action-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: var(--woof-radius-full);
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.health-action-btn:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.health-delete-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.private-content {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-secondary);
+}
+
+.private-content i {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* Message button on profile */
+.message-profile-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--woof-btn-radius);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.message-profile-btn:hover {
+    background-color: var(--color-bg-alt);
+}
+
+/* Follow button */
+.follow-btn {
+    padding: 6px 20px;
+    border: none;
+    border-radius: var(--woof-btn-radius);
+    background: var(--color-primary);
+    color: var(--woof-color-neutral-0);
+    font-size: var(--woof-text-subheadline);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--woof-duration-fast);
+}
+
+.follow-btn:hover {
+    background: var(--color-primary-hover);
+}
+
+.follow-btn.following {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+.follow-btn.following:hover {
+    background: var(--woof-color-brand-primary-subtle);
+    color: var(--woof-color-brand-primary);
+    border-color: var(--woof-color-brand-primary);
+}
+
+.follow-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Edit profile button */
+.edit-profile-btn {
+    padding: 6px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--woof-btn-radius);
+    background: var(--color-surface);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.edit-profile-btn:hover {
+    background: var(--color-bg-alt);
+}
+
+/* Legacy profile styles */
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-pic-large {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--woof-radius-full);
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.profile-details, .private-details {
+    margin-top: 30px;
+}
+
+.private-profile {
+    background-color: var(--color-bg-alt);
+    padding: 20px;
+    border-radius: var(--woof-radius-md);
+    margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+    .profile-page {
+        margin: -20px 0 0;
+    }
+    .profile-follow-sticky {
+        bottom: 56px;
+        padding: 12px 20px 12px;
+    }
+    .health-card-actions {
+        opacity: 1;
+    }
+}
+</style>

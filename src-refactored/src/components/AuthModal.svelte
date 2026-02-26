@@ -383,3 +383,68 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Password requirements */
+.password-requirements {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.password-requirements li {
+    padding: 2px 0;
+}
+
+.password-requirements li::before {
+    content: '○ ';
+    color: var(--color-text-muted);
+}
+
+.password-requirements li.met {
+    color: var(--woof-color-success);
+}
+
+.password-requirements li.met::before {
+    content: '● ';
+}
+
+/* Auth tabs */
+.auth-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 12px 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    text-align: center;
+}
+
+.auth-tab:hover {
+    color: var(--color-text);
+}
+
+.auth-tab.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+.auth-secondary-action {
+    text-align: center;
+    margin-top: 12px;
+    margin-bottom: 0;
+    font-size: 13px;
+}
+</style>

@@ -214,3 +214,81 @@
         </div>
     {/if}
 {/if}
+
+<style>
+.feed-sentinel {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    font-size: 24px;
+    color: var(--text-secondary, #888);
+}
+
+.content-gate {
+    position: relative;
+    margin: -60px auto 0;
+    padding-top: 60px;
+}
+
+.content-gate-overlay {
+    background: linear-gradient(
+        to bottom,
+        rgba(250, 250, 250, 0) 0%,
+        rgba(250, 250, 250, 0.9) 30%,
+        var(--color-bg, #fafafa) 50%
+    );
+    padding: 80px 20px 60px;
+    text-align: center;
+}
+
+.content-gate-content {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 12px);
+    padding: 32px 24px;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.content-gate-icon {
+    font-size: 36px;
+    color: var(--color-primary);
+    margin-bottom: 12px;
+}
+
+.content-gate-heading {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 8px;
+}
+
+.content-gate-desc {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+.content-gate-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.content-gate-btn {
+    padding: 10px 24px;
+    font-size: 14px;
+    min-width: 100px;
+}
+
+@media (max-width: 400px) {
+    .content-gate-buttons {
+        flex-direction: column;
+    }
+    .content-gate-btn {
+        width: 100%;
+    }
+}
+</style>

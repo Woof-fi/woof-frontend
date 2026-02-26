@@ -133,3 +133,130 @@
         </div>
     {/if}
 </div>
+
+<style>
+.action-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--woof-surface-overlay);
+    z-index: var(--woof-z-modal-backdrop, 1040);
+}
+
+.action-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 540px;
+    background: var(--woof-surface-primary);
+    border-radius: var(--woof-radius-lg) var(--woof-radius-lg) 0 0;
+    z-index: var(--woof-z-modal, 1050);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    overflow: hidden;
+}
+
+.action-sheet-title {
+    padding: var(--woof-space-4) var(--woof-space-4) var(--woof-space-2);
+    font-size: var(--woof-font-size-sm);
+    color: var(--woof-color-neutral-500);
+    font-weight: var(--woof-font-weight-medium);
+    text-align: center;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.action-sheet-delete-confirm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--woof-space-6) var(--woof-space-5) var(--woof-space-5);
+    gap: var(--woof-space-3);
+}
+
+.action-sheet-delete-title {
+    margin: 0;
+    font-size: var(--woof-font-size-lg);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-900);
+    text-align: center;
+}
+
+.action-sheet-delete-subtitle {
+    margin: 0;
+    font-size: var(--woof-font-size-sm);
+    color: var(--woof-color-neutral-400);
+    text-align: center;
+}
+
+.action-sheet-delete-btn {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-font-size-base);
+    font-weight: var(--woof-font-weight-semibold);
+    cursor: pointer;
+    transition: opacity var(--woof-duration-fast, 0.15s);
+}
+
+.action-sheet-delete-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.action-sheet-delete-btn.danger {
+    background: var(--woof-color-error);
+    color: var(--woof-color-neutral-0);
+}
+
+.action-sheet-delete-btn.danger:hover:not(:disabled) {
+    opacity: 0.88;
+}
+
+.action-sheet-delete-btn.safe {
+    background: var(--woof-color-neutral-100);
+    color: var(--woof-color-neutral-700);
+}
+
+.action-sheet-delete-btn.safe:hover:not(:disabled) {
+    background: var(--woof-color-neutral-200);
+}
+
+.action-sheet-item {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-3);
+    width: 100%;
+    min-height: 56px;
+    padding: 0 var(--woof-space-5);
+    background: none;
+    border: none;
+    border-top: 1px solid var(--color-border);
+    font-size: var(--woof-font-size-base);
+    color: var(--woof-color-neutral-900);
+    cursor: pointer;
+    text-align: left;
+    transition: background var(--woof-duration-fast, 0.15s);
+}
+
+.action-sheet-item:first-child {
+    border-top: none;
+}
+
+.action-sheet-item:hover,
+.action-sheet-item:active {
+    background: var(--woof-color-neutral-50);
+}
+
+.action-sheet-item.destructive {
+    color: var(--woof-color-error, #E53E3E);
+}
+
+.action-sheet-item.cancel {
+    font-weight: var(--woof-font-weight-bold);
+    margin-top: var(--woof-space-2);
+    border-top: 8px solid var(--woof-color-neutral-100);
+    justify-content: center;
+    color: var(--woof-color-neutral-700);
+}
+</style>

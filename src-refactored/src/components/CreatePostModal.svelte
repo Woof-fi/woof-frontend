@@ -251,3 +251,71 @@
         </div>
     </div>
 </div>
+
+<style>
+#create-post-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.image-source-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#post-image-camera {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #post-image-camera {
+        display: flex;
+    }
+}
+
+.image-source-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: all 0.2s;
+}
+
+.image-source-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(239, 70, 33, 0.05);
+}
+
+.image-source-btn i {
+    font-size: 18px;
+}
+
+.image-preview {
+    margin-bottom: 15px;
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    display: block;
+}
+</style>

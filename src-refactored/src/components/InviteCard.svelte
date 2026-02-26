@@ -70,3 +70,46 @@
         </button>
     </div>
 </div>
+
+<style>
+.invite-card {
+    background: linear-gradient(135deg, var(--woof-color-brand-primary-subtle) 0%, var(--woof-color-neutral-50) 100%);
+    border: 1px solid rgba(239, 70, 33, 0.12);
+    border-left: 4px solid var(--color-primary);
+    margin-bottom: 20px;
+    border-radius: var(--woof-radius-md);
+    padding: 24px;
+    text-align: center;
+}
+
+.invite-card-icon {
+    font-size: 28px;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+}
+
+.invite-card-heading {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 6px;
+}
+
+.invite-card-desc {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0 0 16px;
+}
+
+.invite-card-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.invite-card-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+</style>

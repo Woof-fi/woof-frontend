@@ -61,3 +61,24 @@
         {/if}
     </div>
 </main>
+
+<style>
+.post-detail-page {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.post-detail-nav {
+    padding: var(--woof-space-3) var(--woof-space-4) var(--woof-space-2);
+}
+
+.post-detail-container {
+    padding: 0;
+}
+
+.post-detail-loading {
+    text-align: center;
+    padding: 48px;
+    color: var(--color-text-secondary);
+}
+</style>

@@ -261,3 +261,112 @@
         </div>
     </div>
 </div>
+
+<style>
+.health-modal-content {
+    max-width: 600px;
+    width: 90%;
+    margin: 8% auto;
+    box-sizing: border-box;
+}
+
+.health-type-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.health-type-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    background: var(--color-surface);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.health-type-tab:hover {
+    border-color: var(--color-text-secondary);
+    background: var(--color-bg-alt);
+}
+
+.health-type-tab.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+
+.health-type-tab i {
+    font-size: 12px;
+}
+
+.health-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-group-flex {
+    flex: 1;
+}
+
+.health-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+}
+
+.health-modal-actions .btn-secondary,
+.health-modal-actions .btn-primary {
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+@media (max-width: 480px) {
+    .health-modal-content {
+        width: 95%;
+        margin: 2vh auto;
+        padding: 16px;
+    }
+
+    .health-type-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 6px;
+        padding-bottom: 4px;
+    }
+
+    .health-type-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .health-type-tab {
+        flex-shrink: 0;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 14px;
+    }
+}
+</style>
