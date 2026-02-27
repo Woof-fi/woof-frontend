@@ -184,6 +184,8 @@
         <div class="breed-hero">
             {#if breed.photo}
                 <img src={breed.photo} alt={breed.name} class="breed-hero-img" onerror={fallbackImg} />
+            {:else if breed.heroImageUrl}
+                <img src={breed.heroImageUrl} alt={breed.name} class="breed-hero-img" onerror={fallbackImg} />
             {:else}
                 <div class="breed-hero-gradient"></div>
             {/if}
