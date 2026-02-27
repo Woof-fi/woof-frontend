@@ -185,6 +185,8 @@
                 commentCount={item.commentCount || 0}
                 likedByUser={item.likedByUser || false}
                 createdAt={item.createdAt}
+                breedName={item.breedName || ''}
+                breedSlug={item.breedSlug || ''}
                 onopenAuthModal={handleOpenAuthModal}
             />
         {/if}

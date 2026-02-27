@@ -17,7 +17,7 @@
                 id: dog.id,
                 slug: dog.slug,
                 name: dog.name,
-                breed: dog.breed,
+                breed: dog.breedName,
                 profilePhoto: dog.profilePhoto,
             }));
         } catch {

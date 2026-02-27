@@ -788,5 +788,53 @@ export async function updatePostModeration(postId, status) {
     });
 }
 
+// ============================================================================
+// BREEDS
+// ============================================================================
+
+/**
+ * Search breeds by query (matches both EN and FI names)
+ * @param {string} query - Search term
+ * @returns {Promise<object[]>} - Array of breed objects
+ */
+export async function searchBreeds(query) {
+    try {
+        const data = await apiRequest(`/api/breeds/search?q=${encodeURIComponent(query)}`, { cache: 'default' });
+        return data.breeds || [];
+    } catch (error) {
+        console.error('Failed to search breeds:', error);
+        return [];
+    }
+}
+
+/**
+ * Get all breeds
+ * @returns {Promise<object[]>} - Array of all breed objects
+ */
+export async function getAllBreeds() {
+    try {
+        const data = await apiRequest('/api/breeds', { cache: 'default' });
+        return data.breeds || [];
+    } catch (error) {
+        console.error('Failed to fetch breeds:', error);
+        return [];
+    }
+}
+
+/**
+ * Get breed by slug
+ * @param {string} slug - Breed slug
+ * @returns {Promise<object>} - Breed object with dog count
+ */
+export async function getBreedBySlug(slug) {
+    try {
+        const data = await apiRequest(`/api/breeds/${slug}`, { cache: 'default' });
+        return data.breed;
+    } catch (error) {
+        console.error(`Failed to fetch breed ${slug}:`, error);
+        throw error;
+    }
+}
+
 // Export APIError for use in other modules
 export { APIError };

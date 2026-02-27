@@ -5,13 +5,15 @@
     import { showToast, isValidFileType, isValidFileSize } from '../../js/utils.js';
     import { modals, closeEditDogModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpProfileVersion } from '../../js/svelte-store.svelte.js';
+    import BreedAutocomplete from './BreedAutocomplete.svelte';
 
     let submitting = $state(false);
 
     // Form fields — populated reactively from modals.editDogData
     let dogId = $state('');
     let dogName = $state('');
-    let breed = $state('');
+    let breedId = $state('');
+    let breedName = $state('');
     let age = $state('');
     let location = $state('');
     let bio = $state('');
@@ -26,7 +28,8 @@
         if (modals.editDogModalOpen && modals.editDogData) {
             dogId = modals.editDogData.id;
             dogName = modals.editDogData.name || '';
-            breed = modals.editDogData.breed || '';
+            breedId = modals.editDogData.breedId || '';
+            breedName = modals.editDogData.breedName || '';
             age = modals.editDogData.age ?? '';
             location = modals.editDogData.location || '';
             bio = modals.editDogData.bio || '';
@@ -89,6 +92,12 @@
 
     async function handleSubmit(e) {
         e.preventDefault();
+
+        if (!breedId) {
+            showToast('Please select a breed from the list', 'error');
+            return;
+        }
+
         submitting = true;
 
         try {
@@ -100,7 +109,7 @@
 
             const dogData = {
                 name: dogName.trim(),
-                breed: breed.trim(),
+                breed_id: breedId,
                 age: parseInt(age),
                 location: location.trim(),
                 bio: bio.trim(),
@@ -152,12 +161,11 @@
                 </div>
                 <div class="form-group">
                     <label for="edit-dog-breed">Breed *</label>
-                    <input
-                        type="text"
+                    <BreedAutocomplete
                         id="edit-dog-breed"
-                        required
-                        maxlength="50"
-                        bind:value={breed}
+                        required={true}
+                        bind:selectedBreedId={breedId}
+                        bind:selectedBreedName={breedName}
                     />
                 </div>
                 <div class="form-group">

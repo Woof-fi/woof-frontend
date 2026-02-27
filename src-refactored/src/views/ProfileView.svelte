@@ -281,7 +281,7 @@
                 <div class="profile-sheet-namerow">
                     <div>
                         <div class="profile-sheet-name">{dog.name}</div>
-                        <div class="profile-sheet-breed"><i class="fas fa-paw"></i> {dog.breed}</div>
+                        <a href="/breed/{dog.breedSlug}" data-link class="profile-sheet-breed"><i class="fas fa-paw"></i> {dog.breedName}</a>
                     </div>
                     {#if dog.isOwner}
                         <button class="edit-profile-btn" onclick={handleEditDog}>
@@ -391,7 +391,7 @@
                                     />
                                     <div class="friend-info">
                                         <span class="friend-name">{friend.name}</span>
-                                        <span class="friend-breed">{friend.breed}</span>
+                                        <span class="friend-breed">{friend.breedName}</span>
                                     </div>
                                 </a>
                             </li>
@@ -565,6 +565,11 @@
     color: var(--woof-color-brand-primary);
     font-weight: var(--woof-font-weight-semibold);
     margin-top: 6px;
+    text-decoration: none;
+}
+
+.profile-sheet-breed:hover {
+    text-decoration: underline;
 }
 
 .profile-sheet-stats {

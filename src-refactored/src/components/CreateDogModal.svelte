@@ -6,12 +6,14 @@
     import { showToast, isValidFileType, isValidFileSize } from '../../js/utils.js';
     import { modals, closeCreateDogModal as storeClose, openAuthModal } from '../../js/modal-store.svelte.js';
     import { bumpDogVersion } from '../../js/svelte-store.svelte.js';
+    import BreedAutocomplete from './BreedAutocomplete.svelte';
 
     let submitting = $state(false);
 
     // Form fields
     let dogName = $state('');
-    let breed = $state('');
+    let breedId = $state('');
+    let breedName = $state('');
     let age = $state('');
     let location = $state('');
     let bio = $state('');
@@ -40,7 +42,8 @@
 
     function resetForm() {
         dogName = '';
-        breed = '';
+        breedId = '';
+        breedName = '';
         age = '';
         location = '';
         bio = '';
@@ -90,6 +93,11 @@
             return;
         }
 
+        if (!breedId) {
+            showToast('Please select a breed from the list', 'error');
+            return;
+        }
+
         if (!photoFile) {
             showToast('Please add a profile photo for your dog', 'error');
             return;
@@ -102,7 +110,7 @@
 
             const dogData = {
                 name: dogName.trim(),
-                breed: breed.trim(),
+                breed_id: breedId,
                 age: parseInt(age),
                 profile_photo: profilePhoto,
                 ...(location.trim() && { location: location.trim() }),
@@ -157,13 +165,11 @@
                 </div>
                 <div class="form-group">
                     <label for="dog-breed">Breed *</label>
-                    <input
-                        type="text"
+                    <BreedAutocomplete
                         id="dog-breed"
-                        required
-                        maxlength="50"
-                        placeholder="e.g., Finnish Lapphund"
-                        bind:value={breed}
+                        required={true}
+                        bind:selectedBreedId={breedId}
+                        bind:selectedBreedName={breedName}
                     />
                 </div>
                 <div class="form-group">

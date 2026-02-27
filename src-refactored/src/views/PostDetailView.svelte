@@ -56,6 +56,8 @@
                 commentCount={post.commentCount || 0}
                 likedByUser={post.likedByUser || false}
                 createdAt={post.createdAt}
+                breedName={post.breedName || ''}
+                breedSlug={post.breedSlug || ''}
                 onopenAuthModal={onopenAuthModal}
             />
         {/if}

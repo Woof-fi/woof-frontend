@@ -19,6 +19,8 @@
         commentCount = 0,
         likedByUser = false,
         createdAt = null,
+        breedName = '',
+        breedSlug = '',
         onopenAuthModal = null,
     } = $props();
 
@@ -167,13 +169,12 @@
     <!-- Header -->
     <div class="post-header">
         {#if dogSlug}
-            <a href="/dog/{dogSlug}" data-link class="post-author-link">
+            <a href="/dog/{dogSlug}" data-link class="post-avatar-link">
                 <img
                     src={profilePic || FALLBACK_AVATAR}
                     alt="{username}'s profile picture"
                     onerror={(e) => { if (e.target.src !== FALLBACK_AVATAR) e.target.src = FALLBACK_AVATAR; }}
                 />
-                <strong>{username}</strong>
             </a>
         {:else}
             <img
@@ -181,11 +182,27 @@
                 alt="{username}'s profile picture"
                 onerror={(e) => { if (e.target.src !== FALLBACK_AVATAR) e.target.src = FALLBACK_AVATAR; }}
             />
-            <strong>{username}</strong>
         {/if}
-        {#if location}
-            <span class="post-location">{location}</span>
-        {/if}
+        <div class="post-author-info">
+            {#if dogSlug}
+                <a href="/dog/{dogSlug}" data-link class="post-author-name">{username}</a>
+            {:else}
+                <strong>{username}</strong>
+            {/if}
+            <span class="post-meta-line">
+                {#if breedSlug}
+                    <a href="/breed/{breedSlug}" data-link class="post-breed-link">{breedName}</a>
+                {:else if breedName}
+                    <span>{breedName}</span>
+                {/if}
+                {#if (breedSlug || breedName) && location}
+                    <span class="post-meta-dot">&middot;</span>
+                {/if}
+                {#if location}
+                    <span class="post-location-text">{location}</span>
+                {/if}
+            </span>
+        </div>
         {#if id}
             <button
                 class="post-options-btn"
@@ -324,29 +341,72 @@
 }
 
 .post-header {
-    padding: 10px;
+    padding: var(--woof-space-2) var(--woof-space-3);
     display: flex;
     align-items: center;
-    position: relative;
+    gap: 0;
 }
 
 .post-header img {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--woof-radius-full);
-    margin-right: 10px;
+    margin-right: var(--woof-space-2);
+    flex-shrink: 0;
 }
 
-.post-author-link {
+.post-avatar-link {
+    flex-shrink: 0;
+}
+
+.post-author-name {
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-900);
+    text-decoration: none;
+}
+
+.post-author-name:hover {
+    text-decoration: underline;
+}
+
+.post-author-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+.post-meta-line {
     display: flex;
     align-items: center;
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
+    gap: var(--woof-space-1);
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    min-width: 0;
 }
 
-.post-author-link:hover strong {
+.post-breed-link {
+    color: var(--woof-color-neutral-500);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.post-breed-link:hover {
+    color: var(--woof-color-brand-primary);
     text-decoration: underline;
+}
+
+.post-meta-dot {
+    flex-shrink: 0;
+    color: var(--woof-color-neutral-400);
+}
+
+.post-location-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .post-timestamp-container {
