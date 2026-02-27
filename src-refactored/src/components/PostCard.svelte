@@ -10,7 +10,6 @@
         profilePic = '',
         username = '',
         caption = '',
-        location = '',
         imageUrl = '',
         dogSlug = '',
         dogId = '',
@@ -21,6 +20,10 @@
         createdAt = null,
         breedName = '',
         breedSlug = '',
+        territoryName = '',
+        territoryType = '',
+        territoryParentName = '',
+        territoryGrandparentName = '',
         onopenAuthModal = null,
     } = $props();
 
@@ -195,11 +198,16 @@
                 {:else if breedName}
                     <span>{breedName}</span>
                 {/if}
-                {#if (breedSlug || breedName) && location}
-                    <span class="post-meta-dot">&middot;</span>
-                {/if}
-                {#if location}
-                    <span class="post-location-text">{location}</span>
+                {#if territoryName}
+                    {#if breedSlug || breedName}
+                        <span class="post-meta-dot">&middot;</span>
+                    {/if}
+                    {@const territoryDisplay = territoryType === 'sub_district' && territoryParentName && territoryGrandparentName
+                        ? `${territoryName}, ${territoryParentName}, ${territoryGrandparentName}`
+                        : territoryType === 'district' && territoryParentName
+                            ? `${territoryName}, ${territoryParentName}`
+                            : territoryName}
+                    <span class="post-location-text">{territoryDisplay}</span>
                 {/if}
             </span>
         </div>

@@ -910,5 +910,53 @@ export async function getFollowingBreeds() {
     }
 }
 
+// ============================================================================
+// TERRITORIES
+// ============================================================================
+
+/**
+ * Search territories by text query
+ * @param {string} query - Search term
+ * @returns {Promise<object[]>} - Array of territory objects with hasChildren flag
+ */
+export async function searchTerritories(query) {
+    try {
+        const data = await apiRequest(`/api/territories/search?q=${encodeURIComponent(query)}`, { cache: 'default' });
+        return data.territories || [];
+    } catch (error) {
+        console.error('Failed to search territories:', error);
+        return [];
+    }
+}
+
+/**
+ * Browse children of a territory (for drill-down autocomplete)
+ * @param {string} parentId - Parent territory UUID
+ * @returns {Promise<object[]>} - Array of child territory objects with hasChildren flag
+ */
+export async function browseTerritoryChildren(parentId) {
+    try {
+        const data = await apiRequest(`/api/territories/search?parent=${encodeURIComponent(parentId)}`, { cache: 'default' });
+        return data.territories || [];
+    } catch (error) {
+        console.error('Failed to browse territory children:', error);
+        return [];
+    }
+}
+
+/**
+ * Get all territories
+ * @returns {Promise<object[]>} - Array of all territory objects
+ */
+export async function getAllTerritories() {
+    try {
+        const data = await apiRequest('/api/territories', { cache: 'default' });
+        return data.territories || [];
+    } catch (error) {
+        console.error('Failed to fetch territories:', error);
+        return [];
+    }
+}
+
 // Export APIError for use in other modules
 export { APIError };

@@ -177,7 +177,6 @@
                 username={item.dogName || 'Unknown Dog'}
                 imageUrl={item.imageUrl}
                 caption={item.caption || ''}
-                location={item.dogLocation || ''}
                 dogSlug={item.dogSlug || ''}
                 dogId={item.dogId || ''}
                 isOwnPost={myDogs.some(d => d.id === item.dogId)}
@@ -187,6 +186,10 @@
                 createdAt={item.createdAt}
                 breedName={item.breedName || ''}
                 breedSlug={item.breedSlug || ''}
+                territoryName={item.territoryName || ''}
+                territoryType={item.territoryType || ''}
+                territoryParentName={item.territoryParentName || ''}
+                territoryGrandparentName={item.territoryGrandparentName || ''}
                 onopenAuthModal={handleOpenAuthModal}
             />
         {/if}

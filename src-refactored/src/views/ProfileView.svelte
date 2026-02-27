@@ -282,6 +282,14 @@
                     <div>
                         <div class="profile-sheet-name">{dog.name}</div>
                         <a href="/breed/{dog.breedSlug}" data-link class="profile-sheet-breed"><i class="fas fa-paw"></i> {dog.breedName}</a>
+                        {#if dog.territoryName}
+                            {@const territoryDisplay = dog.territoryType === 'sub_district' && dog.territoryParentName && dog.territoryGrandparentName
+                                ? `${dog.territoryName}, ${dog.territoryParentName}, ${dog.territoryGrandparentName}`
+                                : dog.territoryType === 'district' && dog.territoryParentName
+                                    ? `${dog.territoryName}, ${dog.territoryParentName}`
+                                    : dog.territoryName}
+                            <span class="profile-sheet-territory"><i class="fas fa-map-marker-alt"></i> {territoryDisplay}</span>
+                        {/if}
                     </div>
                     {#if dog.isOwner}
                         <button class="edit-profile-btn" onclick={handleEditDog}>
@@ -305,6 +313,15 @@
                 </div>
                 {#if dog.bio}
                     <p class="profile-sheet-bio">{dog.bio}</p>
+                {/if}
+                {#if dog.isOwner && !dog.territoryId}
+                    <div class="territory-nudge">
+                        <span class="territory-nudge-text">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Set your territory to connect with nearby dogs
+                        </span>
+                        <button class="territory-nudge-btn" onclick={handleEditDog}>Set</button>
+                    </div>
                 {/if}
             </div>
 
@@ -570,6 +587,60 @@
 
 .profile-sheet-breed:hover {
     text-decoration: underline;
+}
+
+.profile-sheet-territory {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    margin-top: 4px;
+}
+
+.profile-sheet-territory i {
+    font-size: 11px;
+}
+
+.territory-nudge {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-3);
+    padding: var(--woof-space-3);
+    background: var(--woof-color-brand-primary-subtle);
+    border-radius: var(--woof-radius-md);
+    margin-bottom: var(--woof-space-4);
+}
+
+.territory-nudge-text {
+    flex: 1;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-700);
+    line-height: 1.4;
+}
+
+.territory-nudge-text i {
+    color: var(--woof-color-brand-primary);
+    margin-right: var(--woof-space-1);
+}
+
+.territory-nudge-btn {
+    flex-shrink: 0;
+    padding: var(--woof-space-1) var(--woof-space-3);
+    border: 1px solid var(--woof-color-brand-primary);
+    border-radius: var(--woof-btn-radius);
+    background: transparent;
+    color: var(--woof-color-brand-primary);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-semibold);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--woof-duration-fast), color var(--woof-duration-fast);
+}
+
+.territory-nudge-btn:hover {
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
 }
 
 .profile-sheet-stats {

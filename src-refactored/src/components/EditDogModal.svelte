@@ -6,6 +6,7 @@
     import { modals, closeEditDogModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpProfileVersion } from '../../js/svelte-store.svelte.js';
     import BreedAutocomplete from './BreedAutocomplete.svelte';
+    import TerritoryAutocomplete from './TerritoryAutocomplete.svelte';
 
     let submitting = $state(false);
 
@@ -15,13 +16,26 @@
     let breedId = $state('');
     let breedName = $state('');
     let age = $state('');
-    let location = $state('');
+    let territoryId = $state('');
+    let territoryName = $state('');
     let bio = $state('');
     let photoFile = $state(null);
     let currentPhotoUrl = $state(null);
     let previewUrl = $state(null);
 
     let photoInputEl = $state(null);
+
+    // Build territory display name from type + parent chain
+    function buildTerritoryDisplayName(data) {
+        if (!data.territoryName) return '';
+        if (data.territoryType === 'sub_district' && data.territoryParentName && data.territoryGrandparentName) {
+            return `${data.territoryName}, ${data.territoryParentName}, ${data.territoryGrandparentName}`;
+        }
+        if (data.territoryType === 'district' && data.territoryParentName) {
+            return `${data.territoryName}, ${data.territoryParentName}`;
+        }
+        return data.territoryName;
+    }
 
     // Populate form fields when modal opens with dog data
     $effect(() => {
@@ -31,7 +45,8 @@
             breedId = modals.editDogData.breedId || '';
             breedName = modals.editDogData.breedName || '';
             age = modals.editDogData.age ?? '';
-            location = modals.editDogData.location || '';
+            territoryId = modals.editDogData.territoryId || '';
+            territoryName = buildTerritoryDisplayName(modals.editDogData);
             bio = modals.editDogData.bio || '';
             photoFile = null;
             currentPhotoUrl = modals.editDogData.profilePhoto || null;
@@ -111,9 +126,9 @@
                 name: dogName.trim(),
                 breed_id: breedId,
                 age: parseInt(age),
-                location: location.trim(),
                 bio: bio.trim(),
                 ...(profile_photo && { profile_photo }),
+                territory_id: territoryId || null,
             };
 
             await updateDog(dogId, dogData);
@@ -181,14 +196,13 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="edit-dog-location">Location</label>
-                    <input
-                        type="text"
-                        id="edit-dog-location"
-                        maxlength="100"
-                        placeholder="e.g., Helsinki, Finland"
-                        bind:value={location}
+                    <label for="edit-dog-territory">Territory / Reviiri</label>
+                    <TerritoryAutocomplete
+                        id="edit-dog-territory"
+                        bind:selectedTerritoryId={territoryId}
+                        bind:selectedTerritoryName={territoryName}
                     />
+                    <small class="form-hint">Set your territory to connect with nearby dogs</small>
                 </div>
                 <div class="form-group">
                     <label for="edit-dog-bio">Bio</label>

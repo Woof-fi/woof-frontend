@@ -7,6 +7,7 @@
     import { modals, closeCreateDogModal as storeClose, openAuthModal } from '../../js/modal-store.svelte.js';
     import { bumpDogVersion } from '../../js/svelte-store.svelte.js';
     import BreedAutocomplete from './BreedAutocomplete.svelte';
+    import TerritoryAutocomplete from './TerritoryAutocomplete.svelte';
 
     let submitting = $state(false);
 
@@ -15,7 +16,8 @@
     let breedId = $state('');
     let breedName = $state('');
     let age = $state('');
-    let location = $state('');
+    let territoryId = $state('');
+    let territoryName = $state('');
     let bio = $state('');
     let photoFile = $state(null);
     let previewUrl = $state(null);
@@ -45,7 +47,8 @@
         breedId = '';
         breedName = '';
         age = '';
-        location = '';
+        territoryId = '';
+        territoryName = '';
         bio = '';
         photoFile = null;
         if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -113,8 +116,8 @@
                 breed_id: breedId,
                 age: parseInt(age),
                 profile_photo: profilePhoto,
-                ...(location.trim() && { location: location.trim() }),
                 ...(bio.trim() && { bio: bio.trim() }),
+                ...(territoryId && { territory_id: territoryId }),
             };
 
             const createdDog = await createDog(dogData);
@@ -185,14 +188,13 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="dog-location">Location (optional)</label>
-                    <input
-                        type="text"
-                        id="dog-location"
-                        maxlength="100"
-                        placeholder="e.g., Helsinki, Finland"
-                        bind:value={location}
+                    <label for="dog-territory">Territory / Reviiri (optional)</label>
+                    <TerritoryAutocomplete
+                        id="dog-territory"
+                        bind:selectedTerritoryId={territoryId}
+                        bind:selectedTerritoryName={territoryName}
                     />
+                    <small class="form-hint">Set your territory to connect with nearby dogs</small>
                 </div>
                 <div class="form-group">
                     <label for="dog-bio">Bio (optional)</label>

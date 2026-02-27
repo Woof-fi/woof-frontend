@@ -50,7 +50,6 @@
                 username={post.dogName || 'Unknown Dog'}
                 imageUrl={post.imageUrl}
                 caption={post.caption || ''}
-                location={post.dogLocation || ''}
                 dogSlug={post.dogSlug || ''}
                 likeCount={post.likeCount || 0}
                 commentCount={post.commentCount || 0}
@@ -58,6 +57,10 @@
                 createdAt={post.createdAt}
                 breedName={post.breedName || ''}
                 breedSlug={post.breedSlug || ''}
+                territoryName={post.territoryName || ''}
+                territoryType={post.territoryType || ''}
+                territoryParentName={post.territoryParentName || ''}
+                territoryGrandparentName={post.territoryGrandparentName || ''}
                 onopenAuthModal={onopenAuthModal}
             />
         {/if}

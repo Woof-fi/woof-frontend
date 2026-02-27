@@ -34,7 +34,6 @@ export interface Dog {
     breed: string;
     age: number;
     profilePhoto: string | null;
-    location: string;
     bio: string | null;
     ownerId: string;
 }
@@ -43,7 +42,6 @@ export interface CreateDogRequest {
     name: string;
     breed: string;
     age: number;
-    location: string;
     bio?: string;
     profile_photo?: string;
 }
@@ -63,7 +61,6 @@ export interface Post {
     updatedAt?: string;
     dogName: string;
     dogPhoto: string | null;
-    dogLocation?: string;
     ownerName: string;
     ownerId: string;
 }
