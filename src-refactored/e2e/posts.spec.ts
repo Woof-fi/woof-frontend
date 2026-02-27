@@ -9,6 +9,7 @@ const API_BASE = 'https://api.woofapp.fi';
 const AUTH_LINK = '.nav-drawer-footer .nav-drawer-row';
 
 let testUser: TestUser;
+let mixedBreedId: string;
 
 // Extra users created within tests (e.g. "author" user in multi-user tests).
 // Populated during tests, always cleaned up in afterEach regardless of pass/fail.
@@ -36,6 +37,13 @@ async function loginUser(page: import('@playwright/test').Page, user: TestUser):
     });
     return token;
 }
+
+test.beforeAll(async ({ request }) => {
+    // Look up the "Mixed Breed" breed_id once for all tests
+    const res = await request.get(`${API_BASE}/api/breeds/mixed-breed`);
+    const data = await res.json();
+    mixedBreedId = data.breed.id;
+});
 
 test.beforeEach(() => {
     testUser = createTestUser();
@@ -72,7 +80,7 @@ test.describe('Post options sheet', () => {
 
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${token}` },
-            data: { name: 'E2E PostDog', breed: 'Test Breed', age: 2, location: 'Helsinki' },
+            data: { name: 'E2E PostDog', breed_id: mixedBreedId, age: 2, location: 'Helsinki' },
         });
         expect(dogRes.ok()).toBeTruthy();
         const dogData = await dogRes.json();
@@ -111,7 +119,7 @@ test.describe('Post options sheet', () => {
 
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${authorToken}` },
-            data: { name: 'E2E AuthorDog', breed: 'Test', age: 1, location: 'Helsinki' },
+            data: { name: 'E2E AuthorDog', breed_id: mixedBreedId, age: 1, location: 'Helsinki' },
         });
         expect(dogRes.ok()).toBeTruthy();
         const dogData = await dogRes.json();
@@ -147,7 +155,7 @@ test.describe('Post options sheet', () => {
 
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${authorToken}` },
-            data: { name: 'E2E BookmarkDog', breed: 'Test', age: 1, location: 'Helsinki' },
+            data: { name: 'E2E BookmarkDog', breed_id: mixedBreedId, age: 1, location: 'Helsinki' },
         });
         expect(dogRes.ok()).toBeTruthy();
         const dogData = await dogRes.json();

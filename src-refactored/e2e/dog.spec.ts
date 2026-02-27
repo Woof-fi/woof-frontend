@@ -46,7 +46,12 @@ test.describe('Dog CRUD', () => {
 
     // Fill the form
     await page.fill('#dog-name', 'E2E TestDog');
-    await page.fill('#dog-breed', 'Test Breed');
+
+    // Breed autocomplete: type, wait for dropdown, select first match
+    await page.fill('#dog-breed', 'Miniature Schnauzer');
+    await page.waitForSelector('#dog-breed-listbox [role="option"]', { timeout: 5_000 });
+    await page.click('#dog-breed-listbox [role="option"]:first-child');
+
     await page.fill('#dog-age', '3');
     await page.fill('#dog-location', 'Helsinki, Finland');
     await page.fill('#dog-bio', 'A good dog created by E2E tests');
@@ -69,6 +74,6 @@ test.describe('Dog CRUD', () => {
 
     // Profile page should show the dog's info
     await expect(page.locator('body')).toContainText('E2E TestDog', { timeout: 10_000 });
-    await expect(page.locator('body')).toContainText('Test Breed');
+    await expect(page.locator('body')).toContainText('Miniature Schnauzer');
   });
 });
