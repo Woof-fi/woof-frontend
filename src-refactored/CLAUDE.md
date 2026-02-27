@@ -18,12 +18,12 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 ## Key Files
 
 ### Svelte Entry
-- `src/main.ts` — `mount(App, { target: document.getElementById('app')! })`
+- `src/main.ts` — `mount(App, { target: document.getElementById('app')! })` + service worker update detection (auto-reload toast on new SW activation)
 - `src/App.svelte` — App shell: imports `Navigation.svelte` + `Router.svelte`, handles auth modal open events
 - `src/router/Router.svelte` — SPA router; renders view components
 
 ### Svelte Components (`src/components/`)
-- `PostCard.svelte` — Post card with optimistic like toggle (reverts on API error), inline comments, fallback images
+- `PostCard.svelte` — Post card with optimistic like toggle (reverts on API error), inline comments, fallback images, clickable territory links
 - `Feed.svelte` — Infinite scroll (IntersectionObserver sentinel), content gate (4 posts for unauth), invite cards at positions 5/25/45
 - `Navigation.svelte` — Header + nav drawer (fixed sidebar on desktop, slide-in on mobile) + bottom nav; 60s unread-count polling; auth-reactive
 - `AuthModal.svelte` — 5 modes: login / register / verify / forgot / reset. Mode config as const object, `$derived` active config.
@@ -47,6 +47,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `NotificationsView.svelte` — Notification feed at `/notifications`; marks all read on visit; 60s polling via Navigation bell badge
 - `AdminView.svelte` — Moderation panel with two sections: Reports (filter tabs pending/reviewed/actioned/dismissed; delete, mark reviewed, dismiss) and Flagged (Rekognition AI-flagged posts; approve or remove)
 - `PrivacyView.svelte` — GDPR Privacy Policy at `/privacy`
+- `TerritoryView.svelte` — Territory page with hero image, breadcrumb nav, stats, child territories grid, Posts/Dogs tabs; SEO-friendly nested URLs (`/territory/helsinki/oulunkyla/patola`)
 - `TermsView.svelte` — Terms of Service at `/terms`
 
 ### Vanilla JS (stable core — modify only to add new API functions or utility helpers)
