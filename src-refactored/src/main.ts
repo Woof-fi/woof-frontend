@@ -9,6 +9,15 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../css/global.css';
 import '../css/styles.css';
 
+// Build metadata (injected at build time by Vite)
+declare const __BUILD_COMMIT__: string;
+declare const __BUILD_TIME__: string;
+(window as any).__BUILD__ = {
+    commit: typeof __BUILD_COMMIT__ !== 'undefined' ? __BUILD_COMMIT__ : 'dev',
+    buildTime: typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : 'dev',
+};
+console.info(`[woof] build ${(window as any).__BUILD__.commit} @ ${(window as any).__BUILD__.buildTime}`);
+
 const app = mount(App, { target: document.getElementById('app')! });
 export default app;
 

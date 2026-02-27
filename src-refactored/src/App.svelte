@@ -8,6 +8,7 @@
     import Toast from './components/Toast.svelte';
     import Navigation from './components/Navigation.svelte';
     import Router from './router/Router.svelte';
+    import SiteGate from './components/SiteGate.svelte';
     import AuthModal from './components/AuthModal.svelte';
     import CreatePostModal from './components/CreatePostModal.svelte';
     import CreateDogModal from './components/CreateDogModal.svelte';
@@ -37,26 +38,30 @@
     });
 </script>
 
-<div class="app-container">
-    <Navigation
-        onopenAuthModal={openAuthModal}
-        onopenCreatePostModal={openCreatePostModal}
-    />
-    <div class="main-container">
-        <Router onopenAuthModal={openAuthModal} />
-    </div>
-</div>
+<SiteGate>
+    {#snippet children()}
+        <div class="app-container">
+            <Navigation
+                onopenAuthModal={openAuthModal}
+                onopenCreatePostModal={openCreatePostModal}
+            />
+            <div class="main-container">
+                <Router onopenAuthModal={openAuthModal} />
+            </div>
+        </div>
 
-<AuthModal />
-<CreatePostModal />
-<CreateDogModal />
-<EditDogModal />
-<HealthRecordModal />
-<Search />
-{#if modals.postOptionsSheetOpen}
-    <PostOptionsSheet />
-{/if}
-{#if modals.commentOptionsSheetOpen}
-    <CommentOptionsSheet />
-{/if}
-<Toast />
+        <AuthModal />
+        <CreatePostModal />
+        <CreateDogModal />
+        <EditDogModal />
+        <HealthRecordModal />
+        <Search />
+        {#if modals.postOptionsSheetOpen}
+            <PostOptionsSheet />
+        {/if}
+        {#if modals.commentOptionsSheetOpen}
+            <CommentOptionsSheet />
+        {/if}
+        <Toast />
+    {/snippet}
+</SiteGate>

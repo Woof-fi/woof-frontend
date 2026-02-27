@@ -4,9 +4,14 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Build metadata injected at build time
+const gitCommit = execSync('git rev-parse --short HEAD').toString().trim();
+const buildTime = new Date().toISOString();
 
 export default defineConfig({
   plugins: [
@@ -72,6 +77,8 @@ export default defineConfig({
   // Polyfill Node's `global` for browser-targeting packages (e.g. amazon-cognito-identity-js)
   define: {
     global: 'globalThis',
+    __BUILD_COMMIT__: JSON.stringify(gitCommit),
+    __BUILD_TIME__: JSON.stringify(buildTime),
   },
 
   build: {
