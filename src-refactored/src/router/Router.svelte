@@ -8,6 +8,8 @@
     import NotificationsView from '../views/NotificationsView.svelte';
     import PrivacyView from '../views/PrivacyView.svelte';
     import TermsView from '../views/TermsView.svelte';
+    import BreedView from '../views/BreedView.svelte';
+    import BreedDirectoryView from '../views/BreedDirectoryView.svelte';
 
     let { onopenAuthModal = null } = $props();
 
@@ -26,6 +28,8 @@
 
     const routes = [
         { path: '/',               component: HomeView,           paramNames: [] },
+        { path: '/breeds',         component: BreedDirectoryView, paramNames: [] },
+        { path: '/breed/:slug',    component: BreedView,          paramNames: ['slug'] },
         { path: '/dog/:slug',      component: ProfileView,        paramNames: ['slug'] },
         { path: '/post/:id',       component: PostDetailView,     paramNames: ['id'] },
         { path: '/messages',       component: MessagesView,       paramNames: [] },
@@ -102,6 +106,10 @@
 <div class="content">
     {#if matched.component === HomeView}
         <HomeView onopenAuthModal={onopenAuthModal} />
+    {:else if matched.component === BreedDirectoryView}
+        <BreedDirectoryView />
+    {:else if matched.component === BreedView}
+        <BreedView params={matched.params} />
     {:else if matched.component === ProfileView}
         <ProfileView params={matched.params} onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === PostDetailView}

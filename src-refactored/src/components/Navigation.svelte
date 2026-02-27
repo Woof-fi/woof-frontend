@@ -1,5 +1,5 @@
 <script>
-    import { getMyDogs, getUnreadCount, getNotifUnreadCount } from '../../js/api.js';
+    import { getMyDogs, getUnreadCount, getNotifUnreadCount, getFollowingBreeds } from '../../js/api.js';
     import { isAuthenticated, logout } from '../../js/auth.js';
     import { openCreateDogModal, openSearchPanel } from '../../js/modal-store.svelte.js';
     import { store, setAuthUser, setFeedTab, setNotifUnreadCount, setCurrentDog, setUserDogIds } from '../../js/svelte-store.svelte.js';
@@ -12,6 +12,7 @@
     let myDogsLoaded = $state(false);
     let drawerOpen = $state(false);
     let authed = $derived(store.authUser !== null);
+    let followedBreeds = $state([]);
 
     function getSlug(dog) {
         return dog.slug ?? `${dog.name.toLowerCase()}-${dog.displayId}`;
@@ -143,6 +144,28 @@
             if (notifInterval) clearInterval(notifInterval);
             window.removeEventListener('routechange', handleRouteChange);
         };
+    });
+
+    // Fetch followed breeds — re-runs on auth change and breedVersion bumps
+    $effect(() => {
+        const _auth = store.authUser;
+        const _bv = store.breedVersion;
+
+        if (!isAuthenticated()) {
+            followedBreeds = [];
+            return;
+        }
+
+        let active = true;
+        (async () => {
+            try {
+                const breeds = await getFollowingBreeds();
+                if (active) followedBreeds = breeds;
+            } catch {
+                if (active) followedBreeds = [];
+            }
+        })();
+        return () => { active = false; };
     });
 
     // Lock body scroll when drawer is open (mobile only)
@@ -324,6 +347,21 @@
             {/if}
         </li>
     </ul>
+
+    {#if authed && followedBreeds.length > 0}
+        <div class="nav-drawer-section">
+            <span class="nav-drawer-section-label">BREEDS</span>
+            {#each followedBreeds.slice(0, 5) as breed (breed.id)}
+                <a href="/breed/{breed.slug}" data-link onclick={closeDrawer}
+                   class="nav-drawer-row" class:active={activePath === `/breed/${breed.slug}`}>
+                    <i class="fas fa-paw"></i> {breed.name}
+                </a>
+            {/each}
+            <a href="/breeds" data-link onclick={closeDrawer} class="nav-drawer-row nav-drawer-explore">
+                Explore Breeds
+            </a>
+        </div>
+    {/if}
 
     <div class="nav-drawer-footer">
         <button type="button" class="nav-drawer-row" onclick={handleAuthLink}>
@@ -633,6 +671,16 @@
     height: 24px;
     border-radius: var(--woof-radius-full);
     object-fit: cover;
+}
+
+.nav-drawer-explore {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-brand-primary);
+    margin-top: var(--woof-space-1);
+}
+
+.nav-drawer-explore:hover {
+    color: var(--color-primary-hover);
 }
 
 .nav-drawer-footer {

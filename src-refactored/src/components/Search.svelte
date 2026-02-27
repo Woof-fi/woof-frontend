@@ -1,27 +1,36 @@
 <script>
-    import { getAllDogs } from '../../js/api.js';
+    import { getAllDogs, getAllBreeds } from '../../js/api.js';
     import { debounce } from '../../js/utils.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { modals, closeSearchPanel as storeClose } from '../../js/modal-store.svelte.js';
 
     let query = $state('');
-    let searchCache = $state([]);
-    let results = $state([]);
+    let dogCache = $state([]);
+    let breedCache = $state([]);
+    let dogResults = $state([]);
+    let breedResults = $state([]);
     let inputEl = $state(null);
 
     async function loadSearchData() {
         try {
-            const dogs = await getAllDogs();
-            searchCache = dogs.map(dog => ({
+            const [dogs, breeds] = await Promise.all([getAllDogs(), getAllBreeds()]);
+            dogCache = dogs.map(dog => ({
                 id: dog.id,
                 slug: dog.slug,
                 name: dog.name,
                 breed: dog.breedName,
                 profilePhoto: dog.profilePhoto,
             }));
+            breedCache = breeds.map(b => ({
+                id: b.id,
+                slug: b.slug,
+                name: b.name,
+                nameFi: b.nameFi,
+            }));
         } catch {
-            searchCache = [];
+            dogCache = [];
+            breedCache = [];
         }
     }
 
@@ -42,7 +51,8 @@
         if (!modals.searchPanelOpen) return;
         storeClose();
         query = '';
-        results = [];
+        dogResults = [];
+        breedResults = [];
     }
 
     function handleKey(e) {
@@ -57,16 +67,24 @@
         close();
     }
 
+    let hasQuery = $derived(query.trim().length > 0);
+    let noResults = $derived(hasQuery && dogResults.length === 0 && breedResults.length === 0);
+
     const debouncedSearch = debounce((q) => {
         if (!q.trim()) {
-            results = [];
+            dogResults = [];
+            breedResults = [];
             return;
         }
         const lower = q.toLowerCase();
-        results = searchCache.filter(item =>
+        dogResults = dogCache.filter(item =>
             item.name.toLowerCase().includes(lower) ||
             (item.breed || '').toLowerCase().includes(lower)
         );
+        breedResults = breedCache.filter(item =>
+            item.name.toLowerCase().includes(lower) ||
+            (item.nameFi || '').toLowerCase().includes(lower)
+        ).slice(0, 5);
     }, 300);
 
     $effect(() => {
@@ -102,32 +120,55 @@
         <button class="close-search" aria-label="Close search" onclick={close}>Cancel</button>
     </div>
     <ul id="search-results" class="search-results" role="listbox">
-        {#if query.trim() && results.length === 0}
+        {#if noResults}
             <li class="search-no-results">
                 <span>No results found for "{query}"</span>
             </li>
         {:else}
-            {#each results as result (result.id)}
-                <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
-                    <a
-                        href="/dog/{result.slug || result.id}"
-                        data-link
-                        class="search-result-link"
-                    >
-                        <img
-                            src={result.profilePhoto || '/images/dog_profile_pic.jpg'}
-                            alt={result.name}
-                            class="search-result-avatar"
-                            loading="lazy"
-                            onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
-                        />
-                        <div class="search-result-text">
-                            <span class="search-result-name">{result.name}</span>
-                            <span class="search-result-breed">{result.breed}</span>
-                        </div>
-                    </a>
-                </li>
-            {/each}
+            {#if breedResults.length > 0}
+                <li class="search-section-header">BREEDS</li>
+                {#each breedResults as breed (breed.id)}
+                    <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
+                        <a href="/breed/{breed.slug}" data-link class="search-result-link">
+                            <div class="search-result-icon">
+                                <i class="fas fa-paw"></i>
+                            </div>
+                            <div class="search-result-text">
+                                <span class="search-result-name">{breed.name}</span>
+                                {#if breed.nameFi && breed.nameFi !== breed.name}
+                                    <span class="search-result-breed">{breed.nameFi}</span>
+                                {/if}
+                            </div>
+                        </a>
+                    </li>
+                {/each}
+            {/if}
+            {#if dogResults.length > 0}
+                {#if breedResults.length > 0}
+                    <li class="search-section-header">DOGS</li>
+                {/if}
+                {#each dogResults as result (result.id)}
+                    <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
+                        <a
+                            href="/dog/{result.slug || result.id}"
+                            data-link
+                            class="search-result-link"
+                        >
+                            <img
+                                src={result.profilePhoto || '/images/dog_profile_pic.jpg'}
+                                alt={result.name}
+                                class="search-result-avatar"
+                                loading="lazy"
+                                onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
+                            />
+                            <div class="search-result-text">
+                                <span class="search-result-name">{result.name}</span>
+                                <span class="search-result-breed">{result.breed}</span>
+                            </div>
+                        </a>
+                    </li>
+                {/each}
+            {/if}
         {/if}
     </ul>
 </div>
@@ -275,6 +316,29 @@
     color: var(--color-text-muted);
     font-size: 14px;
     list-style: none;
+}
+
+.search-section-header {
+    padding: 12px 16px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+    list-style: none;
+}
+
+.search-result-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-brand-primary-subtle);
+    color: var(--woof-color-brand-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-right: 12px;
+    flex-shrink: 0;
 }
 
 @media (max-width: 768px) {

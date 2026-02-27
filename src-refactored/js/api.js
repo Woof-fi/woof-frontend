@@ -824,7 +824,7 @@ export async function getAllBreeds() {
 /**
  * Get breed by slug
  * @param {string} slug - Breed slug
- * @returns {Promise<object>} - Breed object with dog count
+ * @returns {Promise<object>} - Breed object with dog count, follower count, isFollowing
  */
 export async function getBreedBySlug(slug) {
     try {
@@ -833,6 +833,80 @@ export async function getBreedBySlug(slug) {
     } catch (error) {
         console.error(`Failed to fetch breed ${slug}:`, error);
         throw error;
+    }
+}
+
+/**
+ * Follow a breed
+ * @param {string} slug - Breed slug
+ * @returns {Promise<object>}
+ */
+export async function followBreed(slug) {
+    return apiRequest(`/api/breeds/${slug}/follow`, { method: 'POST' });
+}
+
+/**
+ * Unfollow a breed
+ * @param {string} slug - Breed slug
+ * @returns {Promise<void>}
+ */
+export async function unfollowBreed(slug) {
+    return apiRequest(`/api/breeds/${slug}/follow`, { method: 'DELETE' });
+}
+
+/**
+ * Get breed feed (posts from dogs of this breed)
+ * @param {string} slug - Breed slug
+ * @param {string|null} cursor - Cursor for pagination
+ * @param {number} limit - Posts per page
+ * @returns {Promise<{posts: object[], nextCursor: string|null}>}
+ */
+export async function getBreedFeed(slug, cursor = null, limit = 20) {
+    let url = `/api/breeds/${slug}/feed?limit=${limit}`;
+    if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
+    const data = await apiRequest(url);
+    return { posts: data.posts || [], nextCursor: data.nextCursor || null };
+}
+
+/**
+ * Get dogs of a breed
+ * @param {string} slug - Breed slug
+ * @param {string|null} cursor - Cursor for pagination
+ * @param {number} limit - Dogs per page
+ * @returns {Promise<{dogs: object[], nextCursor: string|null}>}
+ */
+export async function getBreedDogs(slug, cursor = null, limit = 20) {
+    let url = `/api/breeds/${slug}/dogs?limit=${limit}`;
+    if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
+    const data = await apiRequest(url);
+    return { dogs: data.dogs || [], nextCursor: data.nextCursor || null };
+}
+
+/**
+ * Get popular breeds (by dog count)
+ * @returns {Promise<object[]>} - Array of breed objects with dogCount
+ */
+export async function getPopularBreeds() {
+    try {
+        const data = await apiRequest('/api/breeds/popular', { cache: 'default' });
+        return data.breeds || [];
+    } catch (error) {
+        console.error('Failed to fetch popular breeds:', error);
+        return [];
+    }
+}
+
+/**
+ * Get breeds the current user follows
+ * @returns {Promise<object[]>} - Array of breed objects
+ */
+export async function getFollowingBreeds() {
+    try {
+        const data = await apiRequest('/api/breeds/following');
+        return data.breeds || [];
+    } catch (error) {
+        console.error('Failed to fetch following breeds:', error);
+        return [];
     }
 }
 
