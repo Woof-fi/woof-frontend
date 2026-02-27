@@ -767,5 +767,26 @@ export async function unbanUser(userId) {
     return apiRequest(`/api/admin/users/${userId}/unban`, { method: 'PUT' });
 }
 
+/**
+ * Get Rekognition-flagged posts (admin/moderator only)
+ * @returns {Promise<{posts: object[]}>}
+ */
+export async function getFlaggedPosts() {
+    return apiRequest('/api/admin/moderation/flagged');
+}
+
+/**
+ * Approve or remove a Rekognition-flagged post (admin/moderator only)
+ * @param {string} postId
+ * @param {'approved'|'removed'} status
+ * @returns {Promise<any>}
+ */
+export async function updatePostModeration(postId, status) {
+    return apiRequest(`/api/admin/moderation/posts/${postId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+    });
+}
+
 // Export APIError for use in other modules
 export { APIError };

@@ -352,6 +352,15 @@
                     </div>
                 {/if}
 
+                {#if mode === 'register'}
+                    <p class="auth-age-notice">
+                        You must be at least <strong>13 years old</strong> to use Woof.
+                        By signing up you agree to our
+                        <a href="/terms" data-link onclick={() => close()}>Terms of Service</a>
+                        and <a href="/privacy" data-link onclick={() => close()}>Privacy Policy</a>.
+                    </p>
+                {/if}
+
                 <button type="submit" class="btn-primary" id="auth-submit" disabled={submitting}>
                     {submitting ? submitLabel : cfg.submit}
                 </button>
@@ -446,5 +455,22 @@
     margin-top: 12px;
     margin-bottom: 0;
     font-size: 13px;
+}
+
+.auth-age-notice {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: 8px 0 4px;
+    line-height: 1.5;
+}
+
+.auth-age-notice a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.auth-age-notice a:hover {
+    text-decoration: underline;
 }
 </style>

@@ -43,7 +43,9 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `PostDetailView.svelte` — Single post view
 - `MessagesView.svelte` — Two-panel messaging with 10s polling
 - `NotificationsView.svelte` — Notification feed at `/notifications`; marks all read on visit; 60s polling via Navigation bell badge
-- `AdminView.svelte` — Report queue for admin/moderator role; filter tabs (pending/reviewed/actioned/dismissed); delete post, mark reviewed, dismiss actions
+- `AdminView.svelte` — Moderation panel with two sections: Reports (filter tabs pending/reviewed/actioned/dismissed; delete, mark reviewed, dismiss) and Flagged (Rekognition AI-flagged posts; approve or remove)
+- `PrivacyView.svelte` — GDPR Privacy Policy at `/privacy`
+- `TermsView.svelte` — Terms of Service at `/terms`
 
 ### Vanilla JS (stable core — modify only to add new API functions or utility helpers)
 - `js/api.js` — All API calls (add new endpoint functions here; never call fetch directly from components)

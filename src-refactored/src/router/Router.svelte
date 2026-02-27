@@ -6,6 +6,8 @@
     import MessagesView from '../views/MessagesView.svelte';
     import AdminView from '../views/AdminView.svelte';
     import NotificationsView from '../views/NotificationsView.svelte';
+    import PrivacyView from '../views/PrivacyView.svelte';
+    import TermsView from '../views/TermsView.svelte';
 
     let { onopenAuthModal = null } = $props();
 
@@ -30,6 +32,8 @@
         { path: '/messages/:id',   component: MessagesView,       paramNames: ['id'] },
         { path: '/admin',          component: AdminView,          paramNames: [] },
         { path: '/notifications',  component: NotificationsView,  paramNames: [] },
+        { path: '/privacy',        component: PrivacyView,        paramNames: [] },
+        { path: '/terms',          component: TermsView,          paramNames: [] },
     ];
 
     const compiledRoutes = routes.map(r => ({
@@ -108,5 +112,9 @@
         <AdminView />
     {:else if matched.component === NotificationsView}
         <NotificationsView onopenAuthModal={onopenAuthModal} />
+    {:else if matched.component === PrivacyView}
+        <PrivacyView />
+    {:else if matched.component === TermsView}
+        <TermsView />
     {/if}
 </div>

@@ -333,6 +333,11 @@
                 <i class="fas fa-user-circle"></i> Login
             {/if}
         </button>
+        <div class="nav-legal-links">
+            <a href="/privacy" data-link onclick={closeDrawer}>Privacy</a>
+            <span class="nav-legal-sep" aria-hidden="true">·</span>
+            <a href="/terms" data-link onclick={closeDrawer}>Terms</a>
+        </div>
     </div>
 </div>
 
@@ -633,6 +638,32 @@
 .nav-drawer-footer {
     padding: var(--woof-space-3) var(--woof-space-4);
     border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-2);
+}
+
+.nav-legal-links {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    padding: 0 var(--woof-space-3);
+}
+
+.nav-legal-links a {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-400);
+    text-decoration: none;
+    transition: color var(--woof-duration-fast);
+}
+
+.nav-legal-links a:hover {
+    color: var(--woof-color-neutral-600);
+}
+
+.nav-legal-sep {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-300);
 }
 
 /* Bottom navigation */
