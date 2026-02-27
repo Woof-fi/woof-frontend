@@ -10,6 +10,7 @@
     import TermsView from '../views/TermsView.svelte';
     import BreedView from '../views/BreedView.svelte';
     import BreedDirectoryView from '../views/BreedDirectoryView.svelte';
+    import TerritoryView from '../views/TerritoryView.svelte';
 
     let { onopenAuthModal = null } = $props();
 
@@ -30,6 +31,9 @@
         { path: '/',               component: HomeView,           paramNames: [] },
         { path: '/breeds',         component: BreedDirectoryView, paramNames: [] },
         { path: '/breed/:slug',    component: BreedView,          paramNames: ['slug'] },
+        { path: '/territory/:a/:b/:c', component: TerritoryView,  paramNames: ['a', 'b', 'c'] },
+        { path: '/territory/:a/:b',    component: TerritoryView,  paramNames: ['a', 'b'] },
+        { path: '/territory/:a',       component: TerritoryView,  paramNames: ['a'] },
         { path: '/dog/:slug',      component: ProfileView,        paramNames: ['slug'] },
         { path: '/post/:id',       component: PostDetailView,     paramNames: ['id'] },
         { path: '/messages',       component: MessagesView,       paramNames: [] },
@@ -110,6 +114,8 @@
         <BreedDirectoryView />
     {:else if matched.component === BreedView}
         <BreedView params={matched.params} />
+    {:else if matched.component === TerritoryView}
+        <TerritoryView params={matched.params} />
     {:else if matched.component === ProfileView}
         <ProfileView params={matched.params} onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === PostDetailView}

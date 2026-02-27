@@ -958,5 +958,43 @@ export async function getAllTerritories() {
     }
 }
 
+/**
+ * Get territory detail by hierarchical path
+ * @param {string} path - URL path (e.g. "helsinki/oulunkyla/patola")
+ * @returns {Promise<object>} - Territory object with stats, children, breadcrumb
+ */
+export async function getTerritoryByPath(path) {
+    const data = await apiRequest(`/api/territories/by-path/${path}`, { cache: 'default' });
+    return data.territory;
+}
+
+/**
+ * Get territory feed (posts from dogs in territory subtree)
+ * @param {string} path - URL path
+ * @param {string|null} cursor - Cursor for pagination
+ * @param {number} limit - Posts per page
+ * @returns {Promise<{posts: object[], nextCursor: string|null}>}
+ */
+export async function getTerritoryFeed(path, cursor = null, limit = 20) {
+    let url = `/api/territories/by-path/${path}/feed?limit=${limit}`;
+    if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
+    const data = await apiRequest(url);
+    return { posts: data.posts || [], nextCursor: data.nextCursor || null };
+}
+
+/**
+ * Get dogs in a territory
+ * @param {string} path - URL path
+ * @param {string|null} cursor - Cursor for pagination
+ * @param {number} limit - Dogs per page
+ * @returns {Promise<{dogs: object[], nextCursor: string|null}>}
+ */
+export async function getTerritoryDogs(path, cursor = null, limit = 20) {
+    let url = `/api/territories/by-path/${path}/dogs?limit=${limit}`;
+    if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
+    const data = await apiRequest(url);
+    return { dogs: data.dogs || [], nextCursor: data.nextCursor || null };
+}
+
 // Export APIError for use in other modules
 export { APIError };

@@ -190,6 +190,7 @@
                 territoryType={item.territoryType || ''}
                 territoryParentName={item.territoryParentName || ''}
                 territoryGrandparentName={item.territoryGrandparentName || ''}
+                territoryUrlPath={item.territoryUrlPath || ''}
                 onopenAuthModal={handleOpenAuthModal}
             />
         {/if}

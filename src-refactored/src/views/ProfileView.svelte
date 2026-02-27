@@ -288,7 +288,11 @@
                                 : dog.territoryType === 'district' && dog.territoryParentName
                                     ? `${dog.territoryName}, ${dog.territoryParentName}`
                                     : dog.territoryName}
-                            <span class="profile-sheet-territory"><i class="fas fa-map-marker-alt"></i> {territoryDisplay}</span>
+                            {#if dog.territoryUrlPath}
+                                <a href="/territory/{dog.territoryUrlPath}" data-link class="profile-sheet-territory"><i class="fas fa-map-marker-alt"></i> {territoryDisplay}</a>
+                            {:else}
+                                <span class="profile-sheet-territory"><i class="fas fa-map-marker-alt"></i> {territoryDisplay}</span>
+                            {/if}
                         {/if}
                     </div>
                     {#if dog.isOwner}
@@ -589,7 +593,21 @@
     text-decoration: underline;
 }
 
-.profile-sheet-territory {
+a.profile-sheet-territory {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    margin-top: 4px;
+    text-decoration: none;
+}
+
+a.profile-sheet-territory:hover {
+    text-decoration: underline;
+}
+
+span.profile-sheet-territory {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -598,7 +616,8 @@
     margin-top: 4px;
 }
 
-.profile-sheet-territory i {
+.profile-sheet-territory i,
+a.profile-sheet-territory i {
     font-size: 11px;
 }
 

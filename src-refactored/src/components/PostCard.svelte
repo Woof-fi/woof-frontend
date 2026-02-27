@@ -24,6 +24,7 @@
         territoryType = '',
         territoryParentName = '',
         territoryGrandparentName = '',
+        territoryUrlPath = '',
         onopenAuthModal = null,
     } = $props();
 
@@ -207,7 +208,11 @@
                         : territoryType === 'district' && territoryParentName
                             ? `${territoryName}, ${territoryParentName}`
                             : territoryName}
-                    <span class="post-location-text">{territoryDisplay}</span>
+                    {#if territoryUrlPath}
+                        <a href="/territory/{territoryUrlPath}" data-link class="post-location-text">{territoryDisplay}</a>
+                    {:else}
+                        <span class="post-location-text">{territoryDisplay}</span>
+                    {/if}
                 {/if}
             </span>
         </div>
@@ -415,6 +420,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-decoration: none;
+    color: inherit;
+}
+
+a.post-location-text:hover {
+    text-decoration: underline;
 }
 
 .post-timestamp-container {

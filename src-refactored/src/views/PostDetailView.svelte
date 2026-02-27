@@ -61,6 +61,7 @@
                 territoryType={post.territoryType || ''}
                 territoryParentName={post.territoryParentName || ''}
                 territoryGrandparentName={post.territoryGrandparentName || ''}
+                territoryUrlPath={post.territoryUrlPath || ''}
                 onopenAuthModal={onopenAuthModal}
             />
         {/if}

@@ -1,44 +1,41 @@
 <script>
-    import { getBreedBySlug, getBreedFeed, getBreedDogs, followBreed, unfollowBreed } from '../../js/api.js';
-    import { isAuthenticated } from '../../js/auth.js';
-    import { showToast, imageVariant } from '../../js/utils.js';
-    import { store, bumpBreedVersion } from '../../js/svelte-store.svelte.js';
+    import { getTerritoryByPath, getTerritoryFeed, getTerritoryDogs } from '../../js/api.js';
+    import { imageVariant } from '../../js/utils.js';
 
     let { params = {} } = $props();
-    let slug = $derived(params.slug);
 
-    let breed = $state(null);
+    // Build path from route params (a, b, c)
+    let path = $derived([params.a, params.b, params.c].filter(Boolean).join('/'));
+
+    let territory = $state(null);
     let loading = $state(true);
     let loadError = $state(false);
     let activeTab = $state('posts');
 
+    // Posts section (eager load)
     let posts = $state([]);
     let postsLoading = $state(false);
     let postsCursor = $state(null);
     let postsLoadingMore = $state(false);
 
+    // Dogs section (lazy load on tab click)
     let dogs = $state([]);
     let dogsLoading = $state(false);
     let dogsLoadedOnce = $state(false);
     let dogsCursor = $state(null);
     let dogsLoadingMore = $state(false);
 
-    let isFollowing = $state(false);
-    let followLoading = $state(false);
-
     function fallbackImg(e) {
-        const img = e.currentTarget;
-        const fallback = '/images/dog_profile_pic.jpg';
-        if (img.src && !img.src.endsWith(fallback)) img.src = fallback;
+        e.target.src = '/images/dog_profile_pic.jpg';
     }
 
-    // Main init — re-runs when slug changes
+    // Main init — re-runs when path changes
     $effect(() => {
-        const s = slug;
-        if (!s) return;
+        const p = path;
+        if (!p) return;
 
         // Reset state
-        breed = null;
+        territory = null;
         loading = true;
         loadError = false;
         activeTab = 'posts';
@@ -49,22 +46,19 @@
         dogsLoading = false;
         dogsLoadedOnce = false;
         dogsCursor = null;
-        isFollowing = false;
-        followLoading = false;
 
         let active = true;
 
         (async () => {
             try {
-                const fetchedBreed = await getBreedBySlug(s);
+                const fetched = await getTerritoryByPath(p);
                 if (!active) return;
-                breed = fetchedBreed;
-                isFollowing = fetchedBreed.isFollowing || false;
+                territory = fetched;
                 loading = false;
 
                 // Load posts immediately
                 postsLoading = true;
-                const feedResult = await getBreedFeed(s);
+                const feedResult = await getTerritoryFeed(p);
                 if (!active) return;
                 posts = feedResult.posts || [];
                 postsCursor = feedResult.nextCursor;
@@ -74,7 +68,7 @@
                 loading = false;
                 postsLoading = false;
                 loadError = true;
-                console.error('Breed load error:', e);
+                console.error('Territory load error:', e);
             }
         })();
 
@@ -83,20 +77,20 @@
 
     // Lazy-load dogs tab
     $effect(() => {
-        if (activeTab === 'dogs' && !dogsLoadedOnce && !dogsLoading && breed) {
+        if (activeTab === 'dogs' && !dogsLoadedOnce && !dogsLoading && territory) {
             loadDogs();
         }
     });
 
     async function loadDogs() {
-        if (!breed) return;
+        if (!territory) return;
         dogsLoading = true;
         try {
-            const result = await getBreedDogs(slug);
+            const result = await getTerritoryDogs(path);
             dogs = result.dogs || [];
             dogsCursor = result.nextCursor;
         } catch (e) {
-            console.error('Failed to load breed dogs:', e);
+            console.error('Failed to load territory dogs:', e);
             dogs = [];
         } finally {
             dogsLoading = false;
@@ -108,7 +102,7 @@
         if (!postsCursor || postsLoadingMore) return;
         postsLoadingMore = true;
         try {
-            const result = await getBreedFeed(slug, postsCursor);
+            const result = await getTerritoryFeed(path, postsCursor);
             posts = [...posts, ...(result.posts || [])];
             postsCursor = result.nextCursor;
         } catch (e) {
@@ -122,7 +116,7 @@
         if (!dogsCursor || dogsLoadingMore) return;
         dogsLoadingMore = true;
         try {
-            const result = await getBreedDogs(slug, dogsCursor);
+            const result = await getTerritoryDogs(path, dogsCursor);
             dogs = [...dogs, ...(result.dogs || [])];
             dogsCursor = result.nextCursor;
         } catch (e) {
@@ -131,104 +125,88 @@
             dogsLoadingMore = false;
         }
     }
-
-    async function handleFollowToggle() {
-        if (!isAuthenticated()) {
-            showToast('Please log in to follow breeds', 'error');
-            return;
-        }
-        followLoading = true;
-        try {
-            if (isFollowing) {
-                await unfollowBreed(slug);
-                isFollowing = false;
-                breed = { ...breed, followerCount: Math.max(0, breed.followerCount - 1) };
-            } else {
-                await followBreed(slug);
-                isFollowing = true;
-                breed = { ...breed, followerCount: breed.followerCount + 1 };
-            }
-            bumpBreedVersion();
-        } catch (e) {
-            console.error('Breed follow toggle failed:', e);
-            showToast('Action failed. Please try again.', 'error');
-        } finally {
-            followLoading = false;
-        }
-    }
 </script>
 
-<div class="breed-page">
+<div class="territory-page">
     {#if loading}
-        <div class="breed-hero"></div>
-        <div class="breed-sheet">
-            <div class="breed-container">
-                <div class="profile-skeleton">
-                    <div class="skeleton-details">
-                        <div class="skeleton skeleton-text"></div>
-                        <div class="skeleton skeleton-text" style="width:60%"></div>
-                    </div>
-                </div>
+        <div class="territory-hero">
+            <div class="territory-hero-gradient"></div>
+        </div>
+        <div class="territory-sheet">
+            <div class="territory-container">
+                <div class="skeleton skeleton-text" style="width: 60%; height: 28px; margin-bottom: 12px;"></div>
+                <div class="skeleton skeleton-text" style="width: 40%; height: 16px;"></div>
             </div>
         </div>
-    {:else if loadError || !breed}
-        <div class="breed-sheet">
-            <div class="breed-container">
+    {:else if loadError || !territory}
+        <div class="territory-sheet" style="margin-top: 0;">
+            <div class="territory-container">
                 <div class="empty-state">
                     <i class="fas fa-exclamation-circle"></i>
-                    <p>Failed to load breed.</p>
+                    <p>Failed to load territory.</p>
                 </div>
             </div>
         </div>
     {:else}
-        <div class="breed-hero">
-            {#if breed.photo}
-                <img src={breed.photo} alt={breed.name} class="breed-hero-img" onerror={fallbackImg} />
-            {:else if breed.heroImageUrl}
-                <img src={breed.heroImageUrl} alt={breed.name} class="breed-hero-img" onerror={fallbackImg} />
+        <div class="territory-hero">
+            {#if territory.heroImageUrl}
+                <img src={territory.heroImageUrl} alt={territory.name} class="territory-hero-img" onerror={fallbackImg} />
             {:else}
-                <div class="breed-hero-gradient"></div>
+                <div class="territory-hero-gradient"></div>
             {/if}
         </div>
-        <div class="breed-sheet">
-            <div class="breed-container">
-                <div class="breed-sheet-namerow">
-                    <div>
-                        <div class="breed-sheet-name">{breed.name}</div>
-                        {#if breed.nameFi && breed.nameFi !== breed.name}
-                            <div class="breed-sheet-namefi">{breed.nameFi}</div>
-                        {/if}
-                    </div>
-                    <button
-                        class="follow-btn"
-                        class:following={isFollowing}
-                        disabled={followLoading}
-                        onclick={handleFollowToggle}
-                    >
-                        {#if isFollowing}
-                            <i class="fas fa-check"></i> Following
-                        {:else}
-                            <i class="fas fa-plus"></i> Follow
-                        {/if}
-                    </button>
-                </div>
-                {#if breed.description}
-                    <p class="breed-sheet-desc">{breed.description}</p>
+        <div class="territory-sheet">
+            <div class="territory-container">
+                <!-- Breadcrumb navigation -->
+                {#if territory.breadcrumb && territory.breadcrumb.length > 1}
+                    <nav class="territory-breadcrumb" aria-label="Territory hierarchy">
+                        {#each territory.breadcrumb as crumb, i}
+                            {#if i > 0}
+                                <span class="territory-breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
+                            {/if}
+                            {#if i < territory.breadcrumb.length - 1}
+                                <a href="/territory/{crumb.urlPath}" data-link class="territory-breadcrumb-link">{crumb.name}</a>
+                            {:else}
+                                <span class="territory-breadcrumb-current">{crumb.name}</span>
+                            {/if}
+                        {/each}
+                    </nav>
                 {/if}
-                <div class="breed-sheet-stats">
-                    <div class="breed-sheet-stat">
-                        <div class="breed-sheet-stat-num">{breed.dogCount}</div>
-                        <div class="breed-sheet-stat-label">Dogs</div>
+
+                <div class="territory-sheet-name">{territory.name}</div>
+                {#if territory.nameFi && territory.nameFi !== territory.name}
+                    <div class="territory-sheet-namefi">{territory.nameFi}</div>
+                {/if}
+
+                <div class="territory-sheet-stats">
+                    <div class="territory-sheet-stat">
+                        <div class="territory-sheet-stat-num">{territory.dogCount}</div>
+                        <div class="territory-sheet-stat-label">Dogs</div>
                     </div>
-                    <div class="breed-sheet-stat">
-                        <div class="breed-sheet-stat-num">{breed.followerCount}</div>
-                        <div class="breed-sheet-stat-label">Followers</div>
-                    </div>
-                    <div class="breed-sheet-stat">
-                        <div class="breed-sheet-stat-num">{postsLoading ? '—' : posts.length}</div>
-                        <div class="breed-sheet-stat-label">Posts</div>
+                    <div class="territory-sheet-stat">
+                        <div class="territory-sheet-stat-num">{postsLoading ? '—' : posts.length}</div>
+                        <div class="territory-sheet-stat-label">Posts</div>
                     </div>
                 </div>
+
+                <!-- Child territories (unique to territories) -->
+                {#if territory.children && territory.children.length > 0}
+                    <div class="territory-children">
+                        <h3 class="territory-children-title">
+                            {territory.type === 'municipality' ? 'Districts' : 'Neighborhoods'}
+                        </h3>
+                        <div class="territory-children-grid">
+                            {#each territory.children as child}
+                                <a href="/territory/{child.urlPath}" data-link class="territory-child-card">
+                                    <span class="territory-child-name">{child.name}</span>
+                                    {#if child.dogCount > 0}
+                                        <span class="territory-child-count">{child.dogCount} <i class="fas fa-dog"></i></span>
+                                    {/if}
+                                </a>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
             </div>
 
             <div class="profile-tabs" role="tablist">
@@ -255,11 +233,11 @@
             <!-- Posts tab -->
             <div class="tab-content" class:active={activeTab === 'posts'} role="tabpanel" aria-hidden={activeTab !== 'posts'}>
                 {#if postsLoading}
-                    <div class="breed-loading"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="territory-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if posts.length === 0}
                     <div class="empty-state">
                         <i class="fas fa-camera"></i>
-                        <p>No posts yet for this breed.</p>
+                        <p>No posts yet in this area.</p>
                     </div>
                 {:else}
                     <div class="posts-grid posts-grid-2col">
@@ -292,38 +270,31 @@
             <!-- Dogs tab -->
             <div class="tab-content" class:active={activeTab === 'dogs'} role="tabpanel" aria-hidden={activeTab !== 'dogs'}>
                 {#if dogsLoading}
-                    <div class="breed-loading"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="territory-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if dogs.length === 0 && dogsLoadedOnce}
                     <div class="empty-state">
                         <i class="fas fa-dog"></i>
-                        <p>No dogs registered for this breed yet.</p>
+                        <p>No dogs registered in this area yet.</p>
                     </div>
                 {:else if dogs.length > 0}
-                    <ul class="breed-dog-list">
+                    <ul class="territory-dog-list">
                         {#each dogs as dog (dog.id)}
-                            <li class="breed-dog-item">
-                                <a href="/dog/{dog.slug || dog.id}" data-link class="breed-dog-link">
+                            <li class="territory-dog-item">
+                                <a href="/dog/{dog.slug || dog.id}" data-link class="territory-dog-link">
                                     <img
                                         src={dog.profilePhoto || '/images/dog_profile_pic.jpg'}
                                         alt={dog.name}
                                         loading="lazy"
-                                        class="breed-dog-avatar"
+                                        class="territory-dog-avatar"
                                         onerror={fallbackImg}
                                     />
-                                    <div class="breed-dog-info">
-                                        <span class="breed-dog-name">{dog.name}</span>
-                                        {#if dog.territoryName}
-                                            {@const territoryText = dog.territoryType === 'sub_district' && dog.territoryParentName
-                                                ? `${dog.territoryName}, ${dog.territoryParentName}`
-                                                : dog.territoryName}
-                                            {#if dog.territoryUrlPath}
-                                                <span class="breed-dog-location breed-dog-territory-link" role="link" tabindex="0" onclick={(e) => { e.preventDefault(); e.stopPropagation(); history.pushState({}, '', `/territory/${dog.territoryUrlPath}`); window.dispatchEvent(new CustomEvent('routechange')); }} onkeydown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); history.pushState({}, '', `/territory/${dog.territoryUrlPath}`); window.dispatchEvent(new CustomEvent('routechange')); } }}><i class="fas fa-map-marker-alt"></i> {territoryText}</span>
-                                            {:else}
-                                                <span class="breed-dog-location"><i class="fas fa-map-marker-alt"></i> {territoryText}</span>
-                                            {/if}
+                                    <div class="territory-dog-info">
+                                        <span class="territory-dog-name">{dog.name}</span>
+                                        {#if dog.breedName}
+                                            <span class="territory-dog-breed">{dog.breedName}</span>
                                         {/if}
                                     </div>
-                                    <div class="breed-dog-meta">
+                                    <div class="territory-dog-meta">
                                         <span>{dog.postCount || 0} posts</span>
                                     </div>
                                 </a>
@@ -344,12 +315,12 @@
 </div>
 
 <style>
-.breed-page {
+.territory-page {
     margin: -20px;
     min-height: 100vh;
 }
 
-.breed-hero {
+.territory-hero {
     width: 100%;
     height: 32vh;
     min-height: 160px;
@@ -359,7 +330,7 @@
     position: relative;
 }
 
-.breed-hero-img {
+.territory-hero-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -367,13 +338,13 @@
     display: block;
 }
 
-.breed-hero-gradient {
+.territory-hero-gradient {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--woof-color-brand-primary) 0%, #e67373 100%);
+    background: linear-gradient(135deg, #4a90a4 0%, #6bb5a0 100%);
 }
 
-.breed-sheet {
+.territory-sheet {
     background: var(--woof-surface-primary);
     border-radius: var(--woof-radius-2xl) var(--woof-radius-2xl) 0 0;
     margin-top: -28px;
@@ -385,110 +356,139 @@
     box-sizing: border-box;
 }
 
-.breed-container {
+.territory-container {
     max-width: 640px;
     margin: 0 auto;
 }
 
-.breed-sheet-namerow {
+/* Breadcrumb */
+.territory-breadcrumb {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+    font-size: var(--woof-text-caption-1);
 }
 
-.breed-sheet-name {
+.territory-breadcrumb-link {
+    color: var(--woof-color-brand-primary);
+    text-decoration: none;
+}
+
+.territory-breadcrumb-link:hover {
+    text-decoration: underline;
+}
+
+.territory-breadcrumb-sep {
+    color: var(--woof-color-neutral-400);
+    font-size: 10px;
+}
+
+.territory-breadcrumb-current {
+    color: var(--woof-color-neutral-500);
+}
+
+.territory-sheet-name {
     font-size: var(--woof-text-title-1);
     font-weight: var(--woof-font-weight-bold);
     color: var(--woof-color-neutral-900);
     letter-spacing: -0.5px;
     line-height: 1.1;
+    margin-bottom: 4px;
 }
 
-.breed-sheet-namefi {
+.territory-sheet-namefi {
     font-size: var(--woof-text-caption-1);
     color: var(--woof-color-neutral-500);
-    margin-top: 4px;
+    margin-bottom: 12px;
 }
 
-.breed-sheet-desc {
-    font-size: var(--woof-text-body);
-    color: var(--woof-color-neutral-700);
-    line-height: 1.5;
-    margin-bottom: 16px;
-}
-
-.breed-sheet-stats {
+.territory-sheet-stats {
     display: flex;
     margin-bottom: 14px;
     padding-bottom: 14px;
     border-bottom: 1px solid var(--woof-color-neutral-100);
 }
 
-.breed-sheet-stat {
+.territory-sheet-stat {
     flex: 1;
     padding-right: 16px;
     margin-right: 16px;
     border-right: 1px solid var(--woof-color-neutral-200);
 }
 
-.breed-sheet-stat:last-child {
+.territory-sheet-stat:last-child {
     border-right: none;
     padding-right: 0;
     margin-right: 0;
 }
 
-.breed-sheet-stat-num {
+.territory-sheet-stat-num {
     font-size: var(--woof-text-title-2);
     font-weight: var(--woof-font-weight-heavy);
     color: var(--woof-color-neutral-900);
     line-height: 1;
 }
 
-.breed-sheet-stat-label {
+.territory-sheet-stat-label {
     font-size: var(--woof-text-caption-1);
     color: var(--woof-color-neutral-500);
     margin-top: 3px;
 }
 
-/* Follow button — reuse profile pattern */
-.follow-btn {
-    padding: 8px 20px;
-    border: none;
-    border-radius: var(--woof-btn-radius);
-    background: var(--color-primary);
-    color: var(--woof-color-neutral-0);
+/* Child territories */
+.territory-children {
+    margin-bottom: 16px;
+}
+
+.territory-children-title {
     font-size: var(--woof-text-subheadline);
     font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background var(--woof-duration-fast);
-    flex-shrink: 0;
+    color: var(--woof-color-neutral-700);
+    margin-bottom: 8px;
 }
 
-.follow-btn:hover {
-    background: var(--color-primary-hover);
+.territory-children-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.follow-btn.following {
-    background: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
+.territory-child-card {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--woof-color-neutral-50);
+    border: 1px solid var(--woof-color-neutral-100);
+    border-radius: var(--woof-radius-full);
+    text-decoration: none;
+    color: inherit;
+    font-size: var(--woof-text-footnote);
+    transition: background 0.15s, border-color 0.15s;
 }
 
-.follow-btn.following:hover {
+.territory-child-card:hover {
     background: var(--woof-color-brand-primary-subtle);
-    color: var(--woof-color-brand-primary);
     border-color: var(--woof-color-brand-primary);
 }
 
-.follow-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.territory-child-name {
+    font-weight: 500;
+    color: var(--woof-color-neutral-800);
 }
 
-/* Posts grid — reuse profile pattern */
+.territory-child-count {
+    color: var(--woof-color-neutral-500);
+    font-size: 12px;
+}
+
+.territory-child-count i {
+    font-size: 10px;
+}
+
+/* Posts grid — same as breed page */
 .posts-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -545,17 +545,17 @@
 }
 
 /* Dog list */
-.breed-dog-list {
+.territory-dog-list {
     list-style: none;
     padding: 8px 0;
     margin: 0;
 }
 
-.breed-dog-item {
+.territory-dog-item {
     list-style: none;
 }
 
-.breed-dog-link {
+.territory-dog-link {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -565,11 +565,11 @@
     transition: background-color 0.15s;
 }
 
-.breed-dog-link:hover {
+.territory-dog-link:hover {
     background-color: var(--color-hover, rgba(0, 0, 0, 0.03));
 }
 
-.breed-dog-avatar {
+.territory-dog-avatar {
     width: 48px;
     height: 48px;
     border-radius: var(--woof-radius-full);
@@ -577,46 +577,32 @@
     flex-shrink: 0;
 }
 
-.breed-dog-info {
+.territory-dog-info {
     flex: 1;
     min-width: 0;
 }
 
-.breed-dog-name {
+.territory-dog-name {
     font-weight: 600;
     font-size: 14px;
     color: var(--color-text);
     display: block;
 }
 
-.breed-dog-location {
+.territory-dog-breed {
     display: block;
     font-size: 13px;
     color: var(--color-text-secondary);
     margin-top: 2px;
-    text-decoration: none;
 }
 
-.breed-dog-territory-link {
-    cursor: pointer;
-}
-
-.breed-dog-territory-link:hover {
-    text-decoration: underline;
-}
-
-.breed-dog-location i {
-    font-size: 11px;
-    margin-right: 2px;
-}
-
-.breed-dog-meta {
+.territory-dog-meta {
     font-size: 12px;
     color: var(--color-text-muted);
     flex-shrink: 0;
 }
 
-.breed-loading {
+.territory-loading {
     text-align: center;
     padding: 32px;
     color: var(--color-text-secondary);
@@ -628,7 +614,7 @@
 }
 
 @media (max-width: 768px) {
-    .breed-page {
+    .territory-page {
         margin: -20px 0 0;
     }
 }
