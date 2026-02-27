@@ -1,0 +1,15 @@
+{
+  "cookies": [
+    {
+      "name": "woof_access",
+      "value": "a42e46a1ad8d82906b0f488f2548d9f6bcb26a54c102b54d1d19ab9297afb5c3",
+      "domain": "woofapp.fi",
+      "path": "/",
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax",
+      "expires": 1930000000
+    }
+  ],
+  "origins": []
+}

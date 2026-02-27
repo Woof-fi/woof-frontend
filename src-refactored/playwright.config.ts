@@ -13,6 +13,8 @@ export default defineConfig({
     baseURL: process.env.E2E_BASE_URL || 'https://woofapp.fi',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    // Pre-set the site password gate cookie so E2E tests can access the app
+    storageState: './e2e/gate-cookie.json',
   },
 
   projects: [
