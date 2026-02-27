@@ -21,6 +21,7 @@ if ('serviceWorker' in navigator) {
             newWorker.addEventListener('statechange', async () => {
                 if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
                     // New version activated — brief toast then reload
+                    // @ts-ignore — JS utils module has no type declarations
                     const { showToast } = await import('../js/utils.js');
                     showToast('Updating to latest version...', 'info');
                     setTimeout(() => window.location.reload(), 1500);
