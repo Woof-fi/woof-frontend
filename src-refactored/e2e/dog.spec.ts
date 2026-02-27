@@ -53,7 +53,12 @@ test.describe('Dog CRUD', () => {
     await page.click('#dog-breed-listbox [role="option"]:first-child');
 
     await page.fill('#dog-age', '3');
-    await page.fill('#dog-location', 'Helsinki, Finland');
+
+    // Territory autocomplete: type, wait for dropdown, select first match
+    await page.fill('#dog-territory', 'Helsinki');
+    await page.waitForSelector('[role="listbox"] [role="option"]', { timeout: 5_000 });
+    await page.click('[role="listbox"] [role="option"]:first-child');
+
     await page.fill('#dog-bio', 'A good dog created by E2E tests');
 
     // Upload photo

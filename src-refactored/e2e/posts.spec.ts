@@ -80,7 +80,7 @@ test.describe('Post options sheet', () => {
 
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${token}` },
-            data: { name: 'E2E PostDog', breed_id: mixedBreedId, age: 2, location: 'Helsinki' },
+            data: { name: 'E2E PostDog', breed_id: mixedBreedId, age: 2 },
         });
         expect(dogRes.ok()).toBeTruthy();
         const dogData = await dogRes.json();
@@ -119,7 +119,7 @@ test.describe('Post options sheet', () => {
 
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${authorToken}` },
-            data: { name: 'E2E AuthorDog', breed_id: mixedBreedId, age: 1, location: 'Helsinki' },
+            data: { name: 'E2E AuthorDog', breed_id: mixedBreedId, age: 1 },
         });
         expect(dogRes.ok()).toBeTruthy();
         const dogData = await dogRes.json();
@@ -155,7 +155,7 @@ test.describe('Post options sheet', () => {
 
         const dogRes = await page.request.post(`${API_BASE}/api/dogs`, {
             headers: { Authorization: `Bearer ${authorToken}` },
-            data: { name: 'E2E BookmarkDog', breed_id: mixedBreedId, age: 1, location: 'Helsinki' },
+            data: { name: 'E2E BookmarkDog', breed_id: mixedBreedId, age: 1 },
         });
         expect(dogRes.ok()).toBeTruthy();
         const dogData = await dogRes.json();
