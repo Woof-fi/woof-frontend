@@ -28,8 +28,10 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `Navigation.svelte` — Header + nav drawer (fixed sidebar on desktop, slide-in on mobile) + bottom nav; 60s unread-count polling; auth-reactive
 - `AuthModal.svelte` — 5 modes: login / register / verify / forgot / reset. Mode config as const object, `$derived` active config.
 - `CreatePostModal.svelte` — S3 presigned upload, dog select, image preview
-- `CreateDogModal.svelte` — Dog creation form
-- `EditDogModal.svelte` — Dog profile editing
+- `CreateDogModal.svelte` — Dog creation form with breed autocomplete + territory autocomplete
+- `EditDogModal.svelte` — Dog profile editing with territory autocomplete
+- `TerritoryAutocomplete.svelte` — Territory search + browse drill-down (municipality → district → sub_district); used in CreateDogModal and EditDogModal
+- `BreedAutocomplete.svelte` — Breed search autocomplete
 - `HealthRecordModal.svelte` — Health record add/edit with type-specific fields
 - `InviteCard.svelte` — Invite prompt card for feed
 - `Search.svelte` — Search panel
@@ -130,7 +132,7 @@ npm run deploy   # build + S3 sync (s3://woofapp.fi/)
 
 ### Unit Tests (Vitest)
 ```bash
-npm test              # Run all unit tests (57 tests, 6 suites)
+npm test              # Run all unit tests (90 tests, 7 suites)
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage
 ```

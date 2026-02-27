@@ -59,8 +59,10 @@ src-refactored/
 │   │   ├── Navigation.svelte       # Header + fixed sidebar drawer + bottom nav
 │   │   ├── AuthModal.svelte        # 5-state auth modal (login/register/verify/forgot/reset)
 │   │   ├── CreatePostModal.svelte  # Post creation with image upload
-│   │   ├── CreateDogModal.svelte   # Dog creation form
-│   │   ├── EditDogModal.svelte     # Dog profile editing
+│   │   ├── CreateDogModal.svelte   # Dog creation with breed + territory autocomplete
+│   │   ├── EditDogModal.svelte     # Dog profile editing with territory autocomplete
+│   │   ├── TerritoryAutocomplete.svelte # Territory search + browse drill-down
+│   │   ├── BreedAutocomplete.svelte # Breed search autocomplete
 │   │   ├── HealthRecordModal.svelte # Health record add/edit
 │   │   ├── InviteCard.svelte       # Invite prompt shown in feed
 │   │   ├── Search.svelte           # Search panel
@@ -80,7 +82,7 @@ src-refactored/
 ## Testing
 
 ```bash
-npm test                  # Vitest unit tests (57 tests, 6 suites)
+npm test                  # Vitest unit tests (90 tests, 7 suites)
 npm run test:e2e:headed   # Playwright E2E against production (always headed)
 ```
 

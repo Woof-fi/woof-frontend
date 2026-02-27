@@ -11,7 +11,7 @@
 
     let posts = $state([]);
     let nextCursor = $state(null);
-    let loading = $state(false);
+    let loading = $state(true);
     let myDogs = $state([]);
 
     const INVITE_FIRST_POSITION = 5;
