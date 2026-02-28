@@ -1,8 +1,8 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-02-28
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E
-**Current:** Tier 1 — Quality of Life & Polish
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12C
+**Current:** Tier 1 — Quality of Life & Polish (12D next)
 
 ---
 
@@ -73,46 +73,17 @@ Woof's differentiator: **Health records** — no competitor offers integrated ve
 
 Small items, 1-3 days each, high impact on existing UX.
 
-#### 12A: UX Fixes & Navigation Polish — Small
+#### 12A: UX Fixes & Navigation Polish — DONE
 
-**Core fixes:**
-- Logo click: if already on `/`, scroll to top instead of re-navigating
-- Bell click: if already on `/notifications`, go back to previous location
-- Home button (mobile): scroll to top if already on feed
-- Double-tap to like: touch handler on PostCard images, heart animation overlay
-- Pull-to-refresh: touch drag at scroll top triggers feed reload
+Logo scroll-to-top, bell click back-navigation, home button scroll, double-tap to like with heart animation, pull-to-refresh, locale-aware timestamps, share button, content gate for unauthenticated users, invite cards in feed. Token expiry fix: 3-layer refresh (reactive 401 retry, proactive 50min interval, visibility change).
 
-**Additional UX issues to fix:**
-- No scroll position restore on back-navigation (Router.svelte always scrolls to top)
-- "Following" tab shows blank when no followed dogs have posted (needs empty state + CTA)
-- Timestamps hardcoded to `en-US` locale (should use system locale)
-- No loading spinner during follow/unfollow API call
-- No share button on posts (Web Share API or copy link)
+#### 12B: Edit Posts — DONE
 
-#### 12B: Edit Posts — Small
+`PUT /api/posts/:id` endpoint with ownership check. EditPostModal component, "Edit caption" button in PostOptionsSheet for own posts, "(edited)" indicator when `updatedAt > createdAt` by 60+ seconds. `updated_at` added to all feed and detail query responses.
 
-Add ability to edit caption text on existing posts (currently only delete).
+#### 12C: New Design Colors — DONE
 
-- `PATCH /api/posts/:id` endpoint (caption-only, ownership check)
-- Add `edited_at` nullable timestamp column to posts table
-- Edit option in PostOptionsSheet for own posts
-- Inline edit textarea or small edit modal
-- "Edited" indicator on modified posts
-
-#### 12C: New Design Colors — Small
-
-Add two new accent colors from the brand moodboard:
-
-```css
---woof-color-coral-peach:       #FF8E7A;  /* Soft Coral Peach — warm accent, highlights */
---woof-color-coral-peach-light: #FFB5A8;
---woof-color-coral-peach-dark:  #E06B56;
---woof-color-fresh-mint:        #6ED3C3;  /* Fresh Mint — secondary actions, success states */
---woof-color-fresh-mint-light:  #9AE5D9;
---woof-color-fresh-mint-dark:   #4DB8A7;
-```
-
-Update: `tokens.css`, design system docs, `tokens.json`.
+Coral Peach (`#FF8E7A`) and Fresh Mint (`#6ED3C3`) accent colors added to `tokens.css`, design docs, and `tokens.json`.
 
 #### 12D: Followers/Following Lists — Small
 
