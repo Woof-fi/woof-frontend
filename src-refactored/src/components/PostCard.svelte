@@ -18,6 +18,7 @@
         commentCount = 0,
         likedByUser = false,
         createdAt = null,
+        updatedAt = null,
         breedName = '',
         breedSlug = '',
         territoryName = '',
@@ -204,6 +205,12 @@
         }
         return timeAgo(createdAt);
     }
+
+    // --- Edited indicator ---
+    // svelte-ignore state_referenced_locally
+    const isEdited = createdAt && updatedAt
+        ? (new Date(updatedAt).getTime() - new Date(createdAt).getTime()) > 60000
+        : false;
 </script>
 
 <div class="post">
@@ -257,7 +264,7 @@
             <button
                 class="post-options-btn"
                 aria-label="Post options"
-                onclick={() => openPostOptionsSheet({ postId: id, dogId, dogSlug, isOwnPost })}
+                onclick={() => openPostOptionsSheet({ postId: id, dogId, dogSlug, isOwnPost, caption })}
             >
                 <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
             </button>
@@ -388,6 +395,9 @@
                 style="cursor:pointer"
                 onclick={() => showFullDate = !showFullDate}
             >{formattedTimestamp()}</time>
+            {#if isEdited}
+                <span class="post-edited-indicator">(edited)</span>
+            {/if}
         </div>
     {/if}
 </div>
@@ -488,6 +498,12 @@ a.post-location-text:hover {
     color: var(--woof-color-neutral-500);
     text-transform: uppercase;
     letter-spacing: 0.2px;
+}
+
+.post-edited-indicator {
+    font-size: 10px;
+    color: var(--woof-color-neutral-400);
+    margin-left: var(--woof-space-1);
 }
 
 .post-image {

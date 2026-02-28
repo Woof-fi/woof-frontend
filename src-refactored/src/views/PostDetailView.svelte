@@ -51,10 +51,12 @@
                 imageUrl={post.imageUrl}
                 caption={post.caption || ''}
                 dogSlug={post.dogSlug || ''}
+                dogId={post.dogId || ''}
                 likeCount={post.likeCount || 0}
                 commentCount={post.commentCount || 0}
                 likedByUser={post.likedByUser || false}
                 createdAt={post.createdAt}
+                updatedAt={post.updatedAt || null}
                 breedName={post.breedName || ''}
                 breedSlug={post.breedSlug || ''}
                 territoryName={post.territoryName || ''}

@@ -1,6 +1,6 @@
 <script>
     import { fly, fade } from 'svelte/transition';
-    import { modals, closePostOptionsSheet, openAuthModal } from '../../js/modal-store.svelte.js';
+    import { modals, closePostOptionsSheet, openAuthModal, openEditPostModal } from '../../js/modal-store.svelte.js';
     import { reportContent, deletePost, toggleBookmark, getBookmarkStatus } from '../../js/api.js';
     import { followDog, unfollowDog, getFollowStatus } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
@@ -156,6 +156,9 @@
     {#if view === 'options'}
         <div in:fade={{ duration: 100, delay: 60 }}>
             {#if isOwnPost}
+                <button class="action-sheet-item" onclick={() => { closePostOptionsSheet(); openEditPostModal({ id: postId, caption: data?.caption }); }}>
+                    <i class="fas fa-pen"></i> Edit caption
+                </button>
                 <button class="action-sheet-item destructive" onclick={() => view = 'confirm-delete'}>
                     <i class="fas fa-trash-alt"></i> Delete post
                 </button>

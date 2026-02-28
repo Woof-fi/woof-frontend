@@ -86,6 +86,7 @@ describe('PostCard', () => {
             dogId: 'dog-123',
             dogSlug: 'nelli-1',
             isOwnPost: true,
+            caption: '',
         });
     });
 

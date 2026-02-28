@@ -13,6 +13,7 @@
     import CreatePostModal from './components/CreatePostModal.svelte';
     import CreateDogModal from './components/CreateDogModal.svelte';
     import EditDogModal from './components/EditDogModal.svelte';
+    import EditPostModal from './components/EditPostModal.svelte';
     import HealthRecordModal from './components/HealthRecordModal.svelte';
     import Search from './components/Search.svelte';
     import PostOptionsSheet from './components/PostOptionsSheet.svelte';
@@ -82,6 +83,7 @@
         <CreatePostModal />
         <CreateDogModal />
         <EditDogModal />
+        <EditPostModal />
         <HealthRecordModal />
         <Search />
         {#if modals.postOptionsSheetOpen}

@@ -266,6 +266,7 @@
                 commentCount={item.commentCount || 0}
                 likedByUser={item.likedByUser || false}
                 createdAt={item.createdAt}
+                updatedAt={item.updatedAt || null}
                 breedName={item.breedName || ''}
                 breedSlug={item.breedSlug || ''}
                 territoryName={item.territoryName || ''}

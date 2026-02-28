@@ -659,6 +659,27 @@ export async function reportContent(targetType, targetId, reason, description) {
 }
 
 /**
+ * Update a post's caption (owner only)
+ * @param {string} postId - Post ID
+ * @param {string} caption - New caption text
+ * @returns {Promise<object>} - Updated post object
+ */
+export async function updatePost(postId, caption) {
+    try {
+        const data = await apiRequest(`/api/posts/${postId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ caption })
+        });
+        showToast('Caption updated!', 'success');
+        return data.post;
+    } catch (error) {
+        console.error(`Failed to update post ${postId}:`, error);
+        showToast('Failed to update caption. Please try again.', 'error');
+        throw error;
+    }
+}
+
+/**
  * Delete a post (owner only)
  * @param {string} postId - Post ID
  * @returns {Promise<void>}
