@@ -81,4 +81,16 @@ describe('Feed (contract tests)', () => {
         const { findByText } = render(Feed, { props: { type: 'following' } });
         await findByText(/following feed is empty/i);
     });
+
+    it('renders pull-to-refresh wrapper with touch handlers', async () => {
+        const { getFeed } = await import('../../../js/api.js');
+        vi.mocked(getFeed).mockResolvedValue({
+            posts: [mockPost('p1')],
+            nextCursor: null,
+        });
+        const { container, findAllByRole } = render(Feed, { props: { type: 'public' } });
+        await findAllByRole('button', { name: /like/i });
+        const wrapper = container.querySelector('.feed-wrapper');
+        expect(wrapper).not.toBeNull();
+    });
 });

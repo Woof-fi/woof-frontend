@@ -16,6 +16,40 @@
 
     let currentPath = $state(window.location.pathname);
     let navigating = $state(false);
+    let isBackNavigation = false;
+
+    // Scroll position map: path → scrollY (stored in sessionStorage for tab persistence)
+    const SCROLL_KEY = 'woof_scroll_positions';
+
+    function saveScrollPosition(path) {
+        try {
+            const positions = JSON.parse(sessionStorage.getItem(SCROLL_KEY) || '{}');
+            positions[path] = window.scrollY;
+            sessionStorage.setItem(SCROLL_KEY, JSON.stringify(positions));
+        } catch { /* ignore storage errors */ }
+    }
+
+    function restoreScrollPosition(path) {
+        try {
+            const positions = JSON.parse(sessionStorage.getItem(SCROLL_KEY) || '{}');
+            const y = positions[path];
+            if (y !== undefined && y > 0) {
+                // Poll until the document is tall enough to scroll to, or give up after 2s
+                let attempts = 0;
+                const maxAttempts = 20;
+                function tryRestore() {
+                    if (document.documentElement.scrollHeight > y + window.innerHeight || attempts >= maxAttempts) {
+                        window.scrollTo(0, y);
+                    } else {
+                        attempts++;
+                        setTimeout(tryRestore, 100);
+                    }
+                }
+                // Start after a frame to let Svelte begin rendering
+                requestAnimationFrame(tryRestore);
+            }
+        } catch { /* ignore storage errors */ }
+    }
 
     function pathToRegex(path) {
         const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -64,12 +98,20 @@
 
     $effect(() => {
         currentPath; // track
-        window.scrollTo(0, 0);
+        if (isBackNavigation) {
+            restoreScrollPosition(currentPath);
+            isBackNavigation = false;
+        } else {
+            window.scrollTo(0, 0);
+        }
     });
 
     function handlePopstate(e) {
         const consumed = handleModalPopstate(e);
-        if (!consumed) currentPath = window.location.pathname;
+        if (!consumed) {
+            isBackNavigation = true;
+            currentPath = window.location.pathname;
+        }
     }
 
     function handleLinkClick(e) {
@@ -77,9 +119,14 @@
         if (!a) return;
         e.preventDefault();
         const href = a.getAttribute('href');
+        const newPath = new URL(href, window.location.origin).pathname;
+
+        // Save scroll position before navigating away
+        saveScrollPosition(currentPath);
+
         navigating = true;
         history.pushState({}, '', href);
-        currentPath = new URL(href, window.location.origin).pathname;
+        currentPath = newPath;
         window.dispatchEvent(new CustomEvent('routechange'));
     }
 
@@ -94,7 +141,11 @@
         document.addEventListener('click', handleLinkClick);
 
         function handleRouteChange() {
-            currentPath = window.location.pathname;
+            const newPath = window.location.pathname;
+            if (newPath !== currentPath) {
+                saveScrollPosition(currentPath);
+            }
+            currentPath = newPath;
         }
         window.addEventListener('routechange', handleRouteChange);
 

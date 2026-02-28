@@ -5,7 +5,7 @@
 
 import { CONFIG } from './config.js';
 import { showToast } from './utils.js';
-import { getToken } from './auth.js';
+import { getToken, handleSessionExpired } from './auth.js';
 
 /**
  * Custom error class for API errors
@@ -20,12 +20,18 @@ class APIError extends Error {
 }
 
 /**
- * Make API request with timeout and error handling
+ * Make API request with timeout, error handling, and automatic token refresh.
+ *
+ * If the server returns 401 (Unauthorized) AND the user had a token, we try to
+ * refresh the Cognito session once and retry the request. If the refresh fails
+ * the user is logged out cleanly with a "session expired" toast.
+ *
  * @param {string} endpoint - API endpoint (e.g., '/api/dogs')
  * @param {object} options - Fetch options
+ * @param {boolean} _isRetry - Internal flag — true when retrying after token refresh
  * @returns {Promise<any>} - Response data
  */
-async function apiRequest(endpoint, options = {}) {
+async function apiRequest(endpoint, options = {}, _isRetry = false) {
     const url = `${CONFIG.API_BASE_URL}${endpoint}`;
     const token = getToken();
 
@@ -57,6 +63,17 @@ async function apiRequest(endpoint, options = {}) {
         const data = text ? JSON.parse(text) : null;
 
         if (!response.ok) {
+            // 401 with a token means it likely expired — try refresh once
+            if (response.status === 401 && token && !_isRetry) {
+                const refreshed = await handleSessionExpired();
+                if (refreshed) {
+                    // Retry with the fresh token
+                    return apiRequest(endpoint, options, true);
+                }
+                // Refresh failed — user has been logged out by handleSessionExpired
+                throw new APIError('Session expired', 401, data);
+            }
+
             throw new APIError(
                 (data && data.error) || 'API request failed',
                 response.status,

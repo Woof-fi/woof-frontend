@@ -30,6 +30,21 @@ A complementary set of earthy, warm-cool tones extracted from the brand moodboar
 
 ---
 
+### Accent Palette
+
+Warm and cool accent tones for highlights, secondary actions, and visual variety.
+
+| Token | Hex | Usage |
+|---|---|---|
+| `--woof-color-coral-peach` | `#FF8E7A` | Soft coral peach — warm accent, highlights, notification badges |
+| `--woof-color-coral-peach-light` | `#FFB5A8` | Lighter coral for hover states, tints |
+| `--woof-color-coral-peach-dark` | `#E06B56` | Darker coral for pressed states |
+| `--woof-color-fresh-mint` | `#6ED3C3` | Fresh mint — secondary actions, cool accent, milestone badges |
+| `--woof-color-fresh-mint-light` | `#9AE5D9` | Lighter mint for hover states, tints |
+| `--woof-color-fresh-mint-dark` | `#4DB8A7` | Darker mint for pressed states |
+
+---
+
 ### Neutral Palette
 
 The neutrals are clean and minimal — predominantly white surfaces with subtle off-white tints, letting the crimson accent stand out.

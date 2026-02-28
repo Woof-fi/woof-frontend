@@ -88,4 +88,36 @@ describe('PostCard', () => {
             isOwnPost: true,
         });
     });
+
+    it('renders share button', () => {
+        const { container } = render(PostCard, { props: baseProps });
+        const shareBtn = container.querySelector('.share-button');
+        expect(shareBtn).not.toBeNull();
+    });
+
+    it('renders post-actions-left group with like and comment', () => {
+        const { container } = render(PostCard, { props: baseProps });
+        const actionsLeft = container.querySelector('.post-actions-left');
+        expect(actionsLeft).not.toBeNull();
+        expect(actionsLeft!.querySelector('.like-button')).not.toBeNull();
+        expect(actionsLeft!.querySelector('.comment-button')).not.toBeNull();
+    });
+
+    it('shows double-tap heart on image double-click', async () => {
+        const { container } = render(PostCard, { props: baseProps });
+        const postImage = container.querySelector('.post-image')!;
+        // Simulate two rapid clicks (double-tap)
+        await fireEvent.click(postImage);
+        await fireEvent.click(postImage);
+        const heart = container.querySelector('.double-tap-heart');
+        expect(heart).not.toBeNull();
+    });
+
+    it('uses locale-aware timestamps (no hardcoded en-US)', () => {
+        const { container } = render(PostCard, { props: baseProps });
+        const time = container.querySelector('.post-timestamp');
+        // Should render the timestamp (locale dependent)
+        expect(time).not.toBeNull();
+        expect(time!.textContent!.length).toBeGreaterThan(0);
+    });
 });

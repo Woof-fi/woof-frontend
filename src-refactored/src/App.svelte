@@ -1,5 +1,5 @@
 <script>
-    import { refreshSession } from '../js/auth.js';
+    import { refreshSession, setOnSessionCleared } from '../js/auth.js';
     import { healthCheck, syncUser } from '../js/api.js';
     import { showToast } from '../js/utils.js';
     import { openAuthModal, openCreatePostModal, modals } from '../js/modal-store.svelte.js';
@@ -18,6 +18,14 @@
     import PostOptionsSheet from './components/PostOptionsSheet.svelte';
     import CommentOptionsSheet from './components/CommentOptionsSheet.svelte';
 
+    // When the API layer detects an expired session that can't be refreshed,
+    // clear the Svelte store so the UI updates reactively (e.g. nav shows login).
+    setOnSessionCleared(() => setAuthUser(null));
+
+    // Cognito ID tokens expire after 1 hour.
+    // Refresh proactively every 50 minutes so the token never goes stale.
+    const TOKEN_REFRESH_INTERVAL = 50 * 60 * 1000; // 50 minutes
+
     $effect(() => {
         (async () => {
             await refreshSession();
@@ -35,6 +43,26 @@
                 // Ignore health check failures
             }
         })();
+
+        // Proactive token refresh: keeps the token fresh while the app is open
+        const refreshInterval = setInterval(async () => {
+            if (isAuthenticated()) {
+                await refreshSession();
+            }
+        }, TOKEN_REFRESH_INTERVAL);
+
+        // Refresh when user returns to the tab after being away (e.g. phone sleep)
+        function handleVisibilityChange() {
+            if (document.visibilityState === 'visible' && isAuthenticated()) {
+                refreshSession();
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            clearInterval(refreshInterval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     });
 </script>
 

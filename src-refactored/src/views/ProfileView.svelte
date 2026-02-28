@@ -50,7 +50,7 @@
     function formatHealthDate(date) {
         const parseable = typeof date === 'string' && date.length === 10
             ? date + 'T00:00:00' : date;
-        return new Date(parseable).toLocaleDateString('en-US', {
+        return new Date(parseable).toLocaleDateString(undefined, {
             year: 'numeric', month: 'short', day: 'numeric'
         });
     }
@@ -506,7 +506,9 @@
                         disabled={followLoading}
                         onclick={handleFollowToggle}
                     >
-                        {#if isFollowing}
+                        {#if followLoading}
+                            <i class="fas fa-spinner fa-spin"></i>
+                        {:else if isFollowing}
                             <i class="fas fa-user-check"></i> Following
                         {:else}
                             <i class="fas fa-user-plus"></i> Follow

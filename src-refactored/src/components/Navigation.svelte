@@ -69,7 +69,32 @@
     }
 
     function handleBellClick() {
-        navigateTo('/notifications');
+        // Use live URL — activePath may be stale after popstate
+        const currentUrl = window.location.pathname;
+        if (currentUrl.startsWith('/notifications')) {
+            // Already on notifications — go back
+            history.back();
+        } else {
+            navigateTo('/notifications');
+        }
+    }
+
+    function handleHomeClick(e) {
+        const currentUrl = window.location.pathname;
+        if (currentUrl === '/') {
+            // Already on home — scroll to top instead of navigating
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // Otherwise let the data-link handler navigate normally
+    }
+
+    function handleLogoClick(e) {
+        const currentUrl = window.location.pathname;
+        if (currentUrl === '/') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     async function fetchUnread() {
@@ -136,13 +161,20 @@
             closeDrawer();
         }
 
+        // Sync activePath on browser back/forward (popstate) too
+        function handlePopstateNav() {
+            activePath = window.location.pathname;
+        }
+
         window.addEventListener('routechange', handleRouteChange);
+        window.addEventListener('popstate', handlePopstateNav);
 
         return () => {
             active = false;
             if (msgInterval) clearInterval(msgInterval);
             if (notifInterval) clearInterval(notifInterval);
             window.removeEventListener('routechange', handleRouteChange);
+            window.removeEventListener('popstate', handlePopstateNav);
         };
     });
 
@@ -225,7 +257,7 @@
                 <span class="header-feed-label">{feedLabel}</span>
             {/if}
         </div>
-        <a href="/" data-link class="logo header-logo-desktop">
+        <a href="/" data-link class="logo header-logo-desktop" onclick={handleLogoClick}>
             <img src="/images/logo.png" alt="Woof Logo">
         </a>
         <div class="header-icons">
@@ -381,7 +413,7 @@
 
 
 <nav class="bottom-nav" aria-label="Mobile navigation">
-    <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item" aria-label="Home" class:active={isHomeActive()}>
+    <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item" aria-label="Home" class:active={isHomeActive()} onclick={handleHomeClick}>
         <i class="fas fa-home"></i>
     </a>
     <button type="button" id="bottom-nav-search" class="bottom-nav-item" aria-label="Search" onclick={handleSearchOpen}>

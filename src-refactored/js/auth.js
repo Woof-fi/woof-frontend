@@ -56,6 +56,9 @@ function sanitizeAuthError(err) {
     }
 }
 
+// Prevent concurrent refresh calls
+let refreshPromise = null;
+
 // Token management — store ID token for synchronous access
 function saveToken(token) {
     try {
@@ -367,6 +370,7 @@ export function logout() {
 /**
  * Refresh the Cognito session and update stored token.
  * Call on app init to keep the token fresh.
+ * Deduplicates concurrent calls — safe to call from multiple places at once.
  * @returns {Promise<boolean>} true if session is valid
  */
 export async function refreshSession() {
@@ -374,19 +378,60 @@ export async function refreshSession() {
         return !!getToken();
     }
 
-    const cognitoUser = userPool.getCurrentUser();
-    if (!cognitoUser) return false;
+    // Deduplicate concurrent refresh calls
+    if (refreshPromise) return refreshPromise;
 
-    return new Promise((resolve) => {
-        cognitoUser.getSession((err, session) => {
-            if (err || !session || !session.isValid()) {
-                clearToken();
-                clearCurrentUser();
-                resolve(false);
-                return;
-            }
-            saveToken(session.getIdToken().getJwtToken());
-            resolve(true);
+    refreshPromise = (async () => {
+        const cognitoUser = userPool.getCurrentUser();
+        if (!cognitoUser) return false;
+
+        return new Promise((resolve) => {
+            cognitoUser.getSession((err, session) => {
+                if (err || !session || !session.isValid()) {
+                    clearToken();
+                    clearCurrentUser();
+                    resolve(false);
+                    return;
+                }
+                saveToken(session.getIdToken().getJwtToken());
+                resolve(true);
+            });
         });
-    });
+    })();
+
+    try {
+        return await refreshPromise;
+    } finally {
+        refreshPromise = null;
+    }
+}
+
+/**
+ * Callback invoked when the session cannot be recovered.
+ * Set by App.svelte so the auth module can clear Svelte reactive state
+ * without importing the Svelte store (avoids circular dependency).
+ * @type {(() => void) | null}
+ */
+let onSessionCleared = null;
+
+/** Register a callback for session-cleared events. */
+export function setOnSessionCleared(cb) {
+    onSessionCleared = cb;
+}
+
+/**
+ * Handle an expired/invalid session detected by the API layer.
+ * Attempts to refresh. If refresh fails, clears auth state and notifies the user.
+ * @returns {Promise<boolean>} true if session was successfully refreshed
+ */
+export async function handleSessionExpired() {
+    const refreshed = await refreshSession();
+    if (!refreshed) {
+        clearToken();
+        clearCurrentUser();
+        onSessionCleared?.();
+        showToast('Your session has expired. Please log in again.', 'info');
+        return false;
+    }
+    return true;
 }

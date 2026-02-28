@@ -56,7 +56,7 @@ export function debounce(func, wait) {
  */
 export function formatDate(date) {
     const d = new Date(date);
-    return d.toLocaleDateString('en-US', {
+    return d.toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -91,7 +91,7 @@ export function timeAgo(date) {
     if (weeks === 1) return '1 week ago';
     if (weeks < 4) return `${weeks} weeks ago`;
 
-    return past.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return past.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
 /**

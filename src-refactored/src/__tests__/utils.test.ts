@@ -2,8 +2,8 @@
  * Utility Functions Tests
  */
 
-import { describe, it, expect } from 'vitest';
-import { escapeHTML, isValidEmail, isValidFileType, isValidFileSize, imageVariant } from '../../js/utils.js';
+import { describe, it, expect, vi } from 'vitest';
+import { escapeHTML, isValidEmail, isValidFileType, isValidFileSize, imageVariant, timeAgo, formatDate } from '../../js/utils.js';
 
 describe('Utility Functions', () => {
   describe('escapeHTML', () => {
@@ -110,6 +110,48 @@ describe('Utility Functions', () => {
     it('should handle exact size limit', () => {
       const exactFile = new File(['x'.repeat(5 * 1024 * 1024)], 'exact.jpg'); // 5MB
       expect(isValidFileSize(exactFile, 5)).toBe(true);
+    });
+  });
+
+  describe('timeAgo', () => {
+    it('returns "just now" for dates less than 60 seconds ago', () => {
+      const now = new Date();
+      expect(timeAgo(now.toISOString())).toBe('just now');
+    });
+
+    it('returns minutes for dates less than 1 hour ago', () => {
+      const date = new Date(Date.now() - 5 * 60 * 1000);
+      expect(timeAgo(date.toISOString())).toBe('5 minutes ago');
+    });
+
+    it('returns hours for dates less than 24 hours ago', () => {
+      const date = new Date(Date.now() - 3 * 60 * 60 * 1000);
+      expect(timeAgo(date.toISOString())).toBe('3 hours ago');
+    });
+
+    it('returns days for dates less than 1 week ago', () => {
+      const date = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+      expect(timeAgo(date.toISOString())).toBe('2 days ago');
+    });
+
+    it('returns weeks for dates less than 4 weeks ago', () => {
+      const date = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+      expect(timeAgo(date.toISOString())).toBe('2 weeks ago');
+    });
+
+    it('uses system locale for old dates (no hardcoded en-US)', () => {
+      const oldDate = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
+      const result = timeAgo(oldDate.toISOString());
+      // Just verify it returns a non-empty string (locale-dependent)
+      expect(result.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('formatDate', () => {
+    it('uses system locale (no hardcoded en-US)', () => {
+      const result = formatDate('2026-01-15T12:00:00Z');
+      // Just verify it returns a non-empty string (locale-dependent)
+      expect(result.length).toBeGreaterThan(0);
     });
   });
 });

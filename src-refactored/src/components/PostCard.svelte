@@ -154,13 +154,50 @@
         });
     }
 
+    // --- Double-tap to like ---
+    let showDoubleTapHeart = $state(false);
+    let lastTapTime = 0;
+
+    function handleImageDoubleTap() {
+        const now = Date.now();
+        if (now - lastTapTime < 300) {
+            // Double tap detected — only like (never unlike)
+            if (!liked) handleLike();
+            // Show heart animation even if already liked
+            showDoubleTapHeart = true;
+            setTimeout(() => { showDoubleTapHeart = false; }, 800);
+            lastTapTime = 0;
+        } else {
+            lastTapTime = now;
+        }
+    }
+
+    // --- Share ---
+    async function handleShare() {
+        const postUrl = `${window.location.origin}/post/${id}`;
+        if (navigator.share) {
+            try {
+                await navigator.share({ title: `${username} on Woof`, url: postUrl });
+            } catch {
+                // User cancelled or share failed silently
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(postUrl);
+                showToast('Link copied!', 'success');
+            } catch {
+                showToast('Could not copy link', 'error');
+            }
+        }
+    }
+
     // --- Timestamp ---
     // svelte-ignore state_referenced_locally
     const createdDate = createdAt ? new Date(createdAt) : null;
     function formattedTimestamp() {
         if (!createdDate) return '';
         if (showFullDate) {
-            return createdDate.toLocaleString('en-US', {
+            return createdDate.toLocaleString(undefined, {
                 month: 'long', day: 'numeric', year: 'numeric',
                 hour: 'numeric', minute: '2-digit'
             });
@@ -227,8 +264,10 @@
         {/if}
     </div>
 
-    <!-- Post image -->
-    <div class="post-image">
+    <!-- Post image (double-tap to like) -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="post-image" onclick={handleImageDoubleTap}>
         <img
             src={imageUrl}
             srcset="{imageVariant(imageUrl, 'medium')} 600w, {imageUrl} 1200w"
@@ -237,23 +276,35 @@
             loading="lazy"
             onerror={(e) => { if (e.target.src !== FALLBACK_POST) e.target.src = FALLBACK_POST; }}
         />
+        {#if showDoubleTapHeart}
+            <div class="double-tap-heart" aria-hidden="true">
+                <i class="fas fa-heart"></i>
+            </div>
+        {/if}
     </div>
 
     <!-- Actions -->
     <div class="post-actions">
-        <button
-            class="like-button"
-            class:liked={liked}
-            aria-label={liked ? 'Unlike post' : 'Like post'}
-            onclick={handleLike}
-        >
-            <i class={liked ? 'fas fa-heart' : 'far fa-heart'} aria-hidden="true"></i>
-        </button>
-        <span class="like-count">{likes > 0 ? likes : ''}</span>
-        <button class="comment-button" aria-label="Comment on post" onclick={handleCommentClick}>
-            <i class="far fa-comment" aria-hidden="true"></i>
-        </button>
-        <span class="comment-count">{commentCount_ > 0 ? commentCount_ : ''}</span>
+        <div class="post-actions-left">
+            <button
+                class="like-button"
+                class:liked={liked}
+                aria-label={liked ? 'Unlike post' : 'Like post'}
+                onclick={handleLike}
+            >
+                <i class={liked ? 'fas fa-heart' : 'far fa-heart'} aria-hidden="true"></i>
+            </button>
+            <span class="like-count">{likes > 0 ? likes : ''}</span>
+            <button class="comment-button" aria-label="Comment on post" onclick={handleCommentClick}>
+                <i class="far fa-comment" aria-hidden="true"></i>
+            </button>
+            <span class="comment-count">{commentCount_ > 0 ? commentCount_ : ''}</span>
+        </div>
+        {#if id}
+            <button class="share-button" aria-label="Share post" onclick={handleShare}>
+                <i class="far fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        {/if}
     </div>
 
     <!-- Caption -->
@@ -333,7 +384,7 @@
             <time
                 class="post-timestamp"
                 datetime={createdDate.toISOString()}
-                title={createdDate.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                title={createdDate.toLocaleString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                 style="cursor:pointer"
                 onclick={() => showFullDate = !showFullDate}
             >{formattedTimestamp()}</time>
@@ -456,6 +507,14 @@ a.post-location-text:hover {
 
 .post-actions {
     padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.post-actions-left {
+    display: flex;
+    align-items: center;
 }
 
 .post-actions button {
@@ -491,6 +550,32 @@ a.post-location-text:hover {
     color: var(--color-text);
     margin-right: 12px;
     vertical-align: middle;
+}
+
+.share-button {
+    margin-right: 0;
+}
+
+/* Double-tap heart animation */
+.double-tap-heart {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 80px;
+    color: var(--woof-color-neutral-0);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    pointer-events: none;
+    animation: double-tap-pop var(--woof-duration-slower) var(--woof-ease-bounce) forwards;
+    z-index: 1;
+}
+
+@keyframes double-tap-pop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0.8; }
+    15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
 }
 
 .post-caption {

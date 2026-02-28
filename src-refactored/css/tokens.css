@@ -29,6 +29,14 @@
   --woof-color-slate-mid:     #799FAE;  /* dusty cerulean */
   --woof-color-slate-light:   #C8DAE4;  /* ice blue */
 
+  /* Accent palette */
+  --woof-color-coral-peach:       #FF8E7A;  /* soft coral peach — warm accent, highlights */
+  --woof-color-coral-peach-light: #FFB5A8;
+  --woof-color-coral-peach-dark:  #E06B56;
+  --woof-color-fresh-mint:        #6ED3C3;  /* fresh mint — secondary actions, cool accent */
+  --woof-color-fresh-mint-light:  #9AE5D9;
+  --woof-color-fresh-mint-dark:   #4DB8A7;
+
   /* ===================================================
    * NEUTRAL PALETTE
    * =================================================== */

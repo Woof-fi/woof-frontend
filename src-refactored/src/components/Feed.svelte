@@ -2,6 +2,7 @@
     import { getFeed, getMyDogs, getAllDogs } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { openCreateDogModal } from '../../js/modal-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import PostCard from './PostCard.svelte';
     import InviteCard from './InviteCard.svelte';
@@ -13,6 +14,9 @@
     let nextCursor = $state(null);
     let loading = $state(true);
     let myDogs = $state([]);
+    let refreshing = $state(false);
+    let pullDistance = $state(0);
+    let feedEl;
 
     const INVITE_FIRST_POSITION = 5;
     const INVITE_INTERVAL = 20;
@@ -57,6 +61,58 @@
         } finally {
             loading = false;
         }
+    }
+
+    async function refreshFeed() {
+        if (refreshing || loading) return;
+        refreshing = true;
+        try {
+            // Minimum 500ms spinner so the user sees feedback
+            const [feedResult, dogsResult] = await Promise.all([
+                getFeed(type),
+                isAuthenticated() ? getMyDogs().catch(() => []) : Promise.resolve([]),
+                new Promise(r => setTimeout(r, 500)),
+            ]);
+            posts = feedResult.posts || [];
+            nextCursor = feedResult.nextCursor;
+            myDogs = dogsResult;
+        } catch (e) {
+            console.error('Failed to refresh feed:', e);
+            showToast('Refresh failed', 'error');
+        } finally {
+            refreshing = false;
+        }
+    }
+
+    // --- Pull-to-refresh (touch only) ---
+    const PULL_THRESHOLD = 60;
+    let touchStartY = 0;
+    let isPulling = false;
+
+    function handleTouchStart(e) {
+        if (window.scrollY === 0 && !refreshing && !loading) {
+            touchStartY = e.touches[0].clientY;
+            isPulling = true;
+        }
+    }
+
+    function handleTouchMove(e) {
+        if (!isPulling) return;
+        const delta = e.touches[0].clientY - touchStartY;
+        if (delta > 0 && window.scrollY === 0) {
+            pullDistance = Math.min(delta * 0.4, 100);
+        } else {
+            pullDistance = 0;
+        }
+    }
+
+    function handleTouchEnd() {
+        if (!isPulling) return;
+        isPulling = false;
+        if (pullDistance >= PULL_THRESHOLD) {
+            refreshFeed();
+        }
+        pullDistance = 0;
     }
 
     function handleOpenAuthModal() {
@@ -110,6 +166,32 @@
     });
 
 </script>
+
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+    class="feed-wrapper"
+    bind:this={feedEl}
+    ontouchstart={handleTouchStart}
+    ontouchmove={handleTouchMove}
+    ontouchend={handleTouchEnd}
+>
+    <!-- Pull-to-refresh indicator -->
+    {#if pullDistance > 0 || refreshing}
+        <div class="pull-to-refresh" style="height: {refreshing ? 48 : pullDistance}px">
+            <div class="pull-to-refresh-inner" class:ready={pullDistance >= PULL_THRESHOLD} class:refreshing>
+                {#if refreshing}
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span class="pull-to-refresh-label">Refreshing…</span>
+                {:else if pullDistance >= PULL_THRESHOLD}
+                    <i class="fas fa-arrow-down" style="transform: rotate(180deg); transition: transform 0.2s"></i>
+                    <span class="pull-to-refresh-label">Release to refresh</span>
+                {:else}
+                    <i class="fas fa-arrow-down" style="transition: transform 0.2s"></i>
+                    <span class="pull-to-refresh-label">Pull to refresh</span>
+                {/if}
+            </div>
+        </div>
+    {/if}
 
 {#if loading && posts.length === 0}
     <div class="post-skeleton" aria-hidden="true">
@@ -220,8 +302,44 @@
         </div>
     {/if}
 {/if}
+</div>
 
 <style>
+.feed-wrapper {
+    touch-action: pan-y;
+}
+
+.pull-to-refresh {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    transition: height var(--woof-duration-fast) var(--woof-ease-out);
+}
+
+.pull-to-refresh-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    padding: var(--woof-space-2);
+    font-size: 16px;
+    color: var(--woof-color-neutral-400);
+    transition: color var(--woof-duration-fast);
+}
+
+.pull-to-refresh-inner.ready {
+    color: var(--woof-color-brand-primary);
+}
+
+.pull-to-refresh-inner.refreshing {
+    color: var(--woof-color-brand-primary);
+}
+
+.pull-to-refresh-label {
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-medium);
+}
+
 .feed-sentinel {
     display: flex;
     justify-content: center;
