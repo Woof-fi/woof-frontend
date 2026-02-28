@@ -18,8 +18,8 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 ## Key Files
 
 ### Svelte Entry
-- `src/main.ts` — `mount(App, { target: document.getElementById('app')! })` + service worker update detection (auto-reload toast on new SW activation)
-- `src/App.svelte` — App shell: imports `Navigation.svelte` + `Router.svelte`, handles auth modal open events
+- `src/main.ts` — `mount(App, { target: document.getElementById('app')! })` + service worker update detection (auto-reload toast on new SW activation) + build metadata logging (`window.__BUILD__` with commit hash + build time, injected by Vite `define`)
+- `src/App.svelte` — App shell: wraps everything in `SiteGate` (password gate), imports `Navigation.svelte` + `Router.svelte`, handles auth modal open events
 - `src/router/Router.svelte` — SPA router; renders view components
 
 ### Svelte Components (`src/components/`)
@@ -35,6 +35,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `HealthRecordModal.svelte` — Health record add/edit with type-specific fields
 - `InviteCard.svelte` — Invite prompt card for feed
 - `Search.svelte` — Search panel
+- `SiteGate.svelte` — Pre-launch password gate. Blocks access on production (`woofapp.fi`) until correct password entered; sets `woof_access` cookie (90 days). Bypassed on localhost for dev/tests.
 - `Toast.svelte` — Renders toast notifications from `js/toast-store.svelte.js`
 - `PostOptionsSheet.svelte` — Instagram-style bottom action sheet (own post: delete/share; others: report/bookmark/follow); multi-view: options → report → confirm-delete
 - `CommentOptionsSheet.svelte` — Action sheet for comments (own: delete with confirm; others: report)
@@ -124,8 +125,11 @@ onopenAuthModal?.();
 ```bash
 npm run dev      # Vite dev server (needs backend running on :3000 or VITE_API_URL set)
 npm run build    # tsc --noEmit && vite build
-npm run deploy   # build + S3 sync (s3://woofapp.fi/)
+npm run deploy          # build + S3 sync (s3://woofapp.fi/)
+npm run verify-deploy   # checks production JS bundle contains expected git commit
 ```
+
+**Build metadata:** `vite.config.ts` injects `__BUILD_COMMIT__` and `__BUILD_TIME__` via `define`. `main.ts` exposes them on `window.__BUILD__` and logs to console. Used by `verify-deploy` script.
 
 **PWA:** Configured in `vite.config.ts` via `vite-plugin-pwa` (`generateSW` strategy). Icons committed to `assets/icons/` (apple-touch-icon, icon-192x192, icon-512x512) — these are source-controlled and copied to `dist/icons/` on build. Service worker precaches app shell; runtime-caches CDN images with CacheFirst 7 days. Meta tags added to `index.html`. `.gitignore` has `!src-refactored/assets/icons/*.png` exception to preserve them past the global `*.png` ignore rule.
 
@@ -157,6 +161,7 @@ npm run test:e2e:dog      # Dog CRUD tests only
 npx playwright test e2e/posts.spec.ts --headed  # Posts tests only
 ```
 E2E tests run against production (`https://woofapp.fi`) by default. Override with `E2E_BASE_URL`.
+**Site gate cookie:** `e2e/gate-cookie.json` is loaded as Playwright `storageState` so tests bypass the password gate on production.
 **Always run E2E in headed mode** so you can observe failures.
 
 **Test helpers:**
