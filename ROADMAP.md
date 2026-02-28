@@ -1,8 +1,8 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-02-28
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12C
-**Current:** Tier 1 — Quality of Life & Polish (12D next)
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1 complete)
+**Current:** Tier 2 — Major Features (13A next)
 
 ---
 
@@ -85,25 +85,17 @@ Logo scroll-to-top, bell click back-navigation, home button scroll, double-tap t
 
 Coral Peach (`#FF8E7A`) and Fresh Mint (`#6ED3C3`) accent colors added to `tokens.css`, design docs, and `tokens.json`.
 
-#### 12D: Followers/Following Lists — Small
+#### 12D: Followers/Following Lists — DONE
 
-API already exists (`getFollowers`, `getFollowing`). Need clickable counts on ProfileView that open a list view/modal showing dog name, photo, breed, follow button.
+FollowListModal component shows followers/following with profile photos, breed, and follow/unfollow buttons. Clickable follower/following counts on ProfileView open the modal. Uses existing `getFollowers`/`getFollowing` API endpoints.
 
-#### 12E: Bookmarks Feed — Small
+#### 12E: Bookmarks Feed — DONE
 
-`post_bookmarks` table already exists (migration 015). Need:
-- `GET /api/bookmarks` endpoint with cursor pagination
-- BookmarksView.svelte at `/bookmarks`
-- Link in Navigation drawer
+`GET /api/bookmarks` endpoint with cursor pagination (full feed-style response with territory, breed, like/comment data). BookmarksView at `/bookmarks` with infinite scroll. "Favourites" link in Navigation drawer (authenticated only).
 
-#### 12F: Dog Date of Birth Migration — Small
+#### 12F: Dog Date of Birth Migration — DONE
 
-Replace `age INTEGER` with `date_of_birth DATE` on dogs table. Enables birthday celebrations and puppy milestones.
-
-- Migration converts existing integer ages to approximate DOB (`CURRENT_DATE - (age * INTERVAL '1 year')`)
-- Backend computes age dynamically from DOB
-- Frontend: date picker replaces number input in CreateDogModal + EditDogModal
-- ProfileView displays computed age (e.g., "2 years 4 months" or "8 weeks")
+Migration 022: added `date_of_birth DATE` column, converted existing integer ages to approximate DOB, made `age` nullable. Backend computes age from DOB on create/update (keeps `age` column for backward compatibility). Frontend: date picker replaces number input in CreateDogModal + EditDogModal. ProfileView displays computed age from DOB (e.g., "2 years, 4 months" or "8 weeks").
 
 ---
 

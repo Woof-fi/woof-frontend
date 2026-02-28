@@ -5,7 +5,7 @@
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast, imageVariant } from '../../js/utils.js';
     import { showOnboardingTour, isOnboardingCompleted } from '../../js/onboarding-tour.js';
-    import { openEditDogModal, openHealthRecordModal } from '../../js/modal-store.svelte.js';
+    import { openEditDogModal, openHealthRecordModal, openFollowListModal } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
 
     let { params = {}, onopenAuthModal = null } = $props();
@@ -40,6 +40,20 @@
     let healthLoading = $state(false);
     let healthLoadedOnce = $state(false);
     let healthFilterType = $state(null);
+
+    function formatAge(dateOfBirth) {
+        if (!dateOfBirth) return null;
+        const dob = new Date(dateOfBirth + 'T00:00:00');
+        const now = new Date();
+        const diffMs = now - dob;
+        const totalMonths = Math.floor(diffMs / (30.44 * 24 * 60 * 60 * 1000));
+        const years = Math.floor(totalMonths / 12);
+        const months = totalMonths % 12;
+        if (years === 0 && months === 0) return 'Newborn';
+        if (years === 0) return `${months} month${months !== 1 ? 's' : ''}`;
+        if (months === 0) return `${years} year${years !== 1 ? 's' : ''}`;
+        return `${years} yr ${months} mo`;
+    }
 
     function fallbackImg(e) {
         const img = e.currentTarget;
@@ -294,6 +308,11 @@
                                 <span class="profile-sheet-territory"><i class="fas fa-map-marker-alt"></i> {territoryDisplay}</span>
                             {/if}
                         {/if}
+                        {#if dog.dateOfBirth}
+                            <span class="profile-sheet-age"><i class="fas fa-birthday-cake"></i> {formatAge(dog.dateOfBirth)}</span>
+                        {:else if dog.age != null}
+                            <span class="profile-sheet-age"><i class="fas fa-birthday-cake"></i> {dog.age} year{dog.age !== 1 ? 's' : ''} old</span>
+                        {/if}
                     </div>
                     {#if dog.isOwner}
                         <button class="edit-profile-btn" onclick={handleEditDog}>
@@ -306,14 +325,14 @@
                         <div class="profile-sheet-stat-num">{postsLoading ? '—' : posts.length}</div>
                         <div class="profile-sheet-stat-label">Posts</div>
                     </div>
-                    <div class="profile-sheet-stat">
+                    <button class="profile-sheet-stat profile-sheet-stat-clickable" aria-label="{followerCount} followers" onclick={() => openFollowListModal(dog.id, 'followers')}>
                         <div class="profile-sheet-stat-num">{followerCount}</div>
                         <div class="profile-sheet-stat-label">Followers</div>
-                    </div>
-                    <div class="profile-sheet-stat">
+                    </button>
+                    <button class="profile-sheet-stat profile-sheet-stat-clickable" aria-label="{followingCount} following" onclick={() => openFollowListModal(dog.id, 'following')}>
                         <div class="profile-sheet-stat-num">{followingCount}</div>
                         <div class="profile-sheet-stat-label">Following</div>
-                    </div>
+                    </button>
                 </div>
                 {#if dog.bio}
                     <p class="profile-sheet-bio">{dog.bio}</p>
@@ -623,6 +642,19 @@ a.profile-sheet-territory i {
     font-size: 11px;
 }
 
+.profile-sheet-age {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    margin-top: 4px;
+}
+
+.profile-sheet-age i {
+    font-size: 11px;
+}
+
 .territory-nudge {
     display: flex;
     align-items: center;
@@ -695,6 +727,20 @@ a.profile-sheet-territory i {
     font-size: var(--woof-text-caption-1);
     color: var(--woof-color-neutral-500);
     margin-top: 3px;
+}
+
+.profile-sheet-stat-clickable {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    text-align: left;
+    transition: opacity var(--woof-duration-fast);
+}
+
+.profile-sheet-stat-clickable:hover {
+    opacity: 0.7;
 }
 
 .profile-sheet-bio {
@@ -897,48 +943,16 @@ a.profile-sheet-territory i {
     min-width: 0;
 }
 
-.friend-name-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 2px;
-}
-
 .friend-name {
     font-weight: 600;
     font-size: 14px;
     color: var(--color-text);
 }
 
-.mutual-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-    border-radius: var(--woof-radius-full);
-    font-size: 11px;
-    font-weight: 600;
-}
-
 .friend-breed {
     display: block;
     font-size: 13px;
     color: var(--color-text-secondary);
-}
-
-.friend-relation {
-    display: block;
-    font-size: 12px;
-    color: var(--color-text-muted);
-    margin-top: 1px;
-}
-
-.friends-loading {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--color-text-muted);
 }
 
 /* Health records */
@@ -1208,53 +1222,6 @@ a.profile-sheet-territory i {
 
 .edit-profile-btn:hover {
     background: var(--color-bg-alt);
-}
-
-/* Legacy profile styles */
-.profile-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.profile-pic-large {
-    width: 120px;
-    height: 120px;
-    border-radius: var(--woof-radius-full);
-    object-fit: cover;
-    margin-right: 20px;
-}
-
-.profile-name-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.profile-actions {
-    display: flex;
-    gap: 8px;
-    margin: 12px 0;
-}
-
-.profile-stats {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: var(--color-text-secondary);
-}
-
-.profile-details, .private-details {
-    margin-top: 30px;
-}
-
-.private-profile {
-    background-color: var(--color-bg-alt);
-    padding: 20px;
-    border-radius: var(--woof-radius-md);
-    margin-top: 40px;
 }
 
 @media (max-width: 768px) {

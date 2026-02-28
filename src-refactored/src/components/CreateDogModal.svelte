@@ -15,7 +15,7 @@
     let dogName = $state('');
     let breedId = $state('');
     let breedName = $state('');
-    let age = $state('');
+    let dateOfBirth = $state('');
     let territoryId = $state('');
     let territoryName = $state('');
     let bio = $state('');
@@ -46,7 +46,7 @@
         dogName = '';
         breedId = '';
         breedName = '';
-        age = '';
+        dateOfBirth = '';
         territoryId = '';
         territoryName = '';
         bio = '';
@@ -114,7 +114,7 @@
             const dogData = {
                 name: dogName.trim(),
                 breed_id: breedId,
-                age: parseInt(age),
+                date_of_birth: dateOfBirth,
                 profile_photo: profilePhoto,
                 ...(bio.trim() && { bio: bio.trim() }),
                 ...(territoryId && { territory_id: territoryId }),
@@ -176,15 +176,14 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="dog-age">Age *</label>
+                    <label for="dog-dob">Date of Birth *</label>
                     <input
-                        type="number"
-                        id="dog-age"
+                        type="date"
+                        id="dog-dob"
                         required
-                        min="0"
-                        max="30"
-                        step="1"
-                        bind:value={age}
+                        max={new Date().toISOString().split('T')[0]}
+                        min="1990-01-01"
+                        bind:value={dateOfBirth}
                     />
                 </div>
                 <div class="form-group">

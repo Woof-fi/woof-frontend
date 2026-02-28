@@ -345,6 +345,11 @@
                     {#if badgeDisplay}<span class="nav-badge">{badgeDisplay}</span>{/if}
                 </a>
             </li>
+            <li>
+                <a href="/bookmarks" data-link onclick={closeDrawer} class:active={activePath.startsWith('/bookmarks')}>
+                    <i class="fas fa-bookmark"></i> Favourites
+                </a>
+            </li>
         {/if}
         {#if isAdmin}
             <li>

@@ -398,12 +398,18 @@ header {
     width: 0;
     background: var(--woof-color-brand-primary);
     z-index: 10000;
-    transition: none;
     pointer-events: none;
+    opacity: 1;
+    transition: none;
 }
-.route-progress.active {
+.route-progress.loading {
     width: 70%;
     transition: width 0.3s ease-out;
+}
+.route-progress.done {
+    width: 100%;
+    opacity: 0;
+    transition: width 0.15s ease-out, opacity 0.2s 0.1s ease-out;
 }
 
 /* ── Modal — shared across AuthModal, CreateDogModal, EditDogModal, CreatePostModal, HealthRecordModal ── */

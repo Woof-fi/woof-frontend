@@ -707,6 +707,24 @@ export async function getBookmarkStatus(postId) {
 }
 
 /**
+ * Get bookmarked posts for the current user (paginated)
+ * @param {string|null} cursor - ISO timestamp cursor for next page
+ * @param {number} limit - Posts per page
+ * @returns {Promise<{posts: object[], nextCursor: string|null}>}
+ */
+export async function getBookmarkedPosts(cursor = null, limit = 20) {
+    let url = `/api/bookmarks?limit=${limit}`;
+    if (cursor) {
+        url += `&cursor=${encodeURIComponent(cursor)}`;
+    }
+    const data = await apiRequest(url);
+    return {
+        posts: data.posts || [],
+        nextCursor: data.nextCursor || null
+    };
+}
+
+/**
  * Get reports (admin/moderator only)
  * @param {object} [opts] - { status, cursor, limit }
  * @returns {Promise<{reports: object[], nextCursor: string|null}>}

@@ -11,11 +11,12 @@
     import BreedView from '../views/BreedView.svelte';
     import BreedDirectoryView from '../views/BreedDirectoryView.svelte';
     import TerritoryView from '../views/TerritoryView.svelte';
+    import BookmarksView from '../views/BookmarksView.svelte';
 
     let { onopenAuthModal = null } = $props();
 
     let currentPath = $state(window.location.pathname);
-    let navigating = $state(false);
+    let navProgress = $state('idle'); // 'idle' | 'loading' | 'done'
     let isBackNavigation = false;
 
     // Scroll position map: path → scrollY (stored in sessionStorage for tab persistence)
@@ -68,6 +69,7 @@
         { path: '/territory/:a/:b/:c', component: TerritoryView,  paramNames: ['a', 'b', 'c'] },
         { path: '/territory/:a/:b',    component: TerritoryView,  paramNames: ['a', 'b'] },
         { path: '/territory/:a',       component: TerritoryView,  paramNames: ['a'] },
+        { path: '/bookmarks',      component: BookmarksView,      paramNames: [] },
         { path: '/dog/:slug',      component: ProfileView,        paramNames: ['slug'] },
         { path: '/post/:id',       component: PostDetailView,     paramNames: ['id'] },
         { path: '/messages',       component: MessagesView,       paramNames: [] },
@@ -124,15 +126,20 @@
         // Save scroll position before navigating away
         saveScrollPosition(currentPath);
 
-        navigating = true;
+        navProgress = 'loading';
         history.pushState({}, '', href);
         currentPath = newPath;
         window.dispatchEvent(new CustomEvent('routechange'));
     }
 
+    // When route matches, animate progress bar: loading → done → idle
     $effect(() => {
         matched; // track
-        const t = setTimeout(() => { navigating = false; }, 150);
+        if (navProgress !== 'loading') return;
+        // First go to 100% (done state)
+        navProgress = 'done';
+        // Then reset to idle after the completion animation finishes
+        const t = setTimeout(() => { navProgress = 'idle'; }, 350);
         return () => clearTimeout(t);
     });
 
@@ -157,7 +164,7 @@
     });
 </script>
 
-<div class="route-progress" class:active={navigating}></div>
+<div class="route-progress" class:loading={navProgress === 'loading'} class:done={navProgress === 'done'}></div>
 <div class="content">
     {#if matched.component === HomeView}
         <HomeView onopenAuthModal={onopenAuthModal} />
@@ -167,6 +174,8 @@
         <BreedView params={matched.params} />
     {:else if matched.component === TerritoryView}
         <TerritoryView params={matched.params} />
+    {:else if matched.component === BookmarksView}
+        <BookmarksView onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === ProfileView}
         <ProfileView params={matched.params} onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === PostDetailView}

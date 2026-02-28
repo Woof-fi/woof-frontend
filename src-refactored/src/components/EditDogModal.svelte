@@ -15,7 +15,7 @@
     let dogName = $state('');
     let breedId = $state('');
     let breedName = $state('');
-    let age = $state('');
+    let dateOfBirth = $state('');
     let territoryId = $state('');
     let territoryName = $state('');
     let bio = $state('');
@@ -44,7 +44,7 @@
             dogName = modals.editDogData.name || '';
             breedId = modals.editDogData.breedId || '';
             breedName = modals.editDogData.breedName || '';
-            age = modals.editDogData.age ?? '';
+            dateOfBirth = modals.editDogData.dateOfBirth || '';
             territoryId = modals.editDogData.territoryId || '';
             territoryName = buildTerritoryDisplayName(modals.editDogData);
             bio = modals.editDogData.bio || '';
@@ -125,7 +125,7 @@
             const dogData = {
                 name: dogName.trim(),
                 breed_id: breedId,
-                age: parseInt(age),
+                date_of_birth: dateOfBirth || undefined,
                 bio: bio.trim(),
                 ...(profile_photo && { profile_photo }),
                 territory_id: territoryId || null,
@@ -184,15 +184,13 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="edit-dog-age">Age *</label>
+                    <label for="edit-dog-dob">Date of Birth</label>
                     <input
-                        type="number"
-                        id="edit-dog-age"
-                        required
-                        min="0"
-                        max="30"
-                        step="1"
-                        bind:value={age}
+                        type="date"
+                        id="edit-dog-dob"
+                        max={new Date().toISOString().split('T')[0]}
+                        min="1990-01-01"
+                        bind:value={dateOfBirth}
                     />
                 </div>
                 <div class="form-group">
