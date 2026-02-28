@@ -156,7 +156,7 @@
     {#if view === 'options'}
         <div in:fade={{ duration: 100, delay: 60 }}>
             {#if isOwnPost}
-                <button class="action-sheet-item" onclick={() => { closePostOptionsSheet(); openEditPostModal({ id: postId, caption: data?.caption }); }}>
+                <button class="action-sheet-item" onclick={() => { const editData = { id: postId, caption: data?.caption }; closePostOptionsSheet(); openEditPostModal(editData); }}>
                     <i class="fas fa-pen"></i> Edit caption
                 </button>
                 <button class="action-sheet-item destructive" onclick={() => view = 'confirm-delete'}>
