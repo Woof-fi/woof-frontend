@@ -52,7 +52,7 @@ test.describe('Dog CRUD', () => {
     await page.waitForSelector('#dog-breed-listbox [role="option"]', { timeout: 5_000 });
     await page.click('#dog-breed-listbox [role="option"]:first-child');
 
-    await page.fill('#dog-age', '3');
+    await page.fill('#dog-dob', '2022-01-15');
 
     // Territory autocomplete: type, wait for dropdown, select first match
     await page.fill('#dog-territory', 'Helsinki');
