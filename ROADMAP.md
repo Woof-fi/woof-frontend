@@ -388,11 +388,9 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Search UX improvements | Medium | 1) Reverse section order: Dogs → Territories → Breeds (dogs are most common search). 2) Minimum 2-char threshold before searching (note: "Ii" is a valid Finnish municipality). 3) Smarter ranking: prefer starts-with matches over contains matches, so typing "Hel" ranks Helsinki above e.g. a dog named "Shelby". |
 | S3 SPA routing | Medium | Direct URL navigation returns S3 404 before JS takes over. Need CloudFront error page redirect to index.html |
 | Test coverage gaps | Medium | Frontend tests minimal, image upload not tested |
 | No staging environment | Low (for now) | Production is test env while user base is friends-only. Revisit before public launch |
-| Design system docs out of sync | Low | `docs/design/tokens.css` and `tokens.json` still have old Woof Orange values (production `tokens.css` is correct with Crimson) |
 
 ---
 

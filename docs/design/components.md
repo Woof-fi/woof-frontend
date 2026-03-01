@@ -18,7 +18,7 @@ The signature full-width call-to-action button. Used for the most important acti
 
 | Property | Value |
 |---|---|
-| Background | `--woof-color-brand-primary` (`#EF4621`) |
+| Background | `--woof-color-brand-primary` (`#C9403F`) |
 | Text color | `#FFFFFF` |
 | Text style | `--woof-text-headline` + `--woof-font-weight-semibold` |
 | Height | `52px` |
@@ -29,15 +29,15 @@ The signature full-width call-to-action button. Used for the most important acti
 | Width | Full-width (subtract 32px for margins) |
 
 **States:**
-- Default: `#EF4621`
-- Pressed: `#CC3615` + `--woof-shadow-brand`
+- Default: `#C9403F`
+- Pressed: `#A83030` + `--woof-shadow-brand`
 - Disabled: `--woof-color-neutral-300` bg, `--woof-color-neutral-500` text
 
 ---
 
 ### Follow Button (Profile)
 
-Full-width orange button on profile pages.
+Full-width crimson button on profile pages.
 
 | Property | Value |
 |---|---|
@@ -83,16 +83,16 @@ The squarish gradient button with a "+" icon — the center action in the naviga
 | Property | Value |
 |---|---|
 | Size | `56×56px` |
-| Background | `--woof-color-brand-gradient` (`linear-gradient(135deg, #EF4621, #F5A623)`) |
+| Background | `--woof-color-brand-gradient` (`linear-gradient(135deg, #C9403F, #C3A84E)`) |
 | Border radius | `18px` (squarish, Dogger style) |
 | Icon | Plus sign (thin outline), white, 24px |
-| Shadow | `0 4px 12px rgba(239,70,33,0.45)` |
+| Shadow | `0 4px 12px rgba(201,64,63,0.45)` |
 
 ---
 
 ### Create / Add Button (Stories Row)
 
-The orange squarish button that starts "My story".
+The crimson squarish button that starts "My story".
 
 | Property | Value |
 |---|---|
@@ -138,7 +138,7 @@ A gradient-bordered squarish rounded rectangle thumbnail indicating an unviewed 
 | Ring method | CSS `outline` or `border` wrapping a gradient pseudo-element |
 | Ring width | `2px` |
 | Gap (ring to image) | `2px` (white padding) |
-| Unseen gradient | `linear-gradient(135deg, #EF4621, #F5A623)` |
+| Unseen gradient | `linear-gradient(135deg, #C9403F, #C3A84E)` |
 | Seen color | `--woof-color-neutral-300` (`#D1D1D1`) |
 
 ---
@@ -250,12 +250,12 @@ The horizontally scrolling story list at the top of the feed. Story thumbnails a
 | Item width | `~70px` |
 | Item gap | `--woof-space-4` (16px) |
 | Thumbnail shape | Squarish rounded rectangle, `border-radius: 18px` |
-| Unseen ring | `2px` gradient (`#EF4621 → #F5A623`), `2px` gap |
+| Unseen ring | `2px` gradient (`#C9403F → #C3A84E`), `2px` gap |
 | Seen ring | `2px solid #D1D1D1` |
 | Label style | `--woof-text-caption-1` + `--woof-color-neutral-900` |
 | Label truncation | Truncate at ~8 chars with ellipsis |
 | Scroll | Horizontal, no scrollbar visible |
-| "My story" item | Orange squarish gradient button + "My story" label |
+| "My story" item | Crimson squarish gradient button + "My story" label |
 
 ---
 
@@ -279,16 +279,16 @@ The flat white bottom navigation bar (Collaction style). Full-width, not floatin
 | Position | Fixed bottom, spans full screen width |
 | Icon style | **Thin-stroke SVG outlines** (`stroke-width: 1.8`, `stroke-linecap: round`) |
 | Icon size | `24px` |
-| Active icon color | `--woof-color-brand-primary` (`#EF4621`) |
+| Active icon color | `--woof-color-brand-primary` (`#C9403F`) |
 | Inactive icon color | `--woof-color-neutral-400` |
 | **Center action button** | `56px`, `border-radius: 18px` (squarish), brand gradient background, `+` icon white |
-| Center button shadow | `0 4px 12px rgba(239,70,33,0.45)` |
+| Center button shadow | `0 4px 12px rgba(201,64,63,0.45)` |
 
 ### Nav Items (left → right)
 
 1. Home — thin-outline house icon
 2. Search/Explore — thin-outline search icon
-3. **Create** — squarish (18px radius) gradient button (`#EF4621 → #F5A623`) with "+" (elevated, 56px)
+3. **Create** — squarish (18px radius) gradient button (`#C9403F → #C3A84E`) with "+" (elevated, 56px)
 4. Activity/Likes — thin-outline heart icon
 5. Profile — circular avatar thumbnail
 
@@ -392,7 +392,7 @@ Standard text inputs for search, captions, comments.
 | Text | `--woof-text-body` + `--woof-color-neutral-900` |
 | Placeholder | `--woof-text-body` + `--woof-color-neutral-400` |
 | Padding | `0 16px` |
-| Focus ring color | `--woof-color-brand-primary` (`#EF4621`) |
+| Focus ring color | `--woof-color-brand-primary` (`#C9403F`) |
 
 ---
 

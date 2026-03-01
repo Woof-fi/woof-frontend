@@ -17,11 +17,12 @@
   --woof-color-brand-primary-light: #D97272;
   --woof-color-brand-primary-dark:  #A83030;
   --woof-color-brand-primary-subtle:#FBF0F0;
+  --woof-color-notif-unread-bg:     var(--woof-color-brand-primary-subtle); /* unread notification row bg */
 
   /* Brand gradient: warm crimson → khaki gold */
   --woof-color-brand-gradient: linear-gradient(135deg, #C9403F, #C3A84E);
 
-  /* Artisan palette */
+  /* New artisan palette */
   --woof-color-gold:          #C3A84E;
   --woof-color-butter:        #F0CA78;
   --woof-color-slate-dark:    #4A5A6B;
@@ -65,6 +66,12 @@
   --woof-color-error:        #FF3B30;
   --woof-color-info:         #007AFF;
 
+  /* Status palette for admin badges */
+  --woof-color-amber-light:  #FEF3C7;   /* pending badge background */
+  --woof-color-amber-text:   #92400E;   /* pending badge text */
+  --woof-color-green-light:  #D1FAE5;   /* actioned badge background */
+  --woof-color-green-text:   #065F46;   /* actioned badge text */
+
   /* ===================================================
    * SURFACE COLORS
    * =================================================== */
@@ -81,8 +88,8 @@
    * TYPOGRAPHY — FONT FAMILIES
    * =================================================== */
 
-  --woof-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-    "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --woof-font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   --woof-font-family-mono: "SF Mono", "Fira Code", Menlo, monospace;
 
   /* ===================================================
@@ -152,6 +159,7 @@
   --woof-radius-xl:   24px;
   --woof-radius-2xl:  32px;
   --woof-radius-full: 9999px;
+  --woof-radius-bubble: 18px;   /* message bubble corners */
 
   /* ===================================================
    * ELEVATION / SHADOWS
