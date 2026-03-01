@@ -45,6 +45,7 @@
                 slug: dog.slug,
                 name: dog.name,
                 breed: dog.breedName,
+                breedFi: dog.breedNameFi,
                 profilePhoto: dog.profilePhoto,
             }));
             breedCache = breeds.map(b => ({
@@ -136,7 +137,8 @@
         const lower = q.toLowerCase();
         dogResults = rankedSearch(dogCache, item => [
             item.name.toLowerCase(),
-            (item.breed || '').toLowerCase()
+            (item.breed || '').toLowerCase(),
+            (item.breedFi || '').toLowerCase()
         ], lower);
         breedResults = rankedSearch(breedCache, item => [
             item.name.toLowerCase(),
