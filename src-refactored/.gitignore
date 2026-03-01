@@ -1,3 +1,6 @@
+# Deploy secrets
+.env.deploy
+
 # Playwright
 /test-results/
 /playwright-report/
