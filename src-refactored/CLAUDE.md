@@ -68,7 +68,6 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 ### Dead code (descoped, do not import)
 - `js/cart-modal.js` — E-commerce feature, abandoned
 - `js/i18n.js` — i18n stub, English-only
-- `js/auth-modal.js` — Legacy DOM-based auth modal; auth is now fully in `AuthModal.svelte`
 
 ## Auth Modal States
 `src/components/AuthModal.svelte` handles 5 modes via a single `mode` `$state`:

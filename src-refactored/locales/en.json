@@ -248,7 +248,8 @@
     "noFollowers": "No followers yet",
     "noFollowing": "No following yet",
     "loginToFollow": "Please log in to follow dogs",
-    "actionFailed": "Action failed. Please try again."
+    "actionFailed": "Action failed. Please try again.",
+    "loadMore": "Load More Posts"
   },
   "bookmarks": {
     "title": "Favourites",

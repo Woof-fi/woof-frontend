@@ -248,7 +248,8 @@
     "noFollowers": "Ei seuraajia vielä",
     "noFollowing": "Ei seurattavia vielä",
     "loginToFollow": "Kirjaudu seurataksesi koiria",
-    "actionFailed": "Toiminto epäonnistui. Yritä uudelleen."
+    "actionFailed": "Toiminto epäonnistui. Yritä uudelleen.",
+    "loadMore": "Lataa lisää julkaisuja"
   },
   "bookmarks": {
     "title": "Suosikit",

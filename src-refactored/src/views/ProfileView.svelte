@@ -27,6 +27,8 @@
 
     let posts = $state([]);
     let postsLoading = $state(false);
+    let nextCursor = $state(null);
+    let loadingMore = $state(false);
 
     let followerCount = $state(0);
     let followingCount = $state(0);
@@ -114,13 +116,14 @@
 
                 postsLoading = true;
                 const [postsResult, followStatus, followingList] = await Promise.all([
-                    getDogPosts(dog.id),
+                    getDogPosts(dog.id, null, 20),
                     getFollowStatus(dog.id),
                     getFollowing(dog.id),
                 ]);
                 if (!active) return;
 
                 posts = postsResult.posts || [];
+                nextCursor = postsResult.nextCursor;
                 postsLoading = false;
                 followingCount = Array.isArray(followingList) ? followingList.length : 0;
                 followerCount = followStatus.followerCount || 0;
@@ -138,6 +141,20 @@
 
         return () => { active = false; };
     });
+
+    async function loadMorePosts() {
+        if (!dog || !nextCursor || loadingMore) return;
+        loadingMore = true;
+        try {
+            const result = await getDogPosts(dog.id, nextCursor, 20);
+            posts = [...posts, ...(result.posts || [])];
+            nextCursor = result.nextCursor;
+        } catch (e) {
+            console.error('Load more posts error:', e);
+        } finally {
+            loadingMore = false;
+        }
+    }
 
     // Lazy-load friends/health on first tab visit
     $effect(() => {
@@ -410,6 +427,19 @@
                             </a>
                         {/each}
                     </div>
+                    {#if nextCursor}
+                        <button
+                            class="load-more-btn"
+                            onclick={loadMorePosts}
+                            disabled={loadingMore}
+                        >
+                            {#if loadingMore}
+                                <i class="fas fa-spinner fa-spin"></i> {t('common.loading')}
+                            {:else}
+                                {t('profile.loadMore')}
+                            {/if}
+                        </button>
+                    {/if}
                 {/if}
             </div>
 
@@ -1240,5 +1270,28 @@ a.profile-sheet-territory i {
     .health-card-actions {
         opacity: 1;
     }
+}
+
+.load-more-btn {
+    display: block;
+    width: 100%;
+    padding: var(--woof-space-md) var(--woof-space-lg);
+    margin-top: var(--woof-space-md);
+    background: var(--woof-color-surface);
+    color: var(--woof-color-brand-primary);
+    border: 1px solid var(--woof-color-brand-primary);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-font-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.load-more-btn:hover:not(:disabled) {
+    background: var(--woof-color-brand-primary);
+    color: white;
+}
+.load-more-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 </style>
