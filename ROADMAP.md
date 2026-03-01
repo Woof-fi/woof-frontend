@@ -388,7 +388,6 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| S3 SPA routing | Medium | Direct URL navigation returns S3 404 before JS takes over. Need CloudFront error page redirect to index.html |
 | Test coverage gaps | Medium | Frontend tests minimal, image upload not tested |
 | No staging environment | Low (for now) | Production is test env while user base is friends-only. Revisit before public launch |
 
