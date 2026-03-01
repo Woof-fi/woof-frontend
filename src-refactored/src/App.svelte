@@ -2,6 +2,7 @@
     import { refreshSession, setOnSessionCleared } from '../js/auth.js';
     import { healthCheck, syncUser } from '../js/api.js';
     import { showToast } from '../js/utils.js';
+    import { t } from '../js/i18n-store.svelte.js';
     import { openAuthModal, openCreatePostModal, modals } from '../js/modal-store.svelte.js';
     import { setAuthUser } from '../js/svelte-store.svelte.js';
     import { isAuthenticated } from '../js/auth.js';
@@ -14,6 +15,7 @@
     import CreateDogModal from './components/CreateDogModal.svelte';
     import EditDogModal from './components/EditDogModal.svelte';
     import EditPostModal from './components/EditPostModal.svelte';
+    import EditCommentModal from './components/EditCommentModal.svelte';
     import HealthRecordModal from './components/HealthRecordModal.svelte';
     import Search from './components/Search.svelte';
     import PostOptionsSheet from './components/PostOptionsSheet.svelte';
@@ -40,7 +42,7 @@
             }
             try {
                 const healthy = await healthCheck();
-                if (!healthy) showToast('Backend API is unavailable', 'error');
+                if (!healthy) showToast(t('common.apiUnavailable'), 'error');
             } catch {
                 // Ignore health check failures
             }
@@ -85,6 +87,7 @@
         <CreateDogModal />
         <EditDogModal />
         <EditPostModal />
+        <EditCommentModal />
         <FollowListModal />
         <HealthRecordModal />
         <Search />

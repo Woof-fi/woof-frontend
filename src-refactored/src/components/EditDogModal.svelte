@@ -5,6 +5,7 @@
     import { showToast, isValidFileType, isValidFileSize } from '../../js/utils.js';
     import { modals, closeEditDogModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpProfileVersion } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
     import BreedAutocomplete from './BreedAutocomplete.svelte';
     import TerritoryAutocomplete from './TerritoryAutocomplete.svelte';
 
@@ -91,12 +92,12 @@
             return;
         }
         if (!isValidFileType(file)) {
-            showToast('Only JPEG, PNG, GIF and WebP images are allowed', 'error');
+            showToast(t('postCreate.invalidFileType'), 'error');
             e.target.value = '';
             return;
         }
         if (!isValidFileSize(file, 10)) {
-            showToast('Image must be under 10 MB', 'error');
+            showToast(t('postCreate.fileTooLarge'), 'error');
             e.target.value = '';
             return;
         }
@@ -109,7 +110,7 @@
         e.preventDefault();
 
         if (!breedId) {
-            showToast('Please select a breed from the list', 'error');
+            showToast(t('dog.selectBreed'), 'error');
             return;
         }
 
@@ -118,7 +119,7 @@
         try {
             let profile_photo = undefined;
             if (photoFile) {
-                showToast('Uploading photo...', 'info');
+                showToast(t('dog.uploadingPhoto'), 'info');
                 profile_photo = await uploadImage(photoFile);
             }
 
@@ -132,12 +133,12 @@
             };
 
             await updateDog(dogId, dogData);
-            showToast('Profile updated!', 'success');
+            showToast(t('dog.profileUpdated'), 'success');
             close();
             bumpProfileVersion();
         } catch (err) {
             console.error('Failed to update dog:', err);
-            showToast('Failed to update profile. Please try again.', 'error');
+            showToast(t('dog.failedUpdate'), 'error');
         } finally {
             submitting = false;
         }
@@ -158,14 +159,14 @@
 >
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Edit Profile</h2>
-            <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
+            <h2>{t('dog.editProfile')}</h2>
+            <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
             <form id="edit-dog-form" onsubmit={handleSubmit}>
                 <input type="hidden" id="edit-dog-id" value={dogId} />
                 <div class="form-group">
-                    <label for="edit-dog-name">Name *</label>
+                    <label for="edit-dog-name">{t('dog.nameLabel')}</label>
                     <input
                         type="text"
                         id="edit-dog-name"
@@ -175,7 +176,7 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="edit-dog-breed">Breed *</label>
+                    <label for="edit-dog-breed">{t('dog.breedLabel')}</label>
                     <BreedAutocomplete
                         id="edit-dog-breed"
                         required={true}
@@ -184,7 +185,7 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="edit-dog-dob">Date of Birth</label>
+                    <label for="edit-dog-dob">{t('dog.dobLabelEdit')}</label>
                     <input
                         type="date"
                         id="edit-dog-dob"
@@ -194,26 +195,26 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="edit-dog-territory">Territory / Reviiri</label>
+                    <label for="edit-dog-territory">{t('dog.territoryLabelEdit')}</label>
                     <TerritoryAutocomplete
                         id="edit-dog-territory"
                         bind:selectedTerritoryId={territoryId}
                         bind:selectedTerritoryName={territoryName}
                     />
-                    <small class="form-hint">Set your territory to connect with nearby dogs</small>
+                    <small class="form-hint">{t('dog.territoryHint')}</small>
                 </div>
                 <div class="form-group">
-                    <label for="edit-dog-bio">Bio</label>
+                    <label for="edit-dog-bio">{t('dog.bioLabelEdit')}</label>
                     <textarea
                         id="edit-dog-bio"
                         rows="3"
                         maxlength="500"
-                        placeholder="Tell us about your dog..."
+                        placeholder={t('dog.bioPlaceholder')}
                         bind:value={bio}
                     ></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="edit-dog-photo">Change Profile Photo</label>
+                    <label for="edit-dog-photo">{t('dog.changePhoto')}</label>
                     <input
                         type="file"
                         id="edit-dog-photo"
@@ -238,7 +239,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn-primary" disabled={submitting}>
-                    {submitting ? 'Saving...' : 'Save Changes'}
+                    {submitting ? t('dog.saving') : t('dog.saveChanges')}
                 </button>
             </form>
         </div>

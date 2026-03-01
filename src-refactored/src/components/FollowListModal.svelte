@@ -5,6 +5,7 @@
     import { toggleBodyScroll } from '../../js/ui.js';
     import { modals, closeFollowListModal as storeClose } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let dogs = $state([]);
     let loading = $state(true);
@@ -106,7 +107,7 @@
         if (img.src && !img.src.endsWith(fallback)) img.src = fallback;
     }
 
-    let title = $derived(modals.followListData?.type === 'followers' ? 'Followers' : 'Following');
+    let title = $derived(modals.followListData?.type === 'followers' ? t('profile.followers') : t('profile.following'));
 </script>
 
 <svelte:window onkeydown={handleKey} />
@@ -124,7 +125,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="follow-list-title">{title}</h2>
-            <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
+            <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
             {#if loading}
@@ -132,7 +133,7 @@
             {:else if dogs.length === 0}
                 <div class="follow-list-empty">
                     <i class="fas fa-user-friends"></i>
-                    <p>No {modals.followListData?.type === 'followers' ? 'followers' : 'following'} yet</p>
+                    <p>{modals.followListData?.type === 'followers' ? t('profile.noFollowers') : t('profile.noFollowing')}</p>
                 </div>
             {:else}
                 <ul class="follow-list">
@@ -163,9 +164,9 @@
                                     {#if followInFlight.has(dog.id)}
                                         <i class="fas fa-spinner fa-spin"></i>
                                     {:else if followingSet.has(dog.id)}
-                                        Following
+                                        {t('profile.followingBtn')}
                                     {:else}
-                                        Follow
+                                        {t('profile.followBtn')}
                                     {/if}
                                 </button>
                             {/if}

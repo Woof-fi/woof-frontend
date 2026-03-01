@@ -12,6 +12,7 @@ import {
 } from 'amazon-cognito-identity-js';
 import { showToast } from './utils.js';
 import { CONFIG } from './config.js';
+import { t } from './i18n-store.svelte.js';
 
 const MOCK_AUTH = import.meta.env.VITE_MOCK_AUTH === 'true';
 
@@ -35,24 +36,24 @@ function sanitizeAuthError(err) {
     switch (err.code) {
         case 'UserNotFoundException':
         case 'NotAuthorizedException':
-            return 'Incorrect email or password.';
+            return t('auth.errIncorrect');
         case 'UsernameExistsException':
-            return 'Registration failed. Please try again.';
+            return t('auth.errRegistration');
         case 'InvalidPasswordException':
-            return 'Password does not meet the requirements.';
+            return t('auth.errPassword');
         case 'CodeMismatchException':
-            return 'Invalid verification code.';
+            return t('auth.errInvalidCode');
         case 'ExpiredCodeException':
-            return 'Verification code has expired. Please request a new one.';
+            return t('auth.errExpiredCode');
         case 'LimitExceededException':
         case 'TooManyRequestsException':
-            return 'Too many attempts. Please try again later.';
+            return t('auth.errTooMany');
         case 'InvalidParameterException':
-            return 'Please check your input and try again.';
+            return t('auth.errInvalidInput');
         case 'UserNotConfirmedException':
-            return 'Please verify your email before logging in.';
+            return t('auth.errUnconfirmed');
         default:
-            return 'Something went wrong. Please try again.';
+            return t('auth.errGeneric');
     }
 }
 
@@ -135,7 +136,7 @@ export function isAuthenticated() {
 export async function register(email, password, name) {
     if (MOCK_AUTH) {
         mockUsers.set(email, { email, password, name });
-        showToast('Account created! (mock mode — no email sent)', 'success');
+        showToast(t('auth.accountCreated'), 'success');
         return { user: { username: email } };
     }
 
@@ -163,7 +164,7 @@ export async function register(email, password, name) {
                         // Resend failed (user already confirmed, or other issue).
                         // Show the same generic message to avoid leaking info.
                     }
-                    showToast('Check your email for a verification code.', 'success');
+                    showToast(t('auth.checkEmail'), 'success');
                     resolve({ user: { username: email } });
                     return;
                 }
@@ -172,7 +173,7 @@ export async function register(email, password, name) {
                 reject(err);
                 return;
             }
-            showToast('Account created! Check your email for a verification code.', 'success');
+            showToast(t('auth.accountCreated'), 'success');
             resolve(result);
         });
     });
@@ -183,7 +184,7 @@ export async function register(email, password, name) {
  */
 export async function confirmRegistration(email, code) {
     if (MOCK_AUTH) {
-        showToast('Email verified! (mock mode)', 'success');
+        showToast(t('auth.emailVerified'), 'success');
         return 'SUCCESS';
     }
 
@@ -206,7 +207,7 @@ export async function confirmRegistration(email, code) {
  */
 export async function resendConfirmationCode(email) {
     if (MOCK_AUTH) {
-        showToast('Verification code resent! (mock mode)', 'success');
+        showToast(t('auth.codeResentFull'), 'success');
         return {};
     }
 
@@ -219,7 +220,7 @@ export async function resendConfirmationCode(email) {
                 reject(err);
                 return;
             }
-            showToast('Verification code resent! Check your email.', 'success');
+            showToast(t('auth.codeResentFull'), 'success');
             resolve(result);
         });
     });
@@ -250,7 +251,7 @@ export async function login(email, password) {
             console.error('User sync failed:', error);
         }
 
-        showToast('Logged in successfully! (mock mode)', 'success');
+        showToast(t('auth.loggedIn'), 'success');
         return { getIdToken: () => ({ getJwtToken: () => fakeToken }) };
     }
 
@@ -291,7 +292,7 @@ export async function login(email, password) {
         console.error('User sync failed:', error);
     }
 
-    showToast('Logged in successfully!', 'success');
+    showToast(t('auth.loggedIn'), 'success');
     return session;
 }
 
@@ -300,7 +301,7 @@ export async function login(email, password) {
  */
 export async function forgotPassword(email) {
     if (MOCK_AUTH) {
-        showToast('Password reset code sent! (mock mode)', 'success');
+        showToast(t('auth.resetCodeSent'), 'success');
         return {};
     }
 
@@ -309,13 +310,13 @@ export async function forgotPassword(email) {
     return new Promise((resolve, reject) => {
         cognitoUser.forgotPassword({
             onSuccess: (data) => {
-                showToast('If an account exists for this email, a reset code has been sent.', 'success');
+                showToast(t('auth.resetCodeSent'), 'success');
                 resolve(data);
             },
             onFailure: (err) => {
                 if (err.code === 'UserNotFoundException') {
                     // Don't reveal that the account doesn't exist
-                    showToast('If an account exists for this email, a reset code has been sent.', 'success');
+                    showToast(t('auth.resetCodeSent'), 'success');
                     resolve({});
                     return;
                 }
@@ -331,7 +332,7 @@ export async function forgotPassword(email) {
  */
 export async function confirmNewPassword(email, code, newPassword) {
     if (MOCK_AUTH) {
-        showToast('Password reset successful! (mock mode)', 'success');
+        showToast(t('auth.passwordResetSuccess'), 'success');
         return;
     }
 
@@ -340,7 +341,7 @@ export async function confirmNewPassword(email, code, newPassword) {
     return new Promise((resolve, reject) => {
         cognitoUser.confirmPassword(code, newPassword, {
             onSuccess: () => {
-                showToast('Password reset successful! You can now log in.', 'success');
+                showToast(t('auth.passwordResetSuccess'), 'success');
                 resolve();
             },
             onFailure: (err) => {
@@ -363,7 +364,7 @@ export function logout() {
     }
     clearToken();
     clearCurrentUser();
-    showToast('Logged out successfully', 'success');
+    showToast(t('auth.loggedOut'), 'success');
     window.location.href = '/';
 }
 
@@ -430,7 +431,7 @@ export async function handleSessionExpired() {
         clearToken();
         clearCurrentUser();
         onSessionCleared?.();
-        showToast('Your session has expired. Please log in again.', 'info');
+        showToast(t('auth.sessionExpired'), 'info');
         return false;
     }
     return true;

@@ -86,7 +86,7 @@ describe('BreedView', () => {
         vi.clearAllMocks();
     });
 
-    it('renders breed name and Finnish name', async () => {
+    it('renders breed name', async () => {
         const { container } = render(BreedView, {
             props: { params: { slug: 'miniature-schnauzer' } },
         });
@@ -94,8 +94,6 @@ describe('BreedView', () => {
         await waitFor(() => {
             expect(container.querySelector('.breed-sheet-name')?.textContent).toBe('Miniature Schnauzer');
         });
-
-        expect(container.querySelector('.breed-sheet-namefi')?.textContent).toBe('Kääpiösnautseri');
     });
 
     it('renders breed description', async () => {

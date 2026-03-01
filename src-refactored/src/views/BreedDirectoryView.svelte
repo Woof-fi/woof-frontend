@@ -1,5 +1,6 @@
 <script>
     import { getAllBreeds, getPopularBreeds } from '../../js/api.js';
+    import { t, localName } from '../../js/i18n-store.svelte.js';
 
     let allBreeds = $state([]);
     let popularBreeds = $state([]);
@@ -38,33 +39,33 @@
 
 <div class="breed-directory">
     <div class="breed-directory-header">
-        <h1>Breeds</h1>
-        <p class="breed-directory-subtitle">Explore dog breeds and their communities</p>
+        <h1>{t('breedDirectory.title')}</h1>
+        <p class="breed-directory-subtitle">{t('breedDirectory.subtitle')}</p>
     </div>
 
     <div class="breed-directory-search">
         <i class="fas fa-search"></i>
         <input
             type="text"
-            placeholder="Search breeds..."
+            placeholder={t('breedDirectory.searchPlaceholder')}
             bind:value={query}
         />
     </div>
 
     {#if loading}
-        <div class="breed-directory-loading"><i class="fas fa-spinner fa-spin"></i> Loading breeds...</div>
+        <div class="breed-directory-loading"><i class="fas fa-spinner fa-spin"></i> {t('breedDirectory.loading')}</div>
     {:else}
         {#if !query && popularBreeds.length > 0}
             <section class="breed-section">
-                <h2 class="breed-section-title">Popular Breeds</h2>
+                <h2 class="breed-section-title">{t('breedDirectory.popularBreeds')}</h2>
                 <div class="breed-popular-grid">
                     {#each popularBreeds as breed (breed.id)}
                         <a href="/breed/{breed.slug}" data-link class="breed-popular-card">
                             <div class="breed-popular-icon">
                                 <i class="fas fa-paw"></i>
                             </div>
-                            <span class="breed-popular-name">{breed.name}</span>
-                            <span class="breed-popular-count">{breed.dogCount} {breed.dogCount === 1 ? 'dog' : 'dogs'}</span>
+                            <span class="breed-popular-name">{localName(breed)}</span>
+                            <span class="breed-popular-count">{breed.dogCount === 1 ? t('breedDirectory.dogSingular', { count: breed.dogCount }) : t('breedDirectory.dogCount', { count: breed.dogCount })}</span>
                         </a>
                     {/each}
                 </div>
@@ -73,13 +74,13 @@
 
         <section class="breed-section">
             <h2 class="breed-section-title">
-                {query ? `Results for "${query}"` : 'All Breeds'}
+                {query ? t('breedDirectory.resultsFor', { query }) : t('breedDirectory.allBreeds')}
                 <span class="breed-section-count">{filteredBreeds.length}</span>
             </h2>
             {#if filteredBreeds.length === 0}
                 <div class="empty-state">
                     <i class="fas fa-search"></i>
-                    <p>No breeds found matching "{query}"</p>
+                    <p>{t('breedDirectory.noResults', { query })}</p>
                 </div>
             {:else}
                 <ul class="breed-alpha-list">
@@ -88,10 +89,7 @@
                             <a href="/breed/{breed.slug}" data-link class="breed-alpha-item">
                                 <i class="fas fa-paw breed-alpha-icon"></i>
                                 <div class="breed-alpha-info">
-                                    <span class="breed-alpha-name">{breed.name}</span>
-                                    {#if breed.nameFi && breed.nameFi !== breed.name}
-                                        <span class="breed-alpha-fi">{breed.nameFi}</span>
-                                    {/if}
+                                    <span class="breed-alpha-name">{localName(breed)}</span>
                                 </div>
                                 <i class="fas fa-chevron-right breed-alpha-arrow"></i>
                             </a>

@@ -1,25 +1,28 @@
 <script>
     import { fly, fade } from 'svelte/transition';
-    import { modals, closeCommentOptionsSheet, openAuthModal } from '../../js/modal-store.svelte.js';
+    import { modals, closeCommentOptionsSheet, openAuthModal, openEditCommentModal } from '../../js/modal-store.svelte.js';
     import { reportContent, deleteComment } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast } from '../../js/utils.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let data         = $derived(modals.commentOptionsSheetData);
-    let commentId    = $derived(data?.commentId ?? '');
-    let isOwnComment = $derived(data?.isOwnComment ?? false);
-    let onDeleted    = $derived(data?.onDeleted ?? null);
+    let commentId      = $derived(data?.commentId ?? '');
+    let isOwnComment   = $derived(data?.isOwnComment ?? false);
+    let onDeleted      = $derived(data?.onDeleted ?? null);
+    let commentContent = $derived(data?.content ?? '');
+    let onUpdated      = $derived(data?.onUpdated ?? null);
 
     // 'options' | 'report' | 'confirm-delete'
     let view     = $state('options');
     let deleting = $state(false);
 
     const REASONS = [
-        { key: 'inappropriate_content', label: 'Inappropriate content' },
-        { key: 'spam',                  label: 'Spam' },
-        { key: 'harassment',            label: 'Harassment' },
-        { key: 'violence',              label: 'Violence' },
-        { key: 'other',                 label: 'Other' },
+        { key: 'inappropriate_content', labelKey: 'post.reasonInappropriate' },
+        { key: 'spam',                  labelKey: 'post.reasonSpam' },
+        { key: 'harassment',            labelKey: 'post.reasonHarassment' },
+        { key: 'violence',              labelKey: 'post.reasonViolence' },
+        { key: 'other',                 labelKey: 'post.reasonOther' },
     ];
 
     // Reset view state when sheet closes
@@ -35,11 +38,11 @@
         deleting = true;
         try {
             await deleteComment(commentId);
-            showToast('Comment deleted', 'success');
+            showToast(t('post.commentDeleted'), 'success');
             onDeleted?.(commentId);
             closeCommentOptionsSheet();
         } catch {
-            showToast('Failed to delete comment', 'error');
+            showToast(t('post.failedDeleteComment'), 'error');
             deleting = false;
         }
     }
@@ -47,14 +50,27 @@
     async function handleReportReason(reason) {
         try {
             await reportContent('comment', commentId, reason);
-            showToast('Report submitted. Thank you!', 'success');
+            showToast(t('post.reportSubmitted'), 'success');
         } catch (err) {
             showToast(
-                err?.status === 409 ? 'Already reported' : 'Failed to submit report',
+                err?.status === 409 ? t('post.alreadyReported') : t('post.failedReport'),
                 err?.status === 409 ? 'info' : 'error'
             );
         }
         closeCommentOptionsSheet();
+    }
+
+    function handleEdit() {
+        // Capture derived values before closing (close nullifies the sheet data)
+        const id = commentId;
+        const text = commentContent;
+        const callback = onUpdated;
+        closeCommentOptionsSheet();
+        openEditCommentModal({
+            commentId: id,
+            content: text,
+            onUpdated: callback,
+        });
     }
 
     function handleReportClick() {
@@ -79,48 +95,51 @@
     class="action-sheet"
     role="dialog"
     aria-modal="true"
-    aria-label="Comment options"
+    aria-label={t('post.commentOptions')}
     in:fly={{ y: 500, duration: 280, opacity: 1 }}
     out:fly={{ y: 500, duration: 200, opacity: 1 }}
 >
     {#if view === 'options'}
         <div in:fade={{ duration: 100, delay: 60 }}>
             {#if isOwnComment}
+                <button class="action-sheet-item" onclick={handleEdit}>
+                    <i class="fas fa-pen" aria-hidden="true"></i> {t('post.editComment')}
+                </button>
                 <button class="action-sheet-item destructive" onclick={() => (view = 'confirm-delete')}>
-                    <i class="fas fa-trash-alt" aria-hidden="true"></i> Delete comment
+                    <i class="fas fa-trash-alt" aria-hidden="true"></i> {t('post.deleteComment')}
                 </button>
             {:else}
                 <button class="action-sheet-item destructive" onclick={handleReportClick}>
-                    <i class="fas fa-flag" aria-hidden="true"></i> Report comment
+                    <i class="fas fa-flag" aria-hidden="true"></i> {t('post.reportCommentBtn')}
                 </button>
             {/if}
-            <button class="action-sheet-item cancel" onclick={closeCommentOptionsSheet}>Cancel</button>
+            <button class="action-sheet-item cancel" onclick={closeCommentOptionsSheet}>{t('post.cancel')}</button>
         </div>
 
     {:else if view === 'report'}
         <div in:fade={{ duration: 100, delay: 60 }}>
-            <div class="action-sheet-title">Why are you reporting this comment?</div>
+            <div class="action-sheet-title">{t('post.reportComment')}</div>
             {#each REASONS as reason (reason.key)}
                 <button class="action-sheet-item" onclick={() => handleReportReason(reason.key)}>
-                    {reason.label}
+                    {t(reason.labelKey)}
                 </button>
             {/each}
-            <button class="action-sheet-item cancel" onclick={() => (view = 'options')}>← Back</button>
+            <button class="action-sheet-item cancel" onclick={() => (view = 'options')}>{t('post.back')}</button>
         </div>
 
     {:else if view === 'confirm-delete'}
         <div class="action-sheet-delete-confirm" in:fade={{ duration: 120, delay: 60 }}>
-            <p class="action-sheet-delete-title">Delete this comment?</p>
-            <p class="action-sheet-delete-subtitle">This can't be undone.</p>
+            <p class="action-sheet-delete-title">{t('post.deleteCommentConfirm')}</p>
+            <p class="action-sheet-delete-subtitle">{t('post.cantBeUndone')}</p>
             <button
                 class="action-sheet-delete-btn danger"
                 disabled={deleting}
                 onclick={confirmDelete}
             >
                 {#if deleting}
-                    <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Deleting…
+                    <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> {t('post.deleting')}
                 {:else}
-                    Delete
+                    {t('post.delete')}
                 {/if}
             </button>
             <button
@@ -128,7 +147,7 @@
                 disabled={deleting}
                 onclick={() => (view = 'options')}
             >
-                Keep comment
+                {t('post.keepComment')}
             </button>
         </div>
     {/if}

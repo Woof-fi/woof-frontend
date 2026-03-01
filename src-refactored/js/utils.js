@@ -3,6 +3,7 @@
  * Reusable helper functions for the application
  */
 import { showToast as _showToast } from './toast-store.svelte.js';
+import { t } from './i18n-store.svelte.js';
 
 /**
  * Sanitize HTML to prevent XSS attacks
@@ -73,23 +74,23 @@ export function timeAgo(date) {
     const past = new Date(date);
     const seconds = Math.floor((now - past) / 1000);
 
-    if (seconds < 60) return 'just now';
+    if (seconds < 60) return t('time.justNow');
 
     const minutes = Math.floor(seconds / 60);
-    if (minutes === 1) return '1 minute ago';
-    if (minutes < 60) return `${minutes} minutes ago`;
+    if (minutes === 1) return t('time.oneMinute');
+    if (minutes < 60) return t('time.minutes', { count: minutes });
 
     const hours = Math.floor(minutes / 60);
-    if (hours === 1) return '1 hour ago';
-    if (hours < 24) return `${hours} hours ago`;
+    if (hours === 1) return t('time.oneHour');
+    if (hours < 24) return t('time.hours', { count: hours });
 
     const days = Math.floor(hours / 24);
-    if (days === 1) return '1 day ago';
-    if (days < 7) return `${days} days ago`;
+    if (days === 1) return t('time.oneDay');
+    if (days < 7) return t('time.days', { count: days });
 
     const weeks = Math.floor(days / 7);
-    if (weeks === 1) return '1 week ago';
-    if (weeks < 4) return `${weeks} weeks ago`;
+    if (weeks === 1) return t('time.oneWeek');
+    if (weeks < 4) return t('time.weeks', { count: weeks });
 
     return past.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
 }

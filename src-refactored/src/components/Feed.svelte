@@ -4,6 +4,7 @@
     import { openCreateDogModal } from '../../js/modal-store.svelte.js';
     import { showToast } from '../../js/utils.js';
     import { store } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
     import PostCard from './PostCard.svelte';
     import InviteCard from './InviteCard.svelte';
     import { viewport } from '../actions/viewport.ts';
@@ -78,7 +79,7 @@
             myDogs = dogsResult;
         } catch (e) {
             console.error('Failed to refresh feed:', e);
-            showToast('Refresh failed', 'error');
+            showToast(t('feed.refreshFailed'), 'error');
         } finally {
             refreshing = false;
         }
@@ -181,13 +182,13 @@
             <div class="pull-to-refresh-inner" class:ready={pullDistance >= PULL_THRESHOLD} class:refreshing>
                 {#if refreshing}
                     <i class="fas fa-spinner fa-spin"></i>
-                    <span class="pull-to-refresh-label">Refreshing…</span>
+                    <span class="pull-to-refresh-label">{t('feed.refreshing')}</span>
                 {:else if pullDistance >= PULL_THRESHOLD}
                     <i class="fas fa-arrow-down" style="transform: rotate(180deg); transition: transform 0.2s"></i>
-                    <span class="pull-to-refresh-label">Release to refresh</span>
+                    <span class="pull-to-refresh-label">{t('feed.releaseToRefresh')}</span>
                 {:else}
                     <i class="fas fa-arrow-down" style="transition: transform 0.2s"></i>
-                    <span class="pull-to-refresh-label">Pull to refresh</span>
+                    <span class="pull-to-refresh-label">{t('feed.pullToRefresh')}</span>
                 {/if}
             </div>
         </div>
@@ -228,23 +229,23 @@
     {#if isAuthenticated()}
         <div class="empty-state">
             <i class="fas fa-user-friends"></i>
-            <p>Your following feed is empty.</p>
-            <p>Follow dogs from the <strong>For You</strong> tab to see their posts here!</p>
+            <p>{t('feed.followingEmpty')}</p>
+            <p>{t('feed.followingEmptyHint', { tab: t('nav.forYou') })}</p>
         </div>
     {:else}
         <div class="empty-state">
             <i class="fas fa-user-friends"></i>
-            <p>Sign up to follow dogs and see their posts here!</p>
+            <p>{t('feed.followingSignUp')}</p>
         </div>
     {/if}
 {:else}
     {#if isAuthenticated() && myDogs.length === 0 && !loading}
         <div class="welcome-card">
             <div class="welcome-card-icon"><i class="fas fa-paw"></i></div>
-            <h2>Welcome to Woof!</h2>
-            <p>Add your dog to start posting, follow other dogs, and join the community.</p>
+            <h2>{t('feed.welcomeTitle')}</h2>
+            <p>{t('feed.welcomeDesc')}</p>
             <button class="btn-primary welcome-card-btn" onclick={handleAddDog}>
-                <i class="fas fa-plus"></i> Add Your Dog
+                <i class="fas fa-plus"></i> {t('feed.addYourDog')}
             </button>
         </div>
     {/if}
@@ -256,7 +257,7 @@
             <PostCard
                 id={item.id}
                 profilePic={item.dogPhoto || '/images/dog_profile_pic.jpg'}
-                username={item.dogName || 'Unknown Dog'}
+                username={item.dogName || t('feed.unknownDog')}
                 imageUrl={item.imageUrl}
                 caption={item.caption || ''}
                 dogSlug={item.dogSlug || ''}
@@ -284,11 +285,11 @@
             <div class="content-gate-overlay">
                 <div class="content-gate-content">
                     <div class="content-gate-icon"><i class="fas fa-lock"></i></div>
-                    <h2 class="content-gate-heading">Want to see more?</h2>
-                    <p class="content-gate-desc">Sign up to browse the full feed, follow dogs, and share your own pup's adventures.</p>
+                    <h2 class="content-gate-heading">{t('feed.gateTitle')}</h2>
+                    <p class="content-gate-desc">{t('feed.gateDesc')}</p>
                     <div class="content-gate-buttons">
-                        <button class="btn-primary content-gate-btn" onclick={handleOpenAuthModal}>Sign Up</button>
-                        <button class="btn-secondary content-gate-btn" onclick={handleOpenAuthModal}>Log In</button>
+                        <button class="btn-primary content-gate-btn" onclick={handleOpenAuthModal}>{t('auth.signUp')}</button>
+                        <button class="btn-secondary content-gate-btn" onclick={handleOpenAuthModal}>{t('auth.signIn')}</button>
                     </div>
                 </div>
             </div>

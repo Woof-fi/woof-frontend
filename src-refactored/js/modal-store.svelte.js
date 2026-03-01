@@ -21,7 +21,9 @@ export let modals = $state({
     postOptionsSheetOpen: false,
     postOptionsSheetData: null,     // { postId, dogId, dogSlug, isOwnPost, caption }
     commentOptionsSheetOpen: false,
-    commentOptionsSheetData: null,  // { commentId, isOwnComment, onDeleted }
+    commentOptionsSheetData: null,  // { commentId, isOwnComment, content, onDeleted, onUpdated }
+    editCommentModalOpen: false,
+    editCommentData: null,          // { commentId, content, onUpdated }
     followListModalOpen: false,
     followListData: null,           // { dogId, type: 'followers' | 'following' }
 });
@@ -47,6 +49,8 @@ export function openPostOptionsSheet(data) { modals.postOptionsSheetData = data;
 export function closePostOptionsSheet() { modals.postOptionsSheetOpen = false; modals.postOptionsSheetData = null; }
 export function openCommentOptionsSheet(data) { modals.commentOptionsSheetData = data; modals.commentOptionsSheetOpen = true; }
 export function closeCommentOptionsSheet() { modals.commentOptionsSheetOpen = false; modals.commentOptionsSheetData = null; }
+export function openEditCommentModal(data) { modals.editCommentData = data; modals.editCommentModalOpen = true; }
+export function closeEditCommentModal() { modals.editCommentModalOpen = false; modals.editCommentData = null; }
 export function openFollowListModal(dogId, type) { modals.followListData = { dogId, type }; modals.followListModalOpen = true; }
 export function closeFollowListModal() { modals.followListModalOpen = false; modals.followListData = null; }
 export function closeAllModals() {
@@ -64,6 +68,8 @@ export function closeAllModals() {
     modals.postOptionsSheetData = null;
     modals.commentOptionsSheetOpen = false;
     modals.commentOptionsSheetData = null;
+    modals.editCommentModalOpen = false;
+    modals.editCommentData = null;
     modals.followListModalOpen = false;
     modals.followListData = null;
 }

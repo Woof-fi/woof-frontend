@@ -5,6 +5,7 @@
     import { showToast } from '../../js/utils.js';
     import { modals, closeHealthRecordModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpHealthVersion } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let submitting = $state(false);
     let isEditMode = $state(false);
@@ -18,39 +19,39 @@
     let notes = $state('');
     let weightValue = $state('');
 
-    const TYPE_CONFIG = {
+    let TYPE_CONFIG = $derived({
         vet_visit: {
-            descLabel: 'Reason for visit *',
-            descPlaceholder: 'e.g., Annual check-up, Ear infection',
-            notesPlaceholder: 'Vet name, diagnosis, treatment details...',
+            descLabel: t('health.vetVisitDesc'),
+            descPlaceholder: t('health.vetVisitPlaceholder'),
+            notesPlaceholder: t('health.vetVisitNotes'),
             showWeight: false,
         },
         vaccination: {
-            descLabel: 'Vaccine name *',
-            descPlaceholder: 'e.g., Rabies, DHPP, Bordetella',
-            notesPlaceholder: 'Batch number, next booster due date...',
+            descLabel: t('health.vaccinationDesc'),
+            descPlaceholder: t('health.vaccinationPlaceholder'),
+            notesPlaceholder: t('health.vaccinationNotes'),
             showWeight: false,
         },
         medication: {
-            descLabel: 'Medication name *',
-            descPlaceholder: 'e.g., Apoquel, Heartgard, Bravecto',
-            notesPlaceholder: 'Dosage, frequency, duration...',
+            descLabel: t('health.medicationDesc'),
+            descPlaceholder: t('health.medicationPlaceholder'),
+            notesPlaceholder: t('health.medicationNotes'),
             showWeight: false,
         },
         weight: {
-            descLabel: 'Description (optional)',
-            descPlaceholder: 'e.g., Post-diet weigh-in',
-            notesPlaceholder: 'Additional notes...',
+            descLabel: t('health.weightDesc'),
+            descPlaceholder: t('health.weightPlaceholder'),
+            notesPlaceholder: t('health.weightNotes'),
             showWeight: true,
             descRequired: false,
         },
         note: {
-            descLabel: 'Title *',
-            descPlaceholder: 'e.g., Allergy noted, Behavioral change',
-            notesPlaceholder: 'Details...',
+            descLabel: t('health.noteDesc'),
+            descPlaceholder: t('health.notePlaceholder'),
+            notesPlaceholder: t('health.noteNotes'),
             showWeight: false,
         },
-    };
+    });
 
     let typeConfig = $derived(TYPE_CONFIG[currentType] || TYPE_CONFIG.note);
 
@@ -124,10 +125,10 @@
         try {
             if (editingRecord) {
                 await updateHealthRecord(currentDogId, editingRecord.id, data);
-                showToast('Health record updated', 'success');
+                showToast(t('health.recordUpdated'), 'success');
             } else {
                 await createHealthRecord(currentDogId, data);
-                showToast('Health record added', 'success');
+                showToast(t('health.recordAdded'), 'success');
             }
             close();
             bumpHealthVersion();
@@ -155,8 +156,8 @@
 >
     <div class="modal-content health-modal-content">
         <div class="modal-header">
-            <h2 id="health-modal-title">{isEditMode ? 'Edit Health Record' : 'Add Health Record'}</h2>
-            <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
+            <h2 id="health-modal-title">{isEditMode ? t('health.editRecord') : t('health.addRecord')}</h2>
+            <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
             {#if !isEditMode}
@@ -167,35 +168,35 @@
                         class:active={currentType === 'vet_visit'}
                         data-type="vet_visit"
                         onclick={() => currentType = 'vet_visit'}
-                    ><i class="fas fa-stethoscope"></i> Vet Visit</button>
+                    ><i class="fas fa-stethoscope"></i> {t('health.vetVisit')}</button>
                     <button
                         type="button"
                         class="health-type-tab"
                         class:active={currentType === 'vaccination'}
                         data-type="vaccination"
                         onclick={() => currentType = 'vaccination'}
-                    ><i class="fas fa-syringe"></i> Vaccination</button>
+                    ><i class="fas fa-syringe"></i> {t('health.vaccination')}</button>
                     <button
                         type="button"
                         class="health-type-tab"
                         class:active={currentType === 'medication'}
                         data-type="medication"
                         onclick={() => currentType = 'medication'}
-                    ><i class="fas fa-pills"></i> Medication</button>
+                    ><i class="fas fa-pills"></i> {t('health.medication')}</button>
                     <button
                         type="button"
                         class="health-type-tab"
                         class:active={currentType === 'weight'}
                         data-type="weight"
                         onclick={() => currentType = 'weight'}
-                    ><i class="fas fa-weight"></i> Weight</button>
+                    ><i class="fas fa-weight"></i> {t('health.weight')}</button>
                     <button
                         type="button"
                         class="health-type-tab"
                         class:active={currentType === 'note'}
                         data-type="note"
                         onclick={() => currentType = 'note'}
-                    ><i class="fas fa-sticky-note"></i> Note</button>
+                    ><i class="fas fa-sticky-note"></i> {t('health.note')}</button>
                 </div>
             {/if}
 
@@ -204,7 +205,7 @@
                 <div class="health-form-fields">
                     <div class="form-row">
                         <div class="form-group form-group-flex">
-                            <label for="health-record-date">Date *</label>
+                            <label for="health-record-date">{t('health.date')}</label>
                             <input
                                 type="date"
                                 id="health-record-date"
@@ -241,7 +242,7 @@
                         />
                     </div>
                     <div class="form-group">
-                        <label for="health-record-notes">Notes (optional)</label>
+                        <label for="health-record-notes">{t('health.notes')}</label>
                         <textarea
                             id="health-record-notes"
                             rows="3"
@@ -252,9 +253,9 @@
                     </div>
                 </div>
                 <div class="health-modal-actions">
-                    <button type="button" class="btn-secondary health-cancel-btn" onclick={close}>Cancel</button>
+                    <button type="button" class="btn-secondary health-cancel-btn" onclick={close}>{t('common.cancel')}</button>
                     <button type="submit" class="btn-primary" id="health-submit-btn" disabled={submitting}>
-                        {submitting ? 'Saving...' : isEditMode ? 'Save Changes' : 'Add Record'}
+                        {submitting ? t('postEdit.saving') : isEditMode ? t('common.save') : t('health.addRecordBtn')}
                     </button>
                 </div>
             </form>

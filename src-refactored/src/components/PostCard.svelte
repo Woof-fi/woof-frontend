@@ -1,9 +1,11 @@
 <script>
     import { likePost, unlikePost, createComment, getComments } from '../../js/api.js';
+    import { CONFIG } from '../../js/config.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { timeAgo, showToast, imageVariant } from '../../js/utils.js';
     import { openPostOptionsSheet, openCommentOptionsSheet } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let {
         id = '',
@@ -109,7 +111,7 @@
             commentsLoaded = true;
             commentsVisible = true;
         } catch {
-            showToast('Failed to load comments', 'error');
+            showToast(t('post.failedLoadComments'), 'error');
         }
     }
 
@@ -126,7 +128,7 @@
             commentsVisible = true;
             commentCount_ = result.commentCount ?? commentCount_ + 1;
         } catch {
-            showToast('Failed to post comment', 'error');
+            showToast(t('post.failedPostComment'), 'error');
         } finally {
             submittingComment = false;
         }
@@ -148,9 +150,17 @@
         openCommentOptionsSheet({
             commentId: comment.id,
             isOwnComment: isOwnComment(comment),
+            content: comment.content,
             onDeleted: (deletedId) => {
                 comments = comments.filter(c => c.id !== deletedId);
                 commentCount_ = Math.max(0, commentCount_ - 1);
+            },
+            onUpdated: (updatedComment) => {
+                comments = comments.map(c =>
+                    c.id === updatedComment.id
+                        ? { ...c, content: updatedComment.content, updatedAt: updatedComment.updatedAt }
+                        : c
+                );
             },
         });
     }
@@ -174,20 +184,30 @@
     }
 
     // --- Share ---
+    // Share URL goes through the backend's OG preview endpoint so social media
+    // crawlers see proper Open Graph meta tags (title, image, description).
+    // The endpoint auto-redirects human visitors back to the SPA.
+    function getShareUrl() {
+        const origin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? window.location.origin    // local dev: just use SPA URL
+            : CONFIG.API_BASE_URL;      // production: use backend share endpoint
+        return `${origin}/share/post/${id}`;
+    }
+
     async function handleShare() {
-        const postUrl = `${window.location.origin}/post/${id}`;
+        const shareUrl = getShareUrl();
         if (navigator.share) {
             try {
-                await navigator.share({ title: `${username} on Woof`, url: postUrl });
+                await navigator.share({ title: `${username} on Woof`, url: shareUrl });
             } catch {
                 // User cancelled or share failed silently
             }
         } else {
             try {
-                await navigator.clipboard.writeText(postUrl);
-                showToast('Link copied!', 'success');
+                await navigator.clipboard.writeText(shareUrl);
+                showToast(t('post.linkCopied'), 'success');
             } catch {
-                showToast('Could not copy link', 'error');
+                showToast(t('post.linkCopyFailed'), 'error');
             }
         }
     }
@@ -263,7 +283,7 @@
         {#if id}
             <button
                 class="post-options-btn"
-                aria-label="Post options"
+                aria-label={t('post.postOptions')}
                 onclick={() => openPostOptionsSheet({ postId: id, dogId, dogSlug, isOwnPost, caption })}
             >
                 <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
@@ -296,19 +316,19 @@
             <button
                 class="like-button"
                 class:liked={liked}
-                aria-label={liked ? 'Unlike post' : 'Like post'}
+                aria-label={liked ? t('post.unlikePost') : t('post.likePost')}
                 onclick={handleLike}
             >
                 <i class={liked ? 'fas fa-heart' : 'far fa-heart'} aria-hidden="true"></i>
             </button>
             <span class="like-count">{likes > 0 ? likes : ''}</span>
-            <button class="comment-button" aria-label="Comment on post" onclick={handleCommentClick}>
+            <button class="comment-button" aria-label={t('post.commentOnPost')} onclick={handleCommentClick}>
                 <i class="far fa-comment" aria-hidden="true"></i>
             </button>
             <span class="comment-count">{commentCount_ > 0 ? commentCount_ : ''}</span>
         </div>
         {#if id}
-            <button class="share-button" aria-label="Share post" onclick={handleShare}>
+            <button class="share-button" aria-label={t('post.sharePost')} onclick={handleShare}>
                 <i class="far fa-paper-plane" aria-hidden="true"></i>
             </button>
         {/if}
@@ -327,10 +347,10 @@
             {#if commentCount_ > 0 && id}
                 <button class="view-all-comments" onclick={handleViewComments}>
                     {commentsVisible
-                        ? 'Hide comments'
+                        ? t('post.hideComments')
                         : commentCount_ === 1
-                            ? 'View 1 comment'
-                            : `View all ${commentCount_} comments`}
+                            ? t('post.viewOneComment')
+                            : t('post.viewComments', { count: commentCount_ })}
                 </button>
             {/if}
 
@@ -344,12 +364,17 @@
                                         <strong>{comment.dogName}</strong>
                                     </a>
                                     <span class="comment-content"> {comment.content}</span>
-                                    <span class="comment-time">{timeAgo(comment.createdAt)}</span>
+                                    <span class="comment-time">
+                                        {timeAgo(comment.createdAt)}
+                                        {#if comment.updatedAt && comment.createdAt && (new Date(comment.updatedAt).getTime() - new Date(comment.createdAt).getTime()) > 60000}
+                                            <span class="comment-edited">{t('post.edited')}</span>
+                                        {/if}
+                                    </span>
                                 </div>
                                 <button
                                     type="button"
                                     class="comment-options-btn"
-                                    aria-label="Comment options"
+                                    aria-label={t('post.commentOptions')}
                                     onclick={(e) => handleCommentOptions(e, comment)}
                                 >
                                     <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
@@ -366,7 +391,7 @@
                         type="text"
                         name="comment"
                         class="comment-input"
-                        placeholder="Add a comment..."
+                        placeholder={t('post.addComment')}
                         maxlength="2200"
                         autocomplete="off"
                         data-comment-input={id}
@@ -377,7 +402,7 @@
                         class="comment-submit"
                         disabled={!commentInput.trim() || submittingComment}
                         onclick={handleSubmitComment}
-                    >Post</button>
+                    >{t('post.postComment')}</button>
                 </div>
             {/if}
         {/if}
@@ -396,7 +421,7 @@
                 onclick={() => showFullDate = !showFullDate}
             >{formattedTimestamp()}</time>
             {#if isEdited}
-                <span class="post-edited-indicator">(edited)</span>
+                <span class="post-edited-indicator">{t('post.edited')}</span>
             {/if}
         </div>
     {/if}
@@ -655,6 +680,12 @@ a.post-location-text:hover {
     font-size: 11px;
     color: var(--color-text-muted);
     margin-top: 2px;
+}
+
+.comment-edited {
+    color: var(--woof-color-neutral-400);
+    font-style: italic;
+    margin-left: 4px;
 }
 
 .comment-form {

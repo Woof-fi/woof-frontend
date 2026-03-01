@@ -3,6 +3,7 @@
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast, imageVariant } from '../../js/utils.js';
     import { store, bumpBreedVersion } from '../../js/svelte-store.svelte.js';
+    import { t, localName, locale } from '../../js/i18n-store.svelte.js';
 
     let { params = {} } = $props();
     let slug = $derived(params.slug);
@@ -134,7 +135,7 @@
 
     async function handleFollowToggle() {
         if (!isAuthenticated()) {
-            showToast('Please log in to follow breeds', 'error');
+            showToast(t('breed.loginToFollow'), 'error');
             return;
         }
         followLoading = true;
@@ -151,7 +152,7 @@
             bumpBreedVersion();
         } catch (e) {
             console.error('Breed follow toggle failed:', e);
-            showToast('Action failed. Please try again.', 'error');
+            showToast(t('breed.actionFailed'), 'error');
         } finally {
             followLoading = false;
         }
@@ -176,16 +177,16 @@
             <div class="breed-container">
                 <div class="empty-state">
                     <i class="fas fa-exclamation-circle"></i>
-                    <p>Failed to load breed.</p>
+                    <p>{t('breed.failedLoad')}</p>
                 </div>
             </div>
         </div>
     {:else}
         <div class="breed-hero">
             {#if breed.photo}
-                <img src={breed.photo} alt={breed.name} class="breed-hero-img" onerror={fallbackImg} />
+                <img src={breed.photo} alt={localName(breed)} class="breed-hero-img" onerror={fallbackImg} />
             {:else if breed.heroImageUrl}
-                <img src={breed.heroImageUrl} alt={breed.name} class="breed-hero-img" onerror={fallbackImg} />
+                <img src={breed.heroImageUrl} alt={localName(breed)} class="breed-hero-img" onerror={fallbackImg} />
             {:else}
                 <div class="breed-hero-gradient"></div>
             {/if}
@@ -194,10 +195,7 @@
             <div class="breed-container">
                 <div class="breed-sheet-namerow">
                     <div>
-                        <div class="breed-sheet-name">{breed.name}</div>
-                        {#if breed.nameFi && breed.nameFi !== breed.name}
-                            <div class="breed-sheet-namefi">{breed.nameFi}</div>
-                        {/if}
+                        <div class="breed-sheet-name">{localName(breed)}</div>
                     </div>
                     <button
                         class="follow-btn"
@@ -206,9 +204,9 @@
                         onclick={handleFollowToggle}
                     >
                         {#if isFollowing}
-                            <i class="fas fa-check"></i> Following
+                            <i class="fas fa-check"></i> {t('breed.following')}
                         {:else}
-                            <i class="fas fa-plus"></i> Follow
+                            <i class="fas fa-plus"></i> {t('breed.follow')}
                         {/if}
                     </button>
                 </div>
@@ -218,15 +216,15 @@
                 <div class="breed-sheet-stats">
                     <div class="breed-sheet-stat">
                         <div class="breed-sheet-stat-num">{breed.dogCount}</div>
-                        <div class="breed-sheet-stat-label">Dogs</div>
+                        <div class="breed-sheet-stat-label">{t('breed.dogs')}</div>
                     </div>
                     <div class="breed-sheet-stat">
                         <div class="breed-sheet-stat-num">{breed.followerCount}</div>
-                        <div class="breed-sheet-stat-label">Followers</div>
+                        <div class="breed-sheet-stat-label">{t('breed.followers')}</div>
                     </div>
                     <div class="breed-sheet-stat">
                         <div class="breed-sheet-stat-num">{postsLoading ? '—' : posts.length}</div>
-                        <div class="breed-sheet-stat-label">Posts</div>
+                        <div class="breed-sheet-stat-label">{t('breed.posts')}</div>
                     </div>
                 </div>
             </div>
@@ -239,7 +237,7 @@
                     aria-selected={activeTab === 'posts'}
                     onclick={() => activeTab = 'posts'}
                 >
-                    <i class="fas fa-th"></i> Posts
+                    <i class="fas fa-th"></i> {t('breed.posts')}
                 </button>
                 <button
                     class="tab-link"
@@ -248,7 +246,7 @@
                     aria-selected={activeTab === 'dogs'}
                     onclick={() => activeTab = 'dogs'}
                 >
-                    <i class="fas fa-dog"></i> Dogs
+                    <i class="fas fa-dog"></i> {t('breed.dogs')}
                 </button>
             </div>
 
@@ -259,7 +257,7 @@
                 {:else if posts.length === 0}
                     <div class="empty-state">
                         <i class="fas fa-camera"></i>
-                        <p>No posts yet for this breed.</p>
+                        <p>{t('breed.noPosts')}</p>
                     </div>
                 {:else}
                     <div class="posts-grid posts-grid-2col">
@@ -269,7 +267,7 @@
                                     src={post.imageUrl}
                                     srcset="{imageVariant(post.imageUrl, 'medium')} 600w, {post.imageUrl} 1200w"
                                     sizes="(max-width: 640px) calc(50vw - 16px), 310px"
-                                    alt={post.caption || 'Post image'}
+                                    alt={post.caption || t('breed.postImage')}
                                     loading="lazy"
                                     onerror={fallbackImg}
                                 />
@@ -282,7 +280,7 @@
                     {#if postsCursor}
                         <div class="load-more">
                             <button class="btn-secondary" disabled={postsLoadingMore} onclick={loadMorePosts}>
-                                {postsLoadingMore ? 'Loading...' : 'Load More'}
+                                {postsLoadingMore ? t('common.loadingEllipsis') : t('breed.loadMore')}
                             </button>
                         </div>
                     {/if}
@@ -296,7 +294,7 @@
                 {:else if dogs.length === 0 && dogsLoadedOnce}
                     <div class="empty-state">
                         <i class="fas fa-dog"></i>
-                        <p>No dogs registered for this breed yet.</p>
+                        <p>{t('breed.noDogs')}</p>
                     </div>
                 {:else if dogs.length > 0}
                     <ul class="breed-dog-list">
@@ -324,7 +322,7 @@
                                         {/if}
                                     </div>
                                     <div class="breed-dog-meta">
-                                        <span>{dog.postCount || 0} posts</span>
+                                        <span>{t('breed.postCount', { count: dog.postCount || 0 })}</span>
                                     </div>
                                 </a>
                             </li>
@@ -333,7 +331,7 @@
                     {#if dogsCursor}
                         <div class="load-more">
                             <button class="btn-secondary" disabled={dogsLoadingMore} onclick={loadMoreDogs}>
-                                {dogsLoadingMore ? 'Loading...' : 'Load More'}
+                                {dogsLoadingMore ? t('common.loadingEllipsis') : t('breed.loadMore')}
                             </button>
                         </div>
                     {/if}
@@ -404,12 +402,6 @@
     color: var(--woof-color-neutral-900);
     letter-spacing: -0.5px;
     line-height: 1.1;
-}
-
-.breed-sheet-namefi {
-    font-size: var(--woof-text-caption-1);
-    color: var(--woof-color-neutral-500);
-    margin-top: 4px;
 }
 
 .breed-sheet-desc {

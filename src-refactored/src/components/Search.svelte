@@ -4,6 +4,7 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { modals, closeSearchPanel as storeClose } from '../../js/modal-store.svelte.js';
+    import { t, localName } from '../../js/i18n-store.svelte.js';
 
     let query = $state('');
     let dogCache = $state([]);
@@ -111,22 +112,22 @@
             <input
                 type="text"
                 id="mobile-search-input"
-                placeholder="Search"
+                placeholder={t('search.placeholder')}
                 autocomplete="off"
                 bind:this={inputEl}
                 bind:value={query}
             />
         </div>
-        <button class="close-search" aria-label="Close search" onclick={close}>Cancel</button>
+        <button class="close-search" aria-label="Close search" onclick={close}>{t('search.cancel')}</button>
     </div>
     <ul id="search-results" class="search-results" role="listbox">
         {#if noResults}
             <li class="search-no-results">
-                <span>No results found for "{query}"</span>
+                <span>{t('search.noResults', { query })}</span>
             </li>
         {:else}
             {#if breedResults.length > 0}
-                <li class="search-section-header">BREEDS</li>
+                <li class="search-section-header">{t('search.breeds')}</li>
                 {#each breedResults as breed (breed.id)}
                     <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
                         <a href="/breed/{breed.slug}" data-link class="search-result-link">
@@ -134,10 +135,7 @@
                                 <i class="fas fa-paw"></i>
                             </div>
                             <div class="search-result-text">
-                                <span class="search-result-name">{breed.name}</span>
-                                {#if breed.nameFi && breed.nameFi !== breed.name}
-                                    <span class="search-result-breed">{breed.nameFi}</span>
-                                {/if}
+                                <span class="search-result-name">{localName(breed)}</span>
                             </div>
                         </a>
                     </li>
@@ -145,7 +143,7 @@
             {/if}
             {#if dogResults.length > 0}
                 {#if breedResults.length > 0}
-                    <li class="search-section-header">DOGS</li>
+                    <li class="search-section-header">{t('search.dogs')}</li>
                 {/if}
                 {#each dogResults as result (result.id)}
                     <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">

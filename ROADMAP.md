@@ -1,8 +1,8 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-02-28
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1 complete)
-**Current:** Tier 2 — Major Features (13A next)
+**Last Updated:** 2026-03-01
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes (edit comments, share preview, following feed, visit profile)
+**Current:** Tier 2 — Major Features (15A Sentry next)
 
 ---
 
@@ -103,16 +103,16 @@ Migration 022: added `date_of_birth DATE` column, converted existing integer age
 
 Medium-large items that significantly boost engagement.
 
-#### 13A: Internationalization (i18n) — Large
+#### 13A: Internationalization (i18n) — DONE
 
-*Merges existing Phase 7D.*
+Custom Svelte 5 `$state`-based i18n store (svelte-i18n incompatible with runes). ~220 UI strings in `locales/en.json` + `locales/fi.json`. Language detection: localStorage → `navigator.language` → fallback `en`. EN/FI toggle in Navigation drawer. `t(key, params?)` function with `{param}` interpolation, `localName(item)` helper for bilingual breed/territory names. Backend returns `breedNameFi` in all dog/post/feed endpoints. All hardcoded English strings replaced across ~25 frontend files.
 
-- `svelte-i18n` library (Svelte 5 compatible)
-- Extract ~200-300 UI strings into `locales/en.json` and `locales/fi.json`
-- Language detection: `navigator.language`, override stored in `localStorage`
-- Language picker in Navigation drawer / Account Settings
-- Backend already has `name_fi` on breeds and territories — return both, frontend picks by locale
-- All `toLocaleString('en-US', ...)` calls switch to locale-aware formatting
+#### Bug Fixes (post-13A) — DONE
+
+- **Edit comments**: `PUT /api/comments/:id` endpoint with ownership check. EditCommentModal component, "Edit comment" button in CommentOptionsSheet, "(edited)" indicator on comments.
+- **Share OG preview**: Backend `GET /share/post/:id` serves HTML with Open Graph meta tags for social media crawlers (og:title, og:image, og:description), with auto-redirect to SPA for human visitors. Outside `/api` routes (no rate limiting for crawlers).
+- **Following feed fix**: Added `AND d.owner_id != $1` to exclude own posts from the Following tab.
+- **Visit profile fix**: PostOptionsSheet falls back to `dogId` when `dogSlug` is empty, with early return guard.
 
 #### 13B: Multi-Image Posts — Large
 

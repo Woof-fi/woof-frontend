@@ -1,5 +1,6 @@
 <script>
     import { showToast } from '../../js/utils.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     async function copyToClipboard(text) {
         if (navigator.clipboard && window.isSecureContext) {
@@ -21,15 +22,16 @@
         }
     }
 
-    let btnText = $state('Share');
+    let btnText = $derived.by(() => btnTextOverride || t('invite.share'));
+    let btnTextOverride = $state('');
     let btnIcon = $state('fas fa-share-alt');
 
     async function handleShare() {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Join Woof!',
-                    text: 'Come join the social network for dogs!',
+                    title: t('invite.shareTitle'),
+                    text: t('invite.shareText'),
                     url: window.location.origin
                 });
             } catch (err) {
@@ -45,15 +47,15 @@
     async function doClipboardFallback() {
         const success = await copyToClipboard(window.location.origin);
         if (success) {
-            showToast('Link copied!', 'success');
+            showToast(t('invite.linkCopied'), 'success');
             btnIcon = 'fas fa-check';
-            btnText = 'Copied!';
+            btnTextOverride = t('invite.copied');
             setTimeout(() => {
                 btnIcon = 'fas fa-share-alt';
-                btnText = 'Share';
+                btnTextOverride = '';
             }, 2000);
         } else {
-            showToast('Failed to copy link', 'error');
+            showToast(t('invite.failedCopy'), 'error');
         }
     }
 </script>
@@ -62,8 +64,8 @@
     <div class="invite-card-icon">
         <i class="fas fa-envelope-open-text"></i>
     </div>
-    <h3 class="invite-card-heading">Know a good boy or girl?</h3>
-    <p class="invite-card-desc">Invite your friends and their dogs to join the pack!</p>
+    <h3 class="invite-card-heading">{t('invite.heading')}</h3>
+    <p class="invite-card-desc">{t('invite.desc')}</p>
     <div class="invite-card-actions">
         <button class="btn-primary invite-card-btn" onclick={handleShare}>
             <i class={btnIcon}></i> {btnText}

@@ -7,16 +7,17 @@
     import { showOnboardingTour, isOnboardingCompleted } from '../../js/onboarding-tour.js';
     import { openEditDogModal, openHealthRecordModal, openFollowListModal } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let { params = {}, onopenAuthModal = null } = $props();
     let slug = $derived(params.slug || 'nelli-1');
 
     const HEALTH_TYPE_CONFIG = {
-        vet_visit:   { icon: 'fa-stethoscope', label: 'Vet Visit',   color: '#3b82f6' },
-        vaccination: { icon: 'fa-syringe',     label: 'Vaccination', color: '#10b981' },
-        medication:  { icon: 'fa-pills',       label: 'Medication',  color: '#f59e0b' },
-        weight:      { icon: 'fa-weight',      label: 'Weight',      color: '#C9403F' },
-        note:        { icon: 'fa-sticky-note', label: 'Note',        color: '#6b7280' },
+        vet_visit:   { icon: 'fa-stethoscope', labelKey: 'health.vetVisit',    color: '#3b82f6' },
+        vaccination: { icon: 'fa-syringe',     labelKey: 'health.vaccination', color: '#10b981' },
+        medication:  { icon: 'fa-pills',       labelKey: 'health.medication',  color: '#f59e0b' },
+        weight:      { icon: 'fa-weight',      labelKey: 'health.weight',      color: '#C9403F' },
+        note:        { icon: 'fa-sticky-note', labelKey: 'health.note',        color: '#6b7280' },
     };
 
     let dog = $state(null);
@@ -49,10 +50,14 @@
         const totalMonths = Math.floor(diffMs / (30.44 * 24 * 60 * 60 * 1000));
         const years = Math.floor(totalMonths / 12);
         const months = totalMonths % 12;
-        if (years === 0 && months === 0) return 'Newborn';
-        if (years === 0) return `${months} month${months !== 1 ? 's' : ''}`;
-        if (months === 0) return `${years} year${years !== 1 ? 's' : ''}`;
-        return `${years} yr ${months} mo`;
+        if (years === 0 && months === 0) return t('profile.newborn');
+        if (years === 0) return months === 1
+            ? t('profile.monthSingular', { count: months })
+            : t('profile.monthPlural', { count: months });
+        if (months === 0) return years === 1
+            ? t('profile.yearSingular', { count: years })
+            : t('profile.yearPlural', { count: years });
+        return t('profile.yearMonth', { years, months });
     }
 
     function fallbackImg(e) {
@@ -206,20 +211,20 @@
     }
 
     async function handleDeleteHealthRecord(record) {
-        if (!confirm('Delete this health record?')) return;
+        if (!confirm(t('health.deleteConfirm'))) return;
         try {
             await deleteHealthRecord(dog.id, record.id);
-            showToast('Record deleted', 'success');
+            showToast(t('health.recordDeleted'), 'success');
             healthRecords = healthRecords.filter(r => r.id !== record.id);
         } catch (err) {
             console.error('Delete health record failed:', err);
-            showToast('Failed to delete record', 'error');
+            showToast(t('health.failedDelete'), 'error');
         }
     }
 
     async function handleFollowToggle() {
         if (!isAuthenticated()) {
-            showToast('Please log in to follow dogs', 'error');
+            showToast(t('profile.loginToFollow'), 'error');
             return;
         }
         followLoading = true;
@@ -235,7 +240,7 @@
             }
         } catch (e) {
             console.error('Follow toggle failed:', e);
-            showToast('Action failed. Please try again.', 'error');
+            showToast(t('profile.actionFailed'), 'error');
         } finally {
             followLoading = false;
         }
@@ -243,7 +248,7 @@
 
     async function handleMessage() {
         if (!isAuthenticated()) {
-            showToast('Please log in to send messages', 'error');
+            showToast(t('messages.loginToMessage'), 'error');
             return;
         }
         try {
@@ -253,7 +258,7 @@
             window.dispatchEvent(new CustomEvent('routechange'));
         } catch (e) {
             console.error('Failed to start conversation:', e);
-            showToast('Failed to start conversation', 'error');
+            showToast(t('messages.failedStart'), 'error');
         }
     }
 </script>
@@ -311,27 +316,27 @@
                         {#if dog.dateOfBirth}
                             <span class="profile-sheet-age"><i class="fas fa-birthday-cake"></i> {formatAge(dog.dateOfBirth)}</span>
                         {:else if dog.age != null}
-                            <span class="profile-sheet-age"><i class="fas fa-birthday-cake"></i> {dog.age} year{dog.age !== 1 ? 's' : ''} old</span>
+                            <span class="profile-sheet-age"><i class="fas fa-birthday-cake"></i> {dog.age === 1 ? t('profile.yearSingular', { count: dog.age }) : t('profile.yearPlural', { count: dog.age })}</span>
                         {/if}
                     </div>
                     {#if dog.isOwner}
                         <button class="edit-profile-btn" onclick={handleEditDog}>
-                            <i class="fas fa-edit"></i> Edit
+                            <i class="fas fa-edit"></i> {t('profile.editProfile')}
                         </button>
                     {/if}
                 </div>
                 <div class="profile-sheet-stats">
                     <div class="profile-sheet-stat">
                         <div class="profile-sheet-stat-num">{postsLoading ? '—' : posts.length}</div>
-                        <div class="profile-sheet-stat-label">Posts</div>
+                        <div class="profile-sheet-stat-label">{t('profile.posts')}</div>
                     </div>
-                    <button class="profile-sheet-stat profile-sheet-stat-clickable" aria-label="{followerCount} followers" onclick={() => openFollowListModal(dog.id, 'followers')}>
+                    <button class="profile-sheet-stat profile-sheet-stat-clickable" aria-label="{followerCount} {t('profile.followers')}" onclick={() => openFollowListModal(dog.id, 'followers')}>
                         <div class="profile-sheet-stat-num">{followerCount}</div>
-                        <div class="profile-sheet-stat-label">Followers</div>
+                        <div class="profile-sheet-stat-label">{t('profile.followers')}</div>
                     </button>
-                    <button class="profile-sheet-stat profile-sheet-stat-clickable" aria-label="{followingCount} following" onclick={() => openFollowListModal(dog.id, 'following')}>
+                    <button class="profile-sheet-stat profile-sheet-stat-clickable" aria-label="{followingCount} {t('profile.following')}" onclick={() => openFollowListModal(dog.id, 'following')}>
                         <div class="profile-sheet-stat-num">{followingCount}</div>
-                        <div class="profile-sheet-stat-label">Following</div>
+                        <div class="profile-sheet-stat-label">{t('profile.following')}</div>
                     </button>
                 </div>
                 {#if dog.bio}
@@ -341,7 +346,7 @@
                     <div class="territory-nudge">
                         <span class="territory-nudge-text">
                             <i class="fas fa-map-marker-alt"></i>
-                            Set your territory to connect with nearby dogs
+                            {t('dog.territoryHint')}
                         </span>
                         <button class="territory-nudge-btn" onclick={handleEditDog}>Set</button>
                     </div>
@@ -356,7 +361,7 @@
                     aria-selected={activeTab === 'posts'}
                     onclick={() => activeTab = 'posts'}
                 >
-                    <i class="fas fa-th"></i> Posts
+                    <i class="fas fa-th"></i> {t('profile.posts')}
                 </button>
                 <button
                     class="tab-link"
@@ -365,7 +370,7 @@
                     aria-selected={activeTab === 'friends'}
                     onclick={() => activeTab = 'friends'}
                 >
-                    <i class="fas fa-user-friends"></i> Friends
+                    <i class="fas fa-user-friends"></i> {t('profile.friends')}
                 </button>
                 <button
                     class="tab-link"
@@ -374,7 +379,7 @@
                     aria-selected={activeTab === 'health'}
                     onclick={() => activeTab = 'health'}
                 >
-                    <i class="fas fa-heartbeat"></i> Health
+                    <i class="fas fa-heartbeat"></i> {t('profile.health')}
                 </button>
             </div>
 
@@ -385,7 +390,7 @@
                 {:else if posts.length === 0}
                     <div class="empty-state">
                         <i class="fas fa-camera"></i>
-                        <p>{dog.isOwner ? 'No posts yet. Share your first photo!' : 'No posts yet.'}</p>
+                        <p>{t('profile.noPosts')}</p>
                     </div>
                 {:else}
                     <div class="posts-grid posts-grid-2col">
@@ -415,7 +420,7 @@
                 {:else if friends.length === 0 && friendsLoadedOnce}
                     <div class="empty-state">
                         <i class="fas fa-user-friends"></i>
-                        <p>No friends yet. Start connecting!</p>
+                        <p>{t('profile.noFollowers')}</p>
                     </div>
                 {:else if friends.length > 0}
                     <ul class="friend-list">
@@ -445,38 +450,38 @@
                 {#if !dog.isOwner}
                     <div class="private-content">
                         <i class="fas fa-lock"></i>
-                        <p>Health records are private and only visible to the owner.</p>
+                        <p>{t('health.privateNotice')}</p>
                     </div>
                 {:else}
                     <div class="health-header">
-                        <h2>Health Records</h2>
+                        <h2>{t('profile.health')}</h2>
                         <button class="btn-primary health-add-btn" onclick={handleAddHealthRecord}>
-                            <i class="fas fa-plus"></i> Add Record
+                            <i class="fas fa-plus"></i> {t('health.addRecordBtn')}
                         </button>
                     </div>
                     <div class="health-filters" id="health-filters">
-                        <button class="health-filter-btn" class:active={healthFilterType === null} onclick={() => setHealthFilter(null)}>All</button>
-                        <button class="health-filter-btn" class:active={healthFilterType === 'vet_visit'} onclick={() => setHealthFilter('vet_visit')}><i class="fas fa-stethoscope"></i> Vet</button>
-                        <button class="health-filter-btn" class:active={healthFilterType === 'vaccination'} onclick={() => setHealthFilter('vaccination')}><i class="fas fa-syringe"></i> Vaccines</button>
-                        <button class="health-filter-btn" class:active={healthFilterType === 'medication'} onclick={() => setHealthFilter('medication')}><i class="fas fa-pills"></i> Meds</button>
-                        <button class="health-filter-btn" class:active={healthFilterType === 'weight'} onclick={() => setHealthFilter('weight')}><i class="fas fa-weight"></i> Weight</button>
-                        <button class="health-filter-btn" class:active={healthFilterType === 'note'} onclick={() => setHealthFilter('note')}><i class="fas fa-sticky-note"></i> Notes</button>
+                        <button class="health-filter-btn" class:active={healthFilterType === null} onclick={() => setHealthFilter(null)}>{t('admin.all')}</button>
+                        <button class="health-filter-btn" class:active={healthFilterType === 'vet_visit'} onclick={() => setHealthFilter('vet_visit')}><i class="fas fa-stethoscope"></i> {t('health.vetVisit')}</button>
+                        <button class="health-filter-btn" class:active={healthFilterType === 'vaccination'} onclick={() => setHealthFilter('vaccination')}><i class="fas fa-syringe"></i> {t('health.vaccination')}</button>
+                        <button class="health-filter-btn" class:active={healthFilterType === 'medication'} onclick={() => setHealthFilter('medication')}><i class="fas fa-pills"></i> {t('health.medication')}</button>
+                        <button class="health-filter-btn" class:active={healthFilterType === 'weight'} onclick={() => setHealthFilter('weight')}><i class="fas fa-weight"></i> {t('health.weight')}</button>
+                        <button class="health-filter-btn" class:active={healthFilterType === 'note'} onclick={() => setHealthFilter('note')}><i class="fas fa-sticky-note"></i> {t('health.note')}</button>
                     </div>
                     <div class="health-timeline">
                         {#if healthLoading}
-                            <div class="health-loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                            <div class="health-loading"><i class="fas fa-spinner fa-spin"></i> {t('common.loading')}...</div>
                         {:else if healthRecords.length === 0}
                             {#if healthFilterType}
                                 <div class="empty-state">
                                     <i class="fas fa-heartbeat"></i>
-                                    <p>No records of this type yet.</p>
+                                    <p>{t('health.noRecords')}</p>
                                 </div>
                             {:else}
                                 <div class="empty-state">
                                     <i class="fas fa-heartbeat"></i>
-                                    <p>Start tracking your dog's health!</p>
+                                    <p>{t('health.startTracking')}</p>
                                     <button class="btn-primary" style="margin-top:12px" onclick={handleAddHealthRecord}>
-                                        <i class="fas fa-plus"></i> Add First Record
+                                        <i class="fas fa-plus"></i> {t('health.addFirstRecord')}
                                     </button>
                                 </div>
                             {/if}
@@ -489,7 +494,7 @@
                                     </div>
                                     <div class="health-card-body">
                                         <div class="health-card-header">
-                                            <span class="health-card-type">{config.label}</span>
+                                            <span class="health-card-type">{t(config.labelKey)}</span>
                                             <span class="health-card-date">{formatHealthDate(record.date)}</span>
                                         </div>
                                         <p class="health-card-desc">{record.description}</p>
@@ -528,15 +533,15 @@
                         {#if followLoading}
                             <i class="fas fa-spinner fa-spin"></i>
                         {:else if isFollowing}
-                            <i class="fas fa-user-check"></i> Following
+                            <i class="fas fa-user-check"></i> {t('profile.followingBtn')}
                         {:else}
-                            <i class="fas fa-user-plus"></i> Follow
+                            <i class="fas fa-user-plus"></i> {t('profile.followBtn')}
                         {/if}
                     </button>
                     <button
                         class="message-profile-btn icon-only"
-                        title="Message"
-                        aria-label="Message"
+                        title={t('profile.message')}
+                        aria-label={t('profile.message')}
                         onclick={handleMessage}
                     >
                         <i class="fas fa-envelope"></i>

@@ -1,25 +1,24 @@
 <script>
-    import { updatePost } from '../../js/api.js';
+    import { updateComment } from '../../js/api.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { showToast } from '../../js/utils.js';
-    import { modals, closeEditPostModal as storeClose } from '../../js/modal-store.svelte.js';
-    import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
+    import { modals, closeEditCommentModal as storeClose } from '../../js/modal-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
 
     let submitting = $state(false);
-    let caption = $state('');
+    let content = $state('');
 
-    // Populate caption when modal opens
+    // Populate content when modal opens
     $effect(() => {
-        if (modals.editPostModalOpen && modals.editPostData) {
-            caption = modals.editPostData.caption || '';
+        if (modals.editCommentModalOpen && modals.editCommentData) {
+            content = modals.editCommentData.content || '';
         }
     });
 
     // Manage body scroll + modal history
     $effect(() => {
-        if (modals.editPostModalOpen) {
+        if (modals.editCommentModalOpen) {
             pushModalState();
             toggleBodyScroll(true);
             return () => {
@@ -30,7 +29,7 @@
     });
 
     function close() {
-        if (!modals.editPostModalOpen) return;
+        if (!modals.editCommentModalOpen) return;
         storeClose();
     }
 
@@ -44,15 +43,17 @@
 
     async function handleSubmit(e) {
         e.preventDefault();
-        if (!modals.editPostData?.id) return;
+        if (!modals.editCommentData?.commentId) return;
 
         submitting = true;
         try {
-            await updatePost(modals.editPostData.id, caption.trim());
+            const result = await updateComment(modals.editCommentData.commentId, content.trim());
+            modals.editCommentData.onUpdated?.(result.comment);
+            showToast(t('post.commentUpdated'), 'success');
             close();
-            bumpFeedVersion();
         } catch (err) {
-            console.error('Failed to update post:', err);
+            console.error('Failed to update comment:', err);
+            showToast(t('post.failedUpdateComment'), 'error');
         } finally {
             submitting = false;
         }
@@ -62,9 +63,9 @@
 <svelte:window onkeydown={handleKey} />
 
 <div
-    id="edit-post-modal"
+    id="edit-comment-modal"
     class="modal"
-    style:display={modals.editPostModalOpen ? 'block' : 'none'}
+    style:display={modals.editCommentModalOpen ? 'block' : 'none'}
     onclick={handleOverlayClick}
     onkeydown={() => {}}
     role="dialog"
@@ -73,24 +74,24 @@
 >
     <div class="modal-content">
         <div class="modal-header">
-            <h2>{t('postEdit.title')}</h2>
+            <h2>{t('post.editCommentTitle')}</h2>
             <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
-            <form id="edit-post-form" onsubmit={handleSubmit}>
+            <form id="edit-comment-form" onsubmit={handleSubmit}>
                 <div class="form-group">
-                    <label for="edit-post-caption">{t('postEdit.caption')}</label>
+                    <label for="edit-comment-content">{t('post.commentLabel')}</label>
                     <textarea
-                        id="edit-post-caption"
-                        rows="4"
+                        id="edit-comment-content"
+                        rows="3"
                         maxlength="2200"
-                        placeholder={t('postEdit.placeholder')}
-                        bind:value={caption}
+                        placeholder={t('post.commentPlaceholder')}
+                        bind:value={content}
                     ></textarea>
-                    <small class="char-count">{caption.length} / 2200</small>
+                    <small class="char-count">{content.length} / 2200</small>
                 </div>
-                <button type="submit" class="btn-primary" disabled={submitting}>
-                    {submitting ? t('postEdit.saving') : t('postEdit.save')}
+                <button type="submit" class="btn-primary" disabled={submitting || !content.trim()}>
+                    {submitting ? t('common.saving') : t('common.save')}
                 </button>
             </form>
         </div>

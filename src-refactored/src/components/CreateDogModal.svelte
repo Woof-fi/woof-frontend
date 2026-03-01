@@ -6,6 +6,7 @@
     import { showToast, isValidFileType, isValidFileSize } from '../../js/utils.js';
     import { modals, closeCreateDogModal as storeClose, openAuthModal } from '../../js/modal-store.svelte.js';
     import { bumpDogVersion } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
     import BreedAutocomplete from './BreedAutocomplete.svelte';
     import TerritoryAutocomplete from './TerritoryAutocomplete.svelte';
 
@@ -72,12 +73,12 @@
             return;
         }
         if (!isValidFileType(file)) {
-            showToast('Only JPEG, PNG, GIF and WebP images are allowed', 'error');
+            showToast(t('postCreate.invalidFileType'), 'error');
             e.target.value = '';
             return;
         }
         if (!isValidFileSize(file, 10)) {
-            showToast('Image must be under 10 MB', 'error');
+            showToast(t('postCreate.fileTooLarge'), 'error');
             e.target.value = '';
             return;
         }
@@ -90,25 +91,25 @@
         e.preventDefault();
 
         if (!isAuthenticated()) {
-            showToast('Please login to add a pet', 'error');
+            showToast(t('dog.loginRequired'), 'error');
             close();
             openAuthModal();
             return;
         }
 
         if (!breedId) {
-            showToast('Please select a breed from the list', 'error');
+            showToast(t('dog.selectBreed'), 'error');
             return;
         }
 
         if (!photoFile) {
-            showToast('Please add a profile photo for your dog', 'error');
+            showToast(t('dog.addPhoto'), 'error');
             return;
         }
 
         submitting = true;
         try {
-            showToast('Uploading photo...', 'info');
+            showToast(t('dog.uploadingPhoto'), 'info');
             const profilePhoto = await uploadImage(photoFile);
 
             const dogData = {
@@ -150,24 +151,24 @@
 >
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Add a Pet</h2>
-            <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
+            <h2>{t('dog.addPet')}</h2>
+            <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
             <form id="create-dog-form" onsubmit={handleSubmit}>
                 <div class="form-group">
-                    <label for="dog-name">Name *</label>
+                    <label for="dog-name">{t('dog.nameLabel')}</label>
                     <input
                         type="text"
                         id="dog-name"
                         required
                         maxlength="50"
-                        placeholder="e.g., Nelli"
+                        placeholder={t('dog.namePlaceholder')}
                         bind:value={dogName}
                     />
                 </div>
                 <div class="form-group">
-                    <label for="dog-breed">Breed *</label>
+                    <label for="dog-breed">{t('dog.breedLabel')}</label>
                     <BreedAutocomplete
                         id="dog-breed"
                         required={true}
@@ -176,7 +177,7 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="dog-dob">Date of Birth *</label>
+                    <label for="dog-dob">{t('dog.dobLabel')}</label>
                     <input
                         type="date"
                         id="dog-dob"
@@ -187,26 +188,26 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="dog-territory">Territory / Reviiri (optional)</label>
+                    <label for="dog-territory">{t('dog.territoryLabel')}</label>
                     <TerritoryAutocomplete
                         id="dog-territory"
                         bind:selectedTerritoryId={territoryId}
                         bind:selectedTerritoryName={territoryName}
                     />
-                    <small class="form-hint">Set your territory to connect with nearby dogs</small>
+                    <small class="form-hint">{t('dog.territoryHint')}</small>
                 </div>
                 <div class="form-group">
-                    <label for="dog-bio">Bio (optional)</label>
+                    <label for="dog-bio">{t('dog.bioLabel')}</label>
                     <textarea
                         id="dog-bio"
                         rows="3"
                         maxlength="500"
-                        placeholder="Tell us about your dog..."
+                        placeholder={t('dog.bioPlaceholder')}
                         bind:value={bio}
                     ></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="dog-photo">Profile Photo *</label>
+                    <label for="dog-photo">{t('dog.photoLabel')}</label>
                     <input
                         type="file"
                         id="dog-photo"
@@ -215,7 +216,7 @@
                         bind:this={photoInputEl}
                         onchange={handlePhotoChange}
                     />
-                    <small class="form-hint">Square photos work best</small>
+                    <small class="form-hint">{t('dog.photoHint')}</small>
                     <div id="dog-photo-preview" class="image-preview">
                         {#if previewUrl}
                             <img
@@ -227,7 +228,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn-primary" disabled={submitting}>
-                    {submitting ? 'Adding...' : 'Add Pet'}
+                    {submitting ? t('dog.adding') : t('dog.addPetBtn')}
                 </button>
             </form>
         </div>

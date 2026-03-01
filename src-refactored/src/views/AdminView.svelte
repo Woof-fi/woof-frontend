@@ -2,23 +2,24 @@
     import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration } from '../../js/api.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { showToast, timeAgo } from '../../js/utils.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
-    const REASON_LABELS = {
-        inappropriate_content: 'Inappropriate content',
-        spam:                  'Spam',
-        harassment:            'Harassment',
-        not_a_dog:             'Not a dog',
-        violence:              'Violence',
-        other:                 'Other',
-    };
+    let REASON_LABELS = $derived({
+        inappropriate_content: t('post.reasonInappropriate'),
+        spam:                  t('post.reasonSpam'),
+        harassment:            t('post.reasonHarassment'),
+        not_a_dog:             t('post.reasonNotDog'),
+        violence:              t('post.reasonViolence'),
+        other:                 t('post.reasonOther'),
+    });
 
-    const STATUS_FILTERS = [
-        { value: 'pending',   label: 'Pending' },
-        { value: 'reviewed',  label: 'Reviewed' },
-        { value: 'actioned',  label: 'Actioned' },
-        { value: 'dismissed', label: 'Dismissed' },
-        { value: '',          label: 'All' },
-    ];
+    let STATUS_FILTERS = $derived([
+        { value: 'pending',   label: t('admin.pending') },
+        { value: 'reviewed',  label: t('admin.reviewed') },
+        { value: 'actioned',  label: t('admin.actioned') },
+        { value: 'dismissed', label: t('admin.dismissed') },
+        { value: '',          label: t('admin.all') },
+    ]);
 
     let isAdmin      = $derived(store.authUser?.role === 'admin' || store.authUser?.role === 'moderator');
     let isAdminRole  = $derived(store.authUser?.role === 'admin');
@@ -65,7 +66,7 @@
             reports    = data.reports ?? [];
             nextCursor = data.nextCursor ?? null;
         } catch (err) {
-            showToast(err?.status === 403 ? 'Access denied' : 'Failed to load reports', 'error');
+            showToast(err?.status === 403 ? t('admin.accessDenied') : t('admin.failedLoadReports'), 'error');
         } finally {
             loading = false;
         }
@@ -79,7 +80,7 @@
             reports    = [...reports, ...(data.reports ?? [])];
             nextCursor = data.nextCursor ?? null;
         } catch {
-            showToast('Failed to load more reports', 'error');
+            showToast(t('admin.failedLoadMore'), 'error');
         } finally {
             loadingMore = false;
         }
@@ -95,9 +96,9 @@
             } else {
                 reports = reports.map(r => r.id === report.id ? { ...r, status } : r);
             }
-            showToast('Report updated', 'success');
+            showToast(t('admin.reportUpdated'), 'success');
         } catch {
-            showToast('Failed to update report', 'error');
+            showToast(t('admin.failedUpdateReport'), 'error');
         } finally {
             const next = { ...busy };
             delete next[report.id];
@@ -111,9 +112,9 @@
             await adminDeletePost(report.target_id);
             await updateReportStatus(report.id, 'actioned');
             reports = reports.filter(r => r.id !== report.id);
-            showToast('Post deleted and report actioned', 'success');
+            showToast(t('admin.postDeletedActioned'), 'success');
         } catch (err) {
-            showToast(err?.status === 404 ? 'Post already deleted' : 'Failed to delete post', 'error');
+            showToast(err?.status === 404 ? t('admin.postAlreadyDeleted') : t('admin.failedDeletePost'), 'error');
             // Still mark as actioned even if post was already gone
             try {
                 await updateReportStatus(report.id, 'actioned');
@@ -132,9 +133,9 @@
             await adminDeleteComment(report.target_id);
             await updateReportStatus(report.id, 'actioned');
             reports = reports.filter(r => r.id !== report.id);
-            showToast('Comment deleted and report actioned', 'success');
+            showToast(t('admin.commentDeletedActioned'), 'success');
         } catch (err) {
-            showToast(err?.status === 404 ? 'Comment already deleted' : 'Failed to delete comment', 'error');
+            showToast(err?.status === 404 ? t('admin.commentAlreadyDeleted') : t('admin.failedDeleteComment'), 'error');
             try {
                 await updateReportStatus(report.id, 'actioned');
                 reports = reports.filter(r => r.id !== report.id);
@@ -158,9 +159,9 @@
                 if (r.post_owner_user_id === userId) return { ...r, post_owner_banned_at: new Date().toISOString() };
                 return { ...r, comment_owner_banned_at: new Date().toISOString() };
             });
-            showToast('User banned', 'success');
+            showToast(t('admin.userBanned'), 'success');
         } catch {
-            showToast('Failed to ban user', 'error');
+            showToast(t('admin.failedBan'), 'error');
         } finally {
             const next = { ...busy };
             delete next[report.id];
@@ -174,7 +175,7 @@
             const data = await getFlaggedPosts();
             flaggedPosts = data.posts ?? [];
         } catch (err) {
-            showToast(err?.status === 403 ? 'Access denied' : 'Failed to load flagged posts', 'error');
+            showToast(err?.status === 403 ? t('admin.accessDenied') : t('admin.failedLoadReports'), 'error');
         } finally {
             flaggedLoading = false;
         }
@@ -207,9 +208,9 @@
                 if (r.post_owner_user_id === userId) return { ...r, post_owner_banned_at: null };
                 return { ...r, comment_owner_banned_at: null };
             });
-            showToast('User unbanned', 'success');
+            showToast(t('admin.userUnbanned'), 'success');
         } catch {
-            showToast('Failed to unban user', 'error');
+            showToast(t('admin.failedUnban'), 'error');
         } finally {
             const next = { ...busy };
             delete next[report.id];
@@ -221,7 +222,7 @@
 {#if !isAdmin}
     <div class="admin-access-denied">
         <i class="fas fa-lock"></i>
-        <p>Access denied</p>
+        <p>{t('admin.accessDenied')}</p>
     </div>
 {:else}
     <div class="admin-view">
@@ -236,14 +237,14 @@
                 class:active={section === 'reports'}
                 onclick={() => section = 'reports'}
             >
-                <i class="fas fa-flag"></i> Reports
+                <i class="fas fa-flag"></i> {t('admin.reports')}
             </button>
             <button
                 class="admin-section-tab"
                 class:active={section === 'flagged'}
                 onclick={() => section = 'flagged'}
             >
-                <i class="fas fa-robot"></i> Flagged
+                <i class="fas fa-robot"></i> {t('admin.flagged')}
                 {#if flaggedPosts.length > 0}
                     <span class="admin-section-badge">{flaggedPosts.length}</span>
                 {/if}
@@ -265,13 +266,13 @@
 
             {#if loading}
                 <div class="admin-loading">
-                    <i class="fas fa-spinner fa-spin"></i> Loading reports…
+                    <i class="fas fa-spinner fa-spin"></i> {t('admin.loadingReports')}
                 </div>
 
             {:else if reports.length === 0}
                 <div class="admin-empty">
                     <i class="fas fa-check-circle"></i>
-                    <p>No {statusFilter || ''} reports</p>
+                    <p>{t('admin.noReports', { status: statusFilter || '' })}</p>
                 </div>
 
             {:else}
@@ -351,7 +352,7 @@
                                             disabled={!!busy[report.id]}
                                             onclick={() => handleDeletePost(report)}
                                         >
-                                            <i class="fas fa-trash"></i> Delete post
+                                            <i class="fas fa-trash"></i> {t('admin.deletePost')}
                                         </button>
                                     {/if}
                                     {#if report.target_type === 'comment'}
@@ -360,7 +361,7 @@
                                             disabled={!!busy[report.id]}
                                             onclick={() => handleDeleteComment(report)}
                                         >
-                                            <i class="fas fa-trash"></i> Delete comment
+                                            <i class="fas fa-trash"></i> {t('admin.deleteComment')}
                                         </button>
                                     {/if}
                                     {#if isAdminRole && (report.post_owner_user_id || report.comment_owner_user_id)}
@@ -371,7 +372,7 @@
                                                 disabled={!!busy[report.id]}
                                                 onclick={() => handleUnbanUser(report)}
                                             >
-                                                <i class="fas fa-user-check"></i> Unban user
+                                                <i class="fas fa-user-check"></i> {t('admin.unbanUser')}
                                             </button>
                                         {:else}
                                             <button
@@ -379,7 +380,7 @@
                                                 disabled={!!busy[report.id]}
                                                 onclick={() => handleBanUser(report)}
                                             >
-                                                <i class="fas fa-user-slash"></i> Ban user
+                                                <i class="fas fa-user-slash"></i> {t('admin.banUser')}
                                             </button>
                                         {/if}
                                     {/if}
@@ -388,14 +389,14 @@
                                         disabled={!!busy[report.id]}
                                         onclick={() => setStatus(report, 'reviewed')}
                                     >
-                                        <i class="fas fa-eye"></i> Mark reviewed
+                                        <i class="fas fa-eye"></i> {t('admin.markReviewed')}
                                     </button>
                                     <button
                                         class="admin-action-btn admin-action-btn--muted"
                                         disabled={!!busy[report.id]}
                                         onclick={() => setStatus(report, 'dismissed')}
                                     >
-                                        <i class="fas fa-times"></i> Dismiss
+                                        <i class="fas fa-times"></i> {t('admin.dismiss')}
                                     </button>
                                 </div>
                             </div>
@@ -404,7 +405,7 @@
 
                     {#if nextCursor}
                         <button class="admin-load-more" onclick={loadMore} disabled={loadingMore}>
-                            {loadingMore ? 'Loading…' : 'Load more'}
+                            {loadingMore ? t('common.loadingEllipsis') : t('notifications.loadMore')}
                         </button>
                     {/if}
                 </div>
@@ -413,12 +414,12 @@
         {:else if section === 'flagged'}
             {#if flaggedLoading}
                 <div class="admin-loading">
-                    <i class="fas fa-spinner fa-spin"></i> Loading flagged posts…
+                    <i class="fas fa-spinner fa-spin"></i> {t('admin.loadingFlagged')}
                 </div>
             {:else if flaggedPosts.length === 0}
                 <div class="admin-empty">
                     <i class="fas fa-robot"></i>
-                    <p>No flagged posts</p>
+                    <p>{t('admin.noFlaggedPosts')}</p>
                 </div>
             {:else}
                 <div class="admin-flagged-grid">
@@ -448,14 +449,14 @@
                                         disabled={!!flaggedBusy[post.id]}
                                         onclick={() => handleFlaggedAction(post, 'approved')}
                                     >
-                                        <i class="fas fa-check"></i> Approve
+                                        <i class="fas fa-check"></i> {t('admin.approve')}
                                     </button>
                                     <button
                                         class="admin-action-btn admin-action-btn--danger"
                                         disabled={!!flaggedBusy[post.id]}
                                         onclick={() => handleFlaggedAction(post, 'removed')}
                                     >
-                                        <i class="fas fa-trash"></i> Remove
+                                        <i class="fas fa-trash"></i> {t('admin.remove')}
                                     </button>
                                 </div>
                             </div>

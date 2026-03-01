@@ -1,6 +1,7 @@
 <script>
     import { getPost } from '../../js/api.js';
     import PostCard from '../components/PostCard.svelte';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let { params = {}, onopenAuthModal = null } = $props();
     let post = $state(null);
@@ -30,24 +31,24 @@
 
 <main class="post-detail-page">
     <div class="post-detail-nav">
-        <button class="back-btn" aria-label="Go back" onclick={() => window.history.back()}>
+        <button class="back-btn" aria-label={t('postDetail.goBack')} onclick={() => window.history.back()}>
             <i class="fas fa-arrow-left"></i>
-            Back
+            {t('postDetail.back')}
         </button>
     </div>
     <div class="post-detail-container" id="post-detail-container">
         {#if loading}
-            <div class="post-detail-loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            <div class="post-detail-loading"><i class="fas fa-spinner fa-spin"></i> {t('postDetail.loading')}</div>
         {:else if error}
             <div class="empty-state">
                 <i class="fas fa-exclamation-circle"></i>
-                <p>Failed to load post.</p>
+                <p>{t('postDetail.failedLoad')}</p>
             </div>
         {:else if post}
             <PostCard
                 id={post.id}
                 profilePic={post.dogPhoto || '/images/dog_profile_pic.jpg'}
-                username={post.dogName || 'Unknown Dog'}
+                username={post.dogName || t('feed.unknownDog')}
                 imageUrl={post.imageUrl}
                 caption={post.caption || ''}
                 dogSlug={post.dogSlug || ''}

@@ -3,6 +3,7 @@
     import { isAuthenticated } from '../../js/auth.js';
     import { timeAgo, imageVariant } from '../../js/utils.js';
     import { setNotifUnreadCount } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let { onopenAuthModal = null } = $props();
 
@@ -61,9 +62,9 @@
     /** Human-readable notification text (without the actor name prefix) */
     function notifText(notif) {
         switch (notif.type) {
-            case 'like':    return 'liked your post';
-            case 'comment': return 'commented on your post';
-            case 'follow':  return 'started following you';
+            case 'like':    return t('notifications.liked');
+            case 'comment': return t('notifications.commented');
+            case 'follow':  return t('notifications.followed');
             default:        return '';
         }
     }
@@ -264,7 +265,7 @@
 </style>
 
 <div class="notifications-view">
-    <h1 class="notifications-view-title">Notifications</h1>
+    <h1 class="notifications-view-title">{t('notifications.title')}</h1>
 
     {#if loading}
         {#each Array(6) as _, i (i)}
@@ -279,9 +280,9 @@
     {:else if notifications.length === 0}
         <div class="notifications-empty">
             <i class="fas fa-bell" aria-hidden="true"></i>
-            <p>No notifications yet</p>
+            <p>{t('notifications.empty')}</p>
             <p style="font-size: var(--woof-text-footnote);">
-                When someone likes your post or follows you, it'll show up here.
+                {t('notifications.emptyHint')}
             </p>
         </div>
     {:else}
@@ -298,7 +299,7 @@
                     >
                         <img
                             src={notif.actorDog?.profilePhoto || FALLBACK_AVATAR}
-                            alt={notif.actorDog?.name ?? 'User avatar'}
+                            alt={notif.actorDog?.name ?? t('notifications.userAvatar')}
                             class="notification-avatar"
                             onerror={(e) => { e.target.src = FALLBACK_AVATAR; }}
                         />
@@ -336,9 +337,9 @@
                     disabled={loadingMore}
                 >
                     {#if loadingMore}
-                        <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading…
+                        <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> {t('common.loadingEllipsis')}
                     {:else}
-                        Load more
+                        {t('notifications.loadMore')}
                     {/if}
                 </button>
             {/if}

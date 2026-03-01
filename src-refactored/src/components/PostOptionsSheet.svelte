@@ -3,9 +3,11 @@
     import { modals, closePostOptionsSheet, openAuthModal, openEditPostModal } from '../../js/modal-store.svelte.js';
     import { reportContent, deletePost, toggleBookmark, getBookmarkStatus } from '../../js/api.js';
     import { followDog, unfollowDog, getFollowStatus } from '../../js/api.js';
+    import { CONFIG } from '../../js/config.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast } from '../../js/utils.js';
     import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let data      = $derived(modals.postOptionsSheetData);
     let postId    = $derived(data?.postId ?? '');
@@ -20,13 +22,13 @@
     let isFollowing  = $state(false);
     let isBookmarked = $state(false);
 
-    const REASONS = [
-        { key: 'inappropriate_content', label: 'Inappropriate content' },
-        { key: 'spam',                  label: 'Spam' },
-        { key: 'harassment',            label: 'Harassment' },
-        { key: 'not_a_dog',             label: 'Not a dog' },
-        { key: 'violence',              label: 'Violence' },
-        { key: 'other',                 label: 'Other' },
+    const REASON_KEYS = [
+        { key: 'inappropriate_content', i18n: 'post.reasonInappropriate' },
+        { key: 'spam',                  i18n: 'post.reasonSpam' },
+        { key: 'harassment',            i18n: 'post.reasonHarassment' },
+        { key: 'not_a_dog',             i18n: 'post.reasonNotDog' },
+        { key: 'violence',              i18n: 'post.reasonViolence' },
+        { key: 'other',                 i18n: 'post.reasonOther' },
     ];
 
     $effect(() => {
@@ -58,13 +60,24 @@
     }
 
     function visitProfile() {
+        const slug = dogSlug || dogId;
+        if (!slug) return;
         closePostOptionsSheet();
-        history.pushState({}, '', `/dog/${dogSlug}`);
+        history.pushState({}, '', `/dog/${slug}`);
         window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
     }
 
+    // Share URL goes through the backend's OG preview endpoint so social media
+    // crawlers see proper Open Graph meta tags (title, image, description).
+    function getShareUrl() {
+        const origin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? window.location.origin
+            : CONFIG.API_BASE_URL;
+        return `${origin}/share/post/${postId}`;
+    }
+
     async function handleShare() {
-        const url = `${window.location.origin}/post/${postId}`;
+        const url = getShareUrl();
         if (navigator.share) {
             try { await navigator.share({ url }); } catch { /* dismissed */ }
         } else {
@@ -74,10 +87,10 @@
 
     async function handleCopyLink() {
         try {
-            await navigator.clipboard.writeText(`${window.location.origin}/post/${postId}`);
-            showToast('Link copied', 'success');
+            await navigator.clipboard.writeText(getShareUrl());
+            showToast(t('post.linkCopied'), 'success');
         } catch {
-            showToast('Could not copy link', 'error');
+            showToast(t('post.linkCopyFailed'), 'error');
         }
         closePostOptionsSheet();
     }
@@ -88,14 +101,14 @@
             if (isFollowing) {
                 await unfollowDog(dogId);
                 isFollowing = false;
-                showToast('Unfollowed', 'success');
+                showToast(t('post.unfollowed'), 'success');
             } else {
                 await followDog(dogId);
                 isFollowing = true;
-                showToast('Following!', 'success');
+                showToast(t('post.nowFollowing'), 'success');
             }
         } catch {
-            showToast('Failed to update follow status', 'error');
+            showToast(t('post.failedFollow'), 'error');
         }
     }
 
@@ -104,9 +117,9 @@
         try {
             const result = await toggleBookmark(postId);
             isBookmarked = result.bookmarked;
-            showToast(isBookmarked ? 'Added to favourites' : 'Removed from favourites', 'success');
+            showToast(isBookmarked ? t('post.addedFavourites') : t('post.removedFavourites'), 'success');
         } catch {
-            showToast('Failed to update favourites', 'error');
+            showToast(t('post.failedFavourites'), 'error');
         }
     }
 
@@ -114,11 +127,11 @@
         deleting = true;
         try {
             await deletePost(postId);
-            showToast('Post deleted', 'success');
+            showToast(t('post.postDeleted'), 'success');
             bumpFeedVersion();
             closePostOptionsSheet();
         } catch {
-            showToast('Failed to delete post', 'error');
+            showToast(t('post.failedDeletePost'), 'error');
             deleting = false;
         }
     }
@@ -126,10 +139,10 @@
     async function handleReportReason(reason) {
         try {
             await reportContent('post', postId, reason);
-            showToast('Report submitted. Thank you!', 'success');
+            showToast(t('post.reportSubmitted'), 'success');
         } catch (err) {
             showToast(
-                err?.status === 409 ? 'Already reported' : 'Failed to submit report',
+                err?.status === 409 ? t('post.alreadyReported') : t('post.failedReport'),
                 err?.status === 409 ? 'info' : 'error'
             );
         }
@@ -149,7 +162,7 @@
     class="action-sheet"
     role="dialog"
     aria-modal="true"
-    aria-label="Post options"
+    aria-label={t('post.postOptions')}
     in:fly={{ y: 500, duration: 280, opacity: 1 }}
     out:fly={{ y: 500, duration: 200, opacity: 1 }}
 >
@@ -157,76 +170,76 @@
         <div in:fade={{ duration: 100, delay: 60 }}>
             {#if isOwnPost}
                 <button class="action-sheet-item" onclick={() => { const editData = { id: postId, caption: data?.caption }; closePostOptionsSheet(); openEditPostModal(editData); }}>
-                    <i class="fas fa-pen"></i> Edit caption
+                    <i class="fas fa-pen"></i> {t('post.editCaption')}
                 </button>
                 <button class="action-sheet-item destructive" onclick={() => view = 'confirm-delete'}>
-                    <i class="fas fa-trash-alt"></i> Delete post
+                    <i class="fas fa-trash-alt"></i> {t('post.deletePost')}
                 </button>
                 <button class="action-sheet-item" onclick={goToPost}>
-                    <i class="fas fa-external-link-alt"></i> Go to post
+                    <i class="fas fa-external-link-alt"></i> {t('post.goToPost')}
                 </button>
                 <button class="action-sheet-item" onclick={handleShare}>
-                    <i class="fas fa-share-alt"></i> Share
+                    <i class="fas fa-share-alt"></i> {t('post.share')}
                 </button>
                 <button class="action-sheet-item" onclick={handleCopyLink}>
-                    <i class="fas fa-link"></i> Copy link
+                    <i class="fas fa-link"></i> {t('post.copyLink')}
                 </button>
             {:else}
                 <button class="action-sheet-item destructive" onclick={() => !isAuthenticated() ? (closePostOptionsSheet(), openAuthModal()) : (view = 'report')}>
-                    <i class="fas fa-flag"></i> Report
+                    <i class="fas fa-flag"></i> {t('post.report')}
                 </button>
                 {#if isAuthenticated()}
                     <button class="action-sheet-item" onclick={handleFollow}>
                         <i class="fas fa-user-{isFollowing ? 'minus' : 'plus'}"></i>
-                        {isFollowing ? 'Unfollow' : 'Follow'}
+                        {isFollowing ? t('post.unfollow') : t('post.follow')}
                     </button>
                     <button class="action-sheet-item" onclick={handleBookmark}>
                         <i class="{isBookmarked ? 'fas' : 'far'} fa-bookmark"></i>
-                        {isBookmarked ? 'Remove from favourites' : 'Add to favourites'}
+                        {isBookmarked ? t('post.removeFromFavourites') : t('post.addToFavourites')}
                     </button>
                 {/if}
                 <button class="action-sheet-item" onclick={goToPost}>
-                    <i class="fas fa-external-link-alt"></i> Go to post
+                    <i class="fas fa-external-link-alt"></i> {t('post.goToPost')}
                 </button>
                 <button class="action-sheet-item" onclick={handleShare}>
-                    <i class="fas fa-share-alt"></i> Share
+                    <i class="fas fa-share-alt"></i> {t('post.share')}
                 </button>
                 <button class="action-sheet-item" onclick={handleCopyLink}>
-                    <i class="fas fa-link"></i> Copy link
+                    <i class="fas fa-link"></i> {t('post.copyLink')}
                 </button>
-                {#if dogSlug && isAuthenticated()}
+                {#if (dogSlug || dogId) && isAuthenticated()}
                     <button class="action-sheet-item" onclick={visitProfile}>
-                        <i class="fas fa-paw"></i> Visit profile
+                        <i class="fas fa-paw"></i> {t('post.visitProfile')}
                     </button>
                 {/if}
             {/if}
-            <button class="action-sheet-item cancel" onclick={closePostOptionsSheet}>Cancel</button>
+            <button class="action-sheet-item cancel" onclick={closePostOptionsSheet}>{t('post.cancel')}</button>
         </div>
 
     {:else if view === 'report'}
         <div in:fade={{ duration: 100, delay: 60 }}>
-            <div class="action-sheet-title">Why are you reporting this?</div>
-            {#each REASONS as reason}
+            <div class="action-sheet-title">{t('post.reportTitle')}</div>
+            {#each REASON_KEYS as reason}
                 <button class="action-sheet-item" onclick={() => handleReportReason(reason.key)}>
-                    {reason.label}
+                    {t(reason.i18n)}
                 </button>
             {/each}
-            <button class="action-sheet-item cancel" onclick={() => view = 'options'}>← Back</button>
+            <button class="action-sheet-item cancel" onclick={() => view = 'options'}>{t('post.back')}</button>
         </div>
 
     {:else if view === 'confirm-delete'}
         <div class="action-sheet-delete-confirm" in:fade={{ duration: 120, delay: 60 }}>
-            <p class="action-sheet-delete-title">Delete this post?</p>
-            <p class="action-sheet-delete-subtitle">This can't be undone.</p>
+            <p class="action-sheet-delete-title">{t('post.deletePostConfirm')}</p>
+            <p class="action-sheet-delete-subtitle">{t('post.cantBeUndone')}</p>
             <button
                 class="action-sheet-delete-btn danger"
                 disabled={deleting}
                 onclick={confirmDelete}
             >
                 {#if deleting}
-                    <i class="fas fa-spinner fa-spin"></i> Deleting…
+                    <i class="fas fa-spinner fa-spin"></i> {t('post.deleting')}
                 {:else}
-                    Delete
+                    {t('post.delete')}
                 {/if}
             </button>
             <button
@@ -234,7 +247,7 @@
                 disabled={deleting}
                 onclick={() => view = 'options'}
             >
-                Keep post
+                {t('post.keepPost')}
             </button>
         </div>
     {/if}

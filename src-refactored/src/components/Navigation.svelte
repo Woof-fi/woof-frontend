@@ -3,6 +3,7 @@
     import { isAuthenticated, logout } from '../../js/auth.js';
     import { openCreateDogModal, openSearchPanel } from '../../js/modal-store.svelte.js';
     import { store, setAuthUser, setFeedTab, setNotifUnreadCount, setCurrentDog, setUserDogIds } from '../../js/svelte-store.svelte.js';
+    import { t, localName, locale, setLocale } from '../../js/i18n-store.svelte.js';
 
     let { onopenAuthModal = null, onopenCreatePostModal = null } = $props();
 
@@ -49,7 +50,7 @@
         e.preventDefault();
         closeDrawer();
         if (authed) {
-            if (confirm('Are you sure you want to logout?')) {
+            if (confirm(t('nav.logoutConfirm'))) {
                 logout();
                 setAuthUser(null);
             }
@@ -244,13 +245,13 @@
     let notifBadgeDisplay = $derived(store.notifUnreadCount > 0 ? (store.notifUnreadCount > 99 ? '99+' : String(store.notifUnreadCount)) : null);
     let isAdmin = $derived(store.authUser?.role === 'admin' || store.authUser?.role === 'moderator');
     let isHome = $derived(activePath === '/');
-    let feedLabel = $derived(store.feedTab === 'following' ? 'Following' : 'For You');
+    let feedLabel = $derived(store.feedTab === 'following' ? t('nav.following') : t('nav.forYou'));
 </script>
 
 <header>
     <div class="header-content">
         <div class="header-left">
-            <button type="button" class="hamburger-btn" aria-label="Open menu" onclick={toggleDrawer}>
+            <button type="button" class="hamburger-btn" aria-label={t('nav.openMenu')} onclick={toggleDrawer}>
                 <i class="fas fa-bars"></i>
             </button>
             {#if isHome}
@@ -266,7 +267,7 @@
                 class="header-bell-btn"
                 class:active={isNotificationsActive()}
                 class:has-unread={!!notifBadgeDisplay}
-                aria-label="Notifications"
+                aria-label={t('nav.notifications')}
                 onclick={handleBellClick}
             >
                 <i class={notifBadgeDisplay || isNotificationsActive() ? 'fas fa-bell' : 'far fa-bell'} aria-hidden="true"></i>
@@ -284,9 +285,9 @@
 {/if}
 
 <!-- Navigation drawer -->
-<div class="nav-drawer" class:open={drawerOpen} role="dialog" aria-modal="true" aria-label="Navigation menu">
+<div class="nav-drawer" class:open={drawerOpen} role="dialog" aria-modal="true" aria-label={t('nav.openMenu')}>
     <div class="nav-drawer-header">
-        <button type="button" class="nav-drawer-close" aria-label="Close menu" onclick={closeDrawer}>
+        <button type="button" class="nav-drawer-close" aria-label={t('nav.closeMenu')} onclick={closeDrawer}>
             <i class="fas fa-times"></i>
         </button>
         <a href="/" data-link class="nav-drawer-logo" onclick={closeDrawer}>
@@ -296,14 +297,14 @@
 
     {#if isHome}
         <div class="nav-drawer-section">
-            <span class="nav-drawer-section-label">FEED</span>
+            <span class="nav-drawer-section-label">{t('nav.feed')}</span>
             <button
                 type="button"
                 class="nav-drawer-row"
                 class:active={store.feedTab !== 'following'}
                 onclick={() => selectFeedTab('public')}
             >
-                <i class="fas fa-star"></i> For You
+                <i class="fas fa-star"></i> {t('nav.forYou')}
             </button>
             <button
                 type="button"
@@ -311,7 +312,7 @@
                 class:active={store.feedTab === 'following'}
                 onclick={() => selectFeedTab('following')}
             >
-                <i class="fas fa-heart"></i> Following
+                <i class="fas fa-heart"></i> {t('nav.following')}
             </button>
         </div>
     {/if}
@@ -319,53 +320,53 @@
     <ul class="nav-drawer-links">
         <li>
             <a href="/" data-link onclick={closeDrawer} class:active={isHomeActive()}>
-                <i class="fas fa-home"></i> Home
+                <i class="fas fa-home"></i> {t('nav.home')}
             </a>
         </li>
         <li>
             <button type="button" class="nav-btn" onclick={handleSearchOpen}>
-                <i class="fas fa-search"></i> Search
+                <i class="fas fa-search"></i> {t('nav.search')}
             </button>
         </li>
         <li>
             <button type="button" class="nav-btn" onclick={handleCreatePost}>
-                <i class="fas fa-plus-square"></i> Create
+                <i class="fas fa-plus-square"></i> {t('nav.create')}
             </button>
         </li>
         {#if authed}
             <li>
                 <a href="/notifications" data-link onclick={closeDrawer} class:active={isNotificationsActive()}>
-                    <i class="fas fa-bell"></i> Notifications
+                    <i class="fas fa-bell"></i> {t('nav.notifications')}
                     {#if notifBadgeDisplay}<span class="nav-badge">{notifBadgeDisplay}</span>{/if}
                 </a>
             </li>
             <li>
                 <a href="/messages" data-link onclick={closeDrawer} class:active={isMessagesActive()}>
-                    <i class="fas fa-comment-dots"></i> Messages
+                    <i class="fas fa-comment-dots"></i> {t('nav.messages')}
                     {#if badgeDisplay}<span class="nav-badge">{badgeDisplay}</span>{/if}
                 </a>
             </li>
             <li>
                 <a href="/bookmarks" data-link onclick={closeDrawer} class:active={activePath.startsWith('/bookmarks')}>
-                    <i class="fas fa-bookmark"></i> Favourites
+                    <i class="fas fa-bookmark"></i> {t('nav.favourites')}
                 </a>
             </li>
         {/if}
         {#if isAdmin}
             <li>
                 <a href="/admin" data-link onclick={closeDrawer} class:active={activePath.startsWith('/admin')}>
-                    <i class="fas fa-shield-alt"></i> Moderation
+                    <i class="fas fa-shield-alt"></i> {t('nav.moderation')}
                 </a>
             </li>
         {/if}
         <li>
             {#if !authed}
                 <button type="button" class="nav-btn" onclick={handleAddPetUnauthenticated}>
-                    <i class="fas fa-plus"></i> Add a Pet
+                    <i class="fas fa-plus"></i> {t('nav.addPet')}
                 </button>
             {:else if myDogsLoaded && dogs.length === 0}
                 <button type="button" class="nav-btn" onclick={handleAddPetAuthenticated}>
-                    <i class="fas fa-plus"></i> Add a Pet
+                    <i class="fas fa-plus"></i> {t('nav.addPet')}
                 </button>
             {:else if myDogsLoaded && dogs.length === 1}
                 <a href="/dog/{getSlug(dogs[0])}" data-link onclick={closeDrawer} class:active={isProfileActive()}>
@@ -379,7 +380,7 @@
                 </a>
             {:else if myDogsLoaded && dogs.length > 1}
                 <a href="/dog/{getSlug(dogs[0])}" data-link onclick={closeDrawer}>
-                    <i class="fas fa-paw"></i> My Pets
+                    <i class="fas fa-paw"></i> {t('nav.myPets')}
                 </a>
             {/if}
         </li>
@@ -387,48 +388,66 @@
 
     {#if authed && followedBreeds.length > 0}
         <div class="nav-drawer-section">
-            <span class="nav-drawer-section-label">BREEDS</span>
+            <span class="nav-drawer-section-label">{t('nav.breeds')}</span>
             {#each followedBreeds.slice(0, 5) as breed (breed.id)}
                 <a href="/breed/{breed.slug}" data-link onclick={closeDrawer}
                    class="nav-drawer-row" class:active={activePath === `/breed/${breed.slug}`}>
-                    <i class="fas fa-paw"></i> {breed.name}
+                    <i class="fas fa-paw"></i> {localName(breed)}
                 </a>
             {/each}
             <a href="/breeds" data-link onclick={closeDrawer} class="nav-drawer-row nav-drawer-explore">
-                Explore Breeds
+                {t('nav.exploreBreeds')}
             </a>
         </div>
     {/if}
 
     <div class="nav-drawer-footer">
+        <div class="lang-picker" role="radiogroup" aria-label="Language">
+            <button
+                type="button"
+                class="lang-btn"
+                class:active={locale.current === 'en'}
+                onclick={() => setLocale('en')}
+                aria-checked={locale.current === 'en'}
+                role="radio"
+            >{t('language.en')}</button>
+            <button
+                type="button"
+                class="lang-btn"
+                class:active={locale.current === 'fi'}
+                onclick={() => setLocale('fi')}
+                aria-checked={locale.current === 'fi'}
+                role="radio"
+            >{t('language.fi')}</button>
+        </div>
         <button type="button" class="nav-drawer-row" onclick={handleAuthLink}>
             {#if authed}
-                <i class="fas fa-sign-out-alt"></i> Logout
+                <i class="fas fa-sign-out-alt"></i> {t('nav.logout')}
             {:else}
-                <i class="fas fa-user-circle"></i> Login
+                <i class="fas fa-user-circle"></i> {t('nav.login')}
             {/if}
         </button>
         <div class="nav-legal-links">
-            <a href="/privacy" data-link onclick={closeDrawer}>Privacy</a>
+            <a href="/privacy" data-link onclick={closeDrawer}>{t('nav.privacy')}</a>
             <span class="nav-legal-sep" aria-hidden="true">·</span>
-            <a href="/terms" data-link onclick={closeDrawer}>Terms</a>
+            <a href="/terms" data-link onclick={closeDrawer}>{t('nav.terms')}</a>
         </div>
     </div>
 </div>
 
 
 <nav class="bottom-nav" aria-label="Mobile navigation">
-    <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item" aria-label="Home" class:active={isHomeActive()} onclick={handleHomeClick}>
+    <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item" aria-label={t('nav.home')} class:active={isHomeActive()} onclick={handleHomeClick}>
         <i class="fas fa-home"></i>
     </a>
-    <button type="button" id="bottom-nav-search" class="bottom-nav-item" aria-label="Search" onclick={handleSearchOpen}>
+    <button type="button" id="bottom-nav-search" class="bottom-nav-item" aria-label={t('nav.search')} onclick={handleSearchOpen}>
         <i class="fas fa-search"></i>
     </button>
-    <button type="button" id="create-post-link-mobile" class="bottom-nav-item" aria-label="Create post" onclick={handleCreatePost}>
+    <button type="button" id="create-post-link-mobile" class="bottom-nav-item" aria-label={t('nav.createPost')} onclick={handleCreatePost}>
         <i class="fas fa-plus-square"></i>
     </button>
     {#if authed}
-        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" class:active={isMessagesActive()} aria-label="Messages">
+        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" class:active={isMessagesActive()} aria-label={t('nav.messages')}>
             <i class="fas fa-comment-dots"></i>
             {#if badgeDisplay}
                 <span class="bottom-nav-badge" id="bottom-messages-badge">{badgeDisplay}</span>
@@ -437,7 +456,7 @@
             {/if}
         </a>
     {:else}
-        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" style="display:none" aria-label="Messages">
+        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" style="display:none" aria-label={t('nav.messages')}>
             <i class="fas fa-comment-dots"></i>
             <span class="bottom-nav-badge" id="bottom-messages-badge" style="display:none">0</span>
         </a>
@@ -446,7 +465,7 @@
         href={authed && dogs.length > 0 ? `/dog/${getSlug(dogs[0])}` : '/'}
         id="bottom-nav-profile"
         class="bottom-nav-item"
-        aria-label="Profile"
+        aria-label={t('nav.profile')}
         class:active={isProfileActive()}
         data-link
         onclick={!authed ? handleAddPetUnauthenticated : authed && dogs.length === 0 ? handleAddPetAuthenticated : undefined}
@@ -942,5 +961,41 @@
     .bottom-nav {
         display: none;
     }
+}
+
+/* Language picker */
+.lang-picker {
+    display: flex;
+    gap: 0;
+    margin: 0 var(--woof-space-3) var(--woof-space-2);
+    border-radius: var(--woof-radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+.lang-btn {
+    flex: 1;
+    padding: var(--woof-space-1) var(--woof-space-3);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-semibold);
+    font-family: inherit;
+    color: var(--color-text-secondary);
+    background: var(--color-surface);
+    border: none;
+    cursor: pointer;
+    transition: background var(--woof-duration-fast), color var(--woof-duration-fast);
+}
+
+.lang-btn:first-child {
+    border-right: 1px solid var(--color-border);
+}
+
+.lang-btn:hover {
+    background: var(--color-bg-alt);
+}
+
+.lang-btn.active {
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
 }
 </style>

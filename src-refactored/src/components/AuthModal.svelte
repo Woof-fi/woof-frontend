@@ -12,6 +12,7 @@
     import { showToast } from '../../js/utils.js';
     import { modals, closeAuthModal as storeClose } from '../../js/modal-store.svelte.js';
     import { setAuthUser } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let mode = $state('login'); // 'login' | 'register' | 'verify' | 'forgot' | 'reset'
     let pendingEmail = $state('');
@@ -28,8 +29,8 @@
 
     const modeConfig = {
         login: {
-            title: 'Login',
-            submit: 'Sign In',
+            titleKey: 'auth.loginTitle',
+            submitKey: 'auth.signIn',
             tabs: true,
             email: true,
             password: true,
@@ -43,8 +44,8 @@
             backLink: false,
         },
         register: {
-            title: 'Register',
-            submit: 'Sign Up',
+            titleKey: 'auth.registerTitle',
+            submitKey: 'auth.signUp',
             tabs: true,
             email: true,
             password: true,
@@ -58,8 +59,8 @@
             backLink: false,
         },
         verify: {
-            title: 'Verify Email',
-            submit: 'Verify',
+            titleKey: 'auth.verifyTitle',
+            submitKey: 'auth.verify',
             tabs: false,
             email: false,
             password: false,
@@ -73,8 +74,8 @@
             backLink: true,
         },
         forgot: {
-            title: 'Forgot Password',
-            submit: 'Send Reset Code',
+            titleKey: 'auth.forgotTitle',
+            submitKey: 'auth.sendResetCode',
             tabs: false,
             email: true,
             password: false,
@@ -88,8 +89,8 @@
             backLink: true,
         },
         reset: {
-            title: 'Reset Password',
-            submit: 'Reset Password',
+            titleKey: 'auth.resetTitle',
+            submitKey: 'auth.resetPassword',
             tabs: false,
             email: false,
             password: false,
@@ -155,12 +156,11 @@
     async function handleSubmit(e) {
         e.preventDefault();
         submitting = true;
-        const origLabel = cfg.submit;
 
         try {
             switch (mode) {
                 case 'login': {
-                    submitLabel = 'Logging in...';
+                    submitLabel = t('auth.loggingIn');
                     await login(email, password);
                     setAuthUser({ authenticated: true });
                     close();
@@ -169,7 +169,7 @@
                     break;
                 }
                 case 'register': {
-                    submitLabel = 'Registering...';
+                    submitLabel = t('auth.registering');
                     await register(email, password, name);
                     pendingEmail = email;
                     pendingPassword = password;
@@ -180,7 +180,7 @@
                     break;
                 }
                 case 'verify': {
-                    submitLabel = 'Verifying...';
+                    submitLabel = t('auth.verifying');
                     await confirmRegistration(pendingEmail, verifyCode);
                     verifyCode = '';
                     try {
@@ -190,13 +190,13 @@
                         close();
                     } catch {
                         pendingPassword = '';
-                        showToast('Email verified! Please sign in.', 'success');
+                        showToast(t('auth.emailVerified'), 'success');
                         mode = 'login';
                     }
                     break;
                 }
                 case 'forgot': {
-                    submitLabel = 'Sending...';
+                    submitLabel = t('auth.sending');
                     await forgotPassword(email);
                     pendingEmail = email;
                     email = '';
@@ -204,7 +204,7 @@
                     break;
                 }
                 case 'reset': {
-                    submitLabel = 'Resetting...';
+                    submitLabel = t('auth.resetting');
                     await confirmNewPassword(pendingEmail, verifyCode, newPassword);
                     verifyCode = '';
                     newPassword = '';
@@ -225,7 +225,7 @@
         if (!pendingEmail) return;
         try {
             await resendConfirmationCode(pendingEmail);
-            showToast('Verification code resent', 'success');
+            showToast(t('auth.codeResent'), 'success');
         } catch (err) {
             console.error('Resend error:', err);
         }
@@ -247,8 +247,8 @@
 >
     <div class="modal-content">
         <div class="modal-header">
-            <h2 id="auth-modal-title">{cfg.title}</h2>
-            <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
+            <h2 id="auth-modal-title">{t(cfg.titleKey)}</h2>
+            <button class="modal-close" aria-label={t('auth.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
             {#if cfg.tabs}
@@ -258,20 +258,20 @@
                         class:active={mode === 'login'}
                         data-tab="login"
                         onclick={() => mode = 'login'}
-                    >Login</button>
+                    >{t('auth.loginTitle')}</button>
                     <button
                         class="auth-tab"
                         class:active={mode === 'register'}
                         data-tab="register"
                         onclick={() => mode = 'register'}
-                    >Register</button>
+                    >{t('auth.registerTitle')}</button>
                 </div>
             {/if}
 
             <form id="auth-form" onsubmit={handleSubmit}>
                 {#if cfg.email}
                     <div class="form-group" id="auth-email-group">
-                        <label for="auth-email">Email</label>
+                        <label for="auth-email">{t('auth.email')}</label>
                         <input
                             type="email"
                             id="auth-email"
@@ -284,7 +284,7 @@
 
                 {#if cfg.password}
                     <div class="form-group" id="auth-password-group">
-                        <label for="auth-password">Password</label>
+                        <label for="auth-password">{t('auth.password')}</label>
                         <input
                             type="password"
                             id="auth-password"
@@ -297,11 +297,11 @@
                         />
                         {#if cfg.pwReqs}
                             <ul id="password-requirements" class="password-requirements" aria-live="polite">
-                                <li id="req-length" class:met={pwRules.length}>At least 8 characters</li>
-                                <li id="req-uppercase" class:met={pwRules.uppercase}>An uppercase letter</li>
-                                <li id="req-lowercase" class:met={pwRules.lowercase}>A lowercase letter</li>
-                                <li id="req-number" class:met={pwRules.number}>A number</li>
-                                <li id="req-symbol" class:met={pwRules.symbol}>A special character</li>
+                                <li id="req-length" class:met={pwRules.length}>{t('auth.pwReqLength')}</li>
+                                <li id="req-uppercase" class:met={pwRules.uppercase}>{t('auth.pwReqUppercase')}</li>
+                                <li id="req-lowercase" class:met={pwRules.lowercase}>{t('auth.pwReqLowercase')}</li>
+                                <li id="req-number" class:met={pwRules.number}>{t('auth.pwReqNumber')}</li>
+                                <li id="req-symbol" class:met={pwRules.symbol}>{t('auth.pwReqSymbol')}</li>
                             </ul>
                         {/if}
                     </div>
@@ -309,18 +309,18 @@
 
                 {#if cfg.name}
                     <div class="form-group" id="auth-name-group">
-                        <label for="auth-name">Name</label>
+                        <label for="auth-name">{t('auth.name')}</label>
                         <input type="text" id="auth-name" autocomplete="name" bind:value={name} />
                     </div>
                 {/if}
 
                 {#if cfg.verify}
                     <div class="form-group" id="auth-verify-group">
-                        <label for="auth-verify-code">Verification Code</label>
+                        <label for="auth-verify-code">{t('auth.verificationCode')}</label>
                         <input
                             type="text"
                             id="auth-verify-code"
-                            placeholder="Enter 6-digit code"
+                            placeholder={t('auth.codePlaceholder')}
                             maxlength="6"
                             inputmode="numeric"
                             autocomplete="one-time-code"
@@ -332,7 +332,7 @@
 
                 {#if cfg.newPassword}
                     <div class="form-group" id="auth-new-password-group">
-                        <label for="auth-new-password">New Password</label>
+                        <label for="auth-new-password">{t('auth.newPassword')}</label>
                         <input
                             type="password"
                             id="auth-new-password"
@@ -342,11 +342,11 @@
                         />
                         {#if cfg.newPwReqs}
                             <ul id="new-password-requirements" class="password-requirements" aria-live="polite">
-                                <li id="new-req-length" class:met={newPwRules.length}>At least 8 characters</li>
-                                <li id="new-req-uppercase" class:met={newPwRules.uppercase}>An uppercase letter</li>
-                                <li id="new-req-lowercase" class:met={newPwRules.lowercase}>A lowercase letter</li>
-                                <li id="new-req-number" class:met={newPwRules.number}>A number</li>
-                                <li id="new-req-symbol" class:met={newPwRules.symbol}>A special character</li>
+                                <li id="new-req-length" class:met={newPwRules.length}>{t('auth.pwReqLength')}</li>
+                                <li id="new-req-uppercase" class:met={newPwRules.uppercase}>{t('auth.pwReqUppercase')}</li>
+                                <li id="new-req-lowercase" class:met={newPwRules.lowercase}>{t('auth.pwReqLowercase')}</li>
+                                <li id="new-req-number" class:met={newPwRules.number}>{t('auth.pwReqNumber')}</li>
+                                <li id="new-req-symbol" class:met={newPwRules.symbol}>{t('auth.pwReqSymbol')}</li>
                             </ul>
                         {/if}
                     </div>
@@ -354,21 +354,21 @@
 
                 {#if mode === 'register'}
                     <p class="auth-age-notice">
-                        You must be at least <strong>13 years old</strong> to use Woof.
-                        By signing up you agree to our
-                        <a href="/terms" data-link onclick={() => close()}>Terms of Service</a>
-                        and <a href="/privacy" data-link onclick={() => close()}>Privacy Policy</a>.
+                        {t('auth.ageNotice', { age: 13 })}
+                        {t('auth.agreePrefix')}
+                        <a href="/terms" data-link onclick={() => close()}>{t('auth.termsOfService')}</a>
+                        {t('auth.and')} <a href="/privacy" data-link onclick={() => close()}>{t('auth.privacyPolicy')}</a>.
                     </p>
                 {/if}
 
                 <button type="submit" class="btn-primary" id="auth-submit" disabled={submitting}>
-                    {submitting ? submitLabel : cfg.submit}
+                    {submitting ? submitLabel : t(cfg.submitKey)}
                 </button>
 
                 {#if cfg.forgotLink}
                     <p id="auth-forgot-link" class="auth-secondary-action">
                         <button type="button" id="forgot-password-btn" class="link-btn" onclick={() => mode = 'forgot'}>
-                            Forgot password?
+                            {t('auth.forgotPassword')}
                         </button>
                     </p>
                 {/if}
@@ -376,7 +376,7 @@
                 {#if cfg.resendLink}
                     <p id="auth-resend-group" class="auth-secondary-action">
                         <button type="button" id="resend-code-btn" class="link-btn" onclick={handleResend}>
-                            Resend verification code
+                            {t('auth.resendCode')}
                         </button>
                     </p>
                 {/if}
@@ -384,7 +384,7 @@
                 {#if cfg.backLink}
                     <p id="auth-back-group" class="auth-secondary-action">
                         <button type="button" id="back-to-login-btn" class="link-btn" onclick={() => mode = 'login'}>
-                            &larr; Back to login
+                            &larr; {t('auth.backToLogin')}
                         </button>
                     </p>
                 {/if}

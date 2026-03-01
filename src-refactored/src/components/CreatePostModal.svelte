@@ -8,6 +8,7 @@
         modals, closeCreatePostModal as storeClose,
         openAuthModal, openCreateDogModal,
     } from '../../js/modal-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
     import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
 
     // Local visibility — controlled by async open checks
@@ -28,7 +29,7 @@
         if (modals.createPostModalOpen && !visible) {
             (async () => {
                 if (!isAuthenticated()) {
-                    showToast('Please login to create a post', 'error');
+                    showToast(t('postCreate.loginRequired'), 'error');
                     storeClose();
                     openAuthModal();
                     return;
@@ -38,13 +39,13 @@
                 try {
                     fetchedDogs = await getMyDogs();
                 } catch {
-                    showToast('Failed to load your dogs', 'error');
+                    showToast(t('postCreate.failedLoadDogs'), 'error');
                     storeClose();
                     return;
                 }
 
                 if (fetchedDogs.length === 0) {
-                    showToast('Please add a dog first', 'error');
+                    showToast(t('postCreate.addDogFirst'), 'error');
                     storeClose();
                     openCreateDogModal();
                     return;
@@ -101,11 +102,11 @@
     function handleFileSelect(file) {
         if (!file) return;
         if (!isValidFileType(file)) {
-            showToast('Only JPEG, PNG, GIF and WebP images are allowed', 'error');
+            showToast(t('postCreate.invalidFileType'), 'error');
             return;
         }
         if (!isValidFileSize(file, 10)) {
-            showToast('Image must be under 10 MB', 'error');
+            showToast(t('postCreate.fileTooLarge'), 'error');
             return;
         }
         selectedFile = file;
@@ -131,18 +132,18 @@
         e.preventDefault();
 
         if (!selectedFile) {
-            showToast('Please select an image', 'error');
+            showToast(t('postCreate.selectImage'), 'error');
             return;
         }
 
         if (showDogSelect && !selectedDogId) {
-            showToast('Please select a dog', 'error');
+            showToast(t('postCreate.selectDogError'), 'error');
             return;
         }
 
         submitting = true;
         try {
-            showToast('Uploading image...', 'info');
+            showToast(t('postCreate.uploadingImage'), 'info');
             const imageUrl = await uploadImage(selectedFile);
             await createPost(selectedDogId, imageUrl, caption);
             close();
@@ -169,16 +170,16 @@
 >
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Create Post</h2>
-            <button class="modal-close" aria-label="Close" onclick={close}>&times;</button>
+            <h2>{t('postCreate.title')}</h2>
+            <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
             <form id="create-post-form" novalidate onsubmit={handleSubmit}>
                 {#if showDogSelect}
                     <div class="form-group">
-                        <label for="post-dog-select">Select Dog</label>
+                        <label for="post-dog-select">{t('postCreate.selectDog')}</label>
                         <select id="post-dog-select" required bind:value={selectedDogId}>
-                            <option value="">Choose a dog...</option>
+                            <option value="">{t('postCreate.chooseDog')}</option>
                             {#each dogs as dog (dog.id)}
                                 <option value={dog.id}>{dog.name}</option>
                             {/each}
@@ -187,7 +188,7 @@
                 {/if}
 
                 <div class="form-group">
-                    <label for="post-image-camera">Image</label>
+                    <label for="post-image-camera">{t('postCreate.image')}</label>
                     <div class="image-source-buttons">
                         <button
                             type="button"
@@ -195,7 +196,7 @@
                             class="btn-secondary image-source-btn"
                             onclick={() => cameraInputEl?.click()}
                         >
-                            <i class="fas fa-camera"></i> Take Photo
+                            <i class="fas fa-camera"></i> {t('postCreate.takePhoto')}
                         </button>
                         <button
                             type="button"
@@ -203,7 +204,7 @@
                             class="btn-secondary image-source-btn"
                             onclick={() => galleryInputEl?.click()}
                         >
-                            <i class="fas fa-images"></i> Gallery
+                            <i class="fas fa-images"></i> {t('postCreate.gallery')}
                         </button>
                     </div>
                     <input
@@ -235,7 +236,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="post-caption">Caption (optional)</label>
+                    <label for="post-caption">{t('postCreate.captionOptional')}</label>
                     <textarea
                         id="post-caption"
                         rows="3"
@@ -245,7 +246,7 @@
                 </div>
 
                 <button type="submit" class="btn-primary" disabled={submitting}>
-                    {submitting ? 'Posting...' : 'Post'}
+                    {submitting ? t('postCreate.posting') : t('postCreate.post')}
                 </button>
             </form>
         </div>

@@ -6,6 +6,7 @@
 import { CONFIG } from './config.js';
 import { showToast } from './utils.js';
 import { getToken, handleSessionExpired } from './auth.js';
+import { t } from './i18n-store.svelte.js';
 
 /**
  * Custom error class for API errors
@@ -108,7 +109,7 @@ export async function getAllDogs() {
         return data.dogs || [];
     } catch (error) {
         console.error('Failed to fetch dogs:', error);
-        showToast('Failed to load dogs. Please try again.', 'error');
+        showToast(t('dog.failedLoadDogs'), 'error');
         throw error;
     }
 }
@@ -140,9 +141,9 @@ export async function getDog(id) {
     } catch (error) {
         console.error(`Failed to fetch dog ${id}:`, error);
         if (error.status === 404) {
-            showToast('Dog not found.', 'error');
+            showToast(t('dog.notFound'), 'error');
         } else {
-            showToast('Failed to load dog profile. Please try again.', 'error');
+            showToast(t('dog.failedLoad'), 'error');
         }
         throw error;
     }
@@ -160,9 +161,9 @@ export async function getDogBySlug(slug) {
     } catch (error) {
         console.error(`Failed to fetch dog ${slug}:`, error);
         if (error.status === 404) {
-            showToast('Dog not found.', 'error');
+            showToast(t('dog.notFound'), 'error');
         } else {
-            showToast('Failed to load dog profile. Please try again.', 'error');
+            showToast(t('dog.failedLoad'), 'error');
         }
         throw error;
     }
@@ -179,11 +180,11 @@ export async function createDog(dogData) {
             method: 'POST',
             body: JSON.stringify(dogData)
         });
-        showToast('Dog profile created successfully!', 'success');
+        showToast(t('dog.profileCreated'), 'success');
         return data.dog;
     } catch (error) {
         console.error('Failed to create dog:', error);
-        showToast('Failed to create dog profile. Please try again.', 'error');
+        showToast(t('dog.failedCreate'), 'error');
         throw error;
     }
 }
@@ -200,11 +201,11 @@ export async function updateDog(id, dogData) {
             method: 'PUT',
             body: JSON.stringify(dogData)
         });
-        showToast('Profile updated successfully!', 'success');
+        showToast(t('dog.profileUpdatedApi'), 'success');
         return data.dog;
     } catch (error) {
         console.error(`Failed to update dog ${id}:`, error);
-        showToast('Failed to update profile. Please try again.', 'error');
+        showToast(t('dog.failedUpdate'), 'error');
         throw error;
     }
 }
@@ -219,10 +220,10 @@ export async function deleteDog(id) {
         await apiRequest(`/api/dogs/${id}`, {
             method: 'DELETE'
         });
-        showToast('Profile deleted successfully.', 'success');
+        showToast(t('dog.profileDeleted'), 'success');
     } catch (error) {
         console.error(`Failed to delete dog ${id}:`, error);
-        showToast('Failed to delete profile. Please try again.', 'error');
+        showToast(t('dog.failedDelete'), 'error');
         throw error;
     }
 }
@@ -254,11 +255,11 @@ export async function createPost(dogId, imageUrl, caption) {
             method: 'POST',
             body: JSON.stringify({ dog_id: dogId, image_url: imageUrl, caption })
         });
-        showToast('Post created successfully!', 'success');
+        showToast(t('common.postCreated'), 'success');
         return data.post;
     } catch (error) {
         console.error('Failed to create post:', error);
-        showToast('Failed to create post. Please try again.', 'error');
+        showToast(t('common.failedCreatePost'), 'error');
         throw error;
     }
 }
@@ -283,7 +284,7 @@ export async function getFeed(type = 'public', cursor = null, limit = 20) {
         };
     } catch (error) {
         console.error('Failed to fetch feed:', error);
-        showToast('Failed to load feed. Please try again.', 'error');
+        showToast(t('common.failedLoadFeed'), 'error');
         throw error;
     }
 }
@@ -449,6 +450,19 @@ export async function deleteComment(commentId) {
     });
 }
 
+/**
+ * Update a comment
+ * @param {string} commentId - ID of the comment
+ * @param {string} content - New comment content
+ * @returns {Promise<{comment: object}>}
+ */
+export async function updateComment(commentId, content) {
+    return apiRequest(`/api/comments/${commentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ content }),
+    });
+}
+
 // ============================================================================
 // UPLOAD API
 // ============================================================================
@@ -485,7 +499,7 @@ export async function uploadImage(file) {
         return urlData.publicUrl;
     } catch (error) {
         console.error('Failed to upload image:', error);
-        showToast('Failed to upload image. Please try again.', 'error');
+        showToast(t('common.failedUpload'), 'error');
         throw error;
     }
 }
@@ -670,11 +684,11 @@ export async function updatePost(postId, caption) {
             method: 'PUT',
             body: JSON.stringify({ caption })
         });
-        showToast('Caption updated!', 'success');
+        showToast(t('postEdit.captionUpdated'), 'success');
         return data.post;
     } catch (error) {
         console.error(`Failed to update post ${postId}:`, error);
-        showToast('Failed to update caption. Please try again.', 'error');
+        showToast(t('postEdit.failedUpdate'), 'error');
         throw error;
     }
 }

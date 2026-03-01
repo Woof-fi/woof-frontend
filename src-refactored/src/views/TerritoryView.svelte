@@ -1,6 +1,7 @@
 <script>
     import { getTerritoryByPath, getTerritoryFeed, getTerritoryDogs } from '../../js/api.js';
     import { imageVariant } from '../../js/utils.js';
+    import { t, localName, locale } from '../../js/i18n-store.svelte.js';
 
     let { params = {} } = $props();
 
@@ -143,14 +144,14 @@
             <div class="territory-container">
                 <div class="empty-state">
                     <i class="fas fa-exclamation-circle"></i>
-                    <p>Failed to load territory.</p>
+                    <p>{t('territory.failedLoad')}</p>
                 </div>
             </div>
         </div>
     {:else}
         <div class="territory-hero">
             {#if territory.heroImageUrl}
-                <img src={territory.heroImageUrl} alt={territory.name} class="territory-hero-img" onerror={fallbackImg} />
+                <img src={territory.heroImageUrl} alt={localName(territory)} class="territory-hero-img" onerror={fallbackImg} />
             {:else}
                 <div class="territory-hero-gradient"></div>
             {/if}
@@ -165,27 +166,24 @@
                                 <span class="territory-breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
                             {/if}
                             {#if i < territory.breadcrumb.length - 1}
-                                <a href="/territory/{crumb.urlPath}" data-link class="territory-breadcrumb-link">{crumb.name}</a>
+                                <a href="/territory/{crumb.urlPath}" data-link class="territory-breadcrumb-link">{localName(crumb)}</a>
                             {:else}
-                                <span class="territory-breadcrumb-current">{crumb.name}</span>
+                                <span class="territory-breadcrumb-current">{localName(crumb)}</span>
                             {/if}
                         {/each}
                     </nav>
                 {/if}
 
-                <div class="territory-sheet-name">{territory.name}</div>
-                {#if territory.nameFi && territory.nameFi !== territory.name}
-                    <div class="territory-sheet-namefi">{territory.nameFi}</div>
-                {/if}
+                <div class="territory-sheet-name">{localName(territory)}</div>
 
                 <div class="territory-sheet-stats">
                     <div class="territory-sheet-stat">
                         <div class="territory-sheet-stat-num">{territory.dogCount}</div>
-                        <div class="territory-sheet-stat-label">Dogs</div>
+                        <div class="territory-sheet-stat-label">{t('territory.dogs')}</div>
                     </div>
                     <div class="territory-sheet-stat">
                         <div class="territory-sheet-stat-num">{postsLoading ? '—' : posts.length}</div>
-                        <div class="territory-sheet-stat-label">Posts</div>
+                        <div class="territory-sheet-stat-label">{t('territory.posts')}</div>
                     </div>
                 </div>
 
@@ -193,12 +191,12 @@
                 {#if territory.children && territory.children.length > 0}
                     <div class="territory-children">
                         <h3 class="territory-children-title">
-                            {territory.type === 'municipality' ? 'Districts' : 'Neighborhoods'}
+                            {territory.type === 'municipality' ? t('territory.districts') : t('territory.neighborhoods')}
                         </h3>
                         <div class="territory-children-grid">
                             {#each territory.children as child}
                                 <a href="/territory/{child.urlPath}" data-link class="territory-child-card">
-                                    <span class="territory-child-name">{child.name}</span>
+                                    <span class="territory-child-name">{localName(child)}</span>
                                     {#if child.dogCount > 0}
                                         <span class="territory-child-count">{child.dogCount} <i class="fas fa-dog"></i></span>
                                     {/if}
@@ -217,7 +215,7 @@
                     aria-selected={activeTab === 'posts'}
                     onclick={() => activeTab = 'posts'}
                 >
-                    <i class="fas fa-th"></i> Posts
+                    <i class="fas fa-th"></i> {t('territory.posts')}
                 </button>
                 <button
                     class="tab-link"
@@ -226,7 +224,7 @@
                     aria-selected={activeTab === 'dogs'}
                     onclick={() => activeTab = 'dogs'}
                 >
-                    <i class="fas fa-dog"></i> Dogs
+                    <i class="fas fa-dog"></i> {t('territory.dogs')}
                 </button>
             </div>
 
@@ -237,7 +235,7 @@
                 {:else if posts.length === 0}
                     <div class="empty-state">
                         <i class="fas fa-camera"></i>
-                        <p>No posts yet in this area.</p>
+                        <p>{t('territory.noPosts')}</p>
                     </div>
                 {:else}
                     <div class="posts-grid posts-grid-2col">
@@ -247,7 +245,7 @@
                                     src={post.imageUrl}
                                     srcset="{imageVariant(post.imageUrl, 'medium')} 600w, {post.imageUrl} 1200w"
                                     sizes="(max-width: 640px) calc(50vw - 16px), 310px"
-                                    alt={post.caption || 'Post image'}
+                                    alt={post.caption || t('territory.postImage')}
                                     loading="lazy"
                                     onerror={fallbackImg}
                                 />
@@ -260,7 +258,7 @@
                     {#if postsCursor}
                         <div class="load-more">
                             <button class="btn-secondary" disabled={postsLoadingMore} onclick={loadMorePosts}>
-                                {postsLoadingMore ? 'Loading...' : 'Load More'}
+                                {postsLoadingMore ? t('common.loadingEllipsis') : t('territory.loadMore')}
                             </button>
                         </div>
                     {/if}
@@ -274,7 +272,7 @@
                 {:else if dogs.length === 0 && dogsLoadedOnce}
                     <div class="empty-state">
                         <i class="fas fa-dog"></i>
-                        <p>No dogs registered in this area yet.</p>
+                        <p>{t('territory.noDogs')}</p>
                     </div>
                 {:else if dogs.length > 0}
                     <ul class="territory-dog-list">
@@ -295,7 +293,7 @@
                                         {/if}
                                     </div>
                                     <div class="territory-dog-meta">
-                                        <span>{dog.postCount || 0} posts</span>
+                                        <span>{t('territory.postCount', { count: dog.postCount || 0 })}</span>
                                     </div>
                                 </a>
                             </li>
@@ -304,7 +302,7 @@
                     {#if dogsCursor}
                         <div class="load-more">
                             <button class="btn-secondary" disabled={dogsLoadingMore} onclick={loadMoreDogs}>
-                                {dogsLoadingMore ? 'Loading...' : 'Load More'}
+                                {dogsLoadingMore ? t('common.loadingEllipsis') : t('territory.loadMore')}
                             </button>
                         </div>
                     {/if}

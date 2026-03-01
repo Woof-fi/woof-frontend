@@ -2,6 +2,7 @@
     import { getBookmarkedPosts, getMyDogs } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { store } from '../../js/svelte-store.svelte.js';
+    import { t } from '../../js/i18n-store.svelte.js';
     import PostCard from '../components/PostCard.svelte';
     import { viewport } from '../actions/viewport.ts';
 
@@ -67,7 +68,7 @@
 
 <main class="bookmarks-page">
     <div class="bookmarks-header">
-        <h1>Favourites</h1>
+        <h1>{t('bookmarks.title')}</h1>
     </div>
 
     {#if !isAuthenticated()}
@@ -75,9 +76,9 @@
             <div class="bookmarks-empty-icon">
                 <i class="fas fa-bookmark"></i>
             </div>
-            <h2 class="bookmarks-empty-title">Save your favourite posts</h2>
-            <p class="bookmarks-empty-desc">Sign in to bookmark posts you love and find them here anytime.</p>
-            <button class="bookmarks-empty-btn" onclick={() => onopenAuthModal?.()}>Sign In</button>
+            <h2 class="bookmarks-empty-title">{t('bookmarks.emptyAuthTitle')}</h2>
+            <p class="bookmarks-empty-desc">{t('bookmarks.emptyAuthDesc')}</p>
+            <button class="bookmarks-empty-btn" onclick={() => onopenAuthModal?.()}>{t('bookmarks.signIn')}</button>
         </div>
     {:else if loading && posts.length === 0}
         <div class="bookmarks-loading"><i class="fas fa-spinner fa-spin"></i></div>
@@ -86,16 +87,16 @@
             <div class="bookmarks-empty-icon">
                 <i class="far fa-bookmark"></i>
             </div>
-            <h2 class="bookmarks-empty-title">No favourites yet</h2>
-            <p class="bookmarks-empty-desc">When you see a post you love, tap the <i class="far fa-bookmark bookmarks-empty-inline-icon"></i> bookmark icon to save it here.</p>
-            <a href="/" class="bookmarks-empty-btn" data-link>Browse Feed</a>
+            <h2 class="bookmarks-empty-title">{t('bookmarks.emptyTitle')}</h2>
+            <p class="bookmarks-empty-desc">{t('bookmarks.emptyDesc')}</p>
+            <a href="/" class="bookmarks-empty-btn" data-link>{t('bookmarks.browseFeed')}</a>
         </div>
     {:else}
         {#each posts as item (item.id)}
             <PostCard
                 id={item.id}
                 profilePic={item.dogPhoto || '/images/dog_profile_pic.jpg'}
-                username={item.dogName || 'Unknown Dog'}
+                username={item.dogName || t('feed.unknownDog')}
                 imageUrl={item.imageUrl}
                 caption={item.caption || ''}
                 dogSlug={item.dogSlug || ''}

@@ -1,4 +1,6 @@
 <script>
+    import { t } from '../../js/i18n-store.svelte.js';
+
     /** @type {import('svelte').Snippet} */
     let { children } = $props();
 
@@ -47,7 +49,7 @@
             setCookie(COOKIE_NAME, hash, COOKIE_MAX_AGE);
             unlocked = true;
         } else {
-            error = 'Wrong password';
+            error = t('gate.wrongPassword');
             shaking = true;
             setTimeout(() => { shaking = false; }, 500);
         }
@@ -61,15 +63,15 @@
         <form class="gate-card" class:shake={shaking} onsubmit={handleSubmit}>
             <div class="gate-brand">
                 <i class="fas fa-paw gate-icon"></i>
-                <h1 class="gate-title">Woof</h1>
+                <h1 class="gate-title">{t('gate.title')}</h1>
             </div>
-            <p class="gate-subtitle">This site is in closed beta.</p>
+            <p class="gate-subtitle">{t('gate.subtitle')}</p>
 
             <div class="gate-field">
                 <input
                     type="password"
                     bind:value={password}
-                    placeholder="Enter password"
+                    placeholder={t('gate.placeholder')}
                     class="gate-input"
                     autocomplete="off"
                 />
@@ -79,7 +81,7 @@
                 <p class="gate-error">{error}</p>
             {/if}
 
-            <button type="submit" class="gate-btn">Enter</button>
+            <button type="submit" class="gate-btn">{t('gate.enter')}</button>
         </form>
     </div>
 {/if}

@@ -2,6 +2,7 @@
     import { getConversations, getMessages, sendMessage, markConversationRead } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { timeAgo, showToast } from '../../js/utils.js';
+    import { t } from '../../js/i18n-store.svelte.js';
 
     let { params = {}, onopenAuthModal = null } = $props();
 
@@ -129,7 +130,7 @@
     <main class="messages-page">
         <div class="empty-state" style="padding: 60px 20px;">
             <i class="fas fa-envelope"></i>
-            <p>Please log in to view your messages.</p>
+            <p>{t('messages.loginRequired')}</p>
         </div>
     </main>
 {:else}
@@ -137,7 +138,7 @@
         <div class="messages-layout">
             <div class="conversations-panel" id="conversations-panel">
                 <div class="conversations-header">
-                    <h2>Messages</h2>
+                    <h2>{t('messages.title')}</h2>
                 </div>
                 <div class="conversations-list" id="conversations-list">
                     {#if loading}
@@ -145,8 +146,8 @@
                     {:else if conversations.length === 0}
                         <div class="conv-empty">
                             <i class="fas fa-envelope-open-text"></i>
-                            <p>No messages yet</p>
-                            <p class="conv-empty-sub">Visit a dog's profile and send them a message!</p>
+                            <p>{t('messages.empty')}</p>
+                            <p class="conv-empty-sub">{t('messages.emptyHint')}</p>
                         </div>
                     {:else}
                         {#each conversations as conv (conv.id)}
@@ -186,17 +187,17 @@
                         <i class="fas fa-arrow-left"></i>
                     </button>
                     <span class="thread-title" id="thread-title">
-                        {otherDogName || 'Select a conversation'}
+                        {otherDogName || t('messages.selectConversation')}
                     </span>
                 </div>
                 <div class="thread-messages" id="thread-messages">
                     {#if !selectedId}
                         <div class="thread-empty">
                             <i class="fas fa-comments"></i>
-                            <p>Select a conversation to start chatting</p>
+                            <p>{t('messages.selectConversation')}</p>
                         </div>
                     {:else if messages.length === 0}
-                        <div class="thread-empty"><p>Send the first message!</p></div>
+                        <div class="thread-empty"><p>{t('messages.sendFirst')}</p></div>
                     {:else}
                         {#each messages as msg (msg.id)}
                             <div
@@ -216,7 +217,7 @@
                         <input
                             type="text"
                             id="message-input"
-                            placeholder="Type a message..."
+                            placeholder={t('messages.placeholder')}
                             maxlength="5000"
                             autocomplete="off"
                             bind:value={messageInput}
