@@ -388,7 +388,7 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Test coverage gaps | Medium | Frontend tests minimal, image upload not tested |
+| Test coverage gaps | Medium | 153 tests / 14 files. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
 | No staging environment | Low (for now) | Production is test env while user base is friends-only. Revisit before public launch |
 
 ---
