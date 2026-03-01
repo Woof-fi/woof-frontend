@@ -130,6 +130,7 @@ Custom Svelte 5 `$state`-based i18n store (svelte-i18n incompatible with runes).
 
 #### 13C: Dark Mode — Large
 
+- **Prerequisite: hardcoded hex sweep** — 21 Svelte component files have inline `#RGB` values that must be replaced with `--woof-*` tokens before theme switching can work. Also replace hardcoded `font-size`/`font-weight` px values in `styles.css` with token variables.
 - CSS custom property switching via `[data-theme="dark"]` on `<html>`
 - System preference detection (`prefers-color-scheme`)
 - User override in `localStorage` (`woof_theme`: light/dark/system)
@@ -389,6 +390,10 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 | Item | Priority | Notes |
 |------|----------|-------|
 | Test coverage gaps | Medium | 153 tests / 14 files. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
+| i18n key parity validation | Low | Pre-commit hook or CI check to ensure EN and FI locale files have identical keys |
+| Extract shared controller utilities | Low | "Get user's first dog" duplicated in 3 controllers, "verify dog ownership" in 5+. Extract when touching those files. |
+| OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |
+| Re-enable coverage thresholds | Low | Disabled during active feature dev. Set to 70% minimum pre-launch. |
 | No staging environment | Low (for now) | Production is test env while user base is friends-only. Revisit before public launch |
 
 ---

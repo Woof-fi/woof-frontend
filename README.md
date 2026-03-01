@@ -162,8 +162,8 @@ woof-backend/
 
 ## Tests
 
-- **Backend:** 237 tests across 13 suites (Jest) - auth, posts, dogs, comments, likes, follows, health records, messaging, admin, slugs, reports, bookmarks
-- **Frontend:** 57 tests (Vitest)
+- **Backend:** 376 tests across 18 suites (Jest) - auth, posts, dogs, comments, likes, follows, health records, messaging, admin, slugs, reports, bookmarks, territories, breeds, shares, notifications
+- **Frontend:** 153 tests across 14 files (Vitest)
 
 ## Next Up
 
