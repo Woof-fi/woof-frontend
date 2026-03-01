@@ -1,5 +1,5 @@
 <script>
-    import { getMyDogs, getUnreadCount, getNotifUnreadCount, getFollowingBreeds } from '../../js/api.js';
+    import { getMyDogs, getUnreadCount, getNotifUnreadCount, getFollowingBreeds, getFollowingTerritories } from '../../js/api.js';
     import { isAuthenticated, logout } from '../../js/auth.js';
     import { openCreateDogModal, openSearchPanel } from '../../js/modal-store.svelte.js';
     import { store, setAuthUser, setFeedTab, setNotifUnreadCount, setCurrentDog, setUserDogIds } from '../../js/svelte-store.svelte.js';
@@ -14,6 +14,7 @@
     let drawerOpen = $state(false);
     let authed = $derived(store.authUser !== null);
     let followedBreeds = $state([]);
+    let followedTerritories = $state([]);
 
     function getSlug(dog) {
         return dog.slug ?? `${dog.name.toLowerCase()}-${dog.displayId}`;
@@ -196,6 +197,28 @@
                 if (active) followedBreeds = breeds;
             } catch {
                 if (active) followedBreeds = [];
+            }
+        })();
+        return () => { active = false; };
+    });
+
+    // Fetch followed territories — re-runs on auth change and territoryVersion bumps
+    $effect(() => {
+        const _auth = store.authUser;
+        const _tv = store.territoryVersion;
+
+        if (!isAuthenticated()) {
+            followedTerritories = [];
+            return;
+        }
+
+        let active = true;
+        (async () => {
+            try {
+                const territories = await getFollowingTerritories();
+                if (active) followedTerritories = territories;
+            } catch {
+                if (active) followedTerritories = [];
             }
         })();
         return () => { active = false; };
@@ -397,6 +420,21 @@
             {/each}
             <a href="/breeds" data-link onclick={closeDrawer} class="nav-drawer-row nav-drawer-explore">
                 {t('nav.exploreBreeds')}
+            </a>
+        </div>
+    {/if}
+
+    {#if authed && followedTerritories.length > 0}
+        <div class="nav-drawer-section">
+            <span class="nav-drawer-section-label">{t('nav.territories')}</span>
+            {#each followedTerritories.slice(0, 5) as ter (ter.id)}
+                <a href={ter.urlPath ? `/territory/${ter.urlPath}` : `/territory/${ter.slug}`} data-link onclick={closeDrawer}
+                   class="nav-drawer-row" class:active={activePath.startsWith(`/territory/${ter.slug}`)}>
+                    <i class="fas fa-map-marker-alt"></i> {localName(ter)}
+                </a>
+            {/each}
+            <a href="/territory/helsinki" data-link onclick={closeDrawer} class="nav-drawer-row nav-drawer-explore">
+                {t('nav.exploreTerritories')}
             </a>
         </div>
     {/if}

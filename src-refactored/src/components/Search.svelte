@@ -1,5 +1,5 @@
 <script>
-    import { getAllDogs, getAllBreeds } from '../../js/api.js';
+    import { getAllDogs, getAllBreeds, getAllTerritories } from '../../js/api.js';
     import { debounce } from '../../js/utils.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
@@ -9,13 +9,37 @@
     let query = $state('');
     let dogCache = $state([]);
     let breedCache = $state([]);
+    let territoryCache = $state([]);
     let dogResults = $state([]);
     let breedResults = $state([]);
+    let territoryResults = $state([]);
     let inputEl = $state(null);
+
+    /** Build a /territory/... URL from the getAllTerritories response shape */
+    function buildTerritoryUrl(ter) {
+        if (ter.type === 'sub_district' && ter.grandparentSlug && ter.parentSlug) {
+            return `/territory/${ter.grandparentSlug}/${ter.parentSlug}/${ter.slug}`;
+        }
+        if (ter.type === 'district' && ter.parentSlug) {
+            return `/territory/${ter.parentSlug}/${ter.slug}`;
+        }
+        return `/territory/${ter.slug}`;
+    }
+
+    /** Human-readable type label for territory search results */
+    function territorySubtitle(ter) {
+        const typeName = ter.type === 'sub_district' ? 'Sub-district'
+            : ter.type === 'district' ? 'District'
+            : 'Municipality';
+        if (ter.parentName) return `${typeName} · ${localName({ name: ter.parentName, nameFi: ter.parentNameFi || ter.parentName })}`;
+        return typeName;
+    }
 
     async function loadSearchData() {
         try {
-            const [dogs, breeds] = await Promise.all([getAllDogs(), getAllBreeds()]);
+            const [dogs, breeds, territories] = await Promise.all([
+                getAllDogs(), getAllBreeds(), getAllTerritories()
+            ]);
             dogCache = dogs.map(dog => ({
                 id: dog.id,
                 slug: dog.slug,
@@ -29,9 +53,22 @@
                 name: b.name,
                 nameFi: b.nameFi,
             }));
+            territoryCache = territories.map(ter => ({
+                id: ter.id,
+                slug: ter.slug,
+                name: ter.name,
+                nameFi: ter.nameFi,
+                type: ter.type,
+                parentSlug: ter.parentSlug,
+                parentName: ter.parentName,
+                parentNameFi: ter.parentNameFi,
+                grandparentSlug: ter.grandparentSlug,
+                url: buildTerritoryUrl(ter),
+            }));
         } catch {
             dogCache = [];
             breedCache = [];
+            territoryCache = [];
         }
     }
 
@@ -54,6 +91,7 @@
         query = '';
         dogResults = [];
         breedResults = [];
+        territoryResults = [];
     }
 
     function handleKey(e) {
@@ -69,12 +107,13 @@
     }
 
     let hasQuery = $derived(query.trim().length > 0);
-    let noResults = $derived(hasQuery && dogResults.length === 0 && breedResults.length === 0);
+    let noResults = $derived(hasQuery && dogResults.length === 0 && breedResults.length === 0 && territoryResults.length === 0);
 
     const debouncedSearch = debounce((q) => {
         if (!q.trim()) {
             dogResults = [];
             breedResults = [];
+            territoryResults = [];
             return;
         }
         const lower = q.toLowerCase();
@@ -83,6 +122,10 @@
             (item.breed || '').toLowerCase().includes(lower)
         );
         breedResults = breedCache.filter(item =>
+            item.name.toLowerCase().includes(lower) ||
+            (item.nameFi || '').toLowerCase().includes(lower)
+        ).slice(0, 5);
+        territoryResults = territoryCache.filter(item =>
             item.name.toLowerCase().includes(lower) ||
             (item.nameFi || '').toLowerCase().includes(lower)
         ).slice(0, 5);
@@ -141,8 +184,24 @@
                     </li>
                 {/each}
             {/if}
+            {#if territoryResults.length > 0}
+                <li class="search-section-header">{t('search.territories')}</li>
+                {#each territoryResults as ter (ter.id)}
+                    <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
+                        <a href={ter.url} data-link class="search-result-link">
+                            <div class="search-result-icon search-result-icon--territory">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="search-result-text">
+                                <span class="search-result-name">{localName(ter)}</span>
+                                <span class="search-result-breed">{territorySubtitle(ter)}</span>
+                            </div>
+                        </a>
+                    </li>
+                {/each}
+            {/if}
             {#if dogResults.length > 0}
-                {#if breedResults.length > 0}
+                {#if breedResults.length > 0 || territoryResults.length > 0}
                     <li class="search-section-header">{t('search.dogs')}</li>
                 {/if}
                 {#each dogResults as result (result.id)}
@@ -337,6 +396,11 @@
     font-size: 16px;
     margin-right: 12px;
     flex-shrink: 0;
+}
+
+.search-result-icon--territory {
+    background: var(--woof-color-brand-secondary-subtle);
+    color: var(--woof-color-brand-secondary);
 }
 
 @media (max-width: 768px) {

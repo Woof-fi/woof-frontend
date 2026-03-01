@@ -1,6 +1,8 @@
 <script>
-    import { getTerritoryByPath, getTerritoryFeed, getTerritoryDogs } from '../../js/api.js';
-    import { imageVariant } from '../../js/utils.js';
+    import { getTerritoryByPath, getTerritoryFeed, getTerritoryDogs, getTerritoryBreeds, followTerritory, unfollowTerritory } from '../../js/api.js';
+    import { isAuthenticated } from '../../js/auth.js';
+    import { imageVariant, showToast } from '../../js/utils.js';
+    import { store, bumpTerritoryVersion } from '../../js/svelte-store.svelte.js';
     import { t, localName, locale } from '../../js/i18n-store.svelte.js';
 
     let { params = {} } = $props();
@@ -26,6 +28,17 @@
     let dogsCursor = $state(null);
     let dogsLoadingMore = $state(false);
 
+    // Follow state
+    let isFollowing = $state(false);
+    let followLoading = $state(false);
+
+    // Breeds section
+    let breeds = $state([]);
+    let breedsLoading = $state(false);
+
+    // Breed filter for Dogs tab
+    let selectedBreedId = $state(null);
+
     function fallbackImg(e) {
         e.target.src = '/images/dog_profile_pic.jpg';
     }
@@ -47,6 +60,11 @@
         dogsLoading = false;
         dogsLoadedOnce = false;
         dogsCursor = null;
+        isFollowing = false;
+        followLoading = false;
+        breeds = [];
+        breedsLoading = false;
+        selectedBreedId = null;
 
         let active = true;
 
@@ -55,6 +73,7 @@
                 const fetched = await getTerritoryByPath(p);
                 if (!active) return;
                 territory = fetched;
+                isFollowing = fetched.isFollowing || false;
                 loading = false;
 
                 // Load posts immediately
@@ -64,10 +83,18 @@
                 posts = feedResult.posts || [];
                 postsCursor = feedResult.nextCursor;
                 postsLoading = false;
+
+                // Load breeds
+                breedsLoading = true;
+                const breedResult = await getTerritoryBreeds(p);
+                if (!active) return;
+                breeds = breedResult;
+                breedsLoading = false;
             } catch (e) {
                 if (!active) return;
                 loading = false;
                 postsLoading = false;
+                breedsLoading = false;
                 loadError = true;
                 console.error('Territory load error:', e);
             }
@@ -87,11 +114,30 @@
         if (!territory) return;
         dogsLoading = true;
         try {
-            const result = await getTerritoryDogs(path);
+            const result = await getTerritoryDogs(path, null, 20, selectedBreedId);
             dogs = result.dogs || [];
             dogsCursor = result.nextCursor;
         } catch (e) {
             console.error('Failed to load territory dogs:', e);
+            dogs = [];
+        } finally {
+            dogsLoading = false;
+            dogsLoadedOnce = true;
+        }
+    }
+
+    async function filterByBreed(breedId) {
+        selectedBreedId = breedId;
+        dogsLoading = true;
+        dogsLoadedOnce = false;
+        dogs = [];
+        dogsCursor = null;
+        try {
+            const result = await getTerritoryDogs(path, null, 20, breedId);
+            dogs = result.dogs || [];
+            dogsCursor = result.nextCursor;
+        } catch (e) {
+            console.error('Failed to filter territory dogs:', e);
             dogs = [];
         } finally {
             dogsLoading = false;
@@ -117,7 +163,7 @@
         if (!dogsCursor || dogsLoadingMore) return;
         dogsLoadingMore = true;
         try {
-            const result = await getTerritoryDogs(path, dogsCursor);
+            const result = await getTerritoryDogs(path, dogsCursor, 20, selectedBreedId);
             dogs = [...dogs, ...(result.dogs || [])];
             dogsCursor = result.nextCursor;
         } catch (e) {
@@ -126,6 +172,34 @@
             dogsLoadingMore = false;
         }
     }
+
+    async function handleFollowToggle() {
+        if (!isAuthenticated()) {
+            showToast(t('territory.loginToFollow'), 'error');
+            return;
+        }
+        if (!territory) return;
+        followLoading = true;
+        try {
+            if (isFollowing) {
+                await unfollowTerritory(territory.id);
+                isFollowing = false;
+                territory = { ...territory, followerCount: Math.max(0, territory.followerCount - 1) };
+            } else {
+                await followTerritory(territory.id);
+                isFollowing = true;
+                territory = { ...territory, followerCount: territory.followerCount + 1 };
+            }
+            bumpTerritoryVersion();
+        } catch (e) {
+            console.error('Territory follow toggle failed:', e);
+            showToast(t('territory.actionFailed'), 'error');
+        } finally {
+            followLoading = false;
+        }
+    }
+
+    let authed = $derived(store.authUser !== null);
 </script>
 
 <div class="territory-page">
@@ -174,7 +248,21 @@
                     </nav>
                 {/if}
 
-                <div class="territory-sheet-name">{localName(territory)}</div>
+                <div class="territory-name-row">
+                    <div class="territory-sheet-name">{localName(territory)}</div>
+                    <button
+                        class="follow-btn"
+                        class:following={isFollowing}
+                        disabled={followLoading}
+                        onclick={handleFollowToggle}
+                    >
+                        {#if isFollowing}
+                            <i class="fas fa-check"></i> {t('territory.following')}
+                        {:else}
+                            <i class="fas fa-plus"></i> {t('territory.follow')}
+                        {/if}
+                    </button>
+                </div>
 
                 <div class="territory-sheet-stats">
                     <div class="territory-sheet-stat">
@@ -185,7 +273,19 @@
                         <div class="territory-sheet-stat-num">{postsLoading ? '—' : posts.length}</div>
                         <div class="territory-sheet-stat-label">{t('territory.posts')}</div>
                     </div>
+                    <div class="territory-sheet-stat">
+                        <div class="territory-sheet-stat-num">{territory.followerCount}</div>
+                        <div class="territory-sheet-stat-label">{t('territory.followers')}</div>
+                    </div>
                 </div>
+
+                <!-- Guidance text for non-followers -->
+                {#if authed && !isFollowing}
+                    <div class="territory-guidance">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{t('territory.guidanceFollow')}</span>
+                    </div>
+                {/if}
 
                 <!-- Child territories (unique to territories) -->
                 {#if territory.children && territory.children.length > 0}
@@ -200,6 +300,24 @@
                                     {#if child.dogCount > 0}
                                         <span class="territory-child-count">{child.dogCount} <i class="fas fa-dog"></i></span>
                                     {/if}
+                                </a>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+
+                <!-- Popular breeds in this territory -->
+                {#if breeds.length > 0}
+                    <div class="territory-breeds">
+                        <h3 class="territory-breeds-title">{t('territory.popularBreeds')}</h3>
+                        <div class="territory-breeds-grid">
+                            {#each breeds as breed (breed.id)}
+                                <a href="/breed/{breed.slug}" data-link class="territory-breed-card">
+                                    <div class="territory-breed-icon">
+                                        <i class="fas fa-paw"></i>
+                                    </div>
+                                    <span class="territory-breed-name">{localName(breed)}</span>
+                                    <span class="territory-breed-count">{t('territory.breedDogCount', { count: breed.dogCount })}</span>
                                 </a>
                             {/each}
                         </div>
@@ -267,6 +385,28 @@
 
             <!-- Dogs tab -->
             <div class="tab-content" class:active={activeTab === 'dogs'} role="tabpanel" aria-hidden={activeTab !== 'dogs'}>
+                <!-- Breed filter chips -->
+                {#if breeds.length > 0 && activeTab === 'dogs'}
+                    <div class="breed-filter-bar">
+                        <button
+                            class="breed-filter-chip"
+                            class:active={selectedBreedId === null}
+                            onclick={() => filterByBreed(null)}
+                        >
+                            {t('territory.allBreeds')}
+                        </button>
+                        {#each breeds as breed (breed.id)}
+                            <button
+                                class="breed-filter-chip"
+                                class:active={selectedBreedId === breed.id}
+                                onclick={() => filterByBreed(breed.id)}
+                            >
+                                {localName(breed)} <span class="chip-count">{breed.dogCount}</span>
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
+
                 {#if dogsLoading}
                     <div class="territory-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if dogs.length === 0 && dogsLoadedOnce}
@@ -289,7 +429,7 @@
                                     <div class="territory-dog-info">
                                         <span class="territory-dog-name">{dog.name}</span>
                                         {#if dog.breedName}
-                                            <span class="territory-dog-breed">{dog.breedName}</span>
+                                            <span class="territory-dog-breed">{localName({ name: dog.breedName, nameFi: dog.breedNameFi })}</span>
                                         {/if}
                                     </div>
                                     <div class="territory-dog-meta">
@@ -387,19 +527,61 @@
     color: var(--woof-color-neutral-500);
 }
 
+/* Name + follow button row */
+.territory-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--woof-space-3);
+    margin-bottom: 4px;
+}
+
 .territory-sheet-name {
     font-size: var(--woof-text-title-1);
     font-weight: var(--woof-font-weight-bold);
     color: var(--woof-color-neutral-900);
     letter-spacing: -0.5px;
     line-height: 1.1;
-    margin-bottom: 4px;
+    flex: 1;
+    min-width: 0;
 }
 
-.territory-sheet-namefi {
-    font-size: var(--woof-text-caption-1);
-    color: var(--woof-color-neutral-500);
-    margin-bottom: 12px;
+/* Follow button — matches BreedView pattern */
+.follow-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: var(--woof-radius-full);
+    font-size: var(--woof-text-footnote);
+    font-weight: var(--woof-font-weight-semibold);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--woof-duration-fast);
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
+    border: 2px solid var(--woof-color-brand-primary);
+}
+
+.follow-btn:hover {
+    opacity: 0.9;
+}
+
+.follow-btn.following {
+    background: transparent;
+    color: var(--woof-color-brand-primary);
+    border-color: var(--woof-color-brand-primary);
+}
+
+.follow-btn.following:hover {
+    background: var(--woof-color-brand-primary-subtle);
+}
+
+.follow-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .territory-sheet-stats {
@@ -433,6 +615,24 @@
     font-size: var(--woof-text-caption-1);
     color: var(--woof-color-neutral-500);
     margin-top: 3px;
+}
+
+/* Guidance text */
+.territory-guidance {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    background: var(--woof-color-brand-primary-subtle);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-brand-primary);
+}
+
+.territory-guidance i {
+    font-size: 14px;
+    flex-shrink: 0;
 }
 
 /* Child territories */
@@ -484,6 +684,112 @@
 
 .territory-child-count i {
     font-size: 10px;
+}
+
+/* Popular breeds */
+.territory-breeds {
+    margin-bottom: 16px;
+}
+
+.territory-breeds-title {
+    font-size: var(--woof-text-subheadline);
+    font-weight: 600;
+    color: var(--woof-color-neutral-700);
+    margin-bottom: 8px;
+}
+
+.territory-breeds-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.territory-breed-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--woof-color-neutral-50);
+    border: 1px solid var(--woof-color-neutral-100);
+    border-radius: var(--woof-radius-full);
+    text-decoration: none;
+    color: inherit;
+    font-size: var(--woof-text-footnote);
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.territory-breed-card:hover {
+    background: var(--woof-color-brand-primary-subtle);
+    border-color: var(--woof-color-brand-primary);
+}
+
+.territory-breed-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-brand-primary-subtle);
+    color: var(--woof-color-brand-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.territory-breed-name {
+    font-weight: 500;
+    color: var(--woof-color-neutral-800);
+}
+
+.territory-breed-count {
+    color: var(--woof-color-neutral-500);
+    font-size: 12px;
+}
+
+/* Breed filter chips */
+.breed-filter-bar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.breed-filter-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.breed-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: var(--woof-radius-full);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-medium);
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all var(--woof-duration-fast);
+    background: var(--woof-color-neutral-50);
+    color: var(--woof-color-neutral-700);
+    border: 1px solid var(--woof-color-neutral-200);
+}
+
+.breed-filter-chip:hover {
+    background: var(--woof-color-neutral-100);
+}
+
+.breed-filter-chip.active {
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
+    border-color: var(--woof-color-brand-primary);
+}
+
+.chip-count {
+    font-size: 11px;
+    opacity: 0.7;
 }
 
 /* Posts grid — same as breed page */

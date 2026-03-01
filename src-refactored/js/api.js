@@ -1059,11 +1059,59 @@ export async function getTerritoryFeed(path, cursor = null, limit = 20) {
  * @param {number} limit - Dogs per page
  * @returns {Promise<{dogs: object[], nextCursor: string|null}>}
  */
-export async function getTerritoryDogs(path, cursor = null, limit = 20) {
+export async function getTerritoryDogs(path, cursor = null, limit = 20, breedId = null) {
     let url = `/api/territories/by-path/${path}/dogs?limit=${limit}`;
     if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
+    if (breedId) url += `&breedId=${encodeURIComponent(breedId)}`;
     const data = await apiRequest(url);
     return { dogs: data.dogs || [], nextCursor: data.nextCursor || null };
+}
+
+/**
+ * Follow a territory
+ * @param {string} id - Territory UUID
+ * @returns {Promise<object>}
+ */
+export async function followTerritory(id) {
+    return apiRequest(`/api/territories/${id}/follow`, { method: 'POST' });
+}
+
+/**
+ * Unfollow a territory
+ * @param {string} id - Territory UUID
+ * @returns {Promise<void>}
+ */
+export async function unfollowTerritory(id) {
+    return apiRequest(`/api/territories/${id}/follow`, { method: 'DELETE' });
+}
+
+/**
+ * Get territories the current user follows
+ * @returns {Promise<object[]>} - Array of territory objects with urlPath
+ */
+export async function getFollowingTerritories() {
+    try {
+        const data = await apiRequest('/api/territories/following');
+        return data.territories || [];
+    } catch (error) {
+        console.error('Failed to fetch following territories:', error);
+        return [];
+    }
+}
+
+/**
+ * Get breeds with dog counts in a territory subtree
+ * @param {string} path - URL path (e.g. "helsinki")
+ * @returns {Promise<object[]>} - Array of breed objects with dogCount
+ */
+export async function getTerritoryBreeds(path) {
+    try {
+        const data = await apiRequest(`/api/territories/by-path/${path}/breeds`);
+        return data.breeds || [];
+    } catch (error) {
+        console.error('Failed to fetch territory breeds:', error);
+        return [];
+    }
 }
 
 // Export APIError for use in other modules

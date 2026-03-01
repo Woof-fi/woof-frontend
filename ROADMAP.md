@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-03-01
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes (edit comments, share preview, following feed, visit profile)
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows
 **Current:** Tier 2 — Major Features (15A Sentry next)
 
 ---
@@ -37,6 +37,9 @@ Persistent sidebar drawer (280px desktop), bell notifications with polling, comm
 
 ### Phase 10A-10E: Breeds & Territories
 246 bilingual breeds (EN + FI), breed pages with follow/feed, breed directory, anti-scraping protections, 635 Finnish territories (3-level hierarchy), territory pages with SEO-friendly URLs, service worker auto-reload.
+
+### Territory Follows & Enhancements
+Territory follow system mirroring breed follows: `territory_follows` table, follow/unfollow endpoints, followed territories in nav drawer, territory follower count + `isFollowing` flag on territory pages, guidance text for non-followers, popular breeds per territory section, breed filter chips on territory Dogs tab, territories searchable in Search panel. Navigation-only (does not affect Following feed).
 
 ---
 
@@ -385,6 +388,7 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
+| Search UX improvements | Medium | 1) Reverse section order: Dogs → Territories → Breeds (dogs are most common search). 2) Minimum 2-char threshold before searching (note: "Ii" is a valid Finnish municipality). 3) Smarter ranking: prefer starts-with matches over contains matches, so typing "Hel" ranks Helsinki above e.g. a dog named "Shelby". |
 | S3 SPA routing | Medium | Direct URL navigation returns S3 404 before JS takes over. Need CloudFront error page redirect to index.html |
 | Test coverage gaps | Medium | Frontend tests minimal, image upload not tested |
 | No staging environment | Low (for now) | Production is test env while user base is friends-only. Revisit before public launch |
