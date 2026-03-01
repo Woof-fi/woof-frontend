@@ -106,29 +106,46 @@
         close();
     }
 
-    let hasQuery = $derived(query.trim().length > 0);
+    let hasQuery = $derived(query.trim().length >= 2);
     let noResults = $derived(hasQuery && dogResults.length === 0 && breedResults.length === 0 && territoryResults.length === 0);
 
+    /**
+     * Filter + rank results: starts-with matches first, then contains.
+     * `getFields` returns an array of lowercase searchable strings for each item.
+     */
+    function rankedSearch(items, getFields, lower, limit) {
+        const matches = items.filter(item =>
+            getFields(item).some(f => f.includes(lower))
+        );
+        // Stable sort: starts-with first
+        matches.sort((a, b) => {
+            const aStarts = getFields(a).some(f => f.startsWith(lower)) ? 0 : 1;
+            const bStarts = getFields(b).some(f => f.startsWith(lower)) ? 0 : 1;
+            return aStarts - bStarts;
+        });
+        return limit ? matches.slice(0, limit) : matches;
+    }
+
     const debouncedSearch = debounce((q) => {
-        if (!q.trim()) {
+        if (q.trim().length < 2) {
             dogResults = [];
             breedResults = [];
             territoryResults = [];
             return;
         }
         const lower = q.toLowerCase();
-        dogResults = dogCache.filter(item =>
-            item.name.toLowerCase().includes(lower) ||
-            (item.breed || '').toLowerCase().includes(lower)
-        );
-        breedResults = breedCache.filter(item =>
-            item.name.toLowerCase().includes(lower) ||
-            (item.nameFi || '').toLowerCase().includes(lower)
-        ).slice(0, 5);
-        territoryResults = territoryCache.filter(item =>
-            item.name.toLowerCase().includes(lower) ||
-            (item.nameFi || '').toLowerCase().includes(lower)
-        ).slice(0, 5);
+        dogResults = rankedSearch(dogCache, item => [
+            item.name.toLowerCase(),
+            (item.breed || '').toLowerCase()
+        ], lower);
+        breedResults = rankedSearch(breedCache, item => [
+            item.name.toLowerCase(),
+            (item.nameFi || '').toLowerCase()
+        ], lower, 5);
+        territoryResults = rankedSearch(territoryCache, item => [
+            item.name.toLowerCase(),
+            (item.nameFi || '').toLowerCase()
+        ], lower, 5);
     }, 300);
 
     $effect(() => {
@@ -169,16 +186,27 @@
                 <span>{t('search.noResults', { query })}</span>
             </li>
         {:else}
-            {#if breedResults.length > 0}
-                <li class="search-section-header">{t('search.breeds')}</li>
-                {#each breedResults as breed (breed.id)}
+            {#if dogResults.length > 0}
+                {#if territoryResults.length > 0 || breedResults.length > 0}
+                    <li class="search-section-header">{t('search.dogs')}</li>
+                {/if}
+                {#each dogResults as result (result.id)}
                     <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
-                        <a href="/breed/{breed.slug}" data-link class="search-result-link">
-                            <div class="search-result-icon">
-                                <i class="fas fa-paw"></i>
-                            </div>
+                        <a
+                            href="/dog/{result.slug || result.id}"
+                            data-link
+                            class="search-result-link"
+                        >
+                            <img
+                                src={result.profilePhoto || '/images/dog_profile_pic.jpg'}
+                                alt={result.name}
+                                class="search-result-avatar"
+                                loading="lazy"
+                                onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
+                            />
                             <div class="search-result-text">
-                                <span class="search-result-name">{localName(breed)}</span>
+                                <span class="search-result-name">{result.name}</span>
+                                <span class="search-result-breed">{result.breed}</span>
                             </div>
                         </a>
                     </li>
@@ -200,27 +228,16 @@
                     </li>
                 {/each}
             {/if}
-            {#if dogResults.length > 0}
-                {#if breedResults.length > 0 || territoryResults.length > 0}
-                    <li class="search-section-header">{t('search.dogs')}</li>
-                {/if}
-                {#each dogResults as result (result.id)}
+            {#if breedResults.length > 0}
+                <li class="search-section-header">{t('search.breeds')}</li>
+                {#each breedResults as breed (breed.id)}
                     <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
-                        <a
-                            href="/dog/{result.slug || result.id}"
-                            data-link
-                            class="search-result-link"
-                        >
-                            <img
-                                src={result.profilePhoto || '/images/dog_profile_pic.jpg'}
-                                alt={result.name}
-                                class="search-result-avatar"
-                                loading="lazy"
-                                onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
-                            />
+                        <a href="/breed/{breed.slug}" data-link class="search-result-link">
+                            <div class="search-result-icon">
+                                <i class="fas fa-paw"></i>
+                            </div>
                             <div class="search-result-text">
-                                <span class="search-result-name">{result.name}</span>
-                                <span class="search-result-breed">{result.breed}</span>
+                                <span class="search-result-name">{localName(breed)}</span>
                             </div>
                         </a>
                     </li>
