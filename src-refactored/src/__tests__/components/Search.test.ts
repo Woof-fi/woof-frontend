@@ -19,8 +19,8 @@ const mockBreeds = [
 ];
 
 const mockTerritories = [
-    { id: 't1', slug: 'helsinki', name: 'Helsinki', nameFi: 'Helsinki', type: 'municipality', parentSlug: null, parentName: null, parentNameFi: null, grandparentSlug: null },
-    { id: 't2', slug: 'oulunkyla', name: 'Oulunkylä', nameFi: 'Oulunkylä', type: 'district', parentSlug: 'helsinki', parentName: 'Helsinki', parentNameFi: 'Helsinki', grandparentSlug: null },
+    { id: 't1', slug: 'helsinki', name: 'Helsinki', nameFi: 'Helsinki', type: 'municipality', parentSlug: null, parentName: null, parentNameFi: null, grandparentSlug: null, urlPath: 'helsinki' },
+    { id: 't2', slug: 'oulunkyla', name: 'Oulunkylä', nameFi: 'Oulunkylä', type: 'district', parentSlug: 'helsinki', parentName: 'Helsinki', parentNameFi: 'Helsinki', grandparentSlug: null, urlPath: 'helsinki/oulunkyla' },
 ];
 
 vi.mock('../../../js/api.js', () => ({

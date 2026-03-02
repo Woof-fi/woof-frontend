@@ -13,6 +13,26 @@
     let loadError = $state(false);
     let activeTab = $state('posts');
 
+    // Persist active tab in sessionStorage so back-navigation restores it
+    const TAB_KEY = 'woof_tab_positions';
+    function saveTab(tab) {
+        try {
+            const tabs = JSON.parse(sessionStorage.getItem(TAB_KEY) || '{}');
+            tabs['/breed/' + slug] = tab;
+            sessionStorage.setItem(TAB_KEY, JSON.stringify(tabs));
+        } catch { /* ignore */ }
+    }
+    function restoreTab() {
+        try {
+            const tabs = JSON.parse(sessionStorage.getItem(TAB_KEY) || '{}');
+            return tabs['/breed/' + slug] || 'posts';
+        } catch { return 'posts'; }
+    }
+    function setTab(tab) {
+        activeTab = tab;
+        saveTab(tab);
+    }
+
     let posts = $state([]);
     let postsLoading = $state(false);
     let postsCursor = $state(null);
@@ -42,7 +62,7 @@
         breed = null;
         loading = true;
         loadError = false;
-        activeTab = 'posts';
+        activeTab = restoreTab();
         posts = [];
         postsLoading = false;
         postsCursor = null;
@@ -175,8 +195,10 @@
     {:else if loadError || !breed}
         <div class="breed-sheet">
             <div class="breed-container">
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-circle"></i>
+                <div class="woof-empty-state">
+                    <div class="woof-empty-state-icon woof-empty-state-icon--error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
                     <p>{t('breed.failedLoad')}</p>
                 </div>
             </div>
@@ -235,7 +257,7 @@
                     class:active={activeTab === 'posts'}
                     role="tab"
                     aria-selected={activeTab === 'posts'}
-                    onclick={() => activeTab = 'posts'}
+                    onclick={() => setTab('posts')}
                 >
                     <i class="fas fa-th"></i> {t('breed.posts')}
                 </button>
@@ -244,7 +266,7 @@
                     class:active={activeTab === 'dogs'}
                     role="tab"
                     aria-selected={activeTab === 'dogs'}
-                    onclick={() => activeTab = 'dogs'}
+                    onclick={() => setTab('dogs')}
                 >
                     <i class="fas fa-dog"></i> {t('breed.dogs')}
                 </button>
@@ -255,8 +277,10 @@
                 {#if postsLoading}
                     <div class="breed-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if posts.length === 0}
-                    <div class="empty-state">
-                        <i class="fas fa-camera"></i>
+                    <div class="woof-empty-state">
+                        <div class="woof-empty-state-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
                         <p>{t('breed.noPosts')}</p>
                     </div>
                 {:else}
@@ -292,8 +316,10 @@
                 {#if dogsLoading}
                     <div class="breed-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if dogs.length === 0 && dogsLoadedOnce}
-                    <div class="empty-state">
-                        <i class="fas fa-dog"></i>
+                    <div class="woof-empty-state">
+                        <div class="woof-empty-state-icon">
+                            <i class="fas fa-dog"></i>
+                        </div>
                         <p>{t('breed.noDogs')}</p>
                     </div>
                 {:else if dogs.length > 0}

@@ -40,8 +40,10 @@
         {#if loading}
             <div class="post-detail-loading"><i class="fas fa-spinner fa-spin"></i> {t('postDetail.loading')}</div>
         {:else if error}
-            <div class="empty-state">
-                <i class="fas fa-exclamation-circle"></i>
+            <div class="woof-empty-state">
+                <div class="woof-empty-state-icon woof-empty-state-icon--error">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
                 <p>{t('postDetail.failedLoad')}</p>
             </div>
         {:else if post}

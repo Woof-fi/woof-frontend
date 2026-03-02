@@ -1,6 +1,7 @@
 <script>
-    import { getDogPark } from '../../js/api.js';
-    import { t, localName } from '../../js/i18n-store.svelte.js';
+    import { getDogPark, updateAdminDogPark, getAllTerritories } from '../../js/api.js';
+    import { t, localName, locale } from '../../js/i18n-store.svelte.js';
+    import { store } from '../../js/svelte-store.svelte.js';
 
     let { params = {} } = $props();
 
@@ -8,247 +9,596 @@
     let loading = $state(true);
     let loadError = $state(false);
 
+    // Admin edit state
+    let isAdmin = $derived(
+        store.authUser && (store.authUser.role === 'admin' || store.authUser.role === 'moderator')
+    );
+    let editing = $state(false);
+    let saving = $state(false);
+    let editForm = $state({});
+    let territories = $state([]);
+
+    async function startEdit() {
+        // Reload fresh data before editing (bypasses HTTP cache)
+        await reloadPark(params.slug);
+        editForm = {
+            name: park.name || '',
+            nameFi: park.nameFi || '',
+            parkType: park.parkType || 'all_sizes',
+            territoryId: park.territory?.id || '',
+            address: park.address || '',
+            sizeM2: park.sizeM2 || '',
+            description: park.description || '',
+            descriptionFi: park.descriptionFi || '',
+            amenities: { ...park.amenities },
+        };
+        if (territories.length === 0) loadTerritories();
+        editing = true;
+    }
+
+    function cancelEdit() {
+        editing = false;
+    }
+
+    async function loadTerritories() {
+        territories = await getAllTerritories();
+    }
+
+    async function saveEdit() {
+        saving = true;
+        try {
+            const updates = {};
+            if (editForm.name !== (park.name || '')) updates.name = editForm.name;
+            if (editForm.nameFi !== (park.nameFi || '')) updates.nameFi = editForm.nameFi;
+            if (editForm.parkType !== park.parkType) updates.parkType = editForm.parkType;
+            if (editForm.territoryId !== (park.territory?.id || '')) updates.territoryId = editForm.territoryId;
+            if (editForm.address !== (park.address || '')) updates.address = editForm.address;
+            const newSize = editForm.sizeM2 === '' ? null : parseInt(editForm.sizeM2, 10);
+            if (newSize !== park.sizeM2) updates.sizeM2 = newSize;
+            if (editForm.description !== (park.description || '')) updates.description = editForm.description;
+            if (editForm.descriptionFi !== (park.descriptionFi || '')) updates.descriptionFi = editForm.descriptionFi;
+            // Always send amenities (simple object comparison is tricky)
+            updates.amenities = editForm.amenities;
+
+            if (Object.keys(updates).length > 0) {
+                await updateAdminDogPark(park.id, updates);
+                // Reload park data (bypass HTTP cache)
+                await reloadPark(params.slug);
+            }
+            editing = false;
+        } catch (e) {
+            console.error('Failed to save park:', e);
+            alert('Failed to save: ' + (e.message || 'Unknown error'));
+        }
+        saving = false;
+    }
+
+    function toggleAmenity(key) {
+        editForm.amenities = {
+            ...editForm.amenities,
+            [key]: !editForm.amenities[key],
+        };
+    }
+
     const parkTypeLabel = (type) => {
-        const map = { all_sizes: 'dogPark.allSizes', small_dogs: 'dogPark.smallDogs', large_dogs: 'dogPark.largeDogs', separate_areas: 'dogPark.separateAreas' };
+        const map = { all_sizes: 'dogPark.allSizes', separate_areas: 'dogPark.separateAreas' };
         return t(map[type] || 'dogPark.allSizes');
     };
 
-    $effect(() => {
-        const slug = params.slug;
-        if (!slug) return;
+    const amenityKeys = ['fenced', 'lighting', 'trash_bins', 'water', 'benches', 'agility', 'shelter'];
+    const amenityIcons = {
+        fenced: 'fa-shield-halved',
+        lighting: 'fa-lightbulb',
+        trash_bins: 'fa-trash-can',
+        water: 'fa-droplet',
+        benches: 'fa-chair',
+        agility: 'fa-person-running',
+        shelter: 'fa-umbrella',
+    };
+    const amenityI18n = {
+        fenced: 'dogPark.fenced',
+        lighting: 'dogPark.lighting',
+        trash_bins: 'dogPark.trashBins',
+        water: 'dogPark.water',
+        benches: 'dogPark.benches',
+        agility: 'dogPark.agility',
+        shelter: 'dogPark.shelter',
+    };
 
+    let activeAmenities = $derived(
+        park?.amenities ? amenityKeys.filter(k => park.amenities[k]) : []
+    );
+
+    let displayDescription = $derived(
+        !park ? '' :
+        (locale.current === 'fi' && park.descriptionFi) ? park.descriptionFi :
+        (park.description || park.descriptionFi || '')
+    );
+
+    // Territory dropdown: group by type for easier selection
+    let sortedTerritories = $derived(
+        [...territories].sort((a, b) => {
+            const typeOrder = { municipality: 0, district: 1, sub_district: 2 };
+            const diff = (typeOrder[a.type] || 0) - (typeOrder[b.type] || 0);
+            return diff !== 0 ? diff : a.name.localeCompare(b.name);
+        })
+    );
+
+    async function loadPark(slug) {
         park = null;
         loading = true;
         loadError = false;
+        try {
+            park = await getDogPark(slug);
+        } catch (e) {
+            loadError = true;
+            console.error('Failed to load dog park:', e);
+        }
+        loading = false;
+    }
 
-        (async () => {
-            try {
-                park = await getDogPark(slug);
-                loading = false;
-            } catch (e) {
-                loading = false;
-                loadError = true;
-                console.error('Failed to load dog park:', e);
+    /** Reload fresh from server after admin edit (bypasses HTTP cache). */
+    async function reloadPark(slug) {
+        try {
+            const base = import.meta.env.VITE_API_URL || '';
+            const resp = await fetch(`${base}/api/dog-parks/${slug}`, { cache: 'no-store' });
+            if (resp.ok) {
+                const data = await resp.json();
+                park = data.park;
             }
-        })();
+        } catch (e) {
+            console.error('Failed to reload park:', e);
+        }
+    }
+
+    $effect(() => {
+        const slug = params.slug;
+        if (slug) loadPark(slug);
     });
 </script>
 
-<div class="dog-park-page">
+<div class="park-page">
     {#if loading}
-        <div class="loading-container">
-            <i class="fas fa-spinner fa-spin"></i>
+        <div class="park-hero">
+            <div class="park-hero-gradient"></div>
+        </div>
+        <div class="park-sheet">
+            <div class="park-container">
+                <div class="skeleton skeleton-text" style="width: 60%; height: 28px; margin-bottom: 12px;"></div>
+                <div class="skeleton skeleton-text" style="width: 40%; height: 16px;"></div>
+            </div>
         </div>
     {:else if loadError || !park}
-        <div class="error-container">
-            <i class="fas fa-exclamation-circle"></i>
-            <p>{t('dogPark.failedLoad')}</p>
+        <div class="park-sheet" style="margin-top: 0;">
+            <div class="park-container">
+                <div class="woof-empty-state">
+                    <div class="woof-empty-state-icon woof-empty-state-icon--error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <p>{t('dogPark.failedLoad')}</p>
+                </div>
+            </div>
         </div>
     {:else}
-        <!-- Hero image -->
+        <!-- Hero -->
         <div class="park-hero">
             {#if park.images && park.images.length > 0}
                 <img src={park.images[0].imageUrl} alt={localName(park)} class="park-hero-img" />
             {:else}
-                <div class="park-hero-placeholder">
-                    <img src="/images/dog-park-placeholder.svg" alt="" class="park-hero-img" />
+                <div class="park-hero-gradient">
+                    <div class="park-hero-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
                 </div>
             {/if}
         </div>
 
-        <div class="park-content">
-            <!-- Header -->
-            <div class="park-header">
-                <h1 class="park-name">{localName(park)}</h1>
-                <span class="park-type-badge">{parkTypeLabel(park.parkType)}</span>
-            </div>
+        <!-- Sheet overlay -->
+        <div class="park-sheet">
+            <div class="park-container">
+                <!-- Breadcrumb -->
+                {#if park.territory}
+                    <a href="/territory/{park.territory.path}" data-link class="park-breadcrumb">
+                        <i class="fas fa-chevron-left"></i> {localName(park.territory)}
+                    </a>
+                {/if}
 
-            <!-- Territory breadcrumb -->
-            {#if park.territory}
-                <a href="/territory/{park.territory.path}" data-link class="park-territory-link">
-                    <i class="fas fa-map-marker-alt"></i> {localName(park.territory)}
-                </a>
-            {/if}
-
-            <!-- Address -->
-            {#if park.address}
-                <div class="park-detail-row">
-                    <i class="fas fa-location-dot"></i>
-                    <span>{park.address}</span>
+                <!-- Name + type -->
+                <div class="park-header">
+                    <h1 class="park-name">{localName(park)}</h1>
+                    <span class="park-type-pill">{parkTypeLabel(park.parkType)}</span>
+                    {#if isAdmin && !editing}
+                        <button class="park-edit-btn" onclick={startEdit} title="Edit park">
+                            <i class="fas fa-pencil"></i>
+                        </button>
+                    {/if}
                 </div>
-            {/if}
 
-            <!-- Description -->
-            {#if park.description || park.descriptionFi}
-                <div class="park-description">
-                    <p>{localName({ name: park.description, nameFi: park.descriptionFi }) || park.description}</p>
-                </div>
-            {/if}
+                {#if editing}
+                    <!-- Admin Edit Form -->
+                    <div class="park-edit-form">
+                        <div class="park-edit-field">
+                            <label for="edit-name">Name (EN)</label>
+                            <input id="edit-name" type="text" bind:value={editForm.name} />
+                        </div>
+                        <div class="park-edit-field">
+                            <label for="edit-name-fi">Name (FI)</label>
+                            <input id="edit-name-fi" type="text" bind:value={editForm.nameFi} />
+                        </div>
+                        <div class="park-edit-field">
+                            <label for="edit-type">Park Type</label>
+                            <select id="edit-type" bind:value={editForm.parkType}>
+                                <option value="all_sizes">All sizes</option>
+                                <option value="separate_areas">Separate areas</option>
+                            </select>
+                        </div>
+                        <div class="park-edit-field">
+                            <label for="edit-territory">Territory</label>
+                            <select id="edit-territory" bind:value={editForm.territoryId}>
+                                <option value="">— None —</option>
+                                {#each sortedTerritories as ter (ter.id)}
+                                    <option value={ter.id}>{ter.name} ({ter.type})</option>
+                                {/each}
+                            </select>
+                        </div>
+                        <div class="park-edit-field">
+                            <label for="edit-address">Address</label>
+                            <input id="edit-address" type="text" bind:value={editForm.address} />
+                        </div>
+                        <div class="park-edit-field">
+                            <label for="edit-size">Size (m²)</label>
+                            <input id="edit-size" type="number" bind:value={editForm.sizeM2} placeholder="e.g. 3500" />
+                        </div>
+                        <div class="park-edit-field">
+                            <label for="edit-desc">Description (EN)</label>
+                            <textarea id="edit-desc" rows="3" bind:value={editForm.description}></textarea>
+                        </div>
+                        <div class="park-edit-field">
+                            <label for="edit-desc-fi">Description (FI)</label>
+                            <textarea id="edit-desc-fi" rows="3" bind:value={editForm.descriptionFi}></textarea>
+                        </div>
 
-            <!-- Coordinates -->
-            {#if park.latitude && park.longitude}
-                <div class="park-section">
-                    <h2 class="park-section-title"><i class="fas fa-compass"></i> {t('dogPark.coordinates')}</h2>
-                    <p class="park-coords">{park.latitude.toFixed(5)}, {park.longitude.toFixed(5)}</p>
-                </div>
-            {/if}
-
-            <!-- Photos placeholder -->
-            <div class="park-section">
-                <h2 class="park-section-title"><i class="fas fa-camera"></i> {t('dogPark.photos')}</h2>
-                {#if park.images && park.images.length > 0}
-                    <div class="park-photos-grid">
-                        {#each park.images as img (img.id)}
-                            <div class="park-photo">
-                                <img src={img.imageUrl} alt={img.caption || ''} loading="lazy" />
+                        <div class="park-edit-field">
+                            <label>Amenities</label>
+                            <div class="park-edit-amenities">
+                                {#each amenityKeys as key}
+                                    <button
+                                        type="button"
+                                        class="park-edit-amenity-toggle"
+                                        class:active={editForm.amenities[key]}
+                                        onclick={() => toggleAmenity(key)}
+                                    >
+                                        <i class="fas {amenityIcons[key]}"></i>
+                                        {t(amenityI18n[key])}
+                                    </button>
+                                {/each}
                             </div>
-                        {/each}
+                        </div>
+
+                        <div class="park-edit-actions">
+                            <button class="park-edit-save" onclick={saveEdit} disabled={saving}>
+                                {saving ? 'Saving...' : 'Save'}
+                            </button>
+                            <button class="park-edit-cancel" onclick={cancelEdit} disabled={saving}>
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 {:else}
-                    <div class="park-no-photos">
-                        <i class="fas fa-image"></i>
-                        <p>{t('dogPark.noPhotosYet')}</p>
+                    <!-- Info rows -->
+                    <div class="park-info-rows">
+                        {#if park.address}
+                            <div class="park-info-row">
+                                <i class="fas fa-location-dot"></i>
+                                <span>{park.address}</span>
+                            </div>
+                        {/if}
+                        {#if park.sizeM2}
+                            <div class="park-info-row">
+                                <i class="fas fa-ruler-combined"></i>
+                                <span>{t('dogPark.sizeM2')}: {park.sizeM2.toLocaleString()} m²</span>
+                            </div>
+                        {/if}
+                        {#if park.latitude && park.longitude}
+                            <div class="park-info-row park-info-coords">
+                                <i class="fas fa-compass"></i>
+                                <span>{park.latitude.toFixed(5)}, {park.longitude.toFixed(5)}</span>
+                            </div>
+                        {/if}
+                    </div>
+
+                    <!-- Description -->
+                    {#if displayDescription}
+                        <div class="park-description">
+                            <p>{displayDescription}</p>
+                        </div>
+                    {/if}
+
+                    <!-- Amenities -->
+                    <div class="park-section">
+                        <h2 class="park-section-title">{t('dogPark.amenities')}</h2>
+                        <div class="park-amenities-grid">
+                            {#if park.parkType === 'separate_areas'}
+                                <div class="park-amenity">
+                                    <div class="park-amenity-icon">
+                                        <i class="fas fa-dog"></i>
+                                    </div>
+                                    <span class="park-amenity-label">{t('dogPark.smallDogArea')}</span>
+                                </div>
+                                <div class="park-amenity">
+                                    <div class="park-amenity-icon">
+                                        <i class="fas fa-dog"></i>
+                                    </div>
+                                    <span class="park-amenity-label">{t('dogPark.largeDogArea')}</span>
+                                </div>
+                            {:else}
+                                <div class="park-amenity">
+                                    <div class="park-amenity-icon">
+                                        <i class="fas fa-paw"></i>
+                                    </div>
+                                    <span class="park-amenity-label">{t('dogPark.allSizesDesc')}</span>
+                                </div>
+                            {/if}
+                            {#each activeAmenities as key}
+                                <div class="park-amenity">
+                                    <div class="park-amenity-icon">
+                                        <i class="fas {amenityIcons[key]}"></i>
+                                    </div>
+                                    <span class="park-amenity-label">{t(amenityI18n[key])}</span>
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+
+                <!-- Photos -->
+                {#if park.images && park.images.length > 0}
+                    <div class="park-section">
+                        <h2 class="park-section-title">{t('dogPark.photos')}</h2>
+                        <div class="park-photos-grid">
+                            {#each park.images as img (img.id)}
+                                <div class="park-photo">
+                                    <img src={img.imageUrl} alt={img.caption || ''} loading="lazy" />
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {:else}
+                    <div class="park-photos-empty">
+                        <i class="fas fa-camera"></i>
+                        <span>{t('dogPark.noPhotosYet')}</span>
+                    </div>
+                {/if}
+
+                <!-- Attribution -->
+                {#if park.source === 'osm'}
+                    <div class="park-attribution">
+                        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">
+                            {t('dogPark.osmAttribution')}
+                        </a>
+                    </div>
+                {:else if park.source === 'municipal'}
+                    <div class="park-attribution">
+                        {t('dogPark.municipalAttribution')}
                     </div>
                 {/if}
             </div>
-
-            <!-- OSM attribution -->
-            {#if park.source === 'osm'}
-                <div class="park-attribution">
-                    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">
-                        {t('dogPark.osmAttribution')}
-                    </a>
-                </div>
-            {/if}
         </div>
     {/if}
 </div>
 
 <style>
-.dog-park-page {
+.park-page {
     margin: -20px;
     min-height: 100vh;
 }
 
-.loading-container,
-.error-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
-    gap: var(--woof-spacing-md);
-    color: var(--woof-text-secondary);
-}
-
-.error-container i {
-    font-size: 2rem;
-    color: var(--woof-color-danger);
-}
-
+/* Hero */
 .park-hero {
     width: 100%;
-    aspect-ratio: 16/9;
-    background: var(--woof-bg-secondary);
+    height: 28vh;
+    min-height: 140px;
+    max-height: 240px;
     overflow: hidden;
-}
-
-.park-hero-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--woof-color-mint) 0%, var(--woof-bg-secondary) 100%);
+    position: relative;
 }
 
 .park-hero-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
-.park-content {
-    padding: var(--woof-spacing-lg);
+.park-hero-gradient {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--woof-color-fresh-mint) 0%, var(--woof-color-fresh-mint-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.park-hero-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--woof-radius-full);
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Sheet */
+.park-sheet {
+    background: var(--woof-surface-primary);
+    border-radius: var(--woof-radius-2xl) var(--woof-radius-2xl) 0 0;
+    margin-top: -28px;
+    position: relative;
+    z-index: 1;
+    padding: var(--woof-space-5) var(--woof-space-5) var(--woof-space-10);
+    min-height: 60vh;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.park-container {
     max-width: 640px;
     margin: 0 auto;
 }
 
-.park-header {
-    display: flex;
+/* Breadcrumb */
+.park-breadcrumb {
+    display: inline-flex;
     align-items: center;
-    gap: var(--woof-spacing-sm);
-    flex-wrap: wrap;
-    margin-bottom: var(--woof-spacing-sm);
-}
-
-.park-name {
-    font-size: var(--woof-text-title2);
-    font-weight: var(--woof-font-weight-bold);
-    margin: 0;
-}
-
-.park-type-badge {
-    display: inline-block;
-    background: var(--woof-color-mint);
-    color: white;
-    font-size: var(--woof-text-caption);
-    font-weight: var(--woof-font-weight-semibold);
-    padding: 2px 10px;
-    border-radius: var(--woof-radius-full);
-}
-
-.park-territory-link {
-    display: inline-block;
-    color: var(--woof-color-primary);
-    font-size: var(--woof-text-footnote);
+    gap: var(--woof-space-1);
+    color: var(--woof-color-brand-primary);
     text-decoration: none;
-    margin-bottom: var(--woof-spacing-md);
+    font-size: var(--woof-text-footnote);
+    margin-bottom: var(--woof-space-2);
 }
 
-.park-territory-link:hover {
+.park-breadcrumb:hover {
     text-decoration: underline;
 }
 
-.park-detail-row {
+.park-breadcrumb i {
+    font-size: 10px;
+}
+
+/* Header */
+.park-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--woof-space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--woof-space-3);
+}
+
+.park-name {
+    font-size: var(--woof-text-title-1);
+    font-weight: var(--woof-font-weight-bold);
+    color: var(--woof-color-neutral-900);
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+}
+
+.park-type-pill {
+    display: inline-block;
+    padding: 2px var(--woof-space-3);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-fresh-mint-light);
+    color: var(--woof-color-fresh-mint-dark);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-semibold);
+    white-space: nowrap;
+}
+
+/* Info rows */
+.park-info-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-2);
+    margin-bottom: var(--woof-space-4);
+    padding-bottom: var(--woof-space-4);
+    border-bottom: 1px solid var(--woof-color-neutral-100);
+}
+
+.park-info-row {
     display: flex;
     align-items: center;
-    gap: var(--woof-spacing-xs);
-    color: var(--woof-text-secondary);
+    gap: var(--woof-space-2);
     font-size: var(--woof-text-body);
-    margin-bottom: var(--woof-spacing-md);
+    color: var(--woof-color-neutral-600);
 }
 
+.park-info-row i {
+    width: 18px;
+    text-align: center;
+    color: var(--woof-color-neutral-400);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.park-info-coords span {
+    font-family: var(--woof-font-family-mono);
+    font-size: var(--woof-text-footnote);
+}
+
+/* Description */
 .park-description {
-    margin-bottom: var(--woof-spacing-lg);
-    color: var(--woof-text-primary);
+    margin-bottom: var(--woof-space-4);
+    color: var(--woof-color-neutral-700);
     line-height: 1.6;
+    font-size: var(--woof-text-body);
 }
 
+.park-description p {
+    margin: 0;
+}
+
+/* Sections */
 .park-section {
-    margin-bottom: var(--woof-spacing-lg);
+    margin-bottom: var(--woof-space-5);
 }
 
 .park-section-title {
-    font-size: var(--woof-text-body);
+    font-size: var(--woof-text-subheadline);
     font-weight: var(--woof-font-weight-semibold);
-    margin: 0 0 var(--woof-spacing-sm);
-    display: flex;
-    align-items: center;
-    gap: var(--woof-spacing-xs);
+    color: var(--woof-color-neutral-800);
+    margin: 0 0 var(--woof-space-3);
 }
 
-.park-coords {
-    color: var(--woof-text-secondary);
-    font-family: monospace;
+/* Amenities */
+.park-amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: var(--woof-space-3);
+}
+
+.park-amenity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--woof-space-1);
+    padding: var(--woof-space-3);
+    background: var(--woof-color-neutral-50);
+    border-radius: var(--woof-radius-lg);
+    text-align: center;
+}
+
+.park-amenity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-fresh-mint-light);
+    color: var(--woof-color-fresh-mint-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.park-amenity-label {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-700);
+    font-weight: var(--woof-font-weight-medium);
+}
+
+.park-no-amenities {
+    color: var(--woof-color-neutral-400);
     font-size: var(--woof-text-footnote);
     margin: 0;
 }
 
+/* Photos */
 .park-photos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: var(--woof-spacing-sm);
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--woof-space-2);
 }
 
 .park-photo img {
@@ -258,33 +608,188 @@
     border-radius: var(--woof-radius-md);
 }
 
-.park-no-photos {
-    text-align: center;
-    padding: var(--woof-spacing-xl);
-    color: var(--woof-text-tertiary);
-    background: var(--woof-bg-secondary);
+.park-photos-empty {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    padding: var(--woof-space-4);
+    border: 2px dashed var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-lg);
+    color: var(--woof-color-neutral-400);
+    font-size: var(--woof-text-footnote);
+    margin-bottom: var(--woof-space-5);
 }
 
-.park-no-photos i {
-    font-size: 2rem;
-    margin-bottom: var(--woof-spacing-sm);
-    display: block;
+.park-photos-empty i {
+    font-size: 18px;
 }
 
+/* Attribution */
 .park-attribution {
     text-align: center;
-    padding: var(--woof-spacing-md);
-    font-size: var(--woof-text-caption);
-    color: var(--woof-text-tertiary);
+    padding: var(--woof-space-4) 0;
+    font-size: var(--woof-text-caption-2);
+    color: var(--woof-color-neutral-400);
 }
 
 .park-attribution a {
-    color: var(--woof-text-tertiary);
+    color: var(--woof-color-neutral-400);
     text-decoration: none;
 }
 
 .park-attribution a:hover {
     text-decoration: underline;
+}
+
+/* Admin edit button */
+.park-edit-btn {
+    background: none;
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-full);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--woof-color-neutral-500);
+    font-size: 13px;
+    margin-left: auto;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+
+.park-edit-btn:hover {
+    background: var(--woof-color-neutral-50);
+    color: var(--woof-color-neutral-700);
+    border-color: var(--woof-color-neutral-300);
+}
+
+/* Edit form */
+.park-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-4);
+    margin-bottom: var(--woof-space-5);
+    padding: var(--woof-space-4);
+    background: var(--woof-color-neutral-50);
+    border-radius: var(--woof-radius-lg);
+}
+
+.park-edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-1);
+}
+
+.park-edit-field label {
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-600);
+}
+
+.park-edit-field input,
+.park-edit-field select,
+.park-edit-field textarea {
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-900);
+    background: var(--woof-surface-primary);
+    font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.park-edit-field input:focus,
+.park-edit-field select:focus,
+.park-edit-field textarea:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+    box-shadow: 0 0 0 2px var(--woof-color-brand-primary-subtle);
+}
+
+.park-edit-amenities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--woof-space-2);
+}
+
+.park-edit-amenity-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+    padding: var(--woof-space-1) var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-surface-primary);
+    color: var(--woof-color-neutral-500);
+    font-size: var(--woof-text-caption-1);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.park-edit-amenity-toggle:hover {
+    border-color: var(--woof-color-neutral-300);
+}
+
+.park-edit-amenity-toggle.active {
+    background: var(--woof-color-fresh-mint-light);
+    border-color: var(--woof-color-fresh-mint);
+    color: var(--woof-color-fresh-mint-dark);
+}
+
+.park-edit-actions {
+    display: flex;
+    gap: var(--woof-space-3);
+    padding-top: var(--woof-space-2);
+}
+
+.park-edit-save {
+    padding: var(--woof-space-2) var(--woof-space-5);
+    border: none;
+    border-radius: var(--woof-radius-md);
+    background: var(--woof-color-brand-primary);
+    color: white;
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-semibold);
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.park-edit-save:hover {
+    opacity: 0.9;
+}
+
+.park-edit-save:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.park-edit-cancel {
+    padding: var(--woof-space-2) var(--woof-space-5);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    background: var(--woof-surface-primary);
+    color: var(--woof-color-neutral-600);
+    font-size: var(--woof-text-body);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.park-edit-cancel:hover {
+    background: var(--woof-color-neutral-50);
+}
+
+.park-edit-cancel:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+@media (max-width: 768px) {
+    .park-page {
+        margin: -20px 0 0;
+    }
 }
 </style>

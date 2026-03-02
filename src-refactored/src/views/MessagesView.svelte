@@ -128,8 +128,10 @@
 
 {#if !isAuthenticated()}
     <main class="messages-page">
-        <div class="empty-state" style="padding: 60px 20px;">
-            <i class="fas fa-envelope"></i>
+        <div class="woof-empty-state">
+            <div class="woof-empty-state-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
             <p>{t('messages.loginRequired')}</p>
         </div>
     </main>

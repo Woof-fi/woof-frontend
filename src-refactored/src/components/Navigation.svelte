@@ -428,8 +428,8 @@
         <div class="nav-drawer-section">
             <span class="nav-drawer-section-label">{t('nav.territories')}</span>
             {#each followedTerritories.slice(0, 5) as ter (ter.id)}
-                <a href={ter.urlPath ? `/territory/${ter.urlPath}` : `/territory/${ter.slug}`} data-link onclick={closeDrawer}
-                   class="nav-drawer-row" class:active={activePath.startsWith(`/territory/${ter.slug}`)}>
+                <a href={`/territory/${ter.urlPath || ter.slug}`} data-link onclick={closeDrawer}
+                   class="nav-drawer-row" class:active={activePath.startsWith(`/territory/${ter.urlPath || ter.slug}`)}>
                     <i class="fas fa-map-marker-alt"></i> {localName(ter)}
                 </a>
             {/each}

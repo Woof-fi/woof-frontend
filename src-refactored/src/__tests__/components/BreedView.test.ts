@@ -161,7 +161,7 @@ describe('BreedView', () => {
         });
 
         await waitFor(() => {
-            expect(container.querySelector('.empty-state')).not.toBeNull();
+            expect(container.querySelector('.woof-empty-state')).not.toBeNull();
         });
     });
 

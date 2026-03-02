@@ -227,14 +227,18 @@
     </div>
 {:else if !loading && posts.length === 0 && type === 'following'}
     {#if isAuthenticated()}
-        <div class="empty-state">
-            <i class="fas fa-user-friends"></i>
+        <div class="woof-empty-state">
+            <div class="woof-empty-state-icon">
+                <i class="fas fa-user-friends"></i>
+            </div>
             <p>{t('feed.followingEmpty')}</p>
             <p>{t('feed.followingEmptyHint', { tab: t('nav.forYou') })}</p>
         </div>
     {:else}
-        <div class="empty-state">
-            <i class="fas fa-user-friends"></i>
+        <div class="woof-empty-state">
+            <div class="woof-empty-state-icon">
+                <i class="fas fa-user-friends"></i>
+            </div>
             <p>{t('feed.followingSignUp')}</p>
         </div>
     {/if}

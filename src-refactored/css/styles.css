@@ -140,6 +140,47 @@ header {
     background-color: var(--color-bg-alt);
 }
 
+/* ── Empty state — shared across all views ── */
+.woof-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--woof-space-10) var(--woof-space-5);
+    gap: var(--woof-space-3);
+}
+
+.woof-empty-state-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-neutral-100);
+    color: var(--woof-color-neutral-400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: var(--woof-space-1);
+}
+
+.woof-empty-state-icon--error {
+    background: var(--woof-color-brand-primary-subtle);
+    color: var(--woof-color-brand-primary);
+}
+
+.woof-empty-state-icon--mint {
+    background: var(--woof-color-fresh-mint-light);
+    color: var(--woof-color-fresh-mint-dark);
+}
+
+.woof-empty-state p {
+    margin: 0;
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-500);
+    text-align: center;
+    line-height: var(--woof-lh-body);
+    max-width: 280px;
+}
+
 /* ── Form groups — shared across AuthModal + CreatePostModal + HealthRecordModal ── */
 .form-group {
     margin-bottom: 16px;

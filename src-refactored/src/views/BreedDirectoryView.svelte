@@ -78,8 +78,10 @@
                 <span class="breed-section-count">{filteredBreeds.length}</span>
             </h2>
             {#if filteredBreeds.length === 0}
-                <div class="empty-state">
-                    <i class="fas fa-search"></i>
+                <div class="woof-empty-state">
+                    <div class="woof-empty-state-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
                     <p>{t('breedDirectory.noResults', { query })}</p>
                 </div>
             {:else}

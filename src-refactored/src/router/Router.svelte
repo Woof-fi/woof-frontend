@@ -76,6 +76,7 @@
         { path: '/post/:id',       component: PostDetailView,     paramNames: ['id'] },
         { path: '/messages',       component: MessagesView,       paramNames: [] },
         { path: '/messages/:id',   component: MessagesView,       paramNames: ['id'] },
+        { path: '/admin/:section',  component: AdminView,          paramNames: ['section'] },
         { path: '/admin',          component: AdminView,          paramNames: [] },
         { path: '/notifications',  component: NotificationsView,  paramNames: [] },
         { path: '/privacy',        component: PrivacyView,        paramNames: [] },
@@ -187,7 +188,7 @@
     {:else if matched.component === MessagesView}
         <MessagesView params={matched.params} onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === AdminView}
-        <AdminView />
+        <AdminView params={matched.params} />
     {:else if matched.component === NotificationsView}
         <NotificationsView onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === PrivacyView}

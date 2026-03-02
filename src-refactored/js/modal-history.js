@@ -38,6 +38,17 @@ export function popModalState() {
 }
 
 /**
+ * Reset modal history state without calling history.back().
+ * Use when navigating away from a modal (e.g. clicking a search result link),
+ * since the router's pushState replaces the modal history entry.
+ */
+export function resetModalState() {
+    modalStateActive = false;
+    closingFromPopstate = false;
+    poppingModalState = false;
+}
+
+/**
  * Check if popstate should be handled as a modal close.
  * Called from the router's popstate handler.
  * @returns {boolean} true if a modal was closed (router should skip routing)

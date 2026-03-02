@@ -16,6 +16,26 @@
     let loadError = $state(false);
     let activeTab = $state('posts');
 
+    // Persist active tab in sessionStorage so back-navigation restores it
+    const TAB_KEY = 'woof_tab_positions';
+    function saveTab(tab) {
+        try {
+            const tabs = JSON.parse(sessionStorage.getItem(TAB_KEY) || '{}');
+            tabs['/territory/' + path] = tab;
+            sessionStorage.setItem(TAB_KEY, JSON.stringify(tabs));
+        } catch { /* ignore */ }
+    }
+    function restoreTab() {
+        try {
+            const tabs = JSON.parse(sessionStorage.getItem(TAB_KEY) || '{}');
+            return tabs['/territory/' + path] || 'posts';
+        } catch { return 'posts'; }
+    }
+    function setTab(tab) {
+        activeTab = tab;
+        saveTab(tab);
+    }
+
     // Posts section (eager load)
     let posts = $state([]);
     let postsLoading = $state(false);
@@ -61,7 +81,7 @@
         territory = null;
         loading = true;
         loadError = false;
-        activeTab = 'posts';
+        activeTab = restoreTab();
         posts = [];
         postsLoading = false;
         postsCursor = null;
@@ -254,8 +274,10 @@
     {:else if loadError || !territory}
         <div class="territory-sheet" style="margin-top: 0;">
             <div class="territory-container">
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-circle"></i>
+                <div class="woof-empty-state">
+                    <div class="woof-empty-state-icon woof-empty-state-icon--error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
                     <p>{t('territory.failedLoad')}</p>
                 </div>
             </div>
@@ -369,7 +391,7 @@
                     class:active={activeTab === 'posts'}
                     role="tab"
                     aria-selected={activeTab === 'posts'}
-                    onclick={() => activeTab = 'posts'}
+                    onclick={() => setTab('posts')}
                 >
                     <i class="fas fa-th"></i> {t('territory.posts')}
                 </button>
@@ -378,7 +400,7 @@
                     class:active={activeTab === 'dogs'}
                     role="tab"
                     aria-selected={activeTab === 'dogs'}
-                    onclick={() => activeTab = 'dogs'}
+                    onclick={() => setTab('dogs')}
                 >
                     <i class="fas fa-dog"></i> {t('territory.dogs')}
                 </button>
@@ -387,7 +409,7 @@
                     class:active={activeTab === 'parks'}
                     role="tab"
                     aria-selected={activeTab === 'parks'}
-                    onclick={() => activeTab = 'parks'}
+                    onclick={() => setTab('parks')}
                 >
                     <i class="fas fa-tree"></i> {t('territory.dogParks')}
                 </button>
@@ -398,8 +420,10 @@
                 {#if postsLoading}
                     <div class="territory-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if posts.length === 0}
-                    <div class="empty-state">
-                        <i class="fas fa-camera"></i>
+                    <div class="woof-empty-state">
+                        <div class="woof-empty-state-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
                         <p>{t('territory.noPosts')}</p>
                     </div>
                 {:else}
@@ -457,8 +481,10 @@
                 {#if dogsLoading}
                     <div class="territory-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if dogs.length === 0 && dogsLoadedOnce}
-                    <div class="empty-state">
-                        <i class="fas fa-dog"></i>
+                    <div class="woof-empty-state">
+                        <div class="woof-empty-state-icon">
+                            <i class="fas fa-dog"></i>
+                        </div>
                         <p>{t('territory.noDogs')}</p>
                     </div>
                 {:else if dogs.length > 0}
@@ -501,31 +527,48 @@
                 {#if parksLoading}
                     <div class="territory-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if parks.length === 0 && parksLoadedOnce}
-                    <div class="empty-state">
-                        <i class="fas fa-tree"></i>
-                        <p>{t('territory.noParks')}</p>
+                    <div class="parks-empty">
+                        <div class="parks-empty-icon">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <p class="parks-empty-title">{t('territory.noParks')}</p>
+                        {#if isAuthenticated()}
+                            <button class="parks-empty-btn" onclick={() => suggestModalOpen = true}>
+                                <i class="fas fa-plus"></i> {t('territory.suggestPark')}
+                            </button>
+                        {/if}
                     </div>
                 {:else if parks.length > 0}
-                    <div class="parks-grid">
+                    <ul class="park-list">
                         {#each parks as park (park.id)}
-                            <a href="/dog-park/{park.slug}" data-link class="park-card">
-                                <div class="park-card-image">
-                                    <img src="/images/dog-park-placeholder.svg" alt={localName(park)} loading="lazy" />
-                                </div>
-                                <div class="park-card-info">
-                                    <h3 class="park-card-name">{localName(park)}</h3>
-                                    <span class="park-card-type">{parkTypeLabel(park.parkType)}</span>
-                                    {#if park.address}
-                                        <span class="park-card-address"><i class="fas fa-map-marker-alt"></i> {park.address}</span>
-                                    {/if}
-                                </div>
-                            </a>
+                            <li class="park-list-item">
+                                <a href="/dog-park/{park.slug}" data-link class="park-list-link">
+                                    <div class="park-list-icon">
+                                        <i class="fas fa-tree"></i>
+                                    </div>
+                                    <div class="park-list-info">
+                                        <span class="park-list-name">{localName(park)}</span>
+                                        <span class="park-list-meta">
+                                            <span class="park-type-pill">{parkTypeLabel(park.parkType)}</span>
+                                            {#if park.sizeM2}
+                                                <span class="park-list-sep">&middot;</span>
+                                                <span>{park.sizeM2} m²</span>
+                                            {/if}
+                                            {#if park.address}
+                                                <span class="park-list-sep">&middot;</span>
+                                                <span>{park.address}</span>
+                                            {/if}
+                                        </span>
+                                    </div>
+                                    <i class="fas fa-chevron-right park-list-chevron"></i>
+                                </a>
+                            </li>
                         {/each}
-                    </div>
+                    </ul>
                 {/if}
-                {#if isAuthenticated()}
+                {#if parks.length > 0 && isAuthenticated()}
                     <div class="suggest-park-cta">
-                        <button class="btn-secondary" onclick={() => suggestModalOpen = true}>
+                        <button class="suggest-park-btn" onclick={() => suggestModalOpen = true}>
                             <i class="fas fa-plus"></i> {t('territory.suggestPark')}
                         </button>
                     </div>
@@ -1009,83 +1052,169 @@
     padding: 20px 0;
 }
 
-/* Dog Parks tab */
-.parks-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: var(--woof-spacing-md);
-    padding: var(--woof-spacing-md);
-}
-
-.park-card {
-    background: var(--woof-bg-card);
-    border-radius: var(--woof-radius-lg);
-    overflow: hidden;
-    text-decoration: none;
-    color: inherit;
-    box-shadow: var(--woof-shadow-sm);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.park-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--woof-shadow-md);
-}
-
-.park-card-image {
-    width: 100%;
-    aspect-ratio: 16/10;
-    background: var(--woof-bg-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.park-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.park-card-info {
-    padding: var(--woof-spacing-sm) var(--woof-spacing-md);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.park-card-name {
-    font-size: var(--woof-text-body);
-    font-weight: var(--woof-font-weight-semibold);
+/* Dog Parks list */
+.park-list {
+    list-style: none;
+    padding: var(--woof-space-2) 0;
     margin: 0;
 }
 
-.park-card-type {
-    font-size: var(--woof-text-footnote);
-    color: var(--woof-text-secondary);
+.park-list-item {
+    list-style: none;
 }
 
-.park-card-address {
-    font-size: var(--woof-text-footnote);
-    color: var(--woof-text-tertiary);
+.park-list-link {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-3);
+    padding: var(--woof-space-3) var(--woof-space-4);
+    text-decoration: none;
+    color: inherit;
+    transition: background-color var(--woof-duration-fast);
 }
 
-.park-card-address i {
-    margin-right: 4px;
+.park-list-link:hover {
+    background-color: var(--woof-color-neutral-50);
+}
+
+.park-list-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--woof-radius-lg);
+    background: var(--woof-color-fresh-mint-light);
+    color: var(--woof-color-fresh-mint-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.park-list-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.park-list-name {
+    display: block;
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-900);
+    line-height: 1.3;
+}
+
+.park-list-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--woof-space-1);
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    margin-top: 2px;
+}
+
+.park-list-sep {
+    color: var(--woof-color-neutral-300);
+}
+
+.park-type-pill {
+    display: inline-block;
+    padding: 1px var(--woof-space-2);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-fresh-mint-light);
+    color: var(--woof-color-fresh-mint-dark);
+    font-size: var(--woof-text-caption-2);
+    font-weight: var(--woof-font-weight-semibold);
+}
+
+.park-list-chevron {
+    color: var(--woof-color-neutral-300);
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.parks-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--woof-space-10) var(--woof-space-5);
+    gap: var(--woof-space-3);
+}
+
+.parks-empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-fresh-mint-light);
+    color: var(--woof-color-fresh-mint-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: var(--woof-space-1);
+}
+
+.parks-empty-title {
+    margin: 0;
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-500);
+    text-align: center;
+    line-height: var(--woof-lh-body);
+}
+
+.parks-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    padding: 0 var(--woof-btn-padding-x);
+    height: var(--woof-btn-height-sm);
+    border: none;
+    border-radius: var(--woof-btn-radius);
+    background: var(--woof-color-fresh-mint);
+    color: var(--woof-color-neutral-0);
+    font-size: var(--woof-text-footnote);
+    font-weight: var(--woof-font-weight-semibold);
+    cursor: pointer;
+    margin-top: var(--woof-space-1);
+    transition: background var(--woof-duration-fast) var(--woof-ease-default);
+}
+
+.parks-empty-btn:hover {
+    background: var(--woof-color-fresh-mint-dark);
 }
 
 .suggest-park-cta {
-    padding: var(--woof-spacing-md);
+    padding: var(--woof-space-3) 0;
     text-align: center;
+    border-top: 1px solid var(--woof-color-neutral-100);
+}
+
+.suggest-park-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border: none;
+    border-radius: var(--woof-radius-full);
+    background: none;
+    color: var(--woof-color-fresh-mint-dark);
+    font-size: var(--woof-text-footnote);
+    font-weight: var(--woof-font-weight-semibold);
+    cursor: pointer;
+    transition: background var(--woof-duration-fast) var(--woof-ease-default);
+}
+
+.suggest-park-btn:hover {
+    background: var(--woof-color-fresh-mint-light);
+}
+
+.suggest-park-btn i {
+    font-size: 11px;
 }
 
 @media (max-width: 768px) {
     .territory-page {
         margin: -20px 0 0;
-    }
-    .parks-grid {
-        grid-template-columns: 1fr;
     }
 }
 </style>

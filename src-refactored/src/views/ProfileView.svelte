@@ -25,6 +25,26 @@
     let loadError = $state(false);
     let activeTab = $state('posts');
 
+    // Persist active tab in sessionStorage so back-navigation restores it
+    const TAB_KEY = 'woof_tab_positions';
+    function saveTab(tab) {
+        try {
+            const tabs = JSON.parse(sessionStorage.getItem(TAB_KEY) || '{}');
+            tabs['/dog/' + slug] = tab;
+            sessionStorage.setItem(TAB_KEY, JSON.stringify(tabs));
+        } catch { /* ignore */ }
+    }
+    function restoreTab() {
+        try {
+            const tabs = JSON.parse(sessionStorage.getItem(TAB_KEY) || '{}');
+            return tabs['/dog/' + slug] || 'posts';
+        } catch { return 'posts'; }
+    }
+    function setTab(tab) {
+        activeTab = tab;
+        saveTab(tab);
+    }
+
     let posts = $state([]);
     let postsLoading = $state(false);
     let nextCursor = $state(null);
@@ -84,7 +104,7 @@
         dog = null;
         loading = true;
         loadError = false;
-        activeTab = 'posts';
+        activeTab = restoreTab();
         posts = [];
         postsLoading = false;
         followerCount = 0;
@@ -297,8 +317,10 @@
     {:else if loadError || !dog}
         <div class="profile-sheet">
             <div class="profile-container">
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-circle"></i>
+                <div class="woof-empty-state">
+                    <div class="woof-empty-state-icon woof-empty-state-icon--error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
                     <p>Failed to load profile.</p>
                 </div>
             </div>
@@ -376,7 +398,7 @@
                     class:active={activeTab === 'posts'}
                     role="tab"
                     aria-selected={activeTab === 'posts'}
-                    onclick={() => activeTab = 'posts'}
+                    onclick={() => setTab('posts')}
                 >
                     <i class="fas fa-th"></i> {t('profile.posts')}
                 </button>
@@ -385,7 +407,7 @@
                     class:active={activeTab === 'friends'}
                     role="tab"
                     aria-selected={activeTab === 'friends'}
-                    onclick={() => activeTab = 'friends'}
+                    onclick={() => setTab('friends')}
                 >
                     <i class="fas fa-user-friends"></i> {t('profile.friends')}
                 </button>
@@ -394,7 +416,7 @@
                     class:active={activeTab === 'health'}
                     role="tab"
                     aria-selected={activeTab === 'health'}
-                    onclick={() => activeTab = 'health'}
+                    onclick={() => setTab('health')}
                 >
                     <i class="fas fa-heartbeat"></i> {t('profile.health')}
                 </button>
@@ -405,8 +427,10 @@
                 {#if postsLoading}
                     <div class="health-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if posts.length === 0}
-                    <div class="empty-state">
-                        <i class="fas fa-camera"></i>
+                    <div class="woof-empty-state">
+                        <div class="woof-empty-state-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
                         <p>{t('profile.noPosts')}</p>
                     </div>
                 {:else}
@@ -448,8 +472,10 @@
                 {#if friendsLoading}
                     <div class="health-loading"><i class="fas fa-spinner fa-spin"></i></div>
                 {:else if friends.length === 0 && friendsLoadedOnce}
-                    <div class="empty-state">
-                        <i class="fas fa-user-friends"></i>
+                    <div class="woof-empty-state">
+                        <div class="woof-empty-state-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
                         <p>{t('profile.noFollowers')}</p>
                     </div>
                 {:else if friends.length > 0}
@@ -502,15 +528,19 @@
                             <div class="health-loading"><i class="fas fa-spinner fa-spin"></i> {t('common.loading')}...</div>
                         {:else if healthRecords.length === 0}
                             {#if healthFilterType}
-                                <div class="empty-state">
-                                    <i class="fas fa-heartbeat"></i>
+                                <div class="woof-empty-state">
+                                    <div class="woof-empty-state-icon">
+                                        <i class="fas fa-heartbeat"></i>
+                                    </div>
                                     <p>{t('health.noRecords')}</p>
                                 </div>
                             {:else}
-                                <div class="empty-state">
-                                    <i class="fas fa-heartbeat"></i>
+                                <div class="woof-empty-state">
+                                    <div class="woof-empty-state-icon">
+                                        <i class="fas fa-heartbeat"></i>
+                                    </div>
                                     <p>{t('health.startTracking')}</p>
-                                    <button class="btn-primary" style="margin-top:12px" onclick={handleAddHealthRecord}>
+                                    <button class="btn-primary" style="margin-top: var(--woof-space-1);" onclick={handleAddHealthRecord}>
                                         <i class="fas fa-plus"></i> {t('health.addFirstRecord')}
                                     </button>
                                 </div>

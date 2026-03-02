@@ -82,8 +82,6 @@
                 <label for="park-type">{t('dogPark.parkType')}</label>
                 <select id="park-type" bind:value={parkType}>
                     <option value="all_sizes">{t('dogPark.allSizes')}</option>
-                    <option value="small_dogs">{t('dogPark.smallDogs')}</option>
-                    <option value="large_dogs">{t('dogPark.largeDogs')}</option>
                     <option value="separate_areas">{t('dogPark.separateAreas')}</option>
                 </select>
             </div>

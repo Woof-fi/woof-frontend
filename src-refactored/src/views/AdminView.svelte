@@ -4,6 +4,15 @@
     import { showToast, timeAgo } from '../../js/utils.js';
     import { t, localName } from '../../js/i18n-store.svelte.js';
 
+    let { params = {} } = $props();
+    const VALID_SECTIONS = ['reports', 'flagged', 'dogparks'];
+    let section = $derived(VALID_SECTIONS.includes(params.section) ? params.section : 'reports');
+
+    function navigateSection(s) {
+        history.pushState({}, '', `/admin/${s}`);
+        window.dispatchEvent(new CustomEvent('routechange'));
+    }
+
     let REASON_LABELS = $derived({
         inappropriate_content: t('post.reasonInappropriate'),
         spam:                  t('post.reasonSpam'),
@@ -23,9 +32,6 @@
 
     let isAdmin      = $derived(store.authUser?.role === 'admin' || store.authUser?.role === 'moderator');
     let isAdminRole  = $derived(store.authUser?.role === 'admin');
-
-    // Top-level section: 'reports' | 'flagged'
-    let section      = $state('reports');
 
     let statusFilter = $state('pending');
     let reports      = $state([]);
@@ -48,6 +54,8 @@
     let parksBusy        = $state({});
     let allTerritories   = $state([]);
     let territoryAssignments = $state({});
+    let parkEditing      = $state({});
+    let parkEditNames    = $state({});
 
     $effect(() => {
         // Re-fetch reports when filter changes (only if in reports section)
@@ -69,7 +77,7 @@
     });
 
     $effect(() => {
-        if (section === 'parks') {
+        if (section === 'dogparks') {
             loadDogParks();
         }
     });
@@ -270,7 +278,41 @@
         parksBusy = { ...parksBusy, [park.id]: true };
         try {
             await updateAdminDogPark(park.id, { territoryId });
+            // Remove from unmatched list (if present), update in pending list (if present)
             unmatchedParks = unmatchedParks.filter(p => p.id !== park.id);
+            pendingParks = pendingParks.map(p => p.id === park.id ? { ...p, territoryId } : p);
+            showToast(t('admin.parkUpdated'), 'success');
+        } catch {
+            showToast(t('admin.failedUpdateReport'), 'error');
+        } finally {
+            const next = { ...parksBusy };
+            delete next[park.id];
+            parksBusy = next;
+        }
+    }
+
+    function startParkEdit(park) {
+        parkEditing = { ...parkEditing, [park.id]: true };
+        parkEditNames = { ...parkEditNames, [park.id]: { name: park.name || '', nameFi: park.nameFi || '' } };
+    }
+
+    function cancelParkEdit(parkId) {
+        const next = { ...parkEditing };
+        delete next[parkId];
+        parkEditing = next;
+    }
+
+    async function saveParkName(park) {
+        const names = parkEditNames[park.id];
+        if (!names?.name?.trim()) return;
+        parksBusy = { ...parksBusy, [park.id]: true };
+        try {
+            await updateAdminDogPark(park.id, { name: names.name.trim(), nameFi: names.nameFi?.trim() || undefined });
+            // Update local state
+            const updateList = (list) => list.map(p => p.id === park.id ? { ...p, name: names.name.trim(), nameFi: names.nameFi?.trim() || p.nameFi } : p);
+            pendingParks = updateList(pendingParks);
+            unmatchedParks = updateList(unmatchedParks);
+            cancelParkEdit(park.id);
             showToast(t('admin.parkUpdated'), 'success');
         } catch {
             showToast(t('admin.failedUpdateReport'), 'error');
@@ -320,14 +362,14 @@
             <button
                 class="admin-section-tab"
                 class:active={section === 'reports'}
-                onclick={() => section = 'reports'}
+                onclick={() => navigateSection('reports')}
             >
                 <i class="fas fa-flag"></i> {t('admin.reports')}
             </button>
             <button
                 class="admin-section-tab"
                 class:active={section === 'flagged'}
-                onclick={() => section = 'flagged'}
+                onclick={() => navigateSection('flagged')}
             >
                 <i class="fas fa-robot"></i> {t('admin.flagged')}
                 {#if flaggedPosts.length > 0}
@@ -336,8 +378,8 @@
             </button>
             <button
                 class="admin-section-tab"
-                class:active={section === 'parks'}
-                onclick={() => section = 'parks'}
+                class:active={section === 'dogparks'}
+                onclick={() => navigateSection('dogparks')}
             >
                 <i class="fas fa-tree"></i> {t('admin.dogParks')}
             </button>
@@ -557,7 +599,7 @@
                 </div>
             {/if}
 
-        {:else if section === 'parks'}
+        {:else if section === 'dogparks'}
             {#if parksLoading}
                 <div class="admin-loading">
                     <i class="fas fa-spinner fa-spin"></i> {t('admin.loadingReports')}
@@ -576,8 +618,38 @@
                             <div class="admin-park-card" class:busy={!!parksBusy[park.id]}>
                                 <div class="admin-park-body">
                                     <div class="admin-report-meta">
-                                        <span class="admin-park-name">{localName(park)}</span>
-                                        <span class="admin-park-type-badge">{parkTypeLabel(park.parkType)}</span>
+                                        {#if parkEditing[park.id]}
+                                            <div class="admin-park-edit-fields">
+                                                <input
+                                                    type="text"
+                                                    class="admin-park-edit-input"
+                                                    placeholder="Name (EN)"
+                                                    value={parkEditNames[park.id]?.name || ''}
+                                                    oninput={(e) => parkEditNames = { ...parkEditNames, [park.id]: { ...parkEditNames[park.id], name: e.target.value } }}
+                                                />
+                                                <input
+                                                    type="text"
+                                                    class="admin-park-edit-input"
+                                                    placeholder="Nimi (FI)"
+                                                    value={parkEditNames[park.id]?.nameFi || ''}
+                                                    oninput={(e) => parkEditNames = { ...parkEditNames, [park.id]: { ...parkEditNames[park.id], nameFi: e.target.value } }}
+                                                />
+                                                <div class="admin-park-edit-actions">
+                                                    <button class="admin-action-btn admin-action-btn--neutral" onclick={() => saveParkName(park)} disabled={!!parksBusy[park.id]}>
+                                                        <i class="fas fa-save"></i> Save
+                                                    </button>
+                                                    <button class="admin-action-btn" onclick={() => cancelParkEdit(park.id)}>
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {:else}
+                                            <span class="admin-park-name">{localName(park)}</span>
+                                            <button class="admin-park-edit-btn" onclick={() => startParkEdit(park)} title="Rename">
+                                                <i class="fas fa-pencil"></i>
+                                            </button>
+                                            <span class="admin-park-type-badge">{parkTypeLabel(park.parkType)}</span>
+                                        {/if}
                                     </div>
                                     {#if park.address}
                                         <p class="admin-park-detail"><i class="fas fa-location-dot"></i> {park.address}</p>
@@ -588,6 +660,30 @@
                                     {#if park.suggestedByEmail}
                                         <p class="admin-park-detail"><i class="fas fa-user"></i> {t('admin.suggestedBy')} {park.suggestedByEmail}</p>
                                     {/if}
+                                    {#if park.latitude && park.longitude}
+                                        <p class="admin-park-detail admin-park-coords"><i class="fas fa-compass"></i> {park.latitude.toFixed(5)}, {park.longitude.toFixed(5)}</p>
+                                    {/if}
+                                    <div class="admin-park-assign">
+                                        <select
+                                            class="admin-park-select"
+                                            value={territoryAssignments[park.id] || park.territoryId || ''}
+                                            onchange={(e) => territoryAssignments = { ...territoryAssignments, [park.id]: e.target.value }}
+                                        >
+                                            <option value="">{t('admin.assignTerritory')}</option>
+                                            {#each allTerritories as terr}
+                                                <option value={terr.id}>{localName(terr)} ({terr.type})</option>
+                                            {/each}
+                                        </select>
+                                        {#if territoryAssignments[park.id] && territoryAssignments[park.id] !== park.territoryId}
+                                            <button
+                                                class="admin-action-btn admin-action-btn--neutral"
+                                                disabled={!!parksBusy[park.id]}
+                                                onclick={() => handleAssignTerritory(park)}
+                                            >
+                                                <i class="fas fa-save"></i>
+                                            </button>
+                                        {/if}
+                                    </div>
                                     <div class="admin-report-actions">
                                         <button
                                             class="admin-action-btn admin-action-btn--neutral"
@@ -1137,7 +1233,7 @@
     display: inline-block;
     padding: var(--woof-space-1) var(--woof-space-3);
     border-radius: var(--woof-radius-full);
-    background: var(--woof-color-mint);
+    background: var(--woof-color-fresh-mint);
     color: var(--woof-color-neutral-0);
     font-size: var(--woof-text-caption-1);
     font-weight: var(--woof-font-weight-semibold);
@@ -1155,6 +1251,51 @@
 .admin-park-coords {
     font-family: monospace;
     font-size: var(--woof-text-caption-1);
+}
+
+.admin-park-edit-btn {
+    background: none;
+    border: none;
+    color: var(--woof-color-neutral-400);
+    cursor: pointer;
+    padding: var(--woof-space-1);
+    font-size: 12px;
+    border-radius: var(--woof-radius-sm);
+    transition: color var(--woof-duration-fast), background var(--woof-duration-fast);
+}
+
+.admin-park-edit-btn:hover {
+    color: var(--woof-color-brand-primary);
+    background: var(--woof-color-brand-primary-subtle);
+}
+
+.admin-park-edit-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-2);
+    width: 100%;
+}
+
+.admin-park-edit-input {
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border-radius: var(--woof-radius-md);
+    border: 1.5px solid var(--woof-color-neutral-200);
+    background: var(--woof-color-neutral-0);
+    font-size: var(--woof-text-footnote);
+    font-family: inherit;
+    color: var(--woof-color-neutral-700);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-park-edit-input:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+}
+
+.admin-park-edit-actions {
+    display: flex;
+    gap: var(--woof-space-2);
 }
 
 .admin-park-assign {

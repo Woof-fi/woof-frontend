@@ -1,7 +1,7 @@
 <script>
     import { getAllDogs, getAllBreeds, getAllTerritories } from '../../js/api.js';
     import { debounce } from '../../js/utils.js';
-    import { pushModalState, popModalState } from '../../js/modal-history.js';
+    import { pushModalState, popModalState, resetModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { modals, closeSearchPanel as storeClose } from '../../js/modal-store.svelte.js';
     import { t, localName } from '../../js/i18n-store.svelte.js';
@@ -17,12 +17,7 @@
 
     /** Build a /territory/... URL from the getAllTerritories response shape */
     function buildTerritoryUrl(ter) {
-        if (ter.type === 'sub_district' && ter.grandparentSlug && ter.parentSlug) {
-            return `/territory/${ter.grandparentSlug}/${ter.parentSlug}/${ter.slug}`;
-        }
-        if (ter.type === 'district' && ter.parentSlug) {
-            return `/territory/${ter.parentSlug}/${ter.slug}`;
-        }
+        if (ter.urlPath) return `/territory/${ter.urlPath}`;
         return `/territory/${ter.slug}`;
     }
 
@@ -60,10 +55,9 @@
                 name: ter.name,
                 nameFi: ter.nameFi,
                 type: ter.type,
-                parentSlug: ter.parentSlug,
+                urlPath: ter.urlPath,
                 parentName: ter.parentName,
                 parentNameFi: ter.parentNameFi,
-                grandparentSlug: ter.grandparentSlug,
                 url: buildTerritoryUrl(ter),
             }));
         } catch {
@@ -104,7 +98,14 @@
     }
 
     function handleResultClick() {
-        close();
+        // Reset modal state without history.back() — the data-link handler
+        // will pushState to the new URL, replacing the modal history entry.
+        resetModalState();
+        storeClose();
+        query = '';
+        dogResults = [];
+        breedResults = [];
+        territoryResults = [];
     }
 
     let hasQuery = $derived(query.trim().length >= 2);
