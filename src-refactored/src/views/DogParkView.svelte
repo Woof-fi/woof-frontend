@@ -1,13 +1,33 @@
 <script>
-    import { getDogPark, updateAdminDogPark, getAllTerritories } from '../../js/api.js';
+    import { getDogPark, updateAdminDogPark, getAllTerritories, followDogPark, unfollowDogPark, suggestParkAmenity, scheduleParkVisit, cancelParkVisit, getUpcomingParkVisits, getMyDogs } from '../../js/api.js';
     import { t, localName, locale } from '../../js/i18n-store.svelte.js';
-    import { store } from '../../js/svelte-store.svelte.js';
+    import { store, bumpParkVersion } from '../../js/svelte-store.svelte.js';
+    import { isAuthenticated } from '../../js/auth.js';
 
     let { params = {} } = $props();
 
     let park = $state(null);
     let loading = $state(true);
     let loadError = $state(false);
+
+    // Follow state
+    let isFollowing = $state(false);
+    let followerCount = $state(0);
+    let followLoading = $state(false);
+
+    // Visits state
+    let visits = $state([]);
+    let visitsLoading = $state(false);
+    let showVisitForm = $state(false);
+    let visitSubmitting = $state(false);
+    let myDogs = $state([]);
+    let visitForm = $state({ dogId: '', arrivalAt: '', durationMinutes: 60, note: '' });
+
+    // Amenity suggestion state
+    let showAmenitySuggest = $state(false);
+    let amenitySuggestForm = $state({});
+    let amenitySuggestSubmitting = $state(false);
+    let amenitySuggestSuccess = $state(false);
 
     // Admin edit state
     let isAdmin = $derived(
@@ -18,8 +38,9 @@
     let editForm = $state({});
     let territories = $state([]);
 
+    let authed = $derived(store.authUser !== null);
+
     async function startEdit() {
-        // Reload fresh data before editing (bypasses HTTP cache)
         await reloadPark(params.slug);
         editForm = {
             name: park.name || '',
@@ -57,12 +78,10 @@
             if (newSize !== park.sizeM2) updates.sizeM2 = newSize;
             if (editForm.description !== (park.description || '')) updates.description = editForm.description;
             if (editForm.descriptionFi !== (park.descriptionFi || '')) updates.descriptionFi = editForm.descriptionFi;
-            // Always send amenities (simple object comparison is tricky)
             updates.amenities = editForm.amenities;
 
             if (Object.keys(updates).length > 0) {
                 await updateAdminDogPark(park.id, updates);
-                // Reload park data (bypass HTTP cache)
                 await reloadPark(params.slug);
             }
             editing = false;
@@ -115,7 +134,6 @@
         (park.description || park.descriptionFi || '')
     );
 
-    // Territory dropdown: group by type for easier selection
     let sortedTerritories = $derived(
         [...territories].sort((a, b) => {
             const typeOrder = { municipality: 0, district: 1, sub_district: 2 };
@@ -124,12 +142,24 @@
         })
     );
 
+    // Duration options
+    const durationOptions = [
+        { value: 15, label: '15 min' },
+        { value: 30, label: '30 min' },
+        { value: 60, label: '1h' },
+        { value: 90, label: '1.5h' },
+        { value: 120, label: '2h' },
+        { value: 180, label: '3h' },
+    ];
+
     async function loadPark(slug) {
         park = null;
         loading = true;
         loadError = false;
         try {
             park = await getDogPark(slug);
+            isFollowing = park.isFollowing || false;
+            followerCount = park.followerCount || 0;
         } catch (e) {
             loadError = true;
             console.error('Failed to load dog park:', e);
@@ -137,23 +167,176 @@
         loading = false;
     }
 
-    /** Reload fresh from server after admin edit (bypasses HTTP cache). */
     async function reloadPark(slug) {
         try {
             const base = import.meta.env.VITE_API_URL || '';
-            const resp = await fetch(`${base}/api/dog-parks/${slug}`, { cache: 'no-store' });
+            const headers = {};
+            const token = localStorage.getItem('idToken');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const resp = await fetch(`${base}/api/dog-parks/${slug}`, { cache: 'no-store', headers });
             if (resp.ok) {
                 const data = await resp.json();
                 park = data.park;
+                isFollowing = park.isFollowing || false;
+                followerCount = park.followerCount || 0;
             }
         } catch (e) {
             console.error('Failed to reload park:', e);
         }
     }
 
+    async function loadVisits() {
+        if (!park) return;
+        visitsLoading = true;
+        try {
+            visits = await getUpcomingParkVisits(park.id);
+        } catch {
+            visits = [];
+        }
+        visitsLoading = false;
+    }
+
+    // Follow / Unfollow
+    async function handleFollow() {
+        if (!authed) return;
+        followLoading = true;
+        try {
+            if (isFollowing) {
+                await unfollowDogPark(park.id);
+                isFollowing = false;
+                followerCount = Math.max(0, followerCount - 1);
+            } else {
+                await followDogPark(park.id);
+                isFollowing = true;
+                followerCount += 1;
+            }
+            bumpParkVersion();
+        } catch (e) {
+            console.error('Follow action failed:', e);
+        }
+        followLoading = false;
+    }
+
+    // Amenity suggestions
+    function openAmenitySuggest() {
+        amenitySuggestForm = {};
+        amenityKeys.forEach(key => {
+            amenitySuggestForm[key] = park.amenities?.[key] || false;
+        });
+        amenitySuggestSuccess = false;
+        showAmenitySuggest = true;
+    }
+
+    async function submitAmenitySuggestion() {
+        amenitySuggestSubmitting = true;
+        try {
+            // Submit each changed amenity
+            const currentAmenities = park.amenities || {};
+            let submitted = 0;
+            for (const key of amenityKeys) {
+                if (amenitySuggestForm[key] !== (currentAmenities[key] || false)) {
+                    await suggestParkAmenity(park.id, key, amenitySuggestForm[key]);
+                    submitted++;
+                }
+            }
+            if (submitted > 0) {
+                amenitySuggestSuccess = true;
+                setTimeout(() => {
+                    showAmenitySuggest = false;
+                    amenitySuggestSuccess = false;
+                }, 2000);
+            } else {
+                showAmenitySuggest = false;
+            }
+        } catch (e) {
+            console.error('Failed to submit amenity suggestion:', e);
+            alert('Failed to submit suggestion');
+        }
+        amenitySuggestSubmitting = false;
+    }
+
+    // Visit scheduling
+    async function openVisitForm() {
+        if (myDogs.length === 0) {
+            try {
+                myDogs = await getMyDogs();
+            } catch {
+                myDogs = [];
+            }
+        }
+        // Default arrival: next full hour
+        const now = new Date();
+        now.setHours(now.getHours() + 1, 0, 0, 0);
+        const localISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        visitForm = {
+            dogId: myDogs.length === 1 ? myDogs[0].id : '',
+            arrivalAt: localISO,
+            durationMinutes: 60,
+            note: '',
+        };
+        showVisitForm = true;
+    }
+
+    async function submitVisit() {
+        visitSubmitting = true;
+        try {
+            const arrivalDate = new Date(visitForm.arrivalAt);
+            await scheduleParkVisit(park.id, {
+                dogId: visitForm.dogId,
+                arrivalAt: arrivalDate.toISOString(),
+                durationMinutes: visitForm.durationMinutes,
+                note: visitForm.note || undefined,
+            });
+            showVisitForm = false;
+            await loadVisits();
+        } catch (e) {
+            console.error('Failed to schedule visit:', e);
+            alert('Failed to schedule visit: ' + (e.message || 'Unknown error'));
+        }
+        visitSubmitting = false;
+    }
+
+    async function handleCancelVisit(visitId) {
+        try {
+            await cancelParkVisit(visitId);
+            visits = visits.filter(v => v.id !== visitId);
+        } catch (e) {
+            console.error('Failed to cancel visit:', e);
+        }
+    }
+
+    function formatVisitTime(isoStr) {
+        const d = new Date(isoStr);
+        const now = new Date();
+        const isToday = d.toDateString() === now.toDateString();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const isTomorrow = d.toDateString() === tomorrow.toDateString();
+
+        const time = d.toLocaleTimeString(locale.current === 'fi' ? 'fi-FI' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
+        if (isToday) return `${locale.current === 'fi' ? 'Tänään' : 'Today'} ${time}`;
+        if (isTomorrow) return `${locale.current === 'fi' ? 'Huomenna' : 'Tomorrow'} ${time}`;
+        const date = d.toLocaleDateString(locale.current === 'fi' ? 'fi-FI' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+        return `${date} ${time}`;
+    }
+
+    function formatDuration(minutes) {
+        if (minutes < 60) return `${minutes} min`;
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return m ? `${h}h ${m}min` : `${h}h`;
+    }
+
     $effect(() => {
         const slug = params.slug;
-        if (slug) loadPark(slug);
+        if (slug) {
+            loadPark(slug);
+        }
+    });
+
+    // Load visits once park is loaded
+    $effect(() => {
+        if (park?.id) loadVisits();
     });
 </script>
 
@@ -203,16 +386,41 @@
                     </a>
                 {/if}
 
-                <!-- Name + type -->
+                <!-- Name + type + follow -->
                 <div class="park-header">
-                    <h1 class="park-name">{localName(park)}</h1>
-                    <span class="park-type-pill">{parkTypeLabel(park.parkType)}</span>
-                    {#if isAdmin && !editing}
-                        <button class="park-edit-btn" onclick={startEdit} title="Edit park">
-                            <i class="fas fa-pencil"></i>
-                        </button>
-                    {/if}
+                    <div class="park-header-left">
+                        <h1 class="park-name">{localName(park)}</h1>
+                        <span class="park-type-pill">{parkTypeLabel(park.parkType)}</span>
+                    </div>
+                    <div class="park-header-right">
+                        {#if isAdmin && !editing}
+                            <button class="park-edit-btn" onclick={startEdit} title="Edit park">
+                                <i class="fas fa-pencil"></i>
+                            </button>
+                        {/if}
+                        {#if authed}
+                            <button
+                                class="park-follow-btn"
+                                class:following={isFollowing}
+                                onclick={handleFollow}
+                                disabled={followLoading}
+                            >
+                                {#if isFollowing}
+                                    <i class="fas fa-heart"></i> {t('dogPark.followingPark')}
+                                {:else}
+                                    <i class="far fa-heart"></i> {t('dogPark.follow')}
+                                {/if}
+                            </button>
+                        {/if}
+                    </div>
                 </div>
+
+                <!-- Follower count -->
+                {#if followerCount > 0}
+                    <div class="park-follower-count">
+                        {followerCount} {followerCount === 1 ? t('dogPark.follower') : t('dogPark.followers')}
+                    </div>
+                {/if}
 
                 {#if editing}
                     <!-- Admin Edit Form -->
@@ -348,6 +556,128 @@
                                 </div>
                             {/each}
                         </div>
+                        {#if authed && !showAmenitySuggest}
+                            <button class="park-suggest-edit-btn" onclick={openAmenitySuggest}>
+                                <i class="fas fa-pen-to-square"></i> {t('dogPark.suggestEdit')}
+                            </button>
+                        {/if}
+                        {#if showAmenitySuggest}
+                            <div class="park-amenity-suggest-form">
+                                {#if amenitySuggestSuccess}
+                                    <div class="park-suggest-success">
+                                        <i class="fas fa-check-circle"></i> {t('dogPark.suggestionSent')}
+                                    </div>
+                                {:else}
+                                    <div class="park-edit-amenities">
+                                        {#each amenityKeys as key}
+                                            <button
+                                                type="button"
+                                                class="park-edit-amenity-toggle"
+                                                class:active={amenitySuggestForm[key]}
+                                                onclick={() => { amenitySuggestForm[key] = !amenitySuggestForm[key]; amenitySuggestForm = { ...amenitySuggestForm }; }}
+                                            >
+                                                <i class="fas {amenityIcons[key]}"></i>
+                                                {t(amenityI18n[key])}
+                                            </button>
+                                        {/each}
+                                    </div>
+                                    <div class="park-edit-actions">
+                                        <button class="park-edit-save" onclick={submitAmenitySuggestion} disabled={amenitySuggestSubmitting}>
+                                            {amenitySuggestSubmitting ? '...' : t('common.save')}
+                                        </button>
+                                        <button class="park-edit-cancel" onclick={() => { showAmenitySuggest = false; }}>
+                                            {t('common.cancel')}
+                                        </button>
+                                    </div>
+                                {/if}
+                            </div>
+                        {/if}
+                    </div>
+
+                    <!-- Upcoming Visits -->
+                    <div class="park-section">
+                        <h2 class="park-section-title">{t('dogPark.upcomingVisits')}</h2>
+                        {#if visits.length > 0}
+                            <div class="park-visits-list">
+                                {#each visits as visit (visit.id)}
+                                    <div class="park-visit-row">
+                                        <a href="/dog/{visit.dog.slug}" data-link class="park-visit-dog">
+                                            <img
+                                                src={visit.dog.profilePhoto || '/images/dog_profile_pic.jpg'}
+                                                alt={visit.dog.name}
+                                                class="park-visit-dog-photo"
+                                                onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
+                                            />
+                                            <span class="park-visit-dog-name">{visit.dog.name}</span>
+                                        </a>
+                                        <div class="park-visit-info">
+                                            <span class="park-visit-time">{formatVisitTime(visit.arrivalAt)}</span>
+                                            <span class="park-visit-duration">~{formatDuration(visit.durationMinutes)}</span>
+                                        </div>
+                                        {#if visit.note}
+                                            <div class="park-visit-note">{visit.note}</div>
+                                        {/if}
+                                        {#if visit.isMine}
+                                            <button class="park-visit-cancel" onclick={() => handleCancelVisit(visit.id)}>
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        {/if}
+                                    </div>
+                                {/each}
+                            </div>
+                        {:else if !visitsLoading}
+                            <p class="park-no-visits">{t('dogPark.noUpcomingVisits')}</p>
+                        {/if}
+
+                        {#if authed && isFollowing && !showVisitForm}
+                            <button class="park-schedule-btn" onclick={openVisitForm}>
+                                <i class="fas fa-calendar-plus"></i> {t('dogPark.scheduleVisit')}
+                            </button>
+                        {:else if authed && !isFollowing && !showVisitForm}
+                            <p class="park-follow-hint">{t('dogPark.followToSchedule')}</p>
+                        {:else if !authed}
+                            <p class="park-follow-hint">{t('dogPark.loginToFollow')}</p>
+                        {/if}
+
+                        {#if showVisitForm}
+                            <div class="park-visit-form">
+                                {#if myDogs.length > 1}
+                                    <div class="park-edit-field">
+                                        <label for="visit-dog">{t('dogPark.selectDog')}</label>
+                                        <select id="visit-dog" bind:value={visitForm.dogId}>
+                                            <option value="">--</option>
+                                            {#each myDogs as dog (dog.id)}
+                                                <option value={dog.id}>{dog.name}</option>
+                                            {/each}
+                                        </select>
+                                    </div>
+                                {/if}
+                                <div class="park-edit-field">
+                                    <label for="visit-time">{t('dogPark.arrivalTime')}</label>
+                                    <input id="visit-time" type="datetime-local" bind:value={visitForm.arrivalAt} />
+                                </div>
+                                <div class="park-edit-field">
+                                    <label for="visit-duration">{t('dogPark.duration')}</label>
+                                    <select id="visit-duration" bind:value={visitForm.durationMinutes}>
+                                        {#each durationOptions as opt}
+                                            <option value={opt.value}>{opt.label}</option>
+                                        {/each}
+                                    </select>
+                                </div>
+                                <div class="park-edit-field">
+                                    <label for="visit-note">{t('dogPark.visitNote')}</label>
+                                    <input id="visit-note" type="text" bind:value={visitForm.note} maxlength="500" />
+                                </div>
+                                <div class="park-edit-actions">
+                                    <button class="park-edit-save" onclick={submitVisit} disabled={visitSubmitting || !visitForm.dogId || !visitForm.arrivalAt}>
+                                        {visitSubmitting ? '...' : t('dogPark.scheduleVisit')}
+                                    </button>
+                                    <button class="park-edit-cancel" onclick={() => { showVisitForm = false; }}>
+                                        {t('common.cancel')}
+                                    </button>
+                                </div>
+                            </div>
+                        {/if}
                     </div>
                 {/if}
 
@@ -471,10 +801,25 @@
 /* Header */
 .park-header {
     display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--woof-space-3);
+    margin-bottom: var(--woof-space-2);
+}
+
+.park-header-left {
+    display: flex;
     align-items: baseline;
     gap: var(--woof-space-3);
     flex-wrap: wrap;
-    margin-bottom: var(--woof-space-3);
+    min-width: 0;
+}
+
+.park-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    flex-shrink: 0;
 }
 
 .park-name {
@@ -495,6 +840,44 @@
     font-size: var(--woof-text-caption-1);
     font-weight: var(--woof-font-weight-semibold);
     white-space: nowrap;
+}
+
+/* Follow button */
+.park-follow-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+    padding: var(--woof-space-2) var(--woof-space-4);
+    border-radius: var(--woof-radius-full);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-semibold);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--woof-color-brand-primary);
+    background: var(--woof-color-brand-primary);
+    color: white;
+    white-space: nowrap;
+}
+
+.park-follow-btn:hover {
+    opacity: 0.9;
+}
+
+.park-follow-btn.following {
+    background: transparent;
+    color: var(--woof-color-brand-primary);
+}
+
+.park-follow-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.park-follower-count {
+    font-size: var(--woof-text-footnote);
+    color: var(--woof-color-neutral-500);
+    margin-bottom: var(--woof-space-3);
 }
 
 /* Info rows */
@@ -588,10 +971,165 @@
     font-weight: var(--woof-font-weight-medium);
 }
 
-.park-no-amenities {
+/* Suggest edit button */
+.park-suggest-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+    margin-top: var(--woof-space-3);
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--woof-color-brand-primary);
+    font-size: var(--woof-text-caption-1);
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.park-suggest-edit-btn:hover {
+    opacity: 0.7;
+}
+
+/* Amenity suggestion form */
+.park-amenity-suggest-form {
+    margin-top: var(--woof-space-3);
+    padding: var(--woof-space-4);
+    background: var(--woof-color-neutral-50);
+    border-radius: var(--woof-radius-lg);
+}
+
+.park-suggest-success {
+    color: var(--woof-color-fresh-mint-dark);
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-semibold);
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+}
+
+/* Visits */
+.park-visits-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-3);
+    margin-bottom: var(--woof-space-3);
+}
+
+.park-visit-row {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-3);
+    padding: var(--woof-space-3);
+    background: var(--woof-color-neutral-50);
+    border-radius: var(--woof-radius-lg);
+    position: relative;
+    flex-wrap: wrap;
+}
+
+.park-visit-dog {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    text-decoration: none;
+    color: var(--woof-color-neutral-900);
+    flex-shrink: 0;
+}
+
+.park-visit-dog-photo {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--woof-radius-full);
+    object-fit: cover;
+}
+
+.park-visit-dog-name {
+    font-weight: var(--woof-font-weight-semibold);
+    font-size: var(--woof-text-body);
+}
+
+.park-visit-info {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    flex: 1;
+    min-width: 0;
+}
+
+.park-visit-time {
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-700);
+}
+
+.park-visit-duration {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+}
+
+.park-visit-note {
+    width: 100%;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    font-style: italic;
+    padding-left: 44px;
+}
+
+.park-visit-cancel {
+    background: none;
+    border: none;
+    color: var(--woof-color-neutral-400);
+    cursor: pointer;
+    padding: var(--woof-space-1);
+    font-size: 14px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+}
+
+.park-visit-cancel:hover {
+    color: var(--woof-color-brand-primary);
+}
+
+.park-no-visits {
     color: var(--woof-color-neutral-400);
     font-size: var(--woof-text-footnote);
+    margin: 0 0 var(--woof-space-3);
+}
+
+.park-schedule-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    padding: var(--woof-space-2) var(--woof-space-4);
+    border: 1px solid var(--woof-color-fresh-mint);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-fresh-mint-light);
+    color: var(--woof-color-fresh-mint-dark);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-semibold);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.park-schedule-btn:hover {
+    background: var(--woof-color-fresh-mint);
+    color: white;
+}
+
+.park-follow-hint {
+    color: var(--woof-color-neutral-400);
+    font-size: var(--woof-text-caption-1);
     margin: 0;
+}
+
+.park-visit-form {
+    margin-top: var(--woof-space-3);
+    padding: var(--woof-space-4);
+    background: var(--woof-color-neutral-50);
+    border-radius: var(--woof-radius-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-3);
 }
 
 /* Photos */
@@ -654,7 +1192,6 @@
     cursor: pointer;
     color: var(--woof-color-neutral-500);
     font-size: 13px;
-    margin-left: auto;
     flex-shrink: 0;
     transition: all 0.15s;
 }

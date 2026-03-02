@@ -62,10 +62,11 @@
     /** Human-readable notification text (without the actor name prefix) */
     function notifText(notif) {
         switch (notif.type) {
-            case 'like':    return t('notifications.liked');
-            case 'comment': return t('notifications.commented');
-            case 'follow':  return t('notifications.followed');
-            default:        return '';
+            case 'like':       return t('notifications.liked');
+            case 'comment':    return t('notifications.commented');
+            case 'follow':     return t('notifications.followed');
+            case 'park_visit': return `${t('notifications.parkVisit')}${notif.park?.name ? ` ${notif.park.name}` : ''}`;
+            default:           return '';
         }
     }
 
@@ -74,6 +75,8 @@
         let href = null;
         if (notif.type === 'follow' && notif.actorDog?.slug) {
             href = `/dog/${notif.actorDog.slug}`;
+        } else if (notif.type === 'park_visit' && notif.park?.slug) {
+            href = `/dog-park/${notif.park.slug}`;
         } else if (notif.targetId && (notif.type === 'like' || notif.type === 'comment')) {
             href = `/post/${notif.targetId}`;
         }

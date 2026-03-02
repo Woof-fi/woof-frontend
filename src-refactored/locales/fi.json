@@ -16,6 +16,7 @@
     "exploreBreeds": "Selaa rotuja",
     "territories": "REVIIRIT",
     "exploreTerritories": "Selaa reviirejä",
+    "dogParks": "KOIRAPUISTOT",
     "logout": "Kirjaudu ulos",
     "login": "Kirjaudu",
     "privacy": "Tietosuoja",
@@ -281,6 +282,7 @@
     "liked": "tykkäsi julkaisustasi",
     "commented": "kommentoi julkaisuasi",
     "followed": "alkoi seurata sinua",
+    "parkVisit": "aikoo käydä puistossa",
     "loadMore": "Lataa lisää",
     "userAvatar": "Käyttäjän kuva"
   },
@@ -396,7 +398,26 @@
     "noAmenityInfo": "Ei varustelutietoja vielä",
     "allSizesDesc": "Kaikenkokoisille",
     "smallDogArea": "Pienten aitaus",
-    "largeDogArea": "Isojen aitaus"
+    "largeDogArea": "Isojen aitaus",
+    "follow": "Seuraa",
+    "unfollow": "Lopeta seuraaminen",
+    "followingPark": "Seurataan",
+    "followers": "seuraajaa",
+    "follower": "seuraaja",
+    "suggestEdit": "Ehdota muokkausta",
+    "suggestionSent": "Ehdotus lähetetty tarkistettavaksi!",
+    "scheduleVisit": "Ilmoita käynti",
+    "upcomingVisits": "Tulevat käynnit",
+    "noUpcomingVisits": "Ei tulevia käyntejä",
+    "arrivalTime": "Saapumisaika",
+    "duration": "Kesto",
+    "selectDog": "Valitse koira",
+    "cancelVisit": "Peruuta käynti",
+    "visitNote": "Viesti (valinnainen)",
+    "followToSchedule": "Seuraa puistoa ilmoittaaksesi käynnin",
+    "loginToFollow": "Kirjaudu seurataksesi puistoja",
+    "visitScheduled": "Käynti ilmoitettu!",
+    "visitCancelled": "Käynti peruutettu"
   },
   "admin": {
     "pending": "Odottaa",
@@ -444,7 +465,12 @@
     "parkRejected": "Puisto hylätty",
     "parkUpdated": "Puisto päivitetty",
     "parkDeleted": "Puisto poistettu",
-    "suggestedBy": "Ehdottanut"
+    "suggestedBy": "Ehdottanut",
+    "amenitySuggestions": "Varusteluehdotukset",
+    "noAmenitySuggestions": "Ei odottavia varusteluehdotuksia",
+    "amenityApproved": "Varusteluehdotus hyväksytty",
+    "amenityRejected": "Varusteluehdotus hylätty",
+    "currentValue": "Nykyinen"
   },
   "health": {
     "vetVisit": "Eläinlääkärikäynti",

@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-03-01
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows
+**Last Updated:** 2026-03-02
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2
 **Current:** Tier 2 — Major Features (15A Sentry next)
 
 ---
@@ -40,6 +40,12 @@ Persistent sidebar drawer (280px desktop), bell notifications with polling, comm
 
 ### Territory Follows & Enhancements
 Territory follow system mirroring breed follows: `territory_follows` table, follow/unfollow endpoints, followed territories in nav drawer, territory follower count + `isFollowing` flag on territory pages, guidance text for non-followers, popular breeds per territory section, breed filter chips on territory Dogs tab, territories searchable in Search panel. Navigation-only (does not affect Following feed).
+
+### Dog Parks Phase 1+1.5: Foundation & Data
+662 Finnish dog parks from OSM + Helsinki palvelukartta enrichment. Park pages with amenity grids, admin inline editing, territory matching, dedup pipeline. SuggestParkModal for user submissions. Territory parks tab with type pills.
+
+### Dog Parks Phase 2: Engagement
+Park following (follow/unfollow, follower count, followed parks in nav drawer). User amenity suggestions with admin approval queue (approve updates park amenities via jsonb_set). Visit scheduling: users announce planned visits with dog, time, duration, and note. Park followers receive notifications when visits are scheduled. 28 new backend tests (420 total).
 
 ---
 
@@ -389,7 +395,7 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Test coverage gaps | Medium | 153 tests / 14 files. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
+| Test coverage gaps | Medium | 420 backend + 148 frontend tests. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
 | i18n key parity validation | Low | Pre-commit hook or CI check to ensure EN and FI locale files have identical keys |
 | Extract shared controller utilities | Low | "Get user's first dog" duplicated in 3 controllers, "verify dog ownership" in 5+. Extract when touching those files. |
 | OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |

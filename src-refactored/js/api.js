@@ -1163,5 +1163,56 @@ export async function deleteAdminDogPark(id) {
     });
 }
 
+// Dog park follows
+export async function followDogPark(parkId) {
+    return apiRequest(`/api/dog-parks/${parkId}/follow`, { method: 'POST' });
+}
+
+export async function unfollowDogPark(parkId) {
+    return apiRequest(`/api/dog-parks/${parkId}/follow`, { method: 'DELETE' });
+}
+
+export async function getFollowingDogParks() {
+    const data = await apiRequest('/api/dog-parks/following', { cache: 'default' });
+    return data.parks || [];
+}
+
+// Amenity suggestions
+export async function suggestParkAmenity(parkId, amenityKey, amenityValue) {
+    return apiRequest(`/api/dog-parks/${parkId}/amenity-suggestions`, {
+        method: 'POST',
+        body: JSON.stringify({ amenityKey, amenityValue }),
+    });
+}
+
+export async function getAdminPendingAmenitySuggestions() {
+    const data = await apiRequest('/api/admin/amenity-suggestions/pending');
+    return data.suggestions || [];
+}
+
+export async function reviewAmenitySuggestion(id, status) {
+    return apiRequest(`/api/admin/amenity-suggestions/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+    });
+}
+
+// Park visits
+export async function scheduleParkVisit(parkId, visitData) {
+    return apiRequest(`/api/dog-parks/${parkId}/visits`, {
+        method: 'POST',
+        body: JSON.stringify(visitData),
+    });
+}
+
+export async function cancelParkVisit(visitId) {
+    return apiRequest(`/api/dog-parks/visits/${visitId}`, { method: 'DELETE' });
+}
+
+export async function getUpcomingParkVisits(parkId) {
+    const data = await apiRequest(`/api/dog-parks/${parkId}/visits`, { cache: 'default' });
+    return data.visits || [];
+}
+
 // Export APIError for use in other modules
 export { APIError };

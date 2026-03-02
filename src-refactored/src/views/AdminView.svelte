@@ -1,5 +1,5 @@
 <script>
-    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration, getAdminPendingParks, getAdminUnmatchedParks, updateAdminDogPark, deleteAdminDogPark, getAllTerritories } from '../../js/api.js';
+    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration, getAdminPendingParks, getAdminUnmatchedParks, updateAdminDogPark, deleteAdminDogPark, getAllTerritories, getAdminPendingAmenitySuggestions, reviewAmenitySuggestion } from '../../js/api.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { showToast, timeAgo } from '../../js/utils.js';
     import { t, localName } from '../../js/i18n-store.svelte.js';
@@ -56,6 +56,8 @@
     let territoryAssignments = $state({});
     let parkEditing      = $state({});
     let parkEditNames    = $state({});
+    let amenitySuggestions = $state([]);
+    let amenityBusy      = $state({});
 
     $effect(() => {
         // Re-fetch reports when filter changes (only if in reports section)
@@ -227,13 +229,15 @@
     async function loadDogParks() {
         parksLoading = true;
         try {
-            const [pending, unmatched, territories] = await Promise.all([
+            const [pending, unmatched, territories, suggestions] = await Promise.all([
                 getAdminPendingParks(),
                 getAdminUnmatchedParks(),
                 allTerritories.length ? Promise.resolve(allTerritories) : getAllTerritories(),
+                getAdminPendingAmenitySuggestions(),
             ]);
             pendingParks = pending;
             unmatchedParks = unmatched;
+            amenitySuggestions = suggestions;
             if (!allTerritories.length) allTerritories = territories;
         } catch (err) {
             showToast(err?.status === 403 ? t('admin.accessDenied') : t('admin.failedLoadReports'), 'error');
@@ -320,6 +324,26 @@
             const next = { ...parksBusy };
             delete next[park.id];
             parksBusy = next;
+        }
+    }
+
+    const AMENITY_LABELS = {
+        fenced: 'dogPark.fenced', lighting: 'dogPark.lighting', trash_bins: 'dogPark.trashBins',
+        water: 'dogPark.water', benches: 'dogPark.benches', agility: 'dogPark.agility', shelter: 'dogPark.shelter',
+    };
+
+    async function handleAmenityReview(suggestion, status) {
+        amenityBusy = { ...amenityBusy, [suggestion.id]: true };
+        try {
+            await reviewAmenitySuggestion(suggestion.id, status);
+            amenitySuggestions = amenitySuggestions.filter(s => s.id !== suggestion.id);
+            showToast(t(status === 'approved' ? 'admin.amenityApproved' : 'admin.amenityRejected'), 'success');
+        } catch {
+            showToast(t('admin.failedUpdateReport'), 'error');
+        } finally {
+            const next = { ...amenityBusy };
+            delete next[suggestion.id];
+            amenityBusy = next;
         }
     }
 
@@ -748,6 +772,53 @@
                                             onclick={() => handleAssignTerritory(park)}
                                         >
                                             <i class="fas fa-save"></i> Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+
+                <!-- Amenity Suggestions -->
+                <h2 class="admin-parks-heading">{t('admin.amenitySuggestions')}</h2>
+                {#if amenitySuggestions.length === 0}
+                    <div class="admin-empty admin-empty--compact">
+                        <i class="fas fa-clipboard-check"></i>
+                        <p>{t('admin.noAmenitySuggestions')}</p>
+                    </div>
+                {:else}
+                    <div class="admin-parks-list">
+                        {#each amenitySuggestions as suggestion (suggestion.id)}
+                            <div class="admin-park-card" class:busy={!!amenityBusy[suggestion.id]}>
+                                <div class="admin-park-body">
+                                    <div class="admin-report-meta">
+                                        <span class="admin-park-name">{suggestion.park?.name || 'Unknown park'}</span>
+                                    </div>
+                                    <p class="admin-park-detail">
+                                        <i class="fas fa-user"></i> {suggestion.userEmail}
+                                    </p>
+                                    <p class="admin-park-detail">
+                                        <strong>{t(AMENITY_LABELS[suggestion.amenityKey] || suggestion.amenityKey)}</strong>
+                                        → {suggestion.amenityValue ? 'Yes' : 'No'}
+                                        {#if suggestion.park?.currentAmenities?.[suggestion.amenityKey] !== undefined}
+                                            <span class="admin-amenity-current">({t('admin.currentValue')}: {suggestion.park.currentAmenities[suggestion.amenityKey] ? 'Yes' : 'No'})</span>
+                                        {/if}
+                                    </p>
+                                    <div class="admin-report-actions">
+                                        <button
+                                            class="admin-action-btn admin-action-btn--neutral"
+                                            disabled={!!amenityBusy[suggestion.id]}
+                                            onclick={() => handleAmenityReview(suggestion, 'approved')}
+                                        >
+                                            <i class="fas fa-check"></i> {t('admin.approve')}
+                                        </button>
+                                        <button
+                                            class="admin-action-btn admin-action-btn--danger"
+                                            disabled={!!amenityBusy[suggestion.id]}
+                                            onclick={() => handleAmenityReview(suggestion, 'rejected')}
+                                        >
+                                            <i class="fas fa-times"></i> {t('admin.reject')}
                                         </button>
                                     </div>
                                 </div>
@@ -1251,6 +1322,12 @@
 .admin-park-coords {
     font-family: monospace;
     font-size: var(--woof-text-caption-1);
+}
+
+.admin-amenity-current {
+    color: var(--woof-color-neutral-400);
+    font-size: var(--woof-text-caption-1);
+    margin-left: var(--woof-space-1);
 }
 
 .admin-park-edit-btn {

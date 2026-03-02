@@ -16,6 +16,7 @@
     "exploreBreeds": "Explore Breeds",
     "territories": "TERRITORIES",
     "exploreTerritories": "Explore Territories",
+    "dogParks": "DOG PARKS",
     "logout": "Logout",
     "login": "Login",
     "privacy": "Privacy",
@@ -281,6 +282,7 @@
     "liked": "liked your post",
     "commented": "commented on your post",
     "followed": "started following you",
+    "parkVisit": "is planning to visit",
     "loadMore": "Load more",
     "userAvatar": "User avatar"
   },
@@ -396,7 +398,26 @@
     "noAmenityInfo": "No amenity info yet",
     "allSizesDesc": "All sizes welcome",
     "smallDogArea": "Small dog area",
-    "largeDogArea": "Large dog area"
+    "largeDogArea": "Large dog area",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "followingPark": "Following",
+    "followers": "followers",
+    "follower": "follower",
+    "suggestEdit": "Suggest an edit",
+    "suggestionSent": "Suggestion sent for review!",
+    "scheduleVisit": "Schedule a visit",
+    "upcomingVisits": "Upcoming visits",
+    "noUpcomingVisits": "No upcoming visits",
+    "arrivalTime": "Arrival time",
+    "duration": "Duration",
+    "selectDog": "Select dog",
+    "cancelVisit": "Cancel visit",
+    "visitNote": "Note (optional)",
+    "followToSchedule": "Follow this park to schedule visits",
+    "loginToFollow": "Log in to follow parks",
+    "visitScheduled": "Visit scheduled!",
+    "visitCancelled": "Visit cancelled"
   },
   "admin": {
     "pending": "Pending",
@@ -444,7 +465,12 @@
     "parkRejected": "Park rejected",
     "parkUpdated": "Park updated",
     "parkDeleted": "Park deleted",
-    "suggestedBy": "Suggested by"
+    "suggestedBy": "Suggested by",
+    "amenitySuggestions": "Amenity Suggestions",
+    "noAmenitySuggestions": "No pending amenity suggestions",
+    "amenityApproved": "Amenity suggestion approved",
+    "amenityRejected": "Amenity suggestion rejected",
+    "currentValue": "Current"
   },
   "health": {
     "vetVisit": "Vet Visit",

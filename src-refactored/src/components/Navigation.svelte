@@ -1,5 +1,5 @@
 <script>
-    import { getMyDogs, getUnreadCount, getNotifUnreadCount, getFollowingBreeds, getFollowingTerritories } from '../../js/api.js';
+    import { getMyDogs, getUnreadCount, getNotifUnreadCount, getFollowingBreeds, getFollowingTerritories, getFollowingDogParks } from '../../js/api.js';
     import { isAuthenticated, logout } from '../../js/auth.js';
     import { openCreateDogModal, openSearchPanel } from '../../js/modal-store.svelte.js';
     import { store, setAuthUser, setFeedTab, setNotifUnreadCount, setCurrentDog, setUserDogIds } from '../../js/svelte-store.svelte.js';
@@ -15,6 +15,7 @@
     let authed = $derived(store.authUser !== null);
     let followedBreeds = $state([]);
     let followedTerritories = $state([]);
+    let followedParks = $state([]);
 
     function getSlug(dog) {
         return dog.slug ?? `${dog.name.toLowerCase()}-${dog.displayId}`;
@@ -219,6 +220,28 @@
                 if (active) followedTerritories = territories;
             } catch {
                 if (active) followedTerritories = [];
+            }
+        })();
+        return () => { active = false; };
+    });
+
+    // Fetch followed parks — re-runs on auth change and parkVersion bumps
+    $effect(() => {
+        const _auth = store.authUser;
+        const _pv = store.parkVersion;
+
+        if (!isAuthenticated()) {
+            followedParks = [];
+            return;
+        }
+
+        let active = true;
+        (async () => {
+            try {
+                const parks = await getFollowingDogParks();
+                if (active) followedParks = parks;
+            } catch {
+                if (active) followedParks = [];
             }
         })();
         return () => { active = false; };
@@ -436,6 +459,18 @@
             <a href="/territory/helsinki" data-link onclick={closeDrawer} class="nav-drawer-row nav-drawer-explore">
                 {t('nav.exploreTerritories')}
             </a>
+        </div>
+    {/if}
+
+    {#if authed && followedParks.length > 0}
+        <div class="nav-drawer-section">
+            <span class="nav-drawer-section-label">{t('nav.dogParks')}</span>
+            {#each followedParks.slice(0, 5) as park (park.id)}
+                <a href="/dog-park/{park.slug}" data-link onclick={closeDrawer}
+                   class="nav-drawer-row" class:active={activePath === `/dog-park/${park.slug}`}>
+                    <i class="fas fa-tree"></i> {localName(park)}
+                </a>
+            {/each}
         </div>
     {/if}
 

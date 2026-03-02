@@ -27,6 +27,7 @@ export let store = $state({
     healthVersion: 0,
     breedVersion: 0,
     territoryVersion: 0,
+    parkVersion: 0,
 });
 
 // Backward-compatible function API (used by existing callers)
@@ -49,3 +50,4 @@ export function bumpProfileVersion() { store.profileVersion++; }
 export function bumpHealthVersion() { store.healthVersion++; }
 export function bumpBreedVersion() { store.breedVersion++; }
 export function bumpTerritoryVersion() { store.territoryVersion++; }
+export function bumpParkVersion() { store.parkVersion++; }
