@@ -358,7 +358,31 @@
     "popularBreeds": "Popular Breeds",
     "allBreeds": "All",
     "breedDogCount": "{count} dogs",
-    "actionFailed": "Action failed. Please try again."
+    "actionFailed": "Action failed. Please try again.",
+    "dogParks": "Dog Parks",
+    "noParks": "No dog parks listed in this area yet.",
+    "suggestPark": "Suggest a park",
+    "viewPark": "View park"
+  },
+  "dogPark": {
+    "title": "Dog Park",
+    "allSizes": "All sizes",
+    "smallDogs": "Small dogs",
+    "largeDogs": "Large dogs",
+    "separateAreas": "Separate areas",
+    "address": "Address",
+    "coordinates": "Coordinates",
+    "photos": "Photos",
+    "noPhotosYet": "Be the first to add a photo!",
+    "osmAttribution": "Park data from OpenStreetMap contributors",
+    "suggestTitle": "Suggest a Dog Park",
+    "suggestSuccess": "Park suggestion submitted for review!",
+    "name": "Park name",
+    "nameFi": "Name in Finnish",
+    "parkType": "Park type",
+    "description": "Description",
+    "failedLoad": "Failed to load dog park.",
+    "backToTerritory": "Back to territory"
   },
   "admin": {
     "pending": "Pending",
@@ -394,7 +418,19 @@
     "failedBan": "Failed to ban user",
     "userUnbanned": "User unbanned",
     "failedUnban": "Failed to unban user",
-    "failedLoadMore": "Failed to load more reports"
+    "failedLoadMore": "Failed to load more reports",
+    "dogParks": "Dog Parks",
+    "pendingParks": "Pending Suggestions",
+    "unmatchedParks": "Unmatched Parks",
+    "assignTerritory": "Assign territory",
+    "reject": "Reject",
+    "noPendingParks": "No pending park suggestions",
+    "noUnmatchedParks": "All parks are matched to territories",
+    "parkApproved": "Park approved",
+    "parkRejected": "Park rejected",
+    "parkUpdated": "Park updated",
+    "parkDeleted": "Park deleted",
+    "suggestedBy": "Suggested by"
   },
   "health": {
     "vetVisit": "Vet Visit",

@@ -12,6 +12,7 @@
     import BreedDirectoryView from '../views/BreedDirectoryView.svelte';
     import TerritoryView from '../views/TerritoryView.svelte';
     import BookmarksView from '../views/BookmarksView.svelte';
+    import DogParkView from '../views/DogParkView.svelte';
 
     let { onopenAuthModal = null } = $props();
 
@@ -69,6 +70,7 @@
         { path: '/territory/:a/:b/:c', component: TerritoryView,  paramNames: ['a', 'b', 'c'] },
         { path: '/territory/:a/:b',    component: TerritoryView,  paramNames: ['a', 'b'] },
         { path: '/territory/:a',       component: TerritoryView,  paramNames: ['a'] },
+        { path: '/dog-park/:slug',  component: DogParkView,        paramNames: ['slug'] },
         { path: '/bookmarks',      component: BookmarksView,      paramNames: [] },
         { path: '/dog/:slug',      component: ProfileView,        paramNames: ['slug'] },
         { path: '/post/:id',       component: PostDetailView,     paramNames: ['id'] },
@@ -174,6 +176,8 @@
         <BreedView params={matched.params} />
     {:else if matched.component === TerritoryView}
         <TerritoryView params={matched.params} />
+    {:else if matched.component === DogParkView}
+        <DogParkView params={matched.params} />
     {:else if matched.component === BookmarksView}
         <BookmarksView onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === ProfileView}

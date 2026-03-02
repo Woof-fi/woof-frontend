@@ -358,7 +358,31 @@
     "popularBreeds": "Suositut rodut",
     "allBreeds": "Kaikki",
     "breedDogCount": "{count} koiraa",
-    "actionFailed": "Toiminto epäonnistui. Yritä uudelleen."
+    "actionFailed": "Toiminto epäonnistui. Yritä uudelleen.",
+    "dogParks": "Koirapuistot",
+    "noParks": "Tälle alueelle ei ole vielä lisätty koirapuistoja.",
+    "suggestPark": "Ehdota puistoa",
+    "viewPark": "Näytä puisto"
+  },
+  "dogPark": {
+    "title": "Koirapuisto",
+    "allSizes": "Kaikenkokoisille",
+    "smallDogs": "Pienille koirille",
+    "largeDogs": "Isoille koirille",
+    "separateAreas": "Erilliset alueet",
+    "address": "Osoite",
+    "coordinates": "Koordinaatit",
+    "photos": "Kuvat",
+    "noPhotosYet": "Ole ensimmäinen, joka lisää kuvan!",
+    "osmAttribution": "Puistotiedot OpenStreetMapin tekijöiltä",
+    "suggestTitle": "Ehdota koirapuistoa",
+    "suggestSuccess": "Puistoehdotus lähetetty tarkistettavaksi!",
+    "name": "Puiston nimi",
+    "nameFi": "Nimi suomeksi",
+    "parkType": "Puiston tyyppi",
+    "description": "Kuvaus",
+    "failedLoad": "Koirapuiston lataus epäonnistui.",
+    "backToTerritory": "Takaisin alueelle"
   },
   "admin": {
     "pending": "Odottaa",
@@ -394,7 +418,19 @@
     "failedBan": "Käyttäjän esto epäonnistui",
     "userUnbanned": "Esto poistettu",
     "failedUnban": "Eston poisto epäonnistui",
-    "failedLoadMore": "Lisäilmiantojen lataus epäonnistui"
+    "failedLoadMore": "Lisäilmiantojen lataus epäonnistui",
+    "dogParks": "Koirapuistot",
+    "pendingParks": "Odottavat ehdotukset",
+    "unmatchedParks": "Kohdentamattomat puistot",
+    "assignTerritory": "Kohdenna alue",
+    "reject": "Hylkää",
+    "noPendingParks": "Ei odottavia puistoehdotuksia",
+    "noUnmatchedParks": "Kaikki puistot on kohdennettu alueille",
+    "parkApproved": "Puisto hyväksytty",
+    "parkRejected": "Puisto hylätty",
+    "parkUpdated": "Puisto päivitetty",
+    "parkDeleted": "Puisto poistettu",
+    "suggestedBy": "Ehdottanut"
   },
   "health": {
     "vetVisit": "Eläinlääkärikäynti",

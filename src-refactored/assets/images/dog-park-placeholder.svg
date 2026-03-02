@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="0" fill="#E8F5E9"/>
+  <!-- Ground -->
+  <rect y="220" width="400" height="80" fill="#A5D6A7"/>
+  <!-- Fence posts -->
+  <rect x="40" y="140" width="8" height="90" rx="2" fill="#8D6E63"/>
+  <rect x="120" y="140" width="8" height="90" rx="2" fill="#8D6E63"/>
+  <rect x="200" y="140" width="8" height="90" rx="2" fill="#8D6E63"/>
+  <rect x="280" y="140" width="8" height="90" rx="2" fill="#8D6E63"/>
+  <rect x="360" y="140" width="8" height="90" rx="2" fill="#8D6E63"/>
+  <!-- Fence rails -->
+  <rect x="40" y="160" width="328" height="6" rx="2" fill="#A1887F"/>
+  <rect x="40" y="190" width="328" height="6" rx="2" fill="#A1887F"/>
+  <!-- Tree -->
+  <circle cx="320" cy="120" r="35" fill="#66BB6A"/>
+  <rect x="316" y="150" width="8" height="40" fill="#8D6E63"/>
+  <!-- Dog silhouette -->
+  <g transform="translate(140, 175)" fill="#5D4037">
+    <ellipse cx="25" cy="18" rx="22" ry="14"/>
+    <circle cx="50" cy="8" r="10"/>
+    <ellipse cx="55" cy="3" rx="5" ry="7" transform="rotate(20, 55, 3)"/>
+    <rect x="10" y="28" width="5" height="16" rx="2"/>
+    <rect x="22" y="28" width="5" height="16" rx="2"/>
+    <rect x="32" y="28" width="5" height="16" rx="2"/>
+    <rect x="44" y="28" width="5" height="16" rx="2"/>
+    <path d="M0 14 Q-12 0 -4 14" stroke="#5D4037" stroke-width="3" fill="none"/>
+  </g>
+  <!-- Paw prints -->
+  <g fill="#8D6E63" opacity="0.3">
+    <circle cx="90" cy="250" r="4"/>
+    <circle cx="84" cy="243" r="2.5"/>
+    <circle cx="96" cy="243" r="2.5"/>
+    <circle cx="82" cy="250" r="2"/>
+    <circle cx="98" cy="250" r="2"/>
+  </g>
+  <g fill="#8D6E63" opacity="0.2">
+    <circle cx="250" cy="260" r="4"/>
+    <circle cx="244" cy="253" r="2.5"/>
+    <circle cx="256" cy="253" r="2.5"/>
+    <circle cx="242" cy="260" r="2"/>
+    <circle cx="258" cy="260" r="2"/>
+  </g>
+</svg>

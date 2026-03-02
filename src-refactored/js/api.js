@@ -1114,5 +1114,54 @@ export async function getTerritoryBreeds(path) {
     }
 }
 
+// ============================================================================
+// DOG PARK API
+// ============================================================================
+
+export async function getTerritoryParks(path) {
+    try {
+        const data = await apiRequest(`/api/territories/by-path/${path}/parks`);
+        return data.parks || [];
+    } catch (error) {
+        console.error('Failed to fetch territory parks:', error);
+        return [];
+    }
+}
+
+export async function getDogPark(slug) {
+    const data = await apiRequest(`/api/dog-parks/${slug}`, { cache: 'default' });
+    return data.park;
+}
+
+export async function suggestDogPark(parkData) {
+    return apiRequest('/api/dog-parks/suggest', {
+        method: 'POST',
+        body: JSON.stringify(parkData),
+    });
+}
+
+export async function getAdminPendingParks() {
+    const data = await apiRequest('/api/admin/dog-parks/pending');
+    return data.parks || [];
+}
+
+export async function getAdminUnmatchedParks() {
+    const data = await apiRequest('/api/admin/dog-parks/unmatched');
+    return data.parks || [];
+}
+
+export async function updateAdminDogPark(id, updates) {
+    return apiRequest(`/api/admin/dog-parks/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updates),
+    });
+}
+
+export async function deleteAdminDogPark(id) {
+    return apiRequest(`/api/admin/dog-parks/${id}`, {
+        method: 'DELETE',
+    });
+}
+
 // Export APIError for use in other modules
 export { APIError };

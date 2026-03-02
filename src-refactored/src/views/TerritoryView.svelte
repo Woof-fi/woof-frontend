@@ -1,9 +1,10 @@
 <script>
-    import { getTerritoryByPath, getTerritoryFeed, getTerritoryDogs, getTerritoryBreeds, followTerritory, unfollowTerritory } from '../../js/api.js';
+    import { getTerritoryByPath, getTerritoryFeed, getTerritoryDogs, getTerritoryBreeds, getTerritoryParks, followTerritory, unfollowTerritory } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { imageVariant, showToast } from '../../js/utils.js';
     import { store, bumpTerritoryVersion } from '../../js/svelte-store.svelte.js';
     import { t, localName, locale } from '../../js/i18n-store.svelte.js';
+    import SuggestParkModal from '../components/SuggestParkModal.svelte';
 
     let { params = {} } = $props();
 
@@ -36,6 +37,14 @@
     let breeds = $state([]);
     let breedsLoading = $state(false);
 
+    // Dog Parks section (lazy load on tab click)
+    let parks = $state([]);
+    let parksLoading = $state(false);
+    let parksLoadedOnce = $state(false);
+
+    // Suggest park modal
+    let suggestModalOpen = $state(false);
+
     // Breed filter for Dogs tab
     let selectedBreedId = $state(null);
 
@@ -65,6 +74,9 @@
         breeds = [];
         breedsLoading = false;
         selectedBreedId = null;
+        parks = [];
+        parksLoading = false;
+        parksLoadedOnce = false;
 
         let active = true;
 
@@ -109,6 +121,32 @@
             loadDogs();
         }
     });
+
+    // Lazy-load parks tab
+    $effect(() => {
+        if (activeTab === 'parks' && !parksLoadedOnce && !parksLoading && territory) {
+            loadParks();
+        }
+    });
+
+    async function loadParks() {
+        if (!territory) return;
+        parksLoading = true;
+        try {
+            parks = await getTerritoryParks(path);
+        } catch (e) {
+            console.error('Failed to load territory parks:', e);
+            parks = [];
+        } finally {
+            parksLoading = false;
+            parksLoadedOnce = true;
+        }
+    }
+
+    const parkTypeLabel = (type) => {
+        const map = { all_sizes: 'dogPark.allSizes', small_dogs: 'dogPark.smallDogs', large_dogs: 'dogPark.largeDogs', separate_areas: 'dogPark.separateAreas' };
+        return t(map[type] || 'dogPark.allSizes');
+    };
 
     async function loadDogs() {
         if (!territory) return;
@@ -344,6 +382,15 @@
                 >
                     <i class="fas fa-dog"></i> {t('territory.dogs')}
                 </button>
+                <button
+                    class="tab-link"
+                    class:active={activeTab === 'parks'}
+                    role="tab"
+                    aria-selected={activeTab === 'parks'}
+                    onclick={() => activeTab = 'parks'}
+                >
+                    <i class="fas fa-tree"></i> {t('territory.dogParks')}
+                </button>
             </div>
 
             <!-- Posts tab -->
@@ -448,9 +495,54 @@
                     {/if}
                 {/if}
             </div>
+
+            <!-- Dog Parks tab -->
+            <div class="tab-content" class:active={activeTab === 'parks'} role="tabpanel" aria-hidden={activeTab !== 'parks'}>
+                {#if parksLoading}
+                    <div class="territory-loading"><i class="fas fa-spinner fa-spin"></i></div>
+                {:else if parks.length === 0 && parksLoadedOnce}
+                    <div class="empty-state">
+                        <i class="fas fa-tree"></i>
+                        <p>{t('territory.noParks')}</p>
+                    </div>
+                {:else if parks.length > 0}
+                    <div class="parks-grid">
+                        {#each parks as park (park.id)}
+                            <a href="/dog-park/{park.slug}" data-link class="park-card">
+                                <div class="park-card-image">
+                                    <img src="/images/dog-park-placeholder.svg" alt={localName(park)} loading="lazy" />
+                                </div>
+                                <div class="park-card-info">
+                                    <h3 class="park-card-name">{localName(park)}</h3>
+                                    <span class="park-card-type">{parkTypeLabel(park.parkType)}</span>
+                                    {#if park.address}
+                                        <span class="park-card-address"><i class="fas fa-map-marker-alt"></i> {park.address}</span>
+                                    {/if}
+                                </div>
+                            </a>
+                        {/each}
+                    </div>
+                {/if}
+                {#if isAuthenticated()}
+                    <div class="suggest-park-cta">
+                        <button class="btn-secondary" onclick={() => suggestModalOpen = true}>
+                            <i class="fas fa-plus"></i> {t('territory.suggestPark')}
+                        </button>
+                    </div>
+                {/if}
+            </div>
         </div>
     {/if}
 </div>
+
+{#if suggestModalOpen}
+    <SuggestParkModal
+        territoryId={territory?.id}
+        territoryName={territory ? localName(territory) : ''}
+        onclose={() => suggestModalOpen = false}
+        onsuccess={() => { suggestModalOpen = false; parksLoadedOnce = false; loadParks(); }}
+    />
+{/if}
 
 <style>
 .territory-page {
@@ -917,9 +1009,83 @@
     padding: 20px 0;
 }
 
+/* Dog Parks tab */
+.parks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--woof-spacing-md);
+    padding: var(--woof-spacing-md);
+}
+
+.park-card {
+    background: var(--woof-bg-card);
+    border-radius: var(--woof-radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--woof-shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.park-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--woof-shadow-md);
+}
+
+.park-card-image {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: var(--woof-bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.park-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.park-card-info {
+    padding: var(--woof-spacing-sm) var(--woof-spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.park-card-name {
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-semibold);
+    margin: 0;
+}
+
+.park-card-type {
+    font-size: var(--woof-text-footnote);
+    color: var(--woof-text-secondary);
+}
+
+.park-card-address {
+    font-size: var(--woof-text-footnote);
+    color: var(--woof-text-tertiary);
+}
+
+.park-card-address i {
+    margin-right: 4px;
+}
+
+.suggest-park-cta {
+    padding: var(--woof-spacing-md);
+    text-align: center;
+}
+
 @media (max-width: 768px) {
     .territory-page {
         margin: -20px 0 0;
+    }
+    .parks-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>

@@ -1,8 +1,8 @@
 <script>
-    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration } from '../../js/api.js';
+    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration, getAdminPendingParks, getAdminUnmatchedParks, updateAdminDogPark, deleteAdminDogPark, getAllTerritories } from '../../js/api.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { showToast, timeAgo } from '../../js/utils.js';
-    import { t } from '../../js/i18n-store.svelte.js';
+    import { t, localName } from '../../js/i18n-store.svelte.js';
 
     let REASON_LABELS = $derived({
         inappropriate_content: t('post.reasonInappropriate'),
@@ -41,6 +41,14 @@
     let flaggedLoading  = $state(false);
     let flaggedBusy     = $state({});
 
+    // ---- Dog Parks ----
+    let pendingParks     = $state([]);
+    let unmatchedParks   = $state([]);
+    let parksLoading     = $state(false);
+    let parksBusy        = $state({});
+    let allTerritories   = $state([]);
+    let territoryAssignments = $state({});
+
     $effect(() => {
         // Re-fetch reports when filter changes (only if in reports section)
         const _s = section;
@@ -57,6 +65,12 @@
         // Load flagged posts when section switches to 'flagged'
         if (section === 'flagged') {
             loadFlaggedPosts();
+        }
+    });
+
+    $effect(() => {
+        if (section === 'parks') {
+            loadDogParks();
         }
     });
 
@@ -196,6 +210,77 @@
         }
     }
 
+    // ---- Dog Parks functions ----
+    const parkTypeLabel = (type) => {
+        const map = { all_sizes: 'dogPark.allSizes', small_dogs: 'dogPark.smallDogs', large_dogs: 'dogPark.largeDogs', separate_areas: 'dogPark.separateAreas' };
+        return t(map[type] || 'dogPark.allSizes');
+    };
+
+    async function loadDogParks() {
+        parksLoading = true;
+        try {
+            const [pending, unmatched, territories] = await Promise.all([
+                getAdminPendingParks(),
+                getAdminUnmatchedParks(),
+                allTerritories.length ? Promise.resolve(allTerritories) : getAllTerritories(),
+            ]);
+            pendingParks = pending;
+            unmatchedParks = unmatched;
+            if (!allTerritories.length) allTerritories = territories;
+        } catch (err) {
+            showToast(err?.status === 403 ? t('admin.accessDenied') : t('admin.failedLoadReports'), 'error');
+        } finally {
+            parksLoading = false;
+        }
+    }
+
+    async function handleApprovePark(park) {
+        parksBusy = { ...parksBusy, [park.id]: true };
+        try {
+            await updateAdminDogPark(park.id, { status: 'active' });
+            pendingParks = pendingParks.filter(p => p.id !== park.id);
+            showToast(t('admin.parkApproved'), 'success');
+        } catch {
+            showToast(t('admin.failedUpdateReport'), 'error');
+        } finally {
+            const next = { ...parksBusy };
+            delete next[park.id];
+            parksBusy = next;
+        }
+    }
+
+    async function handleRejectPark(park) {
+        parksBusy = { ...parksBusy, [park.id]: true };
+        try {
+            await deleteAdminDogPark(park.id);
+            pendingParks = pendingParks.filter(p => p.id !== park.id);
+            showToast(t('admin.parkRejected'), 'success');
+        } catch {
+            showToast(t('admin.failedUpdateReport'), 'error');
+        } finally {
+            const next = { ...parksBusy };
+            delete next[park.id];
+            parksBusy = next;
+        }
+    }
+
+    async function handleAssignTerritory(park) {
+        const territoryId = territoryAssignments[park.id];
+        if (!territoryId) return;
+        parksBusy = { ...parksBusy, [park.id]: true };
+        try {
+            await updateAdminDogPark(park.id, { territoryId });
+            unmatchedParks = unmatchedParks.filter(p => p.id !== park.id);
+            showToast(t('admin.parkUpdated'), 'success');
+        } catch {
+            showToast(t('admin.failedUpdateReport'), 'error');
+        } finally {
+            const next = { ...parksBusy };
+            delete next[park.id];
+            parksBusy = next;
+        }
+    }
+
     async function handleUnbanUser(report) {
         const userId = report.post_owner_user_id || report.comment_owner_user_id;
         if (!userId) return;
@@ -248,6 +333,13 @@
                 {#if flaggedPosts.length > 0}
                     <span class="admin-section-badge">{flaggedPosts.length}</span>
                 {/if}
+            </button>
+            <button
+                class="admin-section-tab"
+                class:active={section === 'parks'}
+                onclick={() => section = 'parks'}
+            >
+                <i class="fas fa-tree"></i> {t('admin.dogParks')}
             </button>
         </div>
 
@@ -463,6 +555,110 @@
                         </div>
                     {/each}
                 </div>
+            {/if}
+
+        {:else if section === 'parks'}
+            {#if parksLoading}
+                <div class="admin-loading">
+                    <i class="fas fa-spinner fa-spin"></i> {t('admin.loadingReports')}
+                </div>
+            {:else}
+                <!-- Pending Suggestions -->
+                <h2 class="admin-parks-heading">{t('admin.pendingParks')}</h2>
+                {#if pendingParks.length === 0}
+                    <div class="admin-empty admin-empty--compact">
+                        <i class="fas fa-check-circle"></i>
+                        <p>{t('admin.noPendingParks')}</p>
+                    </div>
+                {:else}
+                    <div class="admin-parks-list">
+                        {#each pendingParks as park (park.id)}
+                            <div class="admin-park-card" class:busy={!!parksBusy[park.id]}>
+                                <div class="admin-park-body">
+                                    <div class="admin-report-meta">
+                                        <span class="admin-park-name">{localName(park)}</span>
+                                        <span class="admin-park-type-badge">{parkTypeLabel(park.parkType)}</span>
+                                    </div>
+                                    {#if park.address}
+                                        <p class="admin-park-detail"><i class="fas fa-location-dot"></i> {park.address}</p>
+                                    {/if}
+                                    {#if park.description}
+                                        <p class="admin-park-detail">{park.description}</p>
+                                    {/if}
+                                    {#if park.suggestedByEmail}
+                                        <p class="admin-park-detail"><i class="fas fa-user"></i> {t('admin.suggestedBy')} {park.suggestedByEmail}</p>
+                                    {/if}
+                                    <div class="admin-report-actions">
+                                        <button
+                                            class="admin-action-btn admin-action-btn--neutral"
+                                            disabled={!!parksBusy[park.id]}
+                                            onclick={() => handleApprovePark(park)}
+                                        >
+                                            <i class="fas fa-check"></i> {t('admin.approve')}
+                                        </button>
+                                        <button
+                                            class="admin-action-btn admin-action-btn--danger"
+                                            disabled={!!parksBusy[park.id]}
+                                            onclick={() => handleRejectPark(park)}
+                                        >
+                                            <i class="fas fa-trash"></i> {t('admin.reject')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+
+                <!-- Unmatched Parks -->
+                <h2 class="admin-parks-heading">{t('admin.unmatchedParks')}</h2>
+                {#if unmatchedParks.length === 0}
+                    <div class="admin-empty admin-empty--compact">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <p>{t('admin.noUnmatchedParks')}</p>
+                    </div>
+                {:else}
+                    <div class="admin-parks-list">
+                        {#each unmatchedParks as park (park.id)}
+                            <div class="admin-park-card" class:busy={!!parksBusy[park.id]}>
+                                <div class="admin-park-body">
+                                    <div class="admin-report-meta">
+                                        <span class="admin-park-name">{localName(park)}</span>
+                                        <span class="admin-park-type-badge">{parkTypeLabel(park.parkType)}</span>
+                                        {#if park.source === 'osm'}
+                                            <span class="admin-type-badge">OSM</span>
+                                        {/if}
+                                    </div>
+                                    {#if park.address}
+                                        <p class="admin-park-detail"><i class="fas fa-location-dot"></i> {park.address}</p>
+                                    {/if}
+                                    {#if park.latitude && park.longitude}
+                                        <p class="admin-park-detail admin-park-coords"><i class="fas fa-compass"></i> {park.latitude.toFixed(5)}, {park.longitude.toFixed(5)}</p>
+                                    {/if}
+                                    <div class="admin-park-assign">
+                                        <select
+                                            class="admin-park-select"
+                                            value={territoryAssignments[park.id] || ''}
+                                            onchange={(e) => territoryAssignments = { ...territoryAssignments, [park.id]: e.target.value }}
+                                        >
+                                            <option value="">{t('admin.assignTerritory')}</option>
+                                            {#each allTerritories as terr}
+                                                <option value={terr.id}>{localName(terr)} ({terr.type})</option>
+                                            {/each}
+                                        </select>
+                                        <button
+                                            class="admin-action-btn admin-action-btn--neutral"
+                                            disabled={!!parksBusy[park.id] || !territoryAssignments[park.id]}
+                                            onclick={() => handleAssignTerritory(park)}
+                                        >
+                                            <i class="fas fa-save"></i> Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
             {/if}
         {/if}
     </div>
@@ -886,5 +1082,95 @@
     font-size: var(--woof-text-caption-1);
     color: var(--woof-color-neutral-400);
     margin: 0;
+}
+
+/* Dog Parks admin section */
+.admin-parks-heading {
+    font-size: var(--woof-text-callout);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-900);
+    margin: var(--woof-space-5) 0 var(--woof-space-3);
+}
+
+.admin-parks-heading:first-of-type {
+    margin-top: 0;
+}
+
+.admin-empty--compact {
+    padding: var(--woof-space-6) var(--woof-space-4);
+}
+
+.admin-parks-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-3);
+    margin-bottom: var(--woof-space-4);
+}
+
+.admin-park-card {
+    background: var(--woof-color-neutral-0);
+    border: 1.5px solid var(--woof-color-neutral-100);
+    border-radius: var(--woof-radius-xl);
+    padding: var(--woof-space-4);
+    box-shadow: var(--woof-shadow-sm);
+    transition: opacity var(--woof-duration-fast);
+}
+
+.admin-park-card.busy {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.admin-park-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-2);
+}
+
+.admin-park-name {
+    font-size: var(--woof-text-callout);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-900);
+}
+
+.admin-park-type-badge {
+    display: inline-block;
+    padding: var(--woof-space-1) var(--woof-space-3);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-mint);
+    color: var(--woof-color-neutral-0);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-semibold);
+}
+
+.admin-park-detail {
+    font-size: var(--woof-text-footnote);
+    color: var(--woof-color-neutral-500);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+}
+
+.admin-park-coords {
+    font-family: monospace;
+    font-size: var(--woof-text-caption-1);
+}
+
+.admin-park-assign {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    margin-top: var(--woof-space-1);
+}
+
+.admin-park-select {
+    flex: 1;
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border-radius: var(--woof-radius-lg);
+    border: 1.5px solid var(--woof-color-neutral-200);
+    background: var(--woof-color-neutral-0);
+    font-size: var(--woof-text-footnote);
+    color: var(--woof-color-neutral-700);
 }
 </style>
