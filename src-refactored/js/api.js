@@ -1029,6 +1029,20 @@ export async function getAllTerritories() {
 }
 
 /**
+ * Get territory directory (municipalities grouped by country with dog counts)
+ * @returns {Promise<{countries: object[], popular: object[], total: number}>}
+ */
+export async function getTerritoryDirectory() {
+    try {
+        const data = await apiRequest('/api/territories/directory', { cache: 'default' });
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch territory directory:', error);
+        return { countries: [], popular: [], total: 0 };
+    }
+}
+
+/**
  * Get territory detail by hierarchical path
  * @param {string} path - URL path (e.g. "helsinki/oulunkyla/patola")
  * @returns {Promise<object>} - Territory object with stats, children, breadcrumb

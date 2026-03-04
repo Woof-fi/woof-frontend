@@ -456,7 +456,7 @@
                     <i class="fas fa-map-marker-alt"></i> {localName(ter)}
                 </a>
             {/each}
-            <a href="/territory/helsinki" data-link onclick={closeDrawer} class="nav-drawer-row nav-drawer-explore">
+            <a href="/territories" data-link onclick={closeDrawer} class="nav-drawer-row nav-drawer-explore">
                 {t('nav.exploreTerritories')}
             </a>
         </div>

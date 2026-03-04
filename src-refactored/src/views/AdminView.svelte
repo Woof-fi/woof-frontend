@@ -59,6 +59,16 @@
     let amenitySuggestions = $state([]);
     let amenityBusy      = $state({});
 
+    function formatTerritoryLabel(terr) {
+        if (terr.type === 'sub_district' && terr.parentName && terr.grandparentName) {
+            return `${localName(terr)}, ${terr.parentName}, ${terr.grandparentName}`;
+        }
+        if (terr.type === 'district' && terr.parentName) {
+            return `${localName(terr)}, ${terr.parentName}`;
+        }
+        return localName(terr);
+    }
+
     $effect(() => {
         // Re-fetch reports when filter changes (only if in reports section)
         const _s = section;
@@ -695,7 +705,7 @@
                                         >
                                             <option value="">{t('admin.assignTerritory')}</option>
                                             {#each allTerritories as terr}
-                                                <option value={terr.id}>{localName(terr)} ({terr.type})</option>
+                                                <option value={terr.id}>{formatTerritoryLabel(terr)}</option>
                                             {/each}
                                         </select>
                                         {#if territoryAssignments[park.id] && territoryAssignments[park.id] !== park.territoryId}
@@ -763,7 +773,7 @@
                                         >
                                             <option value="">{t('admin.assignTerritory')}</option>
                                             {#each allTerritories as terr}
-                                                <option value={terr.id}>{localName(terr)} ({terr.type})</option>
+                                                <option value={terr.id}>{formatTerritoryLabel(terr)}</option>
                                             {/each}
                                         </select>
                                         <button

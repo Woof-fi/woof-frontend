@@ -309,6 +309,19 @@
     "dogCount": "{count} dogs",
     "dogSingular": "{count} dog"
   },
+  "territoryDirectory": {
+    "title": "Territories",
+    "subtitle": "Explore territories and their dog communities",
+    "searchPlaceholder": "Search territories...",
+    "loading": "Loading territories...",
+    "popularTerritories": "Popular Territories",
+    "yourTerritories": "Your Territories",
+    "allTerritories": "All Territories",
+    "resultsFor": "Results for \"{query}\"",
+    "noResults": "No territories found matching \"{query}\"",
+    "dogCount": "{count} dogs",
+    "dogSingular": "{count} dog"
+  },
   "gate": {
     "title": "Woof",
     "subtitle": "This site is in closed beta.",
@@ -364,7 +377,8 @@
     "dogParks": "Dog Parks",
     "noParks": "No dog parks listed in this area yet.",
     "suggestPark": "Suggest a park",
-    "viewPark": "View park"
+    "viewPark": "View park",
+    "breadcrumbRoot": "Territories"
   },
   "dogPark": {
     "title": "Dog Park",

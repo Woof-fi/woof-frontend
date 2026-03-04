@@ -309,6 +309,19 @@
     "dogCount": "{count} koiraa",
     "dogSingular": "{count} koira"
   },
+  "territoryDirectory": {
+    "title": "Reviirit",
+    "subtitle": "Selaa reviirejä ja niiden koirayhteisöjä",
+    "searchPlaceholder": "Hae reviirejä...",
+    "loading": "Ladataan reviirejä...",
+    "popularTerritories": "Suositut reviirit",
+    "yourTerritories": "Omat reviirisi",
+    "allTerritories": "Kaikki reviirit",
+    "resultsFor": "Tulokset haulle \"{query}\"",
+    "noResults": "Reviirejä ei löytynyt haulla \"{query}\"",
+    "dogCount": "{count} koiraa",
+    "dogSingular": "{count} koira"
+  },
   "gate": {
     "title": "Woof",
     "subtitle": "Tämä sivusto on suljetussa betassa.",
@@ -364,7 +377,8 @@
     "dogParks": "Koirapuistot",
     "noParks": "Tälle alueelle ei ole vielä lisätty koirapuistoja.",
     "suggestPark": "Ehdota puistoa",
-    "viewPark": "Näytä puisto"
+    "viewPark": "Näytä puisto",
+    "breadcrumbRoot": "Reviirit"
   },
   "dogPark": {
     "title": "Koirapuisto",

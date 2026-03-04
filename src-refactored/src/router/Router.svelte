@@ -10,6 +10,7 @@
     import TermsView from '../views/TermsView.svelte';
     import BreedView from '../views/BreedView.svelte';
     import BreedDirectoryView from '../views/BreedDirectoryView.svelte';
+    import TerritoryDirectoryView from '../views/TerritoryDirectoryView.svelte';
     import TerritoryView from '../views/TerritoryView.svelte';
     import BookmarksView from '../views/BookmarksView.svelte';
     import DogParkView from '../views/DogParkView.svelte';
@@ -67,6 +68,7 @@
         { path: '/',               component: HomeView,           paramNames: [] },
         { path: '/breeds',         component: BreedDirectoryView, paramNames: [] },
         { path: '/breed/:slug',    component: BreedView,          paramNames: ['slug'] },
+        { path: '/territories',    component: TerritoryDirectoryView, paramNames: [] },
         { path: '/territory/:a/:b/:c', component: TerritoryView,  paramNames: ['a', 'b', 'c'] },
         { path: '/territory/:a/:b',    component: TerritoryView,  paramNames: ['a', 'b'] },
         { path: '/territory/:a',       component: TerritoryView,  paramNames: ['a'] },
@@ -175,6 +177,8 @@
         <BreedDirectoryView />
     {:else if matched.component === BreedView}
         <BreedView params={matched.params} />
+    {:else if matched.component === TerritoryDirectoryView}
+        <TerritoryDirectoryView />
     {:else if matched.component === TerritoryView}
         <TerritoryView params={matched.params} />
     {:else if matched.component === DogParkView}

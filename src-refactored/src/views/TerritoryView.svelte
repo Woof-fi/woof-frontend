@@ -293,20 +293,19 @@
         <div class="territory-sheet">
             <div class="territory-container">
                 <!-- Breadcrumb navigation -->
-                {#if territory.breadcrumb && territory.breadcrumb.length > 1}
-                    <nav class="territory-breadcrumb" aria-label="Territory hierarchy">
+                <nav class="territory-breadcrumb" aria-label="Territory hierarchy">
+                    <a href="/territories" data-link class="territory-breadcrumb-link">{t('territory.breadcrumbRoot')}</a>
+                    {#if territory.breadcrumb}
                         {#each territory.breadcrumb as crumb, i}
-                            {#if i > 0}
-                                <span class="territory-breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
-                            {/if}
+                            <span class="territory-breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
                             {#if i < territory.breadcrumb.length - 1}
                                 <a href="/territory/{crumb.urlPath}" data-link class="territory-breadcrumb-link">{localName(crumb)}</a>
                             {:else}
                                 <span class="territory-breadcrumb-current">{localName(crumb)}</span>
                             {/if}
                         {/each}
-                    </nav>
-                {/if}
+                    {/if}
+                </nav>
 
                 <div class="territory-name-row">
                     <div class="territory-sheet-name">{localName(territory)}</div>
