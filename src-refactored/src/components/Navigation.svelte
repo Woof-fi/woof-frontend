@@ -524,14 +524,7 @@
             <i class="fas fa-comment-dots"></i>
             {#if badgeDisplay}
                 <span class="bottom-nav-badge" id="bottom-messages-badge">{badgeDisplay}</span>
-            {:else}
-                <span class="bottom-nav-badge" id="bottom-messages-badge" style="display:none">0</span>
             {/if}
-        </a>
-    {:else}
-        <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" style="display:none" aria-label={t('nav.messages')}>
-            <i class="fas fa-comment-dots"></i>
-            <span class="bottom-nav-badge" id="bottom-messages-badge" style="display:none">0</span>
         </a>
     {/if}
     <a

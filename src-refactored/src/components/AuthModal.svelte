@@ -149,8 +149,19 @@
         if (e.key === 'Escape') close();
     }
 
+    // Track mousedown target to prevent Chrome autofill popup from
+    // triggering overlay-close (mousedown on popup, mouseup on overlay).
+    let overlayMouseDownTarget = null;
+
+    function handleOverlayMousedown(e) {
+        overlayMouseDownTarget = e.target;
+    }
+
     function handleOverlayClick(e) {
-        if (e.target === e.currentTarget) close();
+        if (e.target === e.currentTarget && overlayMouseDownTarget === e.currentTarget) {
+            close();
+        }
+        overlayMouseDownTarget = null;
     }
 
     async function handleSubmit(e) {
@@ -238,6 +249,7 @@
     id="auth-modal"
     class="modal"
     style:display={modals.authModalOpen ? 'block' : 'none'}
+    onmousedown={handleOverlayMousedown}
     onclick={handleOverlayClick}
     onkeydown={(e) => e.key === 'Escape' && close()}
     role="dialog"

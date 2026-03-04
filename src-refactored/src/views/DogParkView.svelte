@@ -3,6 +3,7 @@
     import { t, localName, locale } from '../../js/i18n-store.svelte.js';
     import { store, bumpParkVersion } from '../../js/svelte-store.svelte.js';
     import { isAuthenticated } from '../../js/auth.js';
+    import { showToast } from '../../js/utils.js';
 
     let { params = {} } = $props();
 
@@ -87,7 +88,7 @@
             editing = false;
         } catch (e) {
             console.error('Failed to save park:', e);
-            alert('Failed to save: ' + (e.message || 'Unknown error'));
+            showToast(t('common.failedLoad'), 'error');
         }
         saving = false;
     }
@@ -250,7 +251,7 @@
             }
         } catch (e) {
             console.error('Failed to submit amenity suggestion:', e);
-            alert('Failed to submit suggestion');
+            showToast(t('common.failedLoad'), 'error');
         }
         amenitySuggestSubmitting = false;
     }
@@ -291,7 +292,7 @@
             await loadVisits();
         } catch (e) {
             console.error('Failed to schedule visit:', e);
-            alert('Failed to schedule visit: ' + (e.message || 'Unknown error'));
+            showToast(t('common.failedLoad'), 'error');
         }
         visitSubmitting = false;
     }

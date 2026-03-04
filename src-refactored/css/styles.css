@@ -359,8 +359,15 @@ header {
     gap: 8px;
 }
 
+.onboarding-tour {
+    align-items: center;
+    justify-content: center;
+}
+
 .onboarding-tour-content {
     max-width: 400px;
+    margin: 0;
+    width: min(80%, 400px);
 }
 
 .tour-step {

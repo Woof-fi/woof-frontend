@@ -13,11 +13,11 @@
     let slug = $derived(params.slug || 'nelli-1');
 
     const HEALTH_TYPE_CONFIG = {
-        vet_visit:   { icon: 'fa-stethoscope', labelKey: 'health.vetVisit',    color: '#3b82f6' },
-        vaccination: { icon: 'fa-syringe',     labelKey: 'health.vaccination', color: '#10b981' },
-        medication:  { icon: 'fa-pills',       labelKey: 'health.medication',  color: '#f59e0b' },
-        weight:      { icon: 'fa-weight',      labelKey: 'health.weight',      color: '#C9403F' },
-        note:        { icon: 'fa-sticky-note', labelKey: 'health.note',        color: '#6b7280' },
+        vet_visit:   { icon: 'fa-stethoscope', labelKey: 'health.vetVisit',    color: 'var(--woof-color-info)' },
+        vaccination: { icon: 'fa-syringe',     labelKey: 'health.vaccination', color: 'var(--woof-color-success)' },
+        medication:  { icon: 'fa-pills',       labelKey: 'health.medication',  color: 'var(--woof-color-warning)' },
+        weight:      { icon: 'fa-weight',      labelKey: 'health.weight',      color: 'var(--woof-color-brand-primary)' },
+        note:        { icon: 'fa-sticky-note', labelKey: 'health.note',        color: 'var(--woof-color-neutral-500)' },
     };
 
     let dog = $state(null);
