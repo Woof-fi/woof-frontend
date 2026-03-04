@@ -395,9 +395,9 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Test coverage gaps | Medium | 420 backend + 148 frontend tests. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
+| Test coverage gaps | Medium | 430 backend + 160 frontend tests. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
 | i18n key parity validation | Low | Pre-commit hook or CI check to ensure EN and FI locale files have identical keys |
-| Extract shared controller utilities | Low | "Get user's first dog" duplicated in 3 controllers, "verify dog ownership" in 5+. Extract when touching those files. |
+| Extract shared controller utilities | Low | ✅ `getFirstDogId()` extracted to dogService. ✅ `parsePagination()` extracted. ✅ `mapPostRow()` extracted. "Verify dog ownership" still in 5+ controllers. |
 | OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |
 | Re-enable coverage thresholds | Low | Disabled during active feature dev. Set to 70% minimum pre-launch. |
 | No staging environment | Low (for now) | Production is test env while user base is friends-only. Revisit before public launch |

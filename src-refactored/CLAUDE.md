@@ -136,7 +136,7 @@ npm run verify-deploy   # checks production JS bundle contains expected git comm
 
 ### Unit Tests (Vitest)
 ```bash
-npm test              # Run all unit tests (90 tests, 7 suites)
+npm test              # Run all unit tests (160 tests, 14 suites)
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage
 ```
