@@ -21,6 +21,7 @@
     import PostOptionsSheet from './components/PostOptionsSheet.svelte';
     import CommentOptionsSheet from './components/CommentOptionsSheet.svelte';
     import FollowListModal from './components/FollowListModal.svelte';
+    import LikerListModal from './components/LikerListModal.svelte';
 
     // When the API layer detects an expired session that can't be refreshed,
     // clear the Svelte store so the UI updates reactively (e.g. nav shows login).
@@ -89,6 +90,7 @@
         <EditPostModal />
         <EditCommentModal />
         <FollowListModal />
+        <LikerListModal />
         <HealthRecordModal />
         <Search />
         {#if modals.postOptionsSheetOpen}

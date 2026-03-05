@@ -112,6 +112,8 @@
     "edited": "(edited)",
     "failedLoadComments": "Failed to load comments",
     "failedPostComment": "Failed to post comment",
+    "likes": "Likes",
+    "noLikesYet": "No likes yet",
     "linkCopied": "Link copied",
     "linkCopyFailed": "Could not copy link",
     "editCaption": "Edit caption",

@@ -407,6 +407,15 @@ export async function unlikePost(postId) {
     });
 }
 
+/**
+ * Get dogs that liked a post
+ * @param {string} postId - ID of the post
+ * @returns {Promise<{likers: object[]}>}
+ */
+export async function getPostLikers(postId) {
+    return apiRequest(`/api/likes/${postId}/likers`);
+}
+
 // ============================================================================
 // COMMENTS API
 // ============================================================================

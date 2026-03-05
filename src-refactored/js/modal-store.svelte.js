@@ -26,6 +26,8 @@ export let modals = $state({
     editCommentData: null,          // { commentId, content, onUpdated }
     followListModalOpen: false,
     followListData: null,           // { dogId, type: 'followers' | 'following' }
+    likerListModalOpen: false,
+    likerListData: null,            // { postId }
 });
 
 export function openAuthModal() { modals.authModalOpen = true; }
@@ -53,6 +55,8 @@ export function openEditCommentModal(data) { modals.editCommentData = data; moda
 export function closeEditCommentModal() { modals.editCommentModalOpen = false; modals.editCommentData = null; }
 export function openFollowListModal(dogId, type) { modals.followListData = { dogId, type }; modals.followListModalOpen = true; }
 export function closeFollowListModal() { modals.followListModalOpen = false; modals.followListData = null; }
+export function openLikerListModal(postId) { modals.likerListData = { postId }; modals.likerListModalOpen = true; }
+export function closeLikerListModal() { modals.likerListModalOpen = false; modals.likerListData = null; }
 export function closeAllModals() {
     modals.authModalOpen = false;
     modals.createPostModalOpen = false;
@@ -72,4 +76,6 @@ export function closeAllModals() {
     modals.editCommentData = null;
     modals.followListModalOpen = false;
     modals.followListData = null;
+    modals.likerListModalOpen = false;
+    modals.likerListData = null;
 }

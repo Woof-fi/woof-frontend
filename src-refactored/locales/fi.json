@@ -112,6 +112,8 @@
     "edited": "(muokattu)",
     "failedLoadComments": "Kommenttien lataus epäonnistui",
     "failedPostComment": "Kommentin julkaisu epäonnistui",
+    "likes": "Tykkäykset",
+    "noLikesYet": "Ei vielä tykkäyksiä",
     "linkCopied": "Linkki kopioitu",
     "linkCopyFailed": "Linkin kopiointi epäonnistui",
     "editCaption": "Muokkaa kuvatekstiä",

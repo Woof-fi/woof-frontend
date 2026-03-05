@@ -4,7 +4,7 @@
     import { CONFIG } from '../../js/config.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { timeAgo, showToast, imageVariant } from '../../js/utils.js';
-    import { openPostOptionsSheet, openCommentOptionsSheet } from '../../js/modal-store.svelte.js';
+    import { openPostOptionsSheet, openCommentOptionsSheet, openLikerListModal } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
 
@@ -337,7 +337,7 @@
             >
                 <i class={liked ? 'fas fa-heart' : 'far fa-heart'} aria-hidden="true"></i>
             </button>
-            <span class="like-count">{likes > 0 ? likes : ''}</span>
+            <button class="like-count" onclick={() => likes > 0 && openLikerListModal(id)} disabled={likes === 0}>{likes > 0 ? likes : ''}</button>
             <button class="comment-button" aria-label={t('post.commentOnPost')} onclick={handleCommentClick}>
                 <i class="far fa-comment" aria-hidden="true"></i>
             </button>
@@ -595,6 +595,16 @@ a.post-location-text:hover {
     color: var(--color-text);
     margin-right: 12px;
     vertical-align: middle;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.post-actions .like-count:disabled {
+    cursor: default;
+    opacity: 1;
 }
 
 .post-actions .like-button {
