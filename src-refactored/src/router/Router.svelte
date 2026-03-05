@@ -14,6 +14,7 @@
     import TerritoryView from '../views/TerritoryView.svelte';
     import BookmarksView from '../views/BookmarksView.svelte';
     import DogParkView from '../views/DogParkView.svelte';
+    import ProtoView from '../proto/ProtoView.svelte';
 
     let { onopenAuthModal = null } = $props();
 
@@ -83,6 +84,8 @@
         { path: '/notifications',  component: NotificationsView,  paramNames: [] },
         { path: '/privacy',        component: PrivacyView,        paramNames: [] },
         { path: '/terms',          component: TermsView,          paramNames: [] },
+        { path: '/proto/:name',    component: ProtoView,          paramNames: ['name'] },
+        { path: '/proto',          component: ProtoView,          paramNames: [] },
     ];
 
     const compiledRoutes = routes.map(r => ({
@@ -199,5 +202,7 @@
         <PrivacyView />
     {:else if matched.component === TermsView}
         <TermsView />
+    {:else if matched.component === ProtoView}
+        <ProtoView params={matched.params} />
     {/if}
 </div>
