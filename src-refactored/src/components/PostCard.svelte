@@ -1,4 +1,5 @@
 <script>
+    import { tick } from 'svelte';
     import { likePost, unlikePost, createComment, getComments } from '../../js/api.js';
     import { CONFIG } from '../../js/config.js';
     import { isAuthenticated } from '../../js/auth.js';
@@ -89,11 +90,26 @@
     }
 
     // --- Comment button ---
-    function handleCommentClick() {
+    async function handleCommentClick() {
         if (!isAuthenticated()) {
             onopenAuthModal?.();
             return;
         }
+        // Expand comments if not already visible
+        if (!commentsVisible && commentCount_ > 0 && !commentsLoaded) {
+            try {
+                const result = await getComments(id, null, 20);
+                comments = result.comments || [];
+                commentsLoaded = true;
+                commentsVisible = true;
+            } catch {
+                showToast(t('post.failedLoadComments'), 'error');
+            }
+        } else if (!commentsVisible && commentsLoaded) {
+            commentsVisible = true;
+        }
+        // Focus the comment input after DOM updates
+        await tick();
         const input = document.querySelector(`[data-comment-input="${id}"]`);
         if (input) input.focus();
     }
