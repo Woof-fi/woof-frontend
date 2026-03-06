@@ -1,7 +1,7 @@
 {
   "nav": {
     "feed": "FEED",
-    "forYou": "For You",
+    "forYou": "Discover",
     "following": "Following",
     "home": "Home",
     "search": "Search",
@@ -96,7 +96,13 @@
     "addYourDog": "Add Your Dog",
     "gateTitle": "Want to see more?",
     "gateDesc": "Sign up to browse the full feed, follow dogs, and share your own pup's adventures.",
-    "unknownDog": "Unknown Dog"
+    "unknownDog": "Unknown Dog",
+    "upcomingVisits": "Upcoming at your parks",
+    "newInYourArea": "New in your area",
+    "headingTo": "heading to",
+    "justJoinedIn": "just joined in",
+    "today": "Today",
+    "tomorrow": "Tomorrow"
   },
   "post": {
     "unlikePost": "Unlike post",

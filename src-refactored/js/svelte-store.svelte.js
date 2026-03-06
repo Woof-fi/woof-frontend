@@ -19,7 +19,7 @@ export let store = $state({
     notifUnreadCount: 0,
     currentDog: null,
     userDogIds: [], // all dog IDs owned by the authenticated user (for comment ownership checks)
-    feedTab: 'public', // 'public' | 'following'
+    feedTab: isAuthenticated() ? 'following' : 'public', // 'public' | 'following'
     // Version signals — bumped after mutations to trigger re-fetch in watchers
     dogVersion: 0,
     feedVersion: 0,

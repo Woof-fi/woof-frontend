@@ -347,18 +347,18 @@
             <button
                 type="button"
                 class="nav-drawer-row"
-                class:active={store.feedTab !== 'following'}
-                onclick={() => selectFeedTab('public')}
-            >
-                <i class="fas fa-star"></i> {t('nav.forYou')}
-            </button>
-            <button
-                type="button"
-                class="nav-drawer-row"
                 class:active={store.feedTab === 'following'}
                 onclick={() => selectFeedTab('following')}
             >
                 <i class="fas fa-heart"></i> {t('nav.following')}
+            </button>
+            <button
+                type="button"
+                class="nav-drawer-row"
+                class:active={store.feedTab !== 'following'}
+                onclick={() => selectFeedTab('public')}
+            >
+                <i class="fas fa-star"></i> {t('nav.forYou')}
             </button>
         </div>
     {/if}

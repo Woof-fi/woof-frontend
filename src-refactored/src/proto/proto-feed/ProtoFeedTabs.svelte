@@ -1,10 +1,9 @@
 <script>
-    let { activeTab = 'foryou', ontabchange = null } = $props();
+    let { activeTab = 'following', ontabchange = null } = $props();
 
     const tabs = [
-        { id: 'foryou', label: 'For You' },
         { id: 'following', label: 'Following' },
-        { id: 'general', label: 'General' },
+        { id: 'all', label: 'All' },
     ];
 </script>
 

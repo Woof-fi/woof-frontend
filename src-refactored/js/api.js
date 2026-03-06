@@ -1200,6 +1200,34 @@ export async function getFollowingDogParks() {
 }
 
 /**
+ * Get upcoming visits at parks the current user follows
+ * @returns {Promise<object[]>} - Array of visit objects with dog + park info
+ */
+export async function getFollowingVisits() {
+    try {
+        const data = await apiRequest('/api/dog-parks/following/visits');
+        return data.visits || [];
+    } catch (error) {
+        console.error('Failed to fetch following visits:', error);
+        return [];
+    }
+}
+
+/**
+ * Get new dogs in territories the current user follows (sub_district, last 7 days)
+ * @returns {Promise<object[]>} - Array of dog objects
+ */
+export async function getNewDogsInFollowedAreas() {
+    try {
+        const data = await apiRequest('/api/posts/feed/new-dogs');
+        return data.dogs || [];
+    } catch (error) {
+        console.error('Failed to fetch new dogs:', error);
+        return [];
+    }
+}
+
+/**
  * Search all dog parks by name, Finnish name, city, or address
  * @param {string} query - Search term (min 2 chars)
  * @returns {Promise<object[]>} - Array of matching park objects

@@ -25,6 +25,7 @@ export const MOCK_DOGS = [
         profilePhoto: FALLBACK_AVATAR,
         territoryName: 'Kallio',
         territoryParentName: 'Helsinki',
+        isFollowing: true,
     },
     {
         id: 'mock-dog-2',
@@ -35,6 +36,7 @@ export const MOCK_DOGS = [
         profilePhoto: FALLBACK_AVATAR,
         territoryName: 'Töölö',
         territoryParentName: 'Helsinki',
+        isFollowing: true,
     },
     {
         id: 'mock-dog-3',
@@ -45,6 +47,7 @@ export const MOCK_DOGS = [
         profilePhoto: FALLBACK_AVATAR,
         territoryName: 'Kallio',
         territoryParentName: 'Helsinki',
+        isFollowing: false,
     },
     {
         id: 'mock-dog-4',
@@ -55,6 +58,7 @@ export const MOCK_DOGS = [
         profilePhoto: FALLBACK_AVATAR,
         territoryName: 'Kamppi',
         territoryParentName: 'Helsinki',
+        isFollowing: false,
     },
     {
         id: 'mock-dog-5',
@@ -65,6 +69,7 @@ export const MOCK_DOGS = [
         profilePhoto: FALLBACK_AVATAR,
         territoryName: 'Kruununhaka',
         territoryParentName: 'Helsinki',
+        isFollowing: false,
     },
 ];
 
@@ -260,6 +265,7 @@ export const MOCK_NEW_DOGS = [
         name: 'Lumi',
         breedName: 'Samoyed',
         territoryName: 'Kallio',
+        territoryType: 'sub_district',
         profilePhoto: FALLBACK_AVATAR,
         joinedAt: pastTime(3),
     },
@@ -268,6 +274,7 @@ export const MOCK_NEW_DOGS = [
         name: 'Otso',
         breedName: 'Finnish Spitz',
         territoryName: 'Kruununhaka',
+        territoryType: 'sub_district',
         profilePhoto: FALLBACK_AVATAR,
         joinedAt: pastTime(8),
     },
@@ -276,10 +283,14 @@ export const MOCK_NEW_DOGS = [
         name: 'Wilma',
         breedName: 'Dachshund',
         territoryName: 'Töölö',
+        territoryType: 'district',
         profilePhoto: FALLBACK_AVATAR,
         joinedAt: pastTime(18),
     },
 ];
+
+/** Low-level districts the mock user follows (sub_district level only) */
+export const MOCK_FOLLOWED_DISTRICTS = ['Kallio', 'Kruununhaka'];
 
 export const MOCK_TERRITORY_ACTIVITY = [
     { territory: 'Kallio', postsThisWeek: 14, newDogs: 3, upcomingVisits: 5 },

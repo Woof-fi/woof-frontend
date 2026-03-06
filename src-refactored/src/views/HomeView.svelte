@@ -4,15 +4,16 @@
 
     let { onopenAuthModal = null } = $props();
 
-    // Initialize feed tab from URL on mount (e.g. direct link to /?tab=following)
+    // Initialize feed tab from URL on mount (e.g. direct link to /?tab=discover)
     $effect(() => {
         const tab = new URLSearchParams(window.location.search).get('tab');
-        if (tab === 'following') setFeedTab('following');
+        if (tab === 'discover') setFeedTab('public');
+        else if (tab === 'following') setFeedTab('following');
     });
 
     // Keep URL in sync with selected tab
     $effect(() => {
-        const search = store.feedTab === 'following' ? '?tab=following' : '';
+        const search = store.feedTab === 'public' ? '?tab=discover' : '';
         history.replaceState({}, '', window.location.pathname + search);
     });
 </script>

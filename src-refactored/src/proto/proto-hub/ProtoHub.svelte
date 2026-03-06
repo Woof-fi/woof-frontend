@@ -10,7 +10,7 @@
         {
             name: 'feed',
             title: 'Personalized Feed',
-            desc: 'Three-tab feed: "For You" (personalized with park visits & new dogs), "Following", and "General" for browsing. Park visit and new dog announcement cards mixed into the feed.',
+            desc: 'Two-tab feed: "Following" shows posts from dogs you follow, scheduled visits at your parks, and new dogs in your districts. "All" shows everything else.',
             icon: 'fa-stream',
             color: 'var(--woof-color-fresh-mint-dark)',
         },

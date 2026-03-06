@@ -7,6 +7,8 @@ vi.mock('../../../js/api.js', () => ({
     getMyDogs: vi.fn().mockResolvedValue([]),
     getAllDogs: vi.fn().mockResolvedValue([]),
     getUnreadCount: vi.fn().mockResolvedValue({ unreadCount: 0 }),
+    getFollowingVisits: vi.fn().mockResolvedValue([]),
+    getNewDogsInFollowedAreas: vi.fn().mockResolvedValue([]),
 }));
 vi.mock('../../../js/auth.js', () => ({
     isAuthenticated: vi.fn().mockReturnValue(true),

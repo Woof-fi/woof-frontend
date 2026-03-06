@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
 **Last Updated:** 2026-03-06
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed
 **Current:** Tier 2 — Major Features (15A Sentry next)
 
 ---
@@ -49,6 +49,9 @@ Park following (follow/unfollow, follower count, followed parks in nav drawer). 
 
 ### Create Button Makeover
 Crimson FAB (floating action button) replaces "+" icon in bottom nav. CreateActionSheet with "New post", "Schedule park visit", "Add health record" actions. QuickVisitForm with live park search (searches name, city, address, district, sub-district via territory JOIN). Single-dog UX: auto-selects dog when user has only one. Actionable toast links: success toasts include "View" link to created post, park page, or dog profile health tab. Context-dependent: links suppressed when user is already on target page. Hash-based tab deep linking (`#health`). PostCard smart image fallback: tries original URL before placeholder when variants not ready. Toast href validation (XSS prevention). 435 backend + 160 frontend tests.
+
+### Personalized Feed
+Two-feed system: **Following** (default for authenticated users) and **Discover** (renamed from "For You"). Following feed shows posts from followed dogs + followed breeds + own posts, upcoming scheduled visits at followed parks, and new dogs in followed sub_districts (last 7 days). Auto-fallback: if Following is completely empty, silently switches to Discover feed. "Tutustu" / "Discover" replaces "Sinulle" / "For You" in nav labels. Following tab listed first in sidebar. Backend: `GET /api/dog-parks/following/visits` and `GET /api/posts/feed/new-dogs` endpoints. Frontend: ParkVisitCard and NewDogCard components render as highlight sections above the post feed. Proto at `/proto/feed`. 441 backend + 160 frontend tests.
 
 ---
 
@@ -123,7 +126,7 @@ Custom Svelte 5 `$state`-based i18n store (svelte-i18n incompatible with runes).
 
 - **Edit comments**: `PUT /api/comments/:id` endpoint with ownership check. EditCommentModal component, "Edit comment" button in CommentOptionsSheet, "(edited)" indicator on comments.
 - **Share OG preview**: Backend `GET /share/post/:id` serves HTML with Open Graph meta tags for social media crawlers (og:title, og:image, og:description), with auto-redirect to SPA for human visitors. Outside `/api` routes (no rate limiting for crawlers).
-- **Following feed fix**: Added `AND d.owner_id != $1` to exclude own posts from the Following tab.
+- **Following feed fix**: Tuned own-post visibility in Following tab (initially excluded, later re-included as part of Personalized Feed).
 - **Visit profile fix**: PostOptionsSheet falls back to `dogId` when `dogSlug` is empty, with early return guard.
 
 #### 13B: Multi-Image Posts — Large
@@ -207,7 +210,7 @@ Features that change the fundamental social model.
 - Memorial mode: read-only profile, no new posts or edits
 - Visual treatment: memorial badge, muted overlay, "In loving memory" text
 - Existing posts remain, followers remain, comments stay open (community memories)
-- Posts stop appearing in "For You" feed but accessible via profile link and search
+- Posts stop appearing in Discover feed but accessible via profile link and search
 - Owner action: "Mark as memorial" in dog settings, reversible
 
 ---
@@ -398,7 +401,7 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Test coverage gaps | Medium | 435 backend + 160 frontend tests. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
+| Test coverage gaps | Medium | 441 backend + 160 frontend tests. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
 | i18n key parity validation | Low | Pre-commit hook or CI check to ensure EN and FI locale files have identical keys |
 | Extract shared controller utilities | Low | ✅ `getFirstDogId()` extracted to dogService. ✅ `parsePagination()` extracted. ✅ `mapPostRow()` extracted. "Verify dog ownership" still in 5+ controllers. |
 | OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |

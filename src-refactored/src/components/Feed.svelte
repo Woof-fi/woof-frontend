@@ -1,12 +1,14 @@
 <script>
-    import { getFeed, getMyDogs, getAllDogs } from '../../js/api.js';
+    import { getFeed, getMyDogs, getAllDogs, getFollowingVisits, getNewDogsInFollowedAreas } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { openCreateDogModal } from '../../js/modal-store.svelte.js';
     import { showToast } from '../../js/utils.js';
-    import { store } from '../../js/svelte-store.svelte.js';
+    import { store, setFeedTab } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
     import PostCard from './PostCard.svelte';
     import InviteCard from './InviteCard.svelte';
+    import ParkVisitCard from './ParkVisitCard.svelte';
+    import NewDogCard from './NewDogCard.svelte';
     import { viewport } from '../actions/viewport.ts';
 
     let { type = 'public', onopenAuthModal = null } = $props();
@@ -15,9 +17,13 @@
     let nextCursor = $state(null);
     let loading = $state(true);
     let myDogs = $state([]);
+    let followingVisits = $state([]);
+    let followingNewDogs = $state([]);
     let refreshing = $state(false);
     let pullDistance = $state(0);
     let feedEl;
+
+    let isFollowingFeed = $derived(type === 'following' && isAuthenticated());
 
     const INVITE_FIRST_POSITION = 5;
     const INVITE_INTERVAL = 20;
@@ -68,15 +74,20 @@
         if (refreshing || loading) return;
         refreshing = true;
         try {
+            const isFollowing = type === 'following' && isAuthenticated();
             // Minimum 500ms spinner so the user sees feedback
-            const [feedResult, dogsResult] = await Promise.all([
+            const [feedResult, dogsResult, visitsResult, newDogsResult] = await Promise.all([
                 getFeed(type),
                 isAuthenticated() ? getMyDogs().catch(() => []) : Promise.resolve([]),
+                isFollowing ? getFollowingVisits().catch(() => []) : Promise.resolve([]),
+                isFollowing ? getNewDogsInFollowedAreas().catch(() => []) : Promise.resolve([]),
                 new Promise(r => setTimeout(r, 500)),
             ]);
             posts = feedResult.posts || [];
             nextCursor = feedResult.nextCursor;
             myDogs = dogsResult;
+            followingVisits = visitsResult;
+            followingNewDogs = newDogsResult;
         } catch (e) {
             console.error('Failed to refresh feed:', e);
             showToast(t('feed.refreshFailed'), 'error');
@@ -140,16 +151,32 @@
             posts = [];
             nextCursor = null;
             myDogs = [];
+            followingVisits = [];
+            followingNewDogs = [];
+
+            const isFollowing = currentType === 'following' && !!authUser;
 
             try {
-                const [feedResult, dogsResult] = await Promise.all([
+                const [feedResult, dogsResult, visitsResult, newDogsResult] = await Promise.all([
                     getFeed(currentType),
                     authUser ? getMyDogs().catch(() => []) : Promise.resolve([]),
+                    isFollowing ? getFollowingVisits().catch(() => []) : Promise.resolve([]),
+                    isFollowing ? getNewDogsInFollowedAreas().catch(() => []) : Promise.resolve([]),
                 ]);
                 if (!cleanup) {
-                    posts = feedResult.posts || [];
+                    const feedPosts = feedResult.posts || [];
+
+                    // Auto-fallback: if following feed is completely empty, switch to Discover
+                    if (isFollowing && feedPosts.length === 0 && visitsResult.length === 0 && newDogsResult.length === 0) {
+                        setFeedTab('public');
+                        return; // The reactive effect will re-run with 'public' type
+                    }
+
+                    posts = feedPosts;
                     nextCursor = feedResult.nextCursor;
                     myDogs = dogsResult;
+                    followingVisits = visitsResult;
+                    followingNewDogs = newDogsResult;
                 }
             } catch (e) {
                 console.error('Failed to load feed:', e);
@@ -225,7 +252,7 @@
             <div class="skeleton skeleton-text"></div>
         </div>
     </div>
-{:else if !loading && posts.length === 0 && type === 'following'}
+{:else if !loading && posts.length === 0 && followingVisits.length === 0 && followingNewDogs.length === 0 && type === 'following'}
     {#if isAuthenticated()}
         <div class="woof-empty-state">
             <div class="woof-empty-state-icon">
@@ -251,6 +278,28 @@
             <button class="btn-primary welcome-card-btn" onclick={handleAddDog}>
                 <i class="fas fa-plus"></i> {t('feed.addYourDog')}
             </button>
+        </div>
+    {/if}
+
+    {#if isFollowingFeed && followingVisits.length > 0}
+        <div class="following-section">
+            <h3 class="following-section-title">
+                <i class="fas fa-walking"></i> {t('feed.upcomingVisits')}
+            </h3>
+            {#each followingVisits as visit (visit.id)}
+                <ParkVisitCard {visit} />
+            {/each}
+        </div>
+    {/if}
+
+    {#if isFollowingFeed && followingNewDogs.length > 0}
+        <div class="following-section">
+            <h3 class="following-section-title">
+                <i class="fas fa-paw"></i> {t('feed.newInYourArea')}
+            </h3>
+            {#each followingNewDogs as dog (dog.id)}
+                <NewDogCard {dog} />
+            {/each}
         </div>
     {/if}
 
@@ -344,6 +393,23 @@
 .pull-to-refresh-label {
     font-size: var(--woof-text-caption-1);
     font-weight: var(--woof-font-weight-medium);
+}
+
+.following-section {
+    margin-bottom: var(--woof-space-4);
+}
+
+.following-section-title {
+    font-size: var(--woof-text-footnote);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 var(--woof-space-3);
+    padding: 0 var(--woof-space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
 }
 
 .feed-sentinel {

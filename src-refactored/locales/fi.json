@@ -1,7 +1,7 @@
 {
   "nav": {
     "feed": "SYÖTE",
-    "forYou": "Sinulle",
+    "forYou": "Tutustu",
     "following": "Seuratut",
     "home": "Koti",
     "search": "Haku",
@@ -96,7 +96,13 @@
     "addYourDog": "Lisää koirasi",
     "gateTitle": "Haluatko nähdä lisää?",
     "gateDesc": "Rekisteröidy selataksesi koko syötettä, seurataksesi koiria ja jakaaksesi oman koirasi seikkailuja.",
-    "unknownDog": "Tuntematon koira"
+    "unknownDog": "Tuntematon koira",
+    "upcomingVisits": "Tulossa puistoihisi",
+    "newInYourArea": "Uutta alueellasi",
+    "headingTo": "menossa",
+    "justJoinedIn": "liittyi juuri alueelle",
+    "today": "Tänään",
+    "tomorrow": "Huomenna"
   },
   "post": {
     "unlikePost": "Poista tykkäys",
