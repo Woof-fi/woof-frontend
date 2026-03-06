@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-03-02
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2
+**Last Updated:** 2026-03-06
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover
 **Current:** Tier 2 — Major Features (15A Sentry next)
 
 ---
@@ -46,6 +46,9 @@ Territory follow system mirroring breed follows: `territory_follows` table, foll
 
 ### Dog Parks Phase 2: Engagement
 Park following (follow/unfollow, follower count, followed parks in nav drawer). User amenity suggestions with admin approval queue (approve updates park amenities via jsonb_set). Visit scheduling: users announce planned visits with dog, time, duration, and note. Park followers receive notifications when visits are scheduled. 28 new backend tests (420 total).
+
+### Create Button Makeover
+Crimson FAB (floating action button) replaces "+" icon in bottom nav. CreateActionSheet with "New post", "Schedule park visit", "Add health record" actions. QuickVisitForm with live park search (searches name, city, address, district, sub-district via territory JOIN). Single-dog UX: auto-selects dog when user has only one. Actionable toast links: success toasts include "View" link to created post, park page, or dog profile health tab. Context-dependent: links suppressed when user is already on target page. Hash-based tab deep linking (`#health`). PostCard smart image fallback: tries original URL before placeholder when variants not ready. Toast href validation (XSS prevention). 435 backend + 160 frontend tests.
 
 ---
 
@@ -395,7 +398,7 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Test coverage gaps | Medium | 430 backend + 160 frontend tests. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
+| Test coverage gaps | Medium | 435 backend + 160 frontend tests. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
 | i18n key parity validation | Low | Pre-commit hook or CI check to ensure EN and FI locale files have identical keys |
 | Extract shared controller utilities | Low | ✅ `getFirstDogId()` extracted to dogService. ✅ `parsePagination()` extracted. ✅ `mapPostRow()` extracted. "Verify dog ownership" still in 5+ controllers. |
 | OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |

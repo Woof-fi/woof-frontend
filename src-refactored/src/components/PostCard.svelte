@@ -317,7 +317,14 @@
             sizes="(max-width: 540px) 100vw, 500px"
             alt="Post by {username}"
             loading="lazy"
-            onerror={(e) => { if (e.target.src !== FALLBACK_POST) e.target.src = FALLBACK_POST; }}
+            onerror={(e) => {
+                if (e.target.srcset) {
+                    e.target.srcset = '';
+                    e.target.src = imageUrl;
+                } else if (e.target.src !== FALLBACK_POST) {
+                    e.target.src = FALLBACK_POST;
+                }
+            }}
         />
         {#if showDoubleTapHeart}
             <div class="double-tap-heart" aria-hidden="true">

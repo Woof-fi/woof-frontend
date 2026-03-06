@@ -28,6 +28,7 @@ export let modals = $state({
     followListData: null,           // { dogId, type: 'followers' | 'following' }
     likerListModalOpen: false,
     likerListData: null,            // { postId }
+    createActionSheetOpen: false,
 });
 
 export function openAuthModal() { modals.authModalOpen = true; }
@@ -40,8 +41,8 @@ export function openEditDogModal(dog) { modals.editDogData = dog; modals.editDog
 export function closeEditDogModal() { modals.editDogModalOpen = false; modals.editDogData = null; }
 export function openEditPostModal(post) { modals.editPostData = post; modals.editPostModalOpen = true; }
 export function closeEditPostModal() { modals.editPostModalOpen = false; modals.editPostData = null; }
-export function openHealthRecordModal(dogId, record) {
-    modals.healthRecordData = { dogId, record };
+export function openHealthRecordModal(dogId, record, dogSlug = null) {
+    modals.healthRecordData = { dogId, record, dogSlug };
     modals.healthRecordModalOpen = true;
 }
 export function closeHealthRecordModal() { modals.healthRecordModalOpen = false; modals.healthRecordData = null; }
@@ -57,6 +58,8 @@ export function openFollowListModal(dogId, type) { modals.followListData = { dog
 export function closeFollowListModal() { modals.followListModalOpen = false; modals.followListData = null; }
 export function openLikerListModal(postId) { modals.likerListData = { postId }; modals.likerListModalOpen = true; }
 export function closeLikerListModal() { modals.likerListModalOpen = false; modals.likerListData = null; }
+export function openCreateActionSheet() { modals.createActionSheetOpen = true; }
+export function closeCreateActionSheet() { modals.createActionSheetOpen = false; }
 export function closeAllModals() {
     modals.authModalOpen = false;
     modals.createPostModalOpen = false;
@@ -78,4 +81,5 @@ export function closeAllModals() {
     modals.followListData = null;
     modals.likerListModalOpen = false;
     modals.likerListData = null;
+    modals.createActionSheetOpen = false;
 }

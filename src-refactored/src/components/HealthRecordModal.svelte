@@ -2,7 +2,7 @@
     import { createHealthRecord, updateHealthRecord } from '../../js/api.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
-    import { showToast } from '../../js/utils.js';
+    import { showToast } from '../../js/toast-store.svelte.js';
     import { modals, closeHealthRecordModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpHealthVersion } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
@@ -128,7 +128,10 @@
                 showToast(t('health.recordUpdated'), 'success');
             } else {
                 await createHealthRecord(currentDogId, data);
-                showToast(t('health.recordAdded'), 'success');
+                const dogSlug = modals.healthRecordData?.dogSlug;
+                showToast(t('health.recordAdded'), 'success',
+                    dogSlug ? { label: t('common.view'), href: `/dog/${dogSlug}#health` } : null
+                );
             }
             close();
             bumpHealthVersion();
@@ -326,17 +329,24 @@
 
 .health-modal-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--color-border);
+    gap: var(--woof-space-3);
+    margin-top: var(--woof-space-5);
+    padding-top: var(--woof-space-4);
+    border-top: 1px solid var(--woof-color-neutral-200);
 }
 
-.health-modal-actions .btn-secondary,
+.health-modal-actions .btn-secondary {
+    padding: var(--woof-space-3) var(--woof-space-5);
+    font-size: var(--woof-text-body);
+    border-radius: var(--woof-btn-radius);
+    white-space: nowrap;
+}
+
 .health-modal-actions .btn-primary {
-    padding: 10px 20px;
-    font-size: 14px;
+    flex: 1;
+    padding: var(--woof-space-3) var(--woof-space-5);
+    font-size: var(--woof-text-body);
+    border-radius: var(--woof-btn-radius);
 }
 
 @media (max-width: 480px) {

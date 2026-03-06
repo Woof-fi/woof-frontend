@@ -533,6 +533,32 @@ header {
     color: var(--color-text);
 }
 
+/* ============================================================================
+   DATE / DATETIME INPUTS — global polish
+   ============================================================================ */
+input[type="date"],
+input[type="datetime-local"] {
+    width: 100%;
+    padding: var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    font-family: var(--woof-font-family);
+    color: var(--woof-color-neutral-900);
+    background: var(--woof-color-neutral-0);
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color var(--woof-duration-fast);
+}
+
+input[type="date"]:focus,
+input[type="datetime-local"]:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+    box-shadow: 0 0 0 3px var(--woof-color-brand-primary-subtle);
+}
+
 .modal input[type="text"],
 .modal input[type="email"],
 .modal input[type="password"],

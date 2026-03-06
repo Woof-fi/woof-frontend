@@ -1076,14 +1076,17 @@
 }
 
 .park-visit-cancel {
+    position: absolute;
+    top: var(--woof-space-2);
+    right: var(--woof-space-2);
     background: none;
     border: none;
     color: var(--woof-color-neutral-400);
     cursor: pointer;
     padding: var(--woof-space-1);
-    font-size: 14px;
+    font-size: 12px;
+    line-height: 1;
     transition: color 0.15s;
-    flex-shrink: 0;
 }
 
 .park-visit-cancel:hover {

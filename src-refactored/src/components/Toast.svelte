@@ -12,7 +12,10 @@
             in:fly={{ y: 12, duration: 200 }}
             out:fade={{ duration: 150 }}
         >
-            {toast.message}
+            <span>{toast.message}</span>
+            {#if toast.action}
+                <a href={toast.action.href} class="toast-action" data-link>{toast.action.label}</a>
+            {/if}
         </div>
     {/each}
 </div>
@@ -34,6 +37,10 @@
 }
 
 .toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-3);
     padding: var(--woof-space-3) var(--woof-space-5);
     border-radius: var(--woof-radius-xl);
     font-size: var(--woof-text-callout);
@@ -54,4 +61,21 @@
 
 /* info — artisan slate; muted and informational */
 .toast-info    { background: var(--woof-color-slate-dark); }
+
+/* Action link inside toast */
+.toast-action {
+    color: var(--woof-color-neutral-0);
+    text-decoration: none;
+    font-weight: var(--woof-font-weight-bold);
+    white-space: nowrap;
+    opacity: 0.85;
+    padding-left: var(--woof-space-3);
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    transition: opacity var(--woof-duration-fast);
+}
+
+.toast-action:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
 </style>

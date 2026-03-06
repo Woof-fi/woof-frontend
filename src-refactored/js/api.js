@@ -255,7 +255,6 @@ export async function createPost(dogId, imageUrl, caption) {
             method: 'POST',
             body: JSON.stringify({ dog_id: dogId, image_url: imageUrl, caption })
         });
-        showToast(t('common.postCreated'), 'success');
         return data.post;
     } catch (error) {
         console.error('Failed to create post:', error);
@@ -1198,6 +1197,21 @@ export async function unfollowDogPark(parkId) {
 export async function getFollowingDogParks() {
     const data = await apiRequest('/api/dog-parks/following', { cache: 'default' });
     return data.parks || [];
+}
+
+/**
+ * Search all dog parks by name, Finnish name, city, or address
+ * @param {string} query - Search term (min 2 chars)
+ * @returns {Promise<object[]>} - Array of matching park objects
+ */
+export async function searchDogParks(query) {
+    try {
+        const data = await apiRequest(`/api/dog-parks/search?q=${encodeURIComponent(query)}`, { cache: 'default' });
+        return data.parks || [];
+    } catch (error) {
+        console.error('Failed to search dog parks:', error);
+        return [];
+    }
 }
 
 // Amenity suggestions

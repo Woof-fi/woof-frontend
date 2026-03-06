@@ -3,7 +3,8 @@
     import { isAuthenticated } from '../../js/auth.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
-    import { showToast, isValidFileType, isValidFileSize } from '../../js/utils.js';
+    import { isValidFileType, isValidFileSize } from '../../js/utils.js';
+    import { showToast } from '../../js/toast-store.svelte.js';
     import {
         modals, closeCreatePostModal as storeClose,
         openAuthModal, openCreateDogModal,
@@ -145,9 +146,10 @@
         try {
             showToast(t('postCreate.uploadingImage'), 'info');
             const imageUrl = await uploadImage(selectedFile);
-            await createPost(selectedDogId, imageUrl, caption);
+            const post = await createPost(selectedDogId, imageUrl, caption);
             close();
             bumpFeedVersion();
+            showToast(t('common.postCreated'), 'success', { label: t('common.view'), href: `/post/${post.id}` });
         } catch (err) {
             console.error('Failed to create post:', err);
         } finally {
@@ -229,7 +231,7 @@
                             <img
                                 src={previewUrl}
                                 alt="Post preview"
-                                style="max-width:100%;max-height:300px;border-radius:8px;margin-top:10px;"
+                                class="preview-img"
                             />
                         {/if}
                     </div>
@@ -303,19 +305,21 @@
 }
 
 .image-preview {
-    margin-bottom: 15px;
+    margin-bottom: var(--woof-space-4);
     max-height: 400px;
     overflow: hidden;
-    border-radius: var(--radius-sm);
-    background-color: #000;
+    border-radius: var(--woof-radius-md);
+    background-color: var(--woof-color-neutral-900);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.image-preview img {
+.preview-img {
     max-width: 100%;
-    max-height: 400px;
+    max-height: 300px;
+    border-radius: var(--woof-radius-md);
+    margin-top: var(--woof-space-2);
     object-fit: contain;
     display: block;
 }

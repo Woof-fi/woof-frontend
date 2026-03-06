@@ -104,7 +104,9 @@
         dog = null;
         loading = true;
         loadError = false;
-        activeTab = restoreTab();
+        const hash = window.location.hash.slice(1);
+        activeTab = ['posts', 'friends', 'health'].includes(hash) ? hash : restoreTab();
+        if (hash) history.replaceState(null, '', window.location.pathname);
         posts = [];
         postsLoading = false;
         followerCount = 0;

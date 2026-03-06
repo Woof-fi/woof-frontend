@@ -550,7 +550,9 @@
     "apiUnavailable": "Taustapalvelu ei ole käytettävissä",
     "postCreated": "Julkaisu luotu onnistuneesti!",
     "failedCreatePost": "Julkaisun luonti epäonnistui. Yritä uudelleen.",
-    "failedLoadFeed": "Syötteen lataus epäonnistui. Yritä uudelleen."
+    "failedLoad": "Jokin meni pieleen. Yritä uudelleen.",
+    "failedLoadFeed": "Syötteen lataus epäonnistui. Yritä uudelleen.",
+    "view": "Näytä"
   },
   "language": {
     "en": "EN",

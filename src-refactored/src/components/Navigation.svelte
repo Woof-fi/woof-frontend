@@ -1,11 +1,11 @@
 <script>
     import { getMyDogs, getUnreadCount, getNotifUnreadCount, getFollowingBreeds, getFollowingTerritories, getFollowingDogParks } from '../../js/api.js';
     import { isAuthenticated, logout } from '../../js/auth.js';
-    import { openCreateDogModal, openSearchPanel } from '../../js/modal-store.svelte.js';
+    import { openCreateDogModal, openSearchPanel, openCreateActionSheet } from '../../js/modal-store.svelte.js';
     import { store, setAuthUser, setFeedTab, setNotifUnreadCount, setCurrentDog, setUserDogIds } from '../../js/svelte-store.svelte.js';
     import { t, localName, locale, setLocale } from '../../js/i18n-store.svelte.js';
 
-    let { onopenAuthModal = null, onopenCreatePostModal = null } = $props();
+    let { onopenAuthModal = null } = $props();
 
     let dogs = $state([]);
     let unreadCount = $state(0);
@@ -39,7 +39,7 @@
     function handleCreatePost(e) {
         e.preventDefault();
         closeDrawer();
-        onopenCreatePostModal?.();
+        openCreateActionSheet();
     }
 
     function handleSearchOpen(e) {
@@ -516,8 +516,8 @@
     <button type="button" id="bottom-nav-search" class="bottom-nav-item" aria-label={t('nav.search')} onclick={handleSearchOpen}>
         <i class="fas fa-search"></i>
     </button>
-    <button type="button" id="create-post-link-mobile" class="bottom-nav-item" aria-label={t('nav.createPost')} onclick={handleCreatePost}>
-        <i class="fas fa-plus-square"></i>
+    <button type="button" id="create-post-link-mobile" class="bottom-nav-fab" aria-label={t('nav.createPost')} onclick={handleCreatePost}>
+        <i class="fas fa-plus"></i>
     </button>
     {#if authed}
         <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" class:active={isMessagesActive()} aria-label={t('nav.messages')}>
@@ -552,6 +552,11 @@
         {/if}
     </a>
 </nav>
+
+<!-- Desktop floating FAB (right side) -->
+<button type="button" class="desktop-fab" aria-label={t('nav.createPost')} onclick={handleCreatePost}>
+    <i class="fas fa-plus"></i>
+</button>
 
 <style>
 .header-content {
@@ -884,6 +889,42 @@
     display: inline-block;
 }
 
+/* Crimson FAB — mobile bottom nav create button */
+.bottom-nav .bottom-nav-fab {
+    position: relative;
+    width: var(--woof-touch-target);
+    height: var(--woof-touch-target);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-top: -8px;
+    box-shadow: var(--woof-shadow-brand);
+    transition: transform var(--woof-duration-fast), box-shadow var(--woof-duration-fast);
+    flex: 0 0 auto;
+    padding: 0;
+}
+
+.bottom-nav .bottom-nav-fab:hover {
+    transform: scale(1.08);
+    box-shadow: var(--woof-shadow-lg);
+}
+
+.bottom-nav .bottom-nav-fab:active {
+    transform: scale(0.95);
+}
+
+.bottom-nav .bottom-nav-fab i {
+    display: block;
+    line-height: 1;
+    color: var(--woof-color-neutral-0);
+}
+
 /* Navigation badges */
 .nav-badge {
     background: var(--color-primary);
@@ -1063,5 +1104,41 @@
 .lang-btn.active {
     background: var(--woof-color-brand-primary);
     color: var(--woof-color-neutral-0);
+}
+
+/* Desktop floating FAB (right side) */
+.desktop-fab {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .desktop-fab {
+        display: flex;
+        position: fixed;
+        bottom: var(--woof-space-8);
+        right: var(--woof-space-8);
+        width: 56px;
+        height: 56px;
+        border-radius: var(--woof-radius-full);
+        background: var(--woof-color-brand-primary);
+        color: var(--woof-color-neutral-0);
+        border: none;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: var(--woof-shadow-brand);
+        z-index: 100;
+        transition: transform var(--woof-duration-fast), box-shadow var(--woof-duration-fast);
+    }
+
+    .desktop-fab:hover {
+        transform: scale(1.08);
+        box-shadow: var(--woof-shadow-lg);
+    }
+
+    .desktop-fab:active {
+        transform: scale(0.95);
+    }
 }
 </style>

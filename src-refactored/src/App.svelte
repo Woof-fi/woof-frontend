@@ -3,7 +3,7 @@
     import { healthCheck, syncUser } from '../js/api.js';
     import { showToast } from '../js/utils.js';
     import { t } from '../js/i18n-store.svelte.js';
-    import { openAuthModal, openCreatePostModal, modals } from '../js/modal-store.svelte.js';
+    import { openAuthModal, modals } from '../js/modal-store.svelte.js';
     import { setAuthUser } from '../js/svelte-store.svelte.js';
     import { isAuthenticated } from '../js/auth.js';
     import Toast from './components/Toast.svelte';
@@ -22,6 +22,7 @@
     import CommentOptionsSheet from './components/CommentOptionsSheet.svelte';
     import FollowListModal from './components/FollowListModal.svelte';
     import LikerListModal from './components/LikerListModal.svelte';
+    import CreateActionSheet from './components/CreateActionSheet.svelte';
 
     // When the API layer detects an expired session that can't be refreshed,
     // clear the Svelte store so the UI updates reactively (e.g. nav shows login).
@@ -76,7 +77,6 @@
         <div class="app-container">
             <Navigation
                 onopenAuthModal={openAuthModal}
-                onopenCreatePostModal={openCreatePostModal}
             />
             <div class="main-container">
                 <Router onopenAuthModal={openAuthModal} />
@@ -99,6 +99,7 @@
         {#if modals.commentOptionsSheetOpen}
             <CommentOptionsSheet />
         {/if}
+        <CreateActionSheet />
         <Toast />
     {/snippet}
 </SiteGate>

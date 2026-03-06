@@ -550,7 +550,9 @@
     "apiUnavailable": "Backend API is unavailable",
     "postCreated": "Post created successfully!",
     "failedCreatePost": "Failed to create post. Please try again.",
-    "failedLoadFeed": "Failed to load feed. Please try again."
+    "failedLoad": "Something went wrong. Please try again.",
+    "failedLoadFeed": "Failed to load feed. Please try again.",
+    "view": "View"
   },
   "language": {
     "en": "EN",
