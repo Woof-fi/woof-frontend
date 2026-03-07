@@ -8,8 +8,8 @@ export function focusTrap(node: HTMLElement) {
             .filter(el => el.offsetParent !== null);
         if (focusable.length === 0) return;
 
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
+        const first = focusable[0]!;
+        const last = focusable[focusable.length - 1]!;
 
         if (e.shiftKey && document.activeElement === first) {
             last.focus();
