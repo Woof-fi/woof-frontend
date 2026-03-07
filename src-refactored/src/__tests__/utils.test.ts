@@ -48,19 +48,19 @@ describe('Utility Functions', () => {
     it('should accept valid image types', () => {
       const jpgFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
       const pngFile = new File([''], 'test.png', { type: 'image/png' });
-      const gifFile = new File([''], 'test.gif', { type: 'image/gif' });
       const webpFile = new File([''], 'test.webp', { type: 'image/webp' });
 
       expect(isValidFileType(jpgFile)).toBe(true);
       expect(isValidFileType(pngFile)).toBe(true);
-      expect(isValidFileType(gifFile)).toBe(true);
       expect(isValidFileType(webpFile)).toBe(true);
     });
 
     it('should reject invalid file types', () => {
+      const gifFile = new File([''], 'test.gif', { type: 'image/gif' });
       const pdfFile = new File([''], 'test.pdf', { type: 'application/pdf' });
       const txtFile = new File([''], 'test.txt', { type: 'text/plain' });
 
+      expect(isValidFileType(gifFile)).toBe(false);
       expect(isValidFileType(pdfFile)).toBe(false);
       expect(isValidFileType(txtFile)).toBe(false);
     });

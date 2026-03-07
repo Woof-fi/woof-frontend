@@ -200,7 +200,7 @@ export function isValidEmail(email) {
  * @param {string[]} allowedTypes - Allowed MIME types
  * @returns {boolean} - True if valid
  */
-export function isValidFileType(file, allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']) {
+export function isValidFileType(file, allowedTypes = ['image/jpeg', 'image/png', 'image/webp']) {
     return allowedTypes.includes(file.type);
 }
 
