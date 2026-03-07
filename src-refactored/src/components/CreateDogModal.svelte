@@ -131,6 +131,7 @@
             }
         } catch (err) {
             console.error('Failed to create dog:', err);
+            showToast(t('common.error'), 'error');
         } finally {
             submitting = false;
         }
@@ -222,7 +223,7 @@
                             <img
                                 src={previewUrl}
                                 alt="Preview"
-                                style="max-width:200px;max-height:200px;border-radius:8px;"
+                                style="max-width:200px;max-height:200px;border-radius:var(--woof-radius-sm);"
                             />
                         {/if}
                     </div>

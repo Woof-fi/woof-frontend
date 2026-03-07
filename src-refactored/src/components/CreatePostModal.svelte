@@ -5,6 +5,7 @@
     import { toggleBodyScroll } from '../../js/ui.js';
     import { isValidFileType, isValidFileSize } from '../../js/utils.js';
     import { showToast } from '../../js/toast-store.svelte.js';
+    import { focusTrap } from '../actions/focus-trap.ts';
     import {
         modals, closeCreatePostModal as storeClose,
         openAuthModal, openCreateDogModal,
@@ -14,6 +15,7 @@
 
     // Local visibility — controlled by async open checks
     let visible = $state(false);
+    let loading = $state(false);
     let dogs = $state([]);
     let selectedDogId = $state('');
     let caption = $state('');
@@ -28,14 +30,21 @@
     // Watch store state — run async open checks or propagate close
     $effect(() => {
         if (modals.createPostModalOpen && !visible) {
-            (async () => {
-                if (!isAuthenticated()) {
-                    showToast(t('postCreate.loginRequired'), 'error');
-                    storeClose();
-                    openAuthModal();
-                    return;
-                }
+            // Sync auth check — don't show modal if not authenticated
+            if (!isAuthenticated()) {
+                showToast(t('postCreate.loginRequired'), 'error');
+                storeClose();
+                openAuthModal();
+                return;
+            }
 
+            // Show modal immediately (prevents backdrop flash)
+            visible = true;
+            loading = true;
+            pushModalState();
+            toggleBodyScroll(true);
+
+            (async () => {
                 let fetchedDogs;
                 try {
                     fetchedDogs = await getMyDogs();
@@ -61,13 +70,12 @@
                     showDogSelect = true;
                 }
 
-                visible = true;
-                pushModalState();
-                toggleBodyScroll(true);
+                loading = false;
             })();
         } else if (!modals.createPostModalOpen && visible) {
             // Store requested close (e.g. back button via closeAllModals)
             visible = false;
+            loading = false;
             popModalState();
             toggleBodyScroll(false);
             resetForm();
@@ -152,6 +160,7 @@
             showToast(t('common.postCreated'), 'success', { label: t('common.view'), href: `/post/${post.id}` });
         } catch (err) {
             console.error('Failed to create post:', err);
+            showToast(t('common.failedCreatePost'), 'error');
         } finally {
             submitting = false;
         }
@@ -170,12 +179,15 @@
     tabindex="-1"
     aria-modal="true"
 >
-    <div class="modal-content">
+    <div class="modal-content" use:focusTrap>
         <div class="modal-header">
             <h2>{t('postCreate.title')}</h2>
             <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
+            {#if loading}
+                <div class="modal-loading"><i class="fas fa-spinner fa-spin"></i></div>
+            {:else}
             <form id="create-post-form" novalidate onsubmit={handleSubmit}>
                 {#if showDogSelect}
                     <div class="form-group">
@@ -251,11 +263,21 @@
                     {submitting ? t('postCreate.posting') : t('postCreate.post')}
                 </button>
             </form>
+            {/if}
         </div>
     </div>
 </div>
 
 <style>
+.modal-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--woof-space-8) 0;
+    color: var(--woof-color-neutral-400);
+    font-size: var(--woof-text-title-2);
+}
+
 #create-post-form {
     display: flex;
     flex-direction: column;
@@ -297,7 +319,7 @@
 .image-source-btn:hover {
     border-color: var(--color-primary);
     color: var(--color-primary);
-    background: rgba(239, 70, 33, 0.05);
+    background: var(--woof-color-brand-primary-alpha-05);
 }
 
 .image-source-btn i {

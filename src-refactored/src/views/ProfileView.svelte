@@ -242,7 +242,7 @@
     }
 
     function handleAddHealthRecord() {
-        openHealthRecordModal(dog.id, null);
+        openHealthRecordModal(dog.id, null, null, healthFilterType);
     }
 
     function handleEditHealthRecord(record) {
@@ -513,9 +513,6 @@
                 {:else}
                     <div class="health-header">
                         <h2>{t('profile.health')}</h2>
-                        <button class="btn-primary health-add-btn" onclick={handleAddHealthRecord}>
-                            <i class="fas fa-plus"></i> {t('health.addRecordBtn')}
-                        </button>
                     </div>
                     <div class="health-filters" id="health-filters">
                         <button class="health-filter-btn" class:active={healthFilterType === null} onclick={() => setHealthFilter(null)}>{t('admin.all')}</button>
@@ -525,6 +522,9 @@
                         <button class="health-filter-btn" class:active={healthFilterType === 'weight'} onclick={() => setHealthFilter('weight')}><i class="fas fa-weight"></i> {t('health.weight')}</button>
                         <button class="health-filter-btn" class:active={healthFilterType === 'note'} onclick={() => setHealthFilter('note')}><i class="fas fa-sticky-note"></i> {t('health.note')}</button>
                     </div>
+                    <button class="health-add-record-btn" onclick={handleAddHealthRecord}>
+                        <i class="fas fa-plus"></i> {t('health.addRecordBtn')}
+                    </button>
                     <div class="health-timeline">
                         {#if healthLoading}
                             <div class="health-loading"><i class="fas fa-spinner fa-spin"></i> {t('common.loading')}...</div>
@@ -1027,27 +1027,49 @@ a.profile-sheet-territory i {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: var(--woof-space-3);
 }
 
 .health-header h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: var(--woof-text-title-3);
 }
 
-.health-add-btn {
-    padding: 8px 16px;
-    font-size: 13px;
-    border-radius: 20px;
+.health-add-record-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--woof-space-2);
+    width: 100%;
+    padding: var(--woof-space-3);
+    margin-bottom: var(--woof-space-4);
+    background: none;
+    border: 1px dashed var(--woof-color-neutral-300);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-semibold);
+    font-family: var(--woof-font-family);
+    color: var(--woof-color-brand-primary);
+    cursor: pointer;
+    transition: all var(--woof-duration-fast);
+}
+
+.health-add-record-btn:hover {
+    border-color: var(--woof-color-brand-primary);
+    background: var(--woof-color-brand-primary-subtle);
+}
+
+.health-add-record-btn i {
+    font-size: var(--woof-text-caption-1);
 }
 
 .health-filters {
     display: flex;
-    gap: 6px;
+    gap: var(--woof-space-2);
     overflow-x: auto;
-    padding-bottom: 14px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--woof-space-3);
+    margin-bottom: var(--woof-space-4);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
@@ -1059,59 +1081,60 @@ a.profile-sheet-territory i {
 .health-filter-btn {
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 7px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: 20px;
-    background: var(--color-surface);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
+    gap: var(--woof-space-1);
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-surface-primary);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-medium);
+    font-family: var(--woof-font-family);
+    color: var(--woof-color-neutral-500);
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: all var(--woof-duration-fast);
 }
 
 .health-filter-btn i {
-    font-size: 11px;
+    font-size: var(--woof-text-caption-2);
 }
 
 .health-filter-btn:hover {
-    border-color: var(--color-text-secondary);
-    background: var(--color-bg-alt);
+    border-color: var(--woof-color-neutral-400);
+    background: var(--woof-color-neutral-50);
 }
 
 .health-filter-btn.active {
-    background: var(--color-primary);
-    color: #fff;
-    border-color: var(--color-primary);
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
+    border-color: var(--woof-color-brand-primary);
 }
 
 .health-timeline {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--woof-space-3);
 }
 
 .health-loading {
     text-align: center;
-    padding: 32px;
-    color: var(--color-text-secondary);
+    padding: var(--woof-space-8);
+    color: var(--woof-color-neutral-500);
 }
 
 .health-card {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 14px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    transition: box-shadow 0.2s;
+    gap: var(--woof-space-3);
+    padding: var(--woof-space-3);
+    background: var(--woof-surface-primary);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    transition: box-shadow var(--woof-duration-fast);
 }
 
 .health-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--woof-shadow-sm);
 }
 
 .health-card-icon {
@@ -1122,8 +1145,8 @@ a.profile-sheet-territory i {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 14px;
+    color: var(--woof-color-neutral-0);
+    font-size: var(--woof-text-caption-1);
 }
 
 .health-card-body {
@@ -1135,30 +1158,30 @@ a.profile-sheet-territory i {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 4px;
+    margin-bottom: var(--woof-space-1);
 }
 
 .health-card-type {
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--color-text);
+    font-weight: var(--woof-font-weight-semibold);
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-900);
 }
 
 .health-card-date {
-    font-size: 12px;
-    color: var(--color-text-secondary);
+    font-size: var(--woof-text-caption-2);
+    color: var(--woof-color-neutral-500);
 }
 
 .health-card-desc {
-    margin: 0 0 4px;
-    font-size: 14px;
-    color: var(--color-text);
+    margin: 0 0 var(--woof-space-1);
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-900);
 }
 
 .health-card-notes {
     margin: 0;
-    font-size: 13px;
-    color: var(--color-text-secondary);
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
     font-style: italic;
 }
 
@@ -1176,10 +1199,10 @@ a.profile-sheet-territory i {
 .health-card-actions {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--woof-space-1);
     flex-shrink: 0;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity var(--woof-duration-fast);
 }
 
 .health-card:hover .health-card-actions {
@@ -1192,23 +1215,23 @@ a.profile-sheet-territory i {
     border: none;
     border-radius: var(--woof-radius-full);
     background: transparent;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-400);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    transition: all 0.2s;
+    font-size: var(--woof-text-caption-2);
+    transition: all var(--woof-duration-fast);
 }
 
 .health-action-btn:hover {
-    background: var(--color-border);
-    color: var(--color-text);
+    background: var(--woof-color-neutral-100);
+    color: var(--woof-color-neutral-900);
 }
 
 .health-delete-btn:hover {
-    background: #fee2e2;
-    color: #ef4444;
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--woof-color-error);
 }
 
 .private-content {

@@ -80,6 +80,17 @@
     function handleBack() {
         view = 'menu';
     }
+
+    /** Custom out transitions that skip animation when doing instant close */
+    function sheetOut(node) {
+        if (instantClose) return { duration: 0 };
+        return fly(node, { y: 500, duration: 200, opacity: 1 });
+    }
+
+    function backdropOut(node) {
+        if (instantClose) return { duration: 0 };
+        return fade(node, { duration: 150 });
+    }
 </script>
 
 {#if modals.createActionSheetOpen}
@@ -87,19 +98,18 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
         class="action-sheet-backdrop"
-        class:instant-hide={instantClose}
-        transition:fade={{ duration: 150 }}
+        in:fade={{ duration: 150 }}
+        out:backdropOut
         onclick={close}
     ></div>
 
     <div
         class="action-sheet"
-        class:instant-hide={instantClose}
         role="dialog"
         aria-modal="true"
         aria-label="Create new content"
         in:fly={{ y: 500, duration: 280, opacity: 1 }}
-        out:fly={{ y: 500, duration: 200, opacity: 1 }}
+        out:sheetOut
     >
         {#if view === 'menu'}
             <div class="menu-view" in:fade={{ duration: 100, delay: 60 }}>
@@ -148,7 +158,7 @@
 
         {:else if view === 'visit'}
             <div in:fade={{ duration: 100, delay: 60 }}>
-                <QuickVisitForm onback={handleBack} onclose={close} />
+                <QuickVisitForm onback={handleBack} onclose={close} oncloseinstant={closeAndOpen} />
             </div>
 
         {:else if view === 'pick-dog-health'}
@@ -189,22 +199,21 @@
 {/if}
 
 <style>
-.instant-hide {
-    display: none !important;
-}
-
 .action-sheet-backdrop {
     position: fixed;
     inset: 0;
     background: var(--woof-surface-overlay);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     z-index: 1040;
 }
 
 .action-sheet {
     position: fixed;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
     width: 100%;
     max-width: 540px;
     background: var(--woof-surface-primary);
@@ -224,7 +233,7 @@
 
 .sheet-handle {
     width: 36px;
-    height: 4px;
+    height: var(--woof-space-1);
     background: var(--woof-color-neutral-300);
     border-radius: var(--woof-radius-full);
     margin: 0 auto var(--woof-space-4);
@@ -299,8 +308,8 @@
 }
 
 .action-icon {
-    width: 44px;
-    height: 44px;
+    width: var(--woof-touch-target);
+    height: var(--woof-touch-target);
     border-radius: var(--woof-radius-md);
     display: flex;
     align-items: center;
@@ -325,8 +334,8 @@
 }
 
 .dog-picker-photo {
-    width: 44px;
-    height: 44px;
+    width: var(--woof-touch-target);
+    height: var(--woof-touch-target);
     border-radius: var(--woof-radius-full);
     object-fit: cover;
     object-position: center;
@@ -382,10 +391,13 @@
 /* Desktop: centered modal instead of bottom sheet */
 @media (min-width: 769px) {
     .action-sheet {
-        bottom: auto;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        top: 0;
+        bottom: 0;
+        left: 280px;
+        right: 0;
+        margin: auto;
         max-width: 480px;
+        height: fit-content;
         border-radius: var(--woof-radius-lg);
         padding-bottom: 0;
         max-height: 85vh;

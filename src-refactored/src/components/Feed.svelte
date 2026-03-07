@@ -65,6 +65,7 @@
             nextCursor = result.nextCursor;
         } catch (e) {
             console.error('Failed to load more posts:', e);
+            showToast(t('common.failedLoad'), 'error');
         } finally {
             loading = false;
         }
@@ -180,6 +181,7 @@
                 }
             } catch (e) {
                 console.error('Failed to load feed:', e);
+                showToast(t('common.failedLoad'), 'error');
             } finally {
                 if (!cleanup) loading = false;
             }

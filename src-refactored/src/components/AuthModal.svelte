@@ -10,6 +10,7 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { showToast } from '../../js/utils.js';
+    import { focusTrap } from '../actions/focus-trap.ts';
     import { modals, closeAuthModal as storeClose } from '../../js/modal-store.svelte.js';
     import { setAuthUser } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
@@ -26,6 +27,7 @@
     let newPassword = $state('');
     let submitting = $state(false);
     let submitLabel = $state('');
+    let resending = $state(false);
 
     const modeConfig = {
         login: {
@@ -233,12 +235,15 @@
 
     async function handleResend(e) {
         e.preventDefault();
-        if (!pendingEmail) return;
+        if (!pendingEmail || resending) return;
+        resending = true;
         try {
             await resendConfirmationCode(pendingEmail);
             showToast(t('auth.codeResent'), 'success');
         } catch (err) {
             console.error('Resend error:', err);
+        } finally {
+            resending = false;
         }
     }
 </script>
@@ -257,7 +262,7 @@
     aria-modal="true"
     aria-labelledby="auth-modal-title"
 >
-    <div class="modal-content">
+    <div class="modal-content" use:focusTrap>
         <div class="modal-header">
             <h2 id="auth-modal-title">{t(cfg.titleKey)}</h2>
             <button class="modal-close" aria-label={t('auth.close')} onclick={close}>&times;</button>
@@ -387,7 +392,7 @@
 
                 {#if cfg.resendLink}
                     <p id="auth-resend-group" class="auth-secondary-action">
-                        <button type="button" id="resend-code-btn" class="link-btn" onclick={handleResend}>
+                        <button type="button" id="resend-code-btn" class="link-btn" onclick={handleResend} disabled={resending}>
                             {t('auth.resendCode')}
                         </button>
                     </p>
@@ -410,8 +415,8 @@
 .password-requirements {
     list-style: none;
     padding: 0;
-    margin: 8px 0 0;
-    font-size: 12px;
+    margin: var(--woof-space-2) 0 0;
+    font-size: var(--woof-text-caption-1);
     color: var(--color-text-muted);
 }
 
@@ -435,21 +440,21 @@
 /* Auth tabs */
 .auth-tabs {
     display: flex;
-    margin-bottom: 20px;
+    margin-bottom: var(--woof-space-5);
     border-bottom: 1px solid var(--color-border);
 }
 
 .auth-tab {
     flex: 1;
-    padding: 12px 0;
+    padding: var(--woof-space-3) 0;
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
-    font-size: 14px;
+    font-size: var(--woof-text-callout);
     font-weight: 600;
     color: var(--color-text-muted);
     cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
+    transition: color var(--woof-duration-fast), border-color var(--woof-duration-fast);
     text-align: center;
 }
 
@@ -464,16 +469,16 @@
 
 .auth-secondary-action {
     text-align: center;
-    margin-top: 12px;
+    margin-top: var(--woof-space-3);
     margin-bottom: 0;
-    font-size: 13px;
+    font-size: var(--woof-text-footnote);
 }
 
 .auth-age-notice {
-    font-size: 12px;
+    font-size: var(--woof-text-caption-1);
     color: var(--color-text-muted);
     text-align: center;
-    margin: 8px 0 4px;
+    margin: var(--woof-space-2) 0 var(--woof-space-1);
     line-height: 1.5;
 }
 

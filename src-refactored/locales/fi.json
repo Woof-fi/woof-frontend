@@ -292,7 +292,8 @@
     "followed": "alkoi seurata sinua",
     "parkVisit": "aikoo käydä puistossa",
     "loadMore": "Lataa lisää",
-    "userAvatar": "Käyttäjän kuva"
+    "userAvatar": "Käyttäjän kuva",
+    "failedLoad": "Ilmoitusten lataus epäonnistui"
   },
   "messages": {
     "title": "Viestit",

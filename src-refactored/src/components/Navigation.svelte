@@ -397,6 +397,22 @@
                     <i class="fas fa-bookmark"></i> {t('nav.favourites')}
                 </a>
             </li>
+        {:else}
+            <li>
+                <button type="button" class="nav-btn" onclick={handleAddPetUnauthenticated}>
+                    <i class="fas fa-bell"></i> {t('nav.notifications')}
+                </button>
+            </li>
+            <li>
+                <button type="button" class="nav-btn" onclick={handleAddPetUnauthenticated}>
+                    <i class="fas fa-comment-dots"></i> {t('nav.messages')}
+                </button>
+            </li>
+            <li>
+                <button type="button" class="nav-btn" onclick={handleAddPetUnauthenticated}>
+                    <i class="fas fa-bookmark"></i> {t('nav.favourites')}
+                </button>
+            </li>
         {/if}
         {#if isAdmin}
             <li>
@@ -516,9 +532,11 @@
     <button type="button" id="bottom-nav-search" class="bottom-nav-item" aria-label={t('nav.search')} onclick={handleSearchOpen}>
         <i class="fas fa-search"></i>
     </button>
-    <button type="button" id="create-post-link-mobile" class="bottom-nav-fab" aria-label={t('nav.createPost')} onclick={handleCreatePost}>
-        <i class="fas fa-plus"></i>
-    </button>
+    <div class="bottom-nav-fab-slot">
+        <button type="button" id="create-post-link-mobile" class="bottom-nav-fab" aria-label={t('nav.createPost')} onclick={handleCreatePost}>
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
     {#if authed}
         <a href="/messages" data-link id="bottom-nav-messages" class="bottom-nav-item" class:active={isMessagesActive()} aria-label={t('nav.messages')}>
             <i class="fas fa-comment-dots"></i>
@@ -526,6 +544,10 @@
                 <span class="bottom-nav-badge" id="bottom-messages-badge">{badgeDisplay}</span>
             {/if}
         </a>
+    {:else}
+        <button type="button" id="bottom-nav-messages" class="bottom-nav-item" aria-label={t('nav.messages')} onclick={handleAddPetUnauthenticated}>
+            <i class="fas fa-comment-dots"></i>
+        </button>
     {/if}
     <a
         href={authed && dogs.length > 0 ? `/dog/${getSlug(dogs[0])}` : '/'}
@@ -589,7 +611,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 20px;
+    font-size: var(--woof-text-title-3);
     color: var(--color-text);
     padding: var(--woof-space-2);
     border-radius: var(--woof-radius-sm);
@@ -606,7 +628,7 @@
 }
 
 .logo {
-    font-size: 24px;
+    font-size: var(--woof-nav-icon-size);
     font-weight: bold;
     color: var(--color-text);
     text-decoration: none;
@@ -616,7 +638,7 @@
 
 .logo img {
     height: 30px;
-    margin-right: 10px;
+    margin-right: var(--woof-space-3);
 }
 
 .header-icons {
@@ -628,10 +650,10 @@
 }
 
 .header-icons button {
-    font-size: 24px;
+    font-size: var(--woof-nav-icon-size);
     color: var(--color-text);
     cursor: pointer;
-    margin-left: 15px;
+    margin-left: var(--woof-space-4);
     transition: color 0.2s;
     background: none;
     border: none;
@@ -683,7 +705,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 18px;
+    font-size: var(--woof-text-headline);
     color: var(--color-text);
     padding: var(--woof-space-2);
     border-radius: var(--woof-radius-sm);
@@ -700,7 +722,7 @@
 }
 
 .nav-drawer-logo img {
-    height: 28px;
+    height: var(--woof-avatar-xs);
     display: block;
 }
 
@@ -789,13 +811,13 @@
 
 .nav-drawer-links li a i,
 .nav-drawer-links li button i {
-    width: 20px;
+    width: var(--woof-space-5);
     text-align: center;
 }
 
 .nav-drawer-links .profile-pic {
-    width: 24px;
-    height: 24px;
+    width: var(--woof-nav-icon-size);
+    height: var(--woof-nav-icon-size);
     border-radius: var(--woof-radius-full);
     object-fit: cover;
 }
@@ -858,8 +880,8 @@
 .bottom-nav button {
     color: var(--color-text);
     text-decoration: none;
-    font-size: 24px;
-    padding: 10px 0;
+    font-size: var(--woof-nav-icon-size);
+    padding: var(--woof-space-3) 0;
     flex: 1;
     position: relative;
     text-align: center;
@@ -881,19 +903,27 @@
 }
 
 .bottom-nav a .profile-pic {
-    width: 24px;
-    height: 24px;
+    width: var(--woof-nav-icon-size);
+    height: var(--woof-nav-icon-size);
     border-radius: var(--woof-radius-full);
     object-fit: cover;
     object-position: center;
     display: inline-block;
 }
 
+/* FAB slot — equal-width container so spacing is even */
+.bottom-nav-fab-slot {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Crimson FAB — mobile bottom nav create button */
 .bottom-nav .bottom-nav-fab {
     position: relative;
-    width: var(--woof-touch-target);
-    height: var(--woof-touch-target);
+    width: var(--woof-avatar-lg);
+    height: var(--woof-avatar-lg);
     border-radius: var(--woof-radius-full);
     background: var(--woof-color-brand-primary);
     color: var(--woof-color-neutral-0);
@@ -902,12 +932,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
-    margin-top: -8px;
+    font-size: var(--woof-text-title-2);
+    margin-top: calc(-1 * var(--woof-space-5));
     box-shadow: var(--woof-shadow-brand);
     transition: transform var(--woof-duration-fast), box-shadow var(--woof-duration-fast);
-    flex: 0 0 auto;
     padding: 0;
+    flex: 0 0 var(--woof-avatar-lg);
 }
 
 .bottom-nav .bottom-nav-fab:hover {
@@ -929,16 +959,16 @@
 .nav-badge {
     background: var(--color-primary);
     color: white;
-    font-size: 10px;
+    font-size: var(--woof-text-caption-2);
     font-weight: 700;
-    min-width: 16px;
-    height: 16px;
-    border-radius: 8px;
+    min-width: var(--woof-space-4);
+    height: var(--woof-space-4);
+    border-radius: var(--woof-radius-sm);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 4px;
-    margin-left: 6px;
+    padding: 0 var(--woof-space-1);
+    margin-left: var(--woof-space-2);
     vertical-align: middle;
 }
 
@@ -964,7 +994,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 22px;
+    font-size: var(--woof-text-title-2);
     color: var(--woof-color-neutral-500);
     padding: var(--woof-space-2);
     border-radius: var(--woof-radius-sm);
@@ -989,14 +1019,14 @@
 
 .header-notif-badge {
     position: absolute;
-    top: 4px;
-    right: 4px;
+    top: var(--woof-space-1);
+    right: var(--woof-space-1);
     background: var(--color-primary);
     color: var(--woof-color-neutral-0);
     font-size: var(--woof-text-caption-2);
     font-weight: var(--woof-font-weight-bold);
-    min-width: 16px;
-    height: 16px;
+    min-width: var(--woof-space-4);
+    height: var(--woof-space-4);
     border-radius: var(--woof-radius-full);
     display: flex;
     align-items: center;
@@ -1044,8 +1074,8 @@
     .bottom-nav button {
         color: var(--color-text);
         text-decoration: none;
-        font-size: 24px;
-        padding: 10px 0;
+        font-size: var(--woof-nav-icon-size);
+        padding: var(--woof-space-3) 0;
         flex: 1;
         text-align: center;
         background: none;
@@ -1055,8 +1085,8 @@
     }
 
     .bottom-nav a .profile-pic {
-        width: 24px;
-        height: 24px;
+        width: var(--woof-nav-icon-size);
+        height: var(--woof-nav-icon-size);
         border-radius: var(--woof-radius-full);
         object-fit: cover;
         object-position: center;
@@ -1117,8 +1147,8 @@
         position: fixed;
         bottom: var(--woof-space-8);
         right: var(--woof-space-8);
-        width: 56px;
-        height: 56px;
+        width: var(--woof-avatar-lg);
+        height: var(--woof-avatar-lg);
         border-radius: var(--woof-radius-full);
         background: var(--woof-color-brand-primary);
         color: var(--woof-color-neutral-0);
@@ -1126,7 +1156,7 @@
         cursor: pointer;
         align-items: center;
         justify-content: center;
-        font-size: 22px;
+        font-size: var(--woof-text-title-2);
         box-shadow: var(--woof-shadow-brand);
         z-index: 100;
         transition: transform var(--woof-duration-fast), box-shadow var(--woof-duration-fast);

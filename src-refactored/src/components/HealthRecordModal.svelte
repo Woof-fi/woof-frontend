@@ -70,7 +70,7 @@
                 notes = record.notes || '';
                 weightValue = record.value || '';
             } else {
-                currentType = 'vet_visit';
+                currentType = modals.healthRecordData.defaultType || 'vet_visit';
                 date = new Date().toISOString().split('T')[0];
                 description = '';
                 notes = '';
@@ -276,25 +276,25 @@
 
 .health-type-tabs {
     display: flex;
-    gap: 6px;
+    gap: var(--woof-space-2);
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: var(--woof-space-5);
 }
 
 .health-type-tab {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: var(--woof-space-2);
+    padding: var(--woof-space-2) var(--woof-space-3);
     border: 1px solid var(--color-border);
-    border-radius: 20px;
+    border-radius: var(--woof-radius-full);
     background: var(--color-surface);
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--woof-text-footnote);
+    font-weight: var(--woof-font-weight-medium);
     color: var(--color-text-secondary);
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: all var(--woof-duration-fast);
 }
 
 .health-type-tab:hover {
@@ -304,23 +304,23 @@
 
 .health-type-tab.active {
     background: var(--color-primary);
-    color: #fff;
+    color: var(--woof-color-neutral-0);
     border-color: var(--color-primary);
 }
 
 .health-type-tab i {
-    font-size: 12px;
+    font-size: var(--woof-text-caption-1);
 }
 
 .health-form-fields {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: var(--woof-space-3);
 }
 
 .form-row {
     display: flex;
-    gap: 12px;
+    gap: var(--woof-space-3);
 }
 
 .form-group-flex {
@@ -353,7 +353,7 @@
     .health-modal-content {
         width: 95%;
         margin: 2vh auto;
-        padding: 16px;
+        padding: var(--woof-space-4);
     }
 
     .health-type-tabs {
@@ -361,8 +361,8 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        gap: 6px;
-        padding-bottom: 4px;
+        gap: var(--woof-space-2);
+        padding-bottom: var(--woof-space-1);
     }
 
     .health-type-tabs::-webkit-scrollbar {
@@ -371,13 +371,13 @@
 
     .health-type-tab {
         flex-shrink: 0;
-        padding: 6px 10px;
-        font-size: 12px;
+        padding: var(--woof-space-2) var(--woof-space-3);
+        font-size: var(--woof-text-caption-1);
     }
 
     .form-row {
         flex-direction: column;
-        gap: 14px;
+        gap: var(--woof-space-3);
     }
 }
 </style>

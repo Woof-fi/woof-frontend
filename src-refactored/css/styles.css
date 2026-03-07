@@ -328,7 +328,7 @@ header {
 /* ── Welcome card + Onboarding tour — used by onboarding-tour.js ── */
 .welcome-card {
     background: linear-gradient(135deg, var(--woof-color-brand-primary-subtle) 0%, var(--woof-color-neutral-100) 100%);
-    border: 1px solid rgba(239, 70, 33, 0.12);
+    border: 1px solid var(--woof-color-brand-primary-alpha-12);
     border-radius: var(--woof-radius-lg);
     padding: 32px 24px;
     text-align: center;
@@ -475,14 +475,21 @@ header {
     -webkit-backdrop-filter: blur(4px);
 }
 
+@media (min-width: 769px) {
+    .modal {
+        box-sizing: border-box;
+        padding-left: 280px;
+    }
+}
+
 .modal-content {
     background-color: var(--color-surface);
-    margin: 15% auto;
+    margin: var(--woof-space-5) auto;
     padding: 24px;
     border: 1px solid var(--color-border);
     width: 80%;
     max-width: 500px;
-    max-height: 85vh;
+    max-height: calc(100vh - var(--woof-space-5) * 2);
     overflow-y: auto;
     border-radius: var(--woof-radius-lg);
     box-shadow: var(--woof-shadow-lg);
@@ -593,7 +600,7 @@ input[type="datetime-local"]:focus {
 .modal select:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(239, 70, 33, 0.15);
+    box-shadow: 0 0 0 3px var(--woof-color-brand-primary-alpha-15);
     background-color: var(--color-surface);
 }
 
@@ -625,7 +632,7 @@ input[type="datetime-local"]:focus {
 
 .modal input[type="file"]:hover {
     border-color: var(--color-primary);
-    background-color: rgba(239, 70, 33, 0.03);
+    background-color: var(--woof-color-brand-primary-alpha-05);
 }
 
 .modal input[type="file"]:focus {

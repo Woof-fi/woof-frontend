@@ -41,8 +41,8 @@ export function openEditDogModal(dog) { modals.editDogData = dog; modals.editDog
 export function closeEditDogModal() { modals.editDogModalOpen = false; modals.editDogData = null; }
 export function openEditPostModal(post) { modals.editPostData = post; modals.editPostModalOpen = true; }
 export function closeEditPostModal() { modals.editPostModalOpen = false; modals.editPostData = null; }
-export function openHealthRecordModal(dogId, record, dogSlug = null) {
-    modals.healthRecordData = { dogId, record, dogSlug };
+export function openHealthRecordModal(dogId, record, dogSlug = null, defaultType = null) {
+    modals.healthRecordData = { dogId, record, dogSlug, defaultType };
     modals.healthRecordModalOpen = true;
 }
 export function closeHealthRecordModal() { modals.healthRecordModalOpen = false; modals.healthRecordData = null; }

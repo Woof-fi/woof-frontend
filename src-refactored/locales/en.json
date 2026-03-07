@@ -292,7 +292,8 @@
     "followed": "started following you",
     "parkVisit": "is planning to visit",
     "loadMore": "Load more",
-    "userAvatar": "User avatar"
+    "userAvatar": "User avatar",
+    "failedLoad": "Failed to load notifications"
   },
   "messages": {
     "title": "Messages",

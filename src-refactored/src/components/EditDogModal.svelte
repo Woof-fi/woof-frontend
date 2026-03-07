@@ -227,13 +227,13 @@
                             <img
                                 src={previewUrl}
                                 alt="Preview"
-                                style="max-width:200px;max-height:200px;border-radius:8px;"
+                                style="max-width:200px;max-height:200px;border-radius:var(--woof-radius-sm);"
                             />
                         {:else if currentPhotoUrl}
                             <img
                                 src={currentPhotoUrl}
                                 alt="Current profile"
-                                style="max-width:200px;max-height:200px;border-radius:8px;"
+                                style="max-width:200px;max-height:200px;border-radius:var(--woof-radius-sm);"
                             />
                         {/if}
                     </div>

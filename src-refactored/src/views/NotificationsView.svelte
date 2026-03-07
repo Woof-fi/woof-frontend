@@ -1,7 +1,7 @@
 <script>
     import { getNotifications, markNotificationsRead } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
-    import { timeAgo, imageVariant } from '../../js/utils.js';
+    import { timeAgo, imageVariant, showToast } from '../../js/utils.js';
     import { setNotifUnreadCount } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
 
@@ -32,6 +32,7 @@
             } catch {
                 if (!active) return;
                 notifications = [];
+                showToast(t('notifications.failedLoad'), 'error');
             } finally {
                 if (active) loading = false;
             }
@@ -53,7 +54,7 @@
             notifications = [...notifications, ...(result.notifications ?? [])];
             nextCursor = result.nextCursor ?? null;
         } catch {
-            // Silently fail — user can retry
+            showToast(t('notifications.failedLoad'), 'error');
         } finally {
             loadingMore = false;
         }

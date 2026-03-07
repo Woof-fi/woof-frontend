@@ -5,7 +5,7 @@
     import { showToast } from '../../js/toast-store.svelte.js';
     import { localName, t } from '../../js/i18n-store.svelte.js';
 
-    let { onback = null, onclose = null } = $props();
+    let { onback = null, onclose = null, oncloseinstant = null } = $props();
 
     let dogs = $state([]);
     let followedParks = $state([]);
@@ -56,9 +56,16 @@
                 if (!active) return;
 
                 if (fetchedDogs.length === 0) {
-                    onclose?.();
-                    showToast(t('postCreate.addDogFirst'), 'error');
-                    openCreateDogModal();
+                    if (oncloseinstant) {
+                        oncloseinstant(() => {
+                            showToast(t('postCreate.addDogFirst'), 'error');
+                            openCreateDogModal();
+                        });
+                    } else {
+                        onclose?.();
+                        showToast(t('postCreate.addDogFirst'), 'error');
+                        openCreateDogModal();
+                    }
                     return;
                 }
 
