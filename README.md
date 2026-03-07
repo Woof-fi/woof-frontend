@@ -38,25 +38,29 @@ The CSS layer uses aliased variables (`--color-primary` → `--woof-color-brand-
 
 ### Working
 
-- **Feed** - For You + Following tabs, cursor-based pagination, infinite scroll
-- **Posts** - Image upload to S3, captions, like/comment/share
+- **Personalized Feed** - Following (default) + Discover tabs, cursor-based pagination, infinite scroll
+- **Multi-Image Posts** - Up to 5 images per post with swipeable carousel, S3 presigned uploads
 - **Post Detail** - Single post view at `/post/:id` with full comment thread
 - **Comments** - Threaded comments with pagination
-- **Dog Profiles** - Avatar, bio, breed/age/location, posts grid, follower counts
-- **Profile Editing** - Edit dog info + profile photo
+- **Dog Profiles** - Avatar, bio, breed/age/territory, posts grid, follower counts, liker list
+- **Profile Editing** - Edit dog info + profile photo + territory
 - **Health Records** - Vet visits, vaccinations, medications, weight tracking with timeline view
 - **Search** - Search dogs by name/breed
 - **Follow/Unfollow** - Follow dogs, following feed tab
 - **Messaging** - Dog-to-dog DMs with conversation list, polling-based
 - **Auth** - AWS Cognito (email verification, password reset, MFA-ready)
-- **SPA Routing** - `/dog/:slug`, `/post/:id`, `/messages`, deep linking
+- **SPA Routing** - `/dog/:slug`, `/post/:id`, `/messages`, `/territory/*`, deep linking
 - **Mobile** - Instagram-style bottom nav, responsive layout
 - **Loading Skeletons** - Shimmer cards during feed/profile loading
 - **Notifications** - Bell icon + `/notifications` feed, unread badge, mark-all-read
 - **Post/Comment Options** - Action sheets for delete, report, bookmark
-- **Moderation** - Admin/moderator report queue at `/admin`, user banning
+- **Moderation** - Admin/moderator report queue at `/admin`, AI image flagging (Rekognition), user banning
 - **CDN Images** - CloudFront CDN (`cdn.woofapp.fi`) with `_medium`/`_thumb` variants, responsive srcsets
 - **PWA** - Installable app, service worker with CacheFirst CDN strategy
+- **Dog Parks** - 662+ parks with search, amenity data, visit logging
+- **Territories** - Hierarchical territory directory (municipality/district/sub_district) with feeds
+- **Breeds** - Breed directory with feeds and stats
+- **Share Pages** - OG meta tags for social media link previews (posts, dogs, parks)
 
 ### Infrastructure
 
@@ -89,51 +93,51 @@ cd ../woof-backend
 npm install
 npm run dev          # Express dev server with ts-node
 npm run build        # Compile TypeScript to dist/
-npm test             # Jest (237 tests)
+npm test             # Jest (450+ tests)
 eb deploy            # Deploy to Elastic Beanstalk
 ```
 
 ## Project Structure
 
 ```
-docs/design/                # Design system reference (open index.html in browser)
-├── index.html              # Interactive component/token reference
-├── tokens.css              # Canonical token source (also copied to css/)
-└── *.md                    # Foundations, components, motion, patterns
+docs/design/                    # Design system reference (open index.html in browser)
+├── index.html                  # Interactive component/token reference
+├── tokens.css                  # Canonical token source (also copied to css/)
+└── *.md                        # Foundations, components, motion, patterns
 
-Woof/src-refactored/
-├── index.html              # Main SPA entry point
-├── css/tokens.css          # Design tokens (60+ --woof-* properties, Woof Orange brand)
-├── css/styles.css          # All styles (imports tokens.css, aliases --woof-* to --color-*)
-├── js/
-│   ├── app-spa.js          # SPA bootstrap + route registration
-│   ├── router.js           # Client-side router
-│   ├── api.js              # All API calls
-│   ├── auth.js             # JWT token management
-│   ├── posts.js            # Feed rendering, likes, comments
-│   ├── profile.js          # Dog profile page + health records
-│   ├── navigation.js       # Sidebar + bottom nav
-│   ├── search.js           # Search panel
-│   ├── views/
-│   │   ├── HomeView.js     # Feed view
-│   │   ├── ProfileView.js  # Dog profile view
-│   │   ├── PostDetailView.js # Single post view
-│   │   └── MessagesView.js # DM conversations
-│   ├── *-modal.js          # Auth, create post/dog, edit dog, health record modals
-│   └── utils.js            # Shared utilities
+src-refactored/                 # Frontend SPA
+├── index.html                  # SPA entry — <div id="app"> only
+├── css/
+│   ├── tokens.css              # Design tokens (--woof-* namespace, Woof Crimson #C9403F)
+│   ├── global.css              # Global styles: @import tokens, :root aliases, body reset
+│   └── styles.css              # Barrel file importing feature modules (layout, buttons, etc.)
+├── js/                         # Vanilla JS modules (stable core)
+│   ├── api.js                  # All API calls — never fetch directly from components
+│   ├── auth.js                 # Cognito token management
+│   ├── config.js               # Cognito IDs + app constants
+│   ├── utils.js                # escapeHTML, timeAgo, showToast, imageVariant
+│   ├── icons.js                # Font Awesome SVG icon registry (tree-shaken, ~84 icons)
+│   ├── file-handler.js         # Shared file validation + preview
+│   ├── svelte-store.svelte.js  # Svelte 5 $state store (authUser, currentDog, etc.)
+│   ├── modal-store.svelte.js   # Modal/panel visibility store
+│   └── motion.js               # prefers-reduced-motion utility
+├── src/
+│   ├── main.ts                 # Entry: mount(App, { target: #app })
+│   ├── App.svelte              # App shell: Navigation + Router
+│   ├── router/Router.svelte    # SPA router (path-to-regex, popstate)
+│   ├── components/             # ~25 Svelte components
+│   └── views/                  # Page-level views (Home, Profile, Messages, etc.)
 └── package.json
 
-woof-backend/
+woof-backend/                   # REST API
 ├── src/
-│   ├── app.ts              # Express app setup
-│   ├── routes/             # Route definitions
-│   ├── controllers/        # Request handlers
-│   ├── middleware/          # Auth, validation, rate limiting
-│   ├── schemas/            # Zod validation schemas
-│   ├── db/
-│   │   ├── pool.ts         # PostgreSQL connection
-│   │   └── migrations/     # SQL migrations (001-012)
-│   └── __tests__/          # Jest test suites
+│   ├── app.ts                  # Express 5 app setup
+│   ├── routes/                 # Route definitions
+│   ├── controllers/            # Request handlers
+│   ├── middleware/              # Auth, validation, rate limiting
+│   ├── schemas/                # Zod validation schemas
+│   ├── db/migrations/          # SQL migrations (001-030+)
+│   └── __tests__/              # Jest test suites (450+ tests)
 └── package.json
 ```
 
@@ -162,26 +166,12 @@ woof-backend/
 
 ## Tests
 
-- **Backend:** 376 tests across 18 suites (Jest) - auth, posts, dogs, comments, likes, follows, health records, messaging, admin, slugs, reports, bookmarks, territories, breeds, shares, notifications
-- **Frontend:** 153 tests across 14 files (Vitest)
+- **Backend:** 450+ tests (Jest) — auth, posts, dogs, comments, likes, follows, health records, messaging, admin, slugs, reports, bookmarks, territories, breeds, parks, shares, notifications, feed
+- **Frontend:** 160+ tests across 14 files (Vitest) + 12 E2E tests (Playwright)
 
-## Next Up
+## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for the full product roadmap with build vs buy decisions, database schemas, and cost projections.
-
-**Phase 5 — Trust & Safety** (current):
-- ~~Migrate auth to AWS Cognito~~ (done — email verification, password reset)
-- ~~Design system + visual rebrand~~ (done — Woof Orange, warm cream, token architecture)
-- Content moderation (Perspective API hate speech filter + AWS Rekognition for images)
-- Reporting system + admin review queue
-- Sentry error tracking
-
-**Phase 6 — Performance:** Image CDN (`cdn.woofapp.fi`), Sharp resize, HTTP caching, PWA
-**Phase 7 — Engagement:** Notifications, hashtags, breed communities, UX improvements
-**Phase 8 — Real-time:** WebSocket messaging (Socket.io), transactional email (SES)
-**Phase 9 — Content:** Video posts, multi-photo posts
-**Phase 10 — Places:** Dog-friendly places map (Leaflet + OSM), check-ins
-**Phase 11 — Native:** Capacitor wrapper for App Store / Play Store
+See [ROADMAP.md](ROADMAP.md) for the full product roadmap.
 
 ## License
 
