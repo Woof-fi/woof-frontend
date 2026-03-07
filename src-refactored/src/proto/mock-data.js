@@ -302,8 +302,8 @@ export const HEALTH_RECORD_TYPES = [
     { value: 'vet_visit', label: 'Vet visit', icon: 'fa-stethoscope' },
     { value: 'vaccination', label: 'Vaccination', icon: 'fa-syringe' },
     { value: 'medication', label: 'Medication', icon: 'fa-pills' },
-    { value: 'weight', label: 'Weight', icon: 'fa-weight' },
-    { value: 'note', label: 'Note', icon: 'fa-sticky-note' },
+    { value: 'weight', label: 'Weight', icon: 'fa-weight-scale' },
+    { value: 'note', label: 'Note', icon: 'fa-note-sticky' },
 ];
 
 export function formatVisitTime(isoString) {

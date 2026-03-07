@@ -42,7 +42,7 @@
         {:else if error}
             <div class="woof-empty-state">
                 <div class="woof-empty-state-icon woof-empty-state-icon--error">
-                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-circle-exclamation"></i>
                 </div>
                 <p>{t('postDetail.failedLoad')}</p>
             </div>

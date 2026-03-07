@@ -64,7 +64,7 @@
 
             <button class="action-sheet-item" onclick={() => view = 'health'}>
                 <span class="action-icon action-icon-health">
-                    <i class="fas fa-heartbeat"></i>
+                    <i class="fas fa-heart-pulse"></i>
                 </span>
                 <span class="action-text">
                     <span class="action-label">Log a health record</span>

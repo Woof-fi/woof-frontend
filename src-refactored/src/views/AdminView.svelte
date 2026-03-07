@@ -388,7 +388,7 @@
 {:else}
     <div class="admin-view">
         <div class="admin-header">
-            <h1 class="admin-title"><i class="fas fa-shield-alt"></i> Moderation</h1>
+            <h1 class="admin-title"><i class="fas fa-shield-halved"></i> Moderation</h1>
         </div>
 
         <!-- Top-level section tabs -->
@@ -439,7 +439,7 @@
 
             {:else if reports.length === 0}
                 <div class="admin-empty">
-                    <i class="fas fa-check-circle"></i>
+                    <i class="fas fa-circle-check"></i>
                     <p>{t('admin.noReports', { status: statusFilter || '' })}</p>
                 </div>
 
@@ -457,7 +457,7 @@
                                 </a>
                             {:else if report.target_type === 'post'}
                                 <a href="/post/{report.target_id}" data-link class="admin-report-image admin-report-image--text-only">
-                                    <i class="fas fa-file-alt"></i>
+                                    <i class="fas fa-file-lines"></i>
                                 </a>
                             {/if}
 
@@ -643,7 +643,7 @@
                 <h2 class="admin-parks-heading">{t('admin.pendingParks')}</h2>
                 {#if pendingParks.length === 0}
                     <div class="admin-empty admin-empty--compact">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-circle-check"></i>
                         <p>{t('admin.noPendingParks')}</p>
                     </div>
                 {:else}
@@ -670,7 +670,7 @@
                                                 />
                                                 <div class="admin-park-edit-actions">
                                                     <button class="admin-action-btn admin-action-btn--neutral" onclick={() => saveParkName(park)} disabled={!!parksBusy[park.id]}>
-                                                        <i class="fas fa-save"></i> Save
+                                                        <i class="fas fa-floppy-disk"></i> Save
                                                     </button>
                                                     <button class="admin-action-btn" onclick={() => cancelParkEdit(park.id)}>
                                                         Cancel
@@ -714,7 +714,7 @@
                                                 disabled={!!parksBusy[park.id]}
                                                 onclick={() => handleAssignTerritory(park)}
                                             >
-                                                <i class="fas fa-save"></i>
+                                                <i class="fas fa-floppy-disk"></i>
                                             </button>
                                         {/if}
                                     </div>
@@ -744,7 +744,7 @@
                 <h2 class="admin-parks-heading">{t('admin.unmatchedParks')}</h2>
                 {#if unmatchedParks.length === 0}
                     <div class="admin-empty admin-empty--compact">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-location-dot"></i>
                         <p>{t('admin.noUnmatchedParks')}</p>
                     </div>
                 {:else}
@@ -781,7 +781,7 @@
                                             disabled={!!parksBusy[park.id] || !territoryAssignments[park.id]}
                                             onclick={() => handleAssignTerritory(park)}
                                         >
-                                            <i class="fas fa-save"></i> Save
+                                            <i class="fas fa-floppy-disk"></i> Save
                                         </button>
                                     </div>
                                 </div>

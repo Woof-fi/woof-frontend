@@ -10,6 +10,7 @@
 export let modals = $state({
     authModalOpen: false,
     createPostModalOpen: false,
+    createPostData: null,           // { onBack? }
     createDogModalOpen: false,
     editDogModalOpen: false,
     editDogData: null,              // dog object
@@ -33,16 +34,16 @@ export let modals = $state({
 
 export function openAuthModal() { modals.authModalOpen = true; }
 export function closeAuthModal() { modals.authModalOpen = false; }
-export function openCreatePostModal() { modals.createPostModalOpen = true; }
-export function closeCreatePostModal() { modals.createPostModalOpen = false; }
+export function openCreatePostModal(data = null) { modals.createPostData = data; modals.createPostModalOpen = true; }
+export function closeCreatePostModal() { modals.createPostModalOpen = false; modals.createPostData = null; }
 export function openCreateDogModal() { modals.createDogModalOpen = true; }
 export function closeCreateDogModal() { modals.createDogModalOpen = false; }
 export function openEditDogModal(dog) { modals.editDogData = dog; modals.editDogModalOpen = true; }
 export function closeEditDogModal() { modals.editDogModalOpen = false; modals.editDogData = null; }
 export function openEditPostModal(post) { modals.editPostData = post; modals.editPostModalOpen = true; }
 export function closeEditPostModal() { modals.editPostModalOpen = false; modals.editPostData = null; }
-export function openHealthRecordModal(dogId, record, dogSlug = null, defaultType = null) {
-    modals.healthRecordData = { dogId, record, dogSlug, defaultType };
+export function openHealthRecordModal(dogId, record, dogSlug = null, defaultType = null, onBack = null) {
+    modals.healthRecordData = { dogId, record, dogSlug, defaultType, onBack };
     modals.healthRecordModalOpen = true;
 }
 export function closeHealthRecordModal() { modals.healthRecordModalOpen = false; modals.healthRecordData = null; }
@@ -63,6 +64,7 @@ export function closeCreateActionSheet() { modals.createActionSheetOpen = false;
 export function closeAllModals() {
     modals.authModalOpen = false;
     modals.createPostModalOpen = false;
+    modals.createPostData = null;
     modals.createDogModalOpen = false;
     modals.editDogModalOpen = false;
     modals.editDogData = null;

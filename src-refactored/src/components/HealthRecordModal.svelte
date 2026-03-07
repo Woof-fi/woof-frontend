@@ -79,14 +79,20 @@
         }
     });
 
+    // Flag to skip $effect cleanup when handleBack() already handled history/scroll
+    let backHandled = false;
+
     // Manage body scroll + modal history based on store state
     $effect(() => {
         if (modals.healthRecordModalOpen) {
             pushModalState();
             toggleBodyScroll(true);
             return () => {
-                popModalState();
-                toggleBodyScroll(false);
+                if (!backHandled) {
+                    popModalState();
+                    toggleBodyScroll(false);
+                }
+                backHandled = false;
             };
         }
     });
@@ -96,6 +102,25 @@
         storeClose();
         editingRecord = null;
         currentDogId = null;
+    }
+
+    /** Back button: close modal and return to Create action sheet if opened from there */
+    function handleBack() {
+        const onBack = modals.healthRecordData?.onBack;
+        if (!modals.healthRecordModalOpen) return;
+
+        // Mark that we're handling history/scroll ourselves so the $effect cleanup skips it.
+        // Without this, the cleanup's popModalState() would fire AFTER onBack() pushes
+        // a new history state, causing a double history.back() that closes the action sheet.
+        backHandled = true;
+        popModalState();
+        toggleBodyScroll(false);
+
+        storeClose();
+        editingRecord = null;
+        currentDogId = null;
+
+        onBack?.();
     }
 
     function handleKey(e) {
@@ -159,8 +184,10 @@
 >
     <div class="modal-content health-modal-content">
         <div class="modal-header">
+            <button class="modal-back" aria-label={t('common.back')} onclick={handleBack}>
+                <i class="fas fa-arrow-left"></i>
+            </button>
             <h2 id="health-modal-title">{isEditMode ? t('health.editRecord') : t('health.addRecord')}</h2>
-            <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
             {#if !isEditMode}
@@ -192,14 +219,14 @@
                         class:active={currentType === 'weight'}
                         data-type="weight"
                         onclick={() => currentType = 'weight'}
-                    ><i class="fas fa-weight"></i> {t('health.weight')}</button>
+                    ><i class="fas fa-weight-scale"></i> {t('health.weight')}</button>
                     <button
                         type="button"
                         class="health-type-tab"
                         class:active={currentType === 'note'}
                         data-type="note"
                         onclick={() => currentType = 'note'}
-                    ><i class="fas fa-sticky-note"></i> {t('health.note')}</button>
+                    ><i class="fas fa-note-sticky"></i> {t('health.note')}</button>
                 </div>
             {/if}
 
@@ -267,6 +294,41 @@
 </div>
 
 <style>
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--woof-space-3);
+    margin-bottom: var(--woof-space-5);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: var(--woof-text-headline);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-900);
+}
+
+.modal-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--woof-touch-target);
+    height: var(--woof-touch-target);
+    border: none;
+    background: none;
+    color: var(--woof-color-neutral-700);
+    font-size: var(--woof-text-body);
+    cursor: pointer;
+    border-radius: var(--woof-radius-full);
+    transition: background var(--woof-duration-fast);
+    flex-shrink: 0;
+}
+
+.modal-back:hover {
+    background: var(--woof-color-neutral-100);
+}
+
 .health-modal-content {
     max-width: 600px;
     width: 90%;

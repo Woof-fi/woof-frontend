@@ -38,7 +38,7 @@ export function showOnboardingTour(dogName) {
             text: 'Post photos of your dog to build their profile. Other users can like, comment, and follow.',
         },
         {
-            icon: 'fas fa-heartbeat',
+            icon: 'fas fa-heart-pulse',
             title: 'Keep a health diary',
             text: "Track vet visits, vaccinations, medications, and weight \u2014 all in one private place. Only you can see your dog's health records.",
         },

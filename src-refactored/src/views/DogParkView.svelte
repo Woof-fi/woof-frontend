@@ -357,7 +357,7 @@
             <div class="park-container">
                 <div class="woof-empty-state">
                     <div class="woof-empty-state-icon woof-empty-state-icon--error">
-                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-circle-exclamation"></i>
                     </div>
                     <p>{t('dogPark.failedLoad')}</p>
                 </div>
@@ -566,7 +566,7 @@
                             <div class="park-amenity-suggest-form">
                                 {#if amenitySuggestSuccess}
                                     <div class="park-suggest-success">
-                                        <i class="fas fa-check-circle"></i> {t('dogPark.suggestionSent')}
+                                        <i class="fas fa-circle-check"></i> {t('dogPark.suggestionSent')}
                                     </div>
                                 {:else}
                                     <div class="park-edit-amenities">

@@ -1,6 +1,6 @@
 <script>
     import { fly, fade } from 'svelte/transition';
-    import { modals, closeCreateActionSheet, openCreatePostModal, openHealthRecordModal, openCreateDogModal } from '../../js/modal-store.svelte.js';
+    import { modals, closeCreateActionSheet, openCreateActionSheet, openCreatePostModal, openHealthRecordModal, openCreateDogModal } from '../../js/modal-store.svelte.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { getMyDogs } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
@@ -38,7 +38,7 @@
     }
 
     function handlePostPhoto() {
-        closeAndOpen(() => openCreatePostModal());
+        closeAndOpen(() => openCreatePostModal({ onBack: () => openCreateActionSheet() }));
     }
 
     async function handleHealthClick() {
@@ -61,7 +61,7 @@
             }
             if (fetchedDogs.length === 1) {
                 healthLoading = false;
-                closeAndOpen(() => openHealthRecordModal(fetchedDogs[0].id, null, fetchedDogs[0].slug));
+                closeAndOpen(() => openHealthRecordModal(fetchedDogs[0].id, null, fetchedDogs[0].slug, null, () => openCreateActionSheet()));
                 return;
             }
             // Multiple dogs: show picker
@@ -74,7 +74,7 @@
     }
 
     function handleDogSelect(dogId) {
-        closeAndOpen(() => openHealthRecordModal(dogId, null, healthDogs.find(d => d.id === dogId)?.slug));
+        closeAndOpen(() => openHealthRecordModal(dogId, null, healthDogs.find(d => d.id === dogId)?.slug, null, () => openCreateActionSheet()));
     }
 
     function handleBack() {
@@ -143,7 +143,7 @@
                         {#if healthLoading}
                             <i class="fas fa-spinner fa-spin"></i>
                         {:else}
-                            <i class="fas fa-heartbeat"></i>
+                            <i class="fas fa-heart-pulse"></i>
                         {/if}
                     </span>
                     <span class="action-text">

@@ -44,7 +44,7 @@
     </div>
 
     <div class="breed-directory-search">
-        <i class="fas fa-search"></i>
+        <i class="fas fa-magnifying-glass"></i>
         <input
             type="text"
             placeholder={t('breedDirectory.searchPlaceholder')}
@@ -80,7 +80,7 @@
             {#if filteredBreeds.length === 0}
                 <div class="woof-empty-state">
                     <div class="woof-empty-state-icon">
-                        <i class="fas fa-search"></i>
+                        <i class="fas fa-magnifying-glass"></i>
                     </div>
                     <p>{t('breedDirectory.noResults', { query })}</p>
                 </div>

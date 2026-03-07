@@ -24,7 +24,7 @@
 
     let btnText = $derived.by(() => btnTextOverride || t('invite.share'));
     let btnTextOverride = $state('');
-    let btnIcon = $state('fas fa-share-alt');
+    let btnIcon = $state('fas fa-share-nodes');
 
     async function handleShare() {
         if (navigator.share) {
@@ -51,7 +51,7 @@
             btnIcon = 'fas fa-check';
             btnTextOverride = t('invite.copied');
             setTimeout(() => {
-                btnIcon = 'fas fa-share-alt';
+                btnIcon = 'fas fa-share-nodes';
                 btnTextOverride = '';
             }, 2000);
         } else {

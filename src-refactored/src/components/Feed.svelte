@@ -258,7 +258,7 @@
     {#if isAuthenticated()}
         <div class="woof-empty-state">
             <div class="woof-empty-state-icon">
-                <i class="fas fa-user-friends"></i>
+                <i class="fas fa-user-group"></i>
             </div>
             <p>{t('feed.followingEmpty')}</p>
             <p>{t('feed.followingEmptyHint', { tab: t('nav.forYou') })}</p>
@@ -266,7 +266,7 @@
     {:else}
         <div class="woof-empty-state">
             <div class="woof-empty-state-icon">
-                <i class="fas fa-user-friends"></i>
+                <i class="fas fa-user-group"></i>
             </div>
             <p>{t('feed.followingSignUp')}</p>
         </div>
@@ -286,7 +286,7 @@
     {#if isFollowingFeed && followingVisits.length > 0}
         <div class="following-section">
             <h3 class="following-section-title">
-                <i class="fas fa-walking"></i> {t('feed.upcomingVisits')}
+                <i class="fas fa-person-walking"></i> {t('feed.upcomingVisits')}
             </h3>
             {#each followingVisits as visit (visit.id)}
                 <ParkVisitCard {visit} />

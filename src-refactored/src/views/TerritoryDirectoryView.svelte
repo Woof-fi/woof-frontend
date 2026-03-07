@@ -111,7 +111,7 @@
     </div>
 
     <div class="territory-directory-search">
-        <i class="fas fa-search"></i>
+        <i class="fas fa-magnifying-glass"></i>
         <input
             type="text"
             placeholder={t('territoryDirectory.searchPlaceholder')}
@@ -135,7 +135,7 @@
             {:else if searchResults.length === 0}
                 <div class="woof-empty-state">
                     <div class="woof-empty-state-icon">
-                        <i class="fas fa-search"></i>
+                        <i class="fas fa-magnifying-glass"></i>
                     </div>
                     <p>{t('territoryDirectory.noResults', { query })}</p>
                 </div>
@@ -145,7 +145,7 @@
                         {@const context = formatContext(ter)}
                         <li>
                             <a href="/territory/{ter.urlPath}" data-link class="territory-alpha-item">
-                                <i class="fas fa-map-marker-alt territory-alpha-icon"></i>
+                                <i class="fas fa-location-dot territory-alpha-icon"></i>
                                 <div class="territory-alpha-info">
                                     <span class="territory-alpha-name">{ter.name}</span>
                                     {#if context}
@@ -167,7 +167,7 @@
                     {#each followedTerritories as ter (ter.id)}
                         <a href="/territory/{ter.urlPath || ter.slug}" data-link class="territory-popular-card">
                             <div class="territory-popular-icon">
-                                <i class="fas fa-map-marker-alt"></i>
+                                <i class="fas fa-location-dot"></i>
                             </div>
                             <span class="territory-popular-name">{localName(ter)}</span>
                         </a>
@@ -183,7 +183,7 @@
                     {#each popular as ter (ter.id)}
                         <a href="/territory/{ter.urlPath}" data-link class="territory-popular-card">
                             <div class="territory-popular-icon">
-                                <i class="fas fa-map-marker-alt"></i>
+                                <i class="fas fa-location-dot"></i>
                             </div>
                             <span class="territory-popular-name">{localName(ter)}</span>
                             <span class="territory-popular-count">{dogCountLabel(ter.dogCount)}</span>
@@ -202,7 +202,7 @@
                 {#each allMunicipalities as ter (ter.id)}
                     <li>
                         <a href="/territory/{ter.urlPath}" data-link class="territory-alpha-item">
-                            <i class="fas fa-map-marker-alt territory-alpha-icon"></i>
+                            <i class="fas fa-location-dot territory-alpha-icon"></i>
                             <div class="territory-alpha-info">
                                 <span class="territory-alpha-name">{localName(ter)}</span>
                             </div>

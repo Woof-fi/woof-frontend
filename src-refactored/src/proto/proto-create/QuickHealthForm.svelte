@@ -93,7 +93,7 @@
         </div>
 
         <button type="submit" class="submit-btn">
-            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-circle-check"></i>
             Save Record
         </button>
     </form>

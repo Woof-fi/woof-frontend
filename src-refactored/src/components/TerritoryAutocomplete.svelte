@@ -245,7 +245,7 @@
                     onmouseenter={() => { highlightIndex = i; }}
                 >
                     {#if territory.hasChildren}
-                        <i class="fas fa-map-marker-alt territory-option-icon"></i>
+                        <i class="fas fa-location-dot territory-option-icon"></i>
                     {:else}
                         <i class="fas fa-map-pin territory-option-icon"></i>
                     {/if}

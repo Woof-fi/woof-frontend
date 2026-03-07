@@ -94,6 +94,13 @@
         resetForm();
     }
 
+    /** Back button: close modal and return to Create action sheet if opened from there */
+    function handleBack() {
+        const onBack = modals.createPostData?.onBack;
+        close();
+        onBack?.();
+    }
+
     function resetForm() {
         caption = '';
         selectedImages.forEach(img => URL.revokeObjectURL(img.previewUrl));
@@ -203,8 +210,10 @@
 >
     <div class="modal-content" use:focusTrap>
         <div class="modal-header">
+            <button class="modal-back" aria-label={t('common.back')} onclick={handleBack}>
+                <i class="fas fa-arrow-left"></i>
+            </button>
             <h2>{t('postCreate.title')}</h2>
-            <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         <div class="modal-body">
             {#if loading}
@@ -313,6 +322,41 @@
 </div>
 
 <style>
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--woof-space-3);
+    margin-bottom: var(--woof-space-5);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: var(--woof-text-headline);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-900);
+}
+
+.modal-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--woof-touch-target);
+    height: var(--woof-touch-target);
+    border: none;
+    background: none;
+    color: var(--woof-color-neutral-700);
+    font-size: var(--woof-text-body);
+    cursor: pointer;
+    border-radius: var(--woof-radius-full);
+    transition: background var(--woof-duration-fast);
+    flex-shrink: 0;
+}
+
+.modal-back:hover {
+    background: var(--woof-color-neutral-100);
+}
+
 .modal-loading {
     display: flex;
     justify-content: center;

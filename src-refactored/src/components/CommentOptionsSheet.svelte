@@ -106,7 +106,7 @@
                     <i class="fas fa-pen" aria-hidden="true"></i> {t('post.editComment')}
                 </button>
                 <button class="action-sheet-item destructive" onclick={() => (view = 'confirm-delete')}>
-                    <i class="fas fa-trash-alt" aria-hidden="true"></i> {t('post.deleteComment')}
+                    <i class="fas fa-trash-can" aria-hidden="true"></i> {t('post.deleteComment')}
                 </button>
             {:else}
                 <button class="action-sheet-item destructive" onclick={handleReportClick}>
@@ -118,13 +118,18 @@
 
     {:else if view === 'report'}
         <div in:fade={{ duration: 100, delay: 60 }}>
-            <div class="action-sheet-title">{t('post.reportComment')}</div>
+            <div class="sheet-subview-header">
+                <button class="sheet-back" onclick={() => (view = 'options')} aria-label={t('post.back')}>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span class="sheet-subview-title">{t('post.reportComment')}</span>
+                <span class="sheet-subview-spacer"></span>
+            </div>
             {#each REASONS as reason (reason.key)}
                 <button class="action-sheet-item" onclick={() => handleReportReason(reason.key)}>
                     {t(reason.labelKey)}
                 </button>
             {/each}
-            <button class="action-sheet-item cancel" onclick={() => (view = 'options')}>{t('post.back')}</button>
         </div>
 
     {:else if view === 'confirm-delete'}
@@ -175,13 +180,44 @@
     overflow: hidden;
 }
 
-.action-sheet-title {
-    padding: var(--woof-space-4) var(--woof-space-4) var(--woof-space-2);
-    font-size: var(--woof-font-size-sm);
+.sheet-subview-header {
+    display: flex;
+    align-items: center;
+    padding: var(--woof-space-3) var(--woof-space-3) var(--woof-space-2);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sheet-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--woof-touch-target);
+    height: var(--woof-touch-target);
+    border: none;
+    background: none;
+    color: var(--woof-color-neutral-700);
+    font-size: var(--woof-text-body);
+    cursor: pointer;
+    border-radius: var(--woof-radius-full);
+    transition: background var(--woof-duration-fast);
+    flex-shrink: 0;
+}
+
+.sheet-back:hover {
+    background: var(--woof-color-neutral-100);
+}
+
+.sheet-subview-title {
+    flex: 1;
+    text-align: center;
+    font-size: var(--woof-text-callout);
     color: var(--woof-color-neutral-500);
     font-weight: var(--woof-font-weight-medium);
-    text-align: center;
-    border-bottom: 1px solid var(--color-border);
+}
+
+.sheet-subview-spacer {
+    width: var(--woof-touch-target);
+    flex-shrink: 0;
 }
 
 .action-sheet-delete-confirm {

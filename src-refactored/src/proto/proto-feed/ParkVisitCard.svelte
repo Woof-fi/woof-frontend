@@ -20,7 +20,7 @@
                 <span class="visit-heading-text">heading to</span>
             </div>
             <div class="visit-park">
-                <i class="fas fa-map-marker-alt visit-park-icon"></i>
+                <i class="fas fa-location-dot visit-park-icon"></i>
                 <span class="visit-park-name">{visit.park.name}</span>
             </div>
             <div class="visit-time">
@@ -33,7 +33,7 @@
     </div>
     <div class="visit-actions">
         <button class="visit-join-btn">
-            <i class="fas fa-walking"></i> Join visit
+            <i class="fas fa-person-walking"></i> Join visit
         </button>
     </div>
 </div>

@@ -197,7 +197,7 @@
             <div class="breed-container">
                 <div class="woof-empty-state">
                     <div class="woof-empty-state-icon woof-empty-state-icon--error">
-                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-circle-exclamation"></i>
                     </div>
                     <p>{t('breed.failedLoad')}</p>
                 </div>
@@ -259,7 +259,7 @@
                     aria-selected={activeTab === 'posts'}
                     onclick={() => setTab('posts')}
                 >
-                    <i class="fas fa-th"></i> {t('breed.posts')}
+                    <i class="fas fa-table-cells"></i> {t('breed.posts')}
                 </button>
                 <button
                     class="tab-link"
@@ -341,9 +341,9 @@
                                                 ? `${dog.territoryName}, ${dog.territoryParentName}`
                                                 : dog.territoryName}
                                             {#if dog.territoryUrlPath}
-                                                <span class="breed-dog-location breed-dog-territory-link" role="link" tabindex="0" onclick={(e) => { e.preventDefault(); e.stopPropagation(); history.pushState({}, '', `/territory/${dog.territoryUrlPath}`); window.dispatchEvent(new CustomEvent('routechange')); }} onkeydown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); history.pushState({}, '', `/territory/${dog.territoryUrlPath}`); window.dispatchEvent(new CustomEvent('routechange')); } }}><i class="fas fa-map-marker-alt"></i> {territoryText}</span>
+                                                <span class="breed-dog-location breed-dog-territory-link" role="link" tabindex="0" onclick={(e) => { e.preventDefault(); e.stopPropagation(); history.pushState({}, '', `/territory/${dog.territoryUrlPath}`); window.dispatchEvent(new CustomEvent('routechange')); }} onkeydown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); history.pushState({}, '', `/territory/${dog.territoryUrlPath}`); window.dispatchEvent(new CustomEvent('routechange')); } }}><i class="fas fa-location-dot"></i> {territoryText}</span>
                                             {:else}
-                                                <span class="breed-dog-location"><i class="fas fa-map-marker-alt"></i> {territoryText}</span>
+                                                <span class="breed-dog-location"><i class="fas fa-location-dot"></i> {territoryText}</span>
                                             {/if}
                                         {/if}
                                     </div>

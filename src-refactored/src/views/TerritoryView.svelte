@@ -276,7 +276,7 @@
             <div class="territory-container">
                 <div class="woof-empty-state">
                     <div class="woof-empty-state-icon woof-empty-state-icon--error">
-                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-circle-exclamation"></i>
                     </div>
                     <p>{t('territory.failedLoad')}</p>
                 </div>
@@ -341,7 +341,7 @@
                 <!-- Guidance text for non-followers -->
                 {#if authed && !isFollowing}
                     <div class="territory-guidance">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-location-dot"></i>
                         <span>{t('territory.guidanceFollow')}</span>
                     </div>
                 {/if}
@@ -392,7 +392,7 @@
                     aria-selected={activeTab === 'posts'}
                     onclick={() => setTab('posts')}
                 >
-                    <i class="fas fa-th"></i> {t('territory.posts')}
+                    <i class="fas fa-table-cells"></i> {t('territory.posts')}
                 </button>
                 <button
                     class="tab-link"

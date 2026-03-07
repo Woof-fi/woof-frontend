@@ -20,7 +20,7 @@
     </div>
     <div class="dog-actions">
         <button class="dog-hi-btn">
-            <i class="fas fa-hand-paper"></i> Say hi
+            <i class="fas fa-hand"></i> Say hi
         </button>
     </div>
 </div>

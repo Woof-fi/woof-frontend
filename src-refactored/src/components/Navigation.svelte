@@ -366,17 +366,17 @@
     <ul class="nav-drawer-links">
         <li>
             <a href="/" data-link onclick={closeDrawer} class:active={isHomeActive()}>
-                <i class="fas fa-home"></i> {t('nav.home')}
+                <i class="fas fa-house"></i> {t('nav.home')}
             </a>
         </li>
         <li>
             <button type="button" class="nav-btn" onclick={handleSearchOpen}>
-                <i class="fas fa-search"></i> {t('nav.search')}
+                <i class="fas fa-magnifying-glass"></i> {t('nav.search')}
             </button>
         </li>
         <li>
             <button type="button" class="nav-btn" onclick={handleCreatePost}>
-                <i class="fas fa-plus-square"></i> {t('nav.create')}
+                <i class="fas fa-square-plus"></i> {t('nav.create')}
             </button>
         </li>
         {#if authed}
@@ -417,7 +417,7 @@
         {#if isAdmin}
             <li>
                 <a href="/admin" data-link onclick={closeDrawer} class:active={activePath.startsWith('/admin')}>
-                    <i class="fas fa-shield-alt"></i> {t('nav.moderation')}
+                    <i class="fas fa-shield-halved"></i> {t('nav.moderation')}
                 </a>
             </li>
         {/if}
@@ -469,7 +469,7 @@
             {#each followedTerritories.slice(0, 5) as ter (ter.id)}
                 <a href={`/territory/${ter.urlPath || ter.slug}`} data-link onclick={closeDrawer}
                    class="nav-drawer-row" class:active={activePath.startsWith(`/territory/${ter.urlPath || ter.slug}`)}>
-                    <i class="fas fa-map-marker-alt"></i> {localName(ter)}
+                    <i class="fas fa-location-dot"></i> {localName(ter)}
                 </a>
             {/each}
             <a href="/territories" data-link onclick={closeDrawer} class="nav-drawer-row nav-drawer-explore">
@@ -511,9 +511,9 @@
         </div>
         <button type="button" class="nav-drawer-row" onclick={handleAuthLink}>
             {#if authed}
-                <i class="fas fa-sign-out-alt"></i> {t('nav.logout')}
+                <i class="fas fa-right-from-bracket"></i> {t('nav.logout')}
             {:else}
-                <i class="fas fa-user-circle"></i> {t('nav.login')}
+                <i class="fas fa-circle-user"></i> {t('nav.login')}
             {/if}
         </button>
         <div class="nav-legal-links">
@@ -527,10 +527,10 @@
 
 <nav class="bottom-nav" aria-label="Mobile navigation">
     <a href="/" data-link id="bottom-nav-home" class="bottom-nav-item" aria-label={t('nav.home')} class:active={isHomeActive()} onclick={handleHomeClick}>
-        <i class="fas fa-home"></i>
+        <i class="fas fa-house"></i>
     </a>
     <button type="button" id="bottom-nav-search" class="bottom-nav-item" aria-label={t('nav.search')} onclick={handleSearchOpen}>
-        <i class="fas fa-search"></i>
+        <i class="fas fa-magnifying-glass"></i>
     </button>
     <div class="bottom-nav-fab-slot">
         <button type="button" id="create-post-link-mobile" class="bottom-nav-fab" aria-label={t('nav.createPost')} onclick={handleCreatePost}>
@@ -570,7 +570,7 @@
         {:else if authed && dogs.length === 0}
             <i class="fas fa-plus-circle"></i>
         {:else}
-            <i class="fas fa-user-circle"></i>
+            <i class="fas fa-circle-user"></i>
         {/if}
     </a>
 </nav>
@@ -876,33 +876,32 @@
     z-index: 1000;
 }
 
-.bottom-nav a,
-.bottom-nav button {
+.bottom-nav .bottom-nav-item {
     color: var(--color-text);
     text-decoration: none;
     font-size: var(--woof-nav-icon-size);
-    padding: var(--woof-space-3) 0;
-    flex: 1;
+    padding: 14px 0;
+    width: var(--woof-touch-target);
     position: relative;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     font-family: inherit;
     cursor: pointer;
 }
 
-.bottom-nav a.active,
-.bottom-nav button.active {
+.bottom-nav .bottom-nav-item.active {
     color: var(--color-primary);
 }
 
-.bottom-nav a i,
-.bottom-nav button i {
+.bottom-nav .bottom-nav-item i {
     display: block;
     line-height: 1;
 }
 
-.bottom-nav a .profile-pic {
+.bottom-nav .bottom-nav-item .profile-pic {
     width: var(--woof-nav-icon-size);
     height: var(--woof-nav-icon-size);
     border-radius: var(--woof-radius-full);
@@ -911,9 +910,8 @@
     display: inline-block;
 }
 
-/* FAB slot — equal-width container so spacing is even */
+/* FAB slot — no flex, just centers the button at its natural size */
 .bottom-nav-fab-slot {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1066,31 +1064,8 @@
 
     .bottom-nav {
         display: flex;
-        justify-content: space-around;
         align-items: center;
-    }
-
-    .bottom-nav a,
-    .bottom-nav button {
-        color: var(--color-text);
-        text-decoration: none;
-        font-size: var(--woof-nav-icon-size);
-        padding: var(--woof-space-3) 0;
-        flex: 1;
-        text-align: center;
-        background: none;
-        border: none;
-        font-family: inherit;
-        cursor: pointer;
-    }
-
-    .bottom-nav a .profile-pic {
-        width: var(--woof-nav-icon-size);
-        height: var(--woof-nav-icon-size);
-        border-radius: var(--woof-radius-full);
-        object-fit: cover;
-        object-position: center;
-        display: inline-block;
+        justify-content: space-evenly;
     }
 }
 

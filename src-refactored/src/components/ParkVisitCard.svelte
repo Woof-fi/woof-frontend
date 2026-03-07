@@ -44,7 +44,7 @@
                 <span class="visit-heading-text">{t('feed.headingTo')}</span>
             </div>
             <a href="/parks/{visit.park.slug}" data-link class="visit-park">
-                <i class="fas fa-map-marker-alt visit-park-icon"></i>
+                <i class="fas fa-location-dot visit-park-icon"></i>
                 <span class="visit-park-name">{visit.park.name}</span>
             </a>
             <div class="visit-time">

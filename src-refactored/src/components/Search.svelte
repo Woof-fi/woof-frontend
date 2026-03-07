@@ -171,7 +171,7 @@
 >
     <div class="search-bar">
         <div class="search-input-wrapper">
-            <i class="fas fa-search search-input-icon"></i>
+            <i class="fas fa-magnifying-glass search-input-icon"></i>
             <input
                 type="text"
                 id="mobile-search-input"
@@ -221,7 +221,7 @@
                     <li class="search-result-item" onclick={handleResultClick} onkeydown={handleResultClick} role="option" aria-selected="false">
                         <a href={ter.url} data-link class="search-result-link">
                             <div class="search-result-icon search-result-icon--territory">
-                                <i class="fas fa-map-marker-alt"></i>
+                                <i class="fas fa-location-dot"></i>
                             </div>
                             <div class="search-result-text">
                                 <span class="search-result-name">{localName(ter)}</span>

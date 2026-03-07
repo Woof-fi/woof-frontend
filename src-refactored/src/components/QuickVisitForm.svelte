@@ -219,7 +219,7 @@
 
                     <!-- Search input -->
                     <div class="search-wrapper">
-                        <i class="fas fa-search search-icon"></i>
+                        <i class="fas fa-magnifying-glass search-icon"></i>
                         <input
                             type="text"
                             class="search-input"

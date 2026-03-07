@@ -16,8 +16,8 @@
         vet_visit:   { icon: 'fa-stethoscope', labelKey: 'health.vetVisit',    color: 'var(--woof-color-info)' },
         vaccination: { icon: 'fa-syringe',     labelKey: 'health.vaccination', color: 'var(--woof-color-success)' },
         medication:  { icon: 'fa-pills',       labelKey: 'health.medication',  color: 'var(--woof-color-warning)' },
-        weight:      { icon: 'fa-weight',      labelKey: 'health.weight',      color: 'var(--woof-color-brand-primary)' },
-        note:        { icon: 'fa-sticky-note', labelKey: 'health.note',        color: 'var(--woof-color-neutral-500)' },
+        weight:      { icon: 'fa-weight-scale',      labelKey: 'health.weight',      color: 'var(--woof-color-brand-primary)' },
+        note:        { icon: 'fa-note-sticky', labelKey: 'health.note',        color: 'var(--woof-color-neutral-500)' },
     };
 
     let dog = $state(null);
@@ -321,7 +321,7 @@
             <div class="profile-container">
                 <div class="woof-empty-state">
                     <div class="woof-empty-state-icon woof-empty-state-icon--error">
-                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-circle-exclamation"></i>
                     </div>
                     <p>Failed to load profile.</p>
                 </div>
@@ -349,20 +349,20 @@
                                     ? `${dog.territoryName}, ${dog.territoryParentName}`
                                     : dog.territoryName}
                             {#if dog.territoryUrlPath}
-                                <a href="/territory/{dog.territoryUrlPath}" data-link class="profile-sheet-territory"><i class="fas fa-map-marker-alt"></i> {territoryDisplay}</a>
+                                <a href="/territory/{dog.territoryUrlPath}" data-link class="profile-sheet-territory"><i class="fas fa-location-dot"></i> {territoryDisplay}</a>
                             {:else}
-                                <span class="profile-sheet-territory"><i class="fas fa-map-marker-alt"></i> {territoryDisplay}</span>
+                                <span class="profile-sheet-territory"><i class="fas fa-location-dot"></i> {territoryDisplay}</span>
                             {/if}
                         {/if}
                         {#if dog.dateOfBirth}
-                            <span class="profile-sheet-age"><i class="fas fa-birthday-cake"></i> {formatAge(dog.dateOfBirth)}</span>
+                            <span class="profile-sheet-age"><i class="fas fa-cake-candles"></i> {formatAge(dog.dateOfBirth)}</span>
                         {:else if dog.age != null}
-                            <span class="profile-sheet-age"><i class="fas fa-birthday-cake"></i> {dog.age === 1 ? t('profile.yearSingular', { count: dog.age }) : t('profile.yearPlural', { count: dog.age })}</span>
+                            <span class="profile-sheet-age"><i class="fas fa-cake-candles"></i> {dog.age === 1 ? t('profile.yearSingular', { count: dog.age }) : t('profile.yearPlural', { count: dog.age })}</span>
                         {/if}
                     </div>
                     {#if dog.isOwner}
                         <button class="edit-profile-btn" onclick={handleEditDog}>
-                            <i class="fas fa-edit"></i> {t('profile.editProfile')}
+                            <i class="fas fa-pen-to-square"></i> {t('profile.editProfile')}
                         </button>
                     {/if}
                 </div>
@@ -386,7 +386,7 @@
                 {#if dog.isOwner && !dog.territoryId}
                     <div class="territory-nudge">
                         <span class="territory-nudge-text">
-                            <i class="fas fa-map-marker-alt"></i>
+                            <i class="fas fa-location-dot"></i>
                             {t('dog.territoryHint')}
                         </span>
                         <button class="territory-nudge-btn" onclick={handleEditDog}>Set</button>
@@ -402,7 +402,7 @@
                     aria-selected={activeTab === 'posts'}
                     onclick={() => setTab('posts')}
                 >
-                    <i class="fas fa-th"></i> {t('profile.posts')}
+                    <i class="fas fa-table-cells"></i> {t('profile.posts')}
                 </button>
                 <button
                     class="tab-link"
@@ -411,7 +411,7 @@
                     aria-selected={activeTab === 'friends'}
                     onclick={() => setTab('friends')}
                 >
-                    <i class="fas fa-user-friends"></i> {t('profile.friends')}
+                    <i class="fas fa-user-group"></i> {t('profile.friends')}
                 </button>
                 <button
                     class="tab-link"
@@ -420,7 +420,7 @@
                     aria-selected={activeTab === 'health'}
                     onclick={() => setTab('health')}
                 >
-                    <i class="fas fa-heartbeat"></i> {t('profile.health')}
+                    <i class="fas fa-heart-pulse"></i> {t('profile.health')}
                 </button>
             </div>
 
@@ -476,7 +476,7 @@
                 {:else if friends.length === 0 && friendsLoadedOnce}
                     <div class="woof-empty-state">
                         <div class="woof-empty-state-icon">
-                            <i class="fas fa-user-friends"></i>
+                            <i class="fas fa-user-group"></i>
                         </div>
                         <p>{t('profile.noFollowers')}</p>
                     </div>
@@ -519,8 +519,8 @@
                         <button class="health-filter-btn" class:active={healthFilterType === 'vet_visit'} onclick={() => setHealthFilter('vet_visit')}><i class="fas fa-stethoscope"></i> {t('health.vetVisit')}</button>
                         <button class="health-filter-btn" class:active={healthFilterType === 'vaccination'} onclick={() => setHealthFilter('vaccination')}><i class="fas fa-syringe"></i> {t('health.vaccination')}</button>
                         <button class="health-filter-btn" class:active={healthFilterType === 'medication'} onclick={() => setHealthFilter('medication')}><i class="fas fa-pills"></i> {t('health.medication')}</button>
-                        <button class="health-filter-btn" class:active={healthFilterType === 'weight'} onclick={() => setHealthFilter('weight')}><i class="fas fa-weight"></i> {t('health.weight')}</button>
-                        <button class="health-filter-btn" class:active={healthFilterType === 'note'} onclick={() => setHealthFilter('note')}><i class="fas fa-sticky-note"></i> {t('health.note')}</button>
+                        <button class="health-filter-btn" class:active={healthFilterType === 'weight'} onclick={() => setHealthFilter('weight')}><i class="fas fa-weight-scale"></i> {t('health.weight')}</button>
+                        <button class="health-filter-btn" class:active={healthFilterType === 'note'} onclick={() => setHealthFilter('note')}><i class="fas fa-note-sticky"></i> {t('health.note')}</button>
                     </div>
                     <button class="health-add-record-btn" onclick={handleAddHealthRecord}>
                         <i class="fas fa-plus"></i> {t('health.addRecordBtn')}
@@ -532,14 +532,14 @@
                             {#if healthFilterType}
                                 <div class="woof-empty-state">
                                     <div class="woof-empty-state-icon">
-                                        <i class="fas fa-heartbeat"></i>
+                                        <i class="fas fa-heart-pulse"></i>
                                     </div>
                                     <p>{t('health.noRecords')}</p>
                                 </div>
                             {:else}
                                 <div class="woof-empty-state">
                                     <div class="woof-empty-state-icon">
-                                        <i class="fas fa-heartbeat"></i>
+                                        <i class="fas fa-heart-pulse"></i>
                                     </div>
                                     <p>{t('health.startTracking')}</p>
                                     <button class="btn-primary" style="margin-top: var(--woof-space-1);" onclick={handleAddHealthRecord}>
@@ -564,7 +564,7 @@
                                             <p class="health-card-notes">{record.notes}</p>
                                         {/if}
                                         {#if record.type === 'weight' && record.value != null}
-                                            <span class="health-value"><i class="fas fa-weight"></i> {record.value} kg</span>
+                                            <span class="health-value"><i class="fas fa-weight-scale"></i> {record.value} kg</span>
                                         {/if}
                                     </div>
                                     <div class="health-card-actions">

@@ -307,7 +307,7 @@
                 aria-label={t('post.postOptions')}
                 onclick={() => openPostOptionsSheet({ postId: id, dogId, dogSlug, isOwnPost, caption })}
             >
-                <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+                <i class="fas fa-ellipsis" aria-hidden="true"></i>
             </button>
         {/if}
     </div>
@@ -420,7 +420,7 @@
                                     aria-label={t('post.commentOptions')}
                                     onclick={(e) => handleCommentOptions(e, comment)}
                                 >
-                                    <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+                                    <i class="fas fa-ellipsis" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>

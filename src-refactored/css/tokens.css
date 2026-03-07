@@ -227,7 +227,7 @@
   --woof-nav-height:         64px;
   --woof-nav-safe-area:      34px;
   --woof-nav-bg:             var(--woof-surface-nav);
-  --woof-nav-icon-size:      24px;
+  --woof-nav-icon-size:      26px;
   --woof-nav-icon-stroke:    1.8;
   --woof-nav-icon-active:    var(--woof-color-brand-primary);
   --woof-nav-icon-inactive:  var(--woof-color-neutral-400);
