@@ -101,8 +101,8 @@
     .gate-card {
         width: 100%;
         max-width: 360px;
-        margin: 0 var(--woof-spacing-md, 16px);
-        padding: var(--woof-spacing-xl, 32px);
+        margin: 0 var(--woof-space-4, 16px);
+        padding: var(--woof-space-8, 32px);
         background: var(--woof-surface-primary, #FFFFFF);
         border-radius: var(--woof-radius-xl, 16px);
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
@@ -114,7 +114,7 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
-        margin-bottom: var(--woof-spacing-xs, 8px);
+        margin-bottom: var(--woof-space-2, 8px);
     }
 
     .gate-icon {
@@ -132,11 +132,11 @@
     .gate-subtitle {
         font-size: var(--woof-text-callout, 15px);
         color: var(--woof-color-neutral-500, #737373);
-        margin: 0 0 var(--woof-spacing-lg, 24px);
+        margin: 0 0 var(--woof-space-6, 24px);
     }
 
     .gate-field {
-        margin-bottom: var(--woof-spacing-md, 16px);
+        margin-bottom: var(--woof-space-4, 16px);
     }
 
     .gate-input {
@@ -158,7 +158,7 @@
     .gate-error {
         font-size: var(--woof-text-footnote, 13px);
         color: var(--woof-color-error, #FF3B30);
-        margin: 0 0 var(--woof-spacing-sm, 12px);
+        margin: 0 0 var(--woof-space-3, 12px);
     }
 
     .gate-btn {
@@ -167,7 +167,7 @@
         font-size: var(--woof-text-body, 16px);
         font-weight: 600;
         font-family: var(--woof-font-family);
-        color: #FFFFFF;
+        color: var(--woof-color-neutral-0, #FFFFFF);
         background: var(--woof-color-brand-primary, #C9403F);
         border: none;
         border-radius: var(--woof-radius-md, 8px);

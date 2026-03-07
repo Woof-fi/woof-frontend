@@ -330,7 +330,7 @@
 
 .action-sheet-delete-title {
     margin: 0;
-    font-size: var(--woof-font-size-lg);
+    font-size: var(--woof-text-title-3);
     font-weight: var(--woof-font-weight-semibold);
     color: var(--woof-color-neutral-900);
     text-align: center;
@@ -338,7 +338,7 @@
 
 .action-sheet-delete-subtitle {
     margin: 0;
-    font-size: var(--woof-font-size-sm);
+    font-size: var(--woof-text-callout);
     color: var(--woof-color-neutral-400);
     text-align: center;
 }
@@ -348,7 +348,7 @@
     height: 52px;
     border: none;
     border-radius: var(--woof-radius-md);
-    font-size: var(--woof-font-size-base);
+    font-size: var(--woof-text-body);
     font-weight: var(--woof-font-weight-semibold);
     cursor: pointer;
     transition: opacity var(--woof-duration-fast, 0.15s);
@@ -387,7 +387,7 @@
     background: none;
     border: none;
     border-top: 1px solid var(--color-border);
-    font-size: var(--woof-font-size-base);
+    font-size: var(--woof-text-body);
     color: var(--woof-color-neutral-900);
     cursor: pointer;
     text-align: left;

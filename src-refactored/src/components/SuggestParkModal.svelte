@@ -120,15 +120,15 @@
 }
 
 .suggest-territory-hint {
-    color: var(--woof-text-secondary);
+    color: var(--woof-color-neutral-500);
     font-size: var(--woof-text-footnote);
-    margin: 0 0 var(--woof-spacing-md);
-    padding: 0 var(--woof-spacing-md);
+    margin: 0 0 var(--woof-space-4);
+    padding: 0 var(--woof-space-4);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--woof-spacing-sm);
+    gap: var(--woof-space-3);
 }
 </style>

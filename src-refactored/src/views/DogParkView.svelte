@@ -170,17 +170,9 @@
 
     async function reloadPark(slug) {
         try {
-            const base = import.meta.env.VITE_API_URL || '';
-            const headers = {};
-            const token = localStorage.getItem('idToken');
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-            const resp = await fetch(`${base}/api/dog-parks/${slug}`, { cache: 'no-store', headers });
-            if (resp.ok) {
-                const data = await resp.json();
-                park = data.park;
-                isFollowing = park.isFollowing || false;
-                followerCount = park.followerCount || 0;
-            }
+            park = await getDogPark(slug);
+            isFollowing = park.isFollowing || false;
+            followerCount = park.followerCount || 0;
         } catch (e) {
             console.error('Failed to reload park:', e);
         }
