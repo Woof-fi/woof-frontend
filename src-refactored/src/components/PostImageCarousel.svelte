@@ -241,6 +241,7 @@
 }
 
 .carousel-arrow:hover {
+    opacity: 1;
     background: var(--woof-color-neutral-0);
     box-shadow: var(--woof-shadow-md);
 }
@@ -252,7 +253,7 @@
     }
 
     .carousel:hover .carousel-arrow {
-        opacity: 1;
+        opacity: 0.8;
     }
 }
 
