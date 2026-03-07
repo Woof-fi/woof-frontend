@@ -25,7 +25,7 @@
     justify-content: center;
     max-width: 500px;
     margin: 0 auto;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
     position: sticky;
     top: 28px;
     background: var(--woof-surface-primary);
@@ -40,7 +40,7 @@
     border-bottom: 2px solid transparent;
     font-size: var(--woof-text-callout);
     font-weight: var(--woof-font-weight-semibold);
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     cursor: pointer;
     transition: color var(--woof-duration-fast), border-color var(--woof-duration-fast);
     font-family: var(--woof-font-family);
@@ -51,7 +51,7 @@
 }
 
 .feed-tab.active {
-    color: var(--color-primary);
-    border-bottom-color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
+    border-bottom-color: var(--woof-color-brand-primary);
 }
 </style>

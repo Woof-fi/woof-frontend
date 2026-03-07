@@ -144,24 +144,24 @@
 .breed-directory-search input {
     width: 100%;
     padding: 12px 14px 12px 40px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-lg);
     font-size: var(--woof-text-body);
-    background: var(--color-surface);
-    color: var(--color-text);
+    background: var(--woof-surface-primary);
+    color: var(--woof-color-neutral-900);
     box-sizing: border-box;
 }
 
 .breed-directory-search input:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--woof-color-brand-primary);
     box-shadow: 0 0 0 3px var(--woof-color-brand-primary-subtle);
 }
 
 .breed-directory-loading {
     text-align: center;
     padding: 40px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
 }
 
 .breed-section {
@@ -197,8 +197,8 @@
     align-items: center;
     gap: 6px;
     padding: 16px 12px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    background: var(--woof-surface-primary);
+    border: 1px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-lg);
     text-decoration: none;
     color: inherit;
@@ -206,7 +206,7 @@
 }
 
 .breed-popular-card:hover {
-    border-color: var(--color-primary);
+    border-color: var(--woof-color-brand-primary);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -226,12 +226,12 @@
     font-weight: 600;
     font-size: 13px;
     text-align: center;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .breed-popular-count {
     font-size: 12px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
 }
 
 /* Alphabetical breed list */
@@ -253,7 +253,7 @@
 }
 
 .breed-alpha-item:hover {
-    background-color: var(--color-hover, rgba(0, 0, 0, 0.03));
+    background-color: var(--woof-color-neutral-100, rgba(0, 0, 0, 0.03));
 }
 
 .breed-alpha-icon {
@@ -273,13 +273,13 @@
     display: block;
     font-weight: 600;
     font-size: 14px;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .breed-alpha-fi {
     display: block;
     font-size: 12px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     margin-top: 1px;
 }
 

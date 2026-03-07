@@ -257,8 +257,8 @@
     left: 280px;
     width: 400px;
     height: calc(100vh - var(--header-height));
-    background-color: var(--color-surface);
-    border-right: 1px solid var(--color-border);
+    background-color: var(--woof-surface-primary);
+    border-right: 1px solid var(--woof-color-neutral-200);
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
@@ -280,7 +280,7 @@
     align-items: center;
     gap: 12px;
     padding: 16px;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
     flex-shrink: 0;
 }
 
@@ -294,7 +294,7 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     font-size: 14px;
     pointer-events: none;
 }
@@ -303,26 +303,26 @@
     width: 100%;
     padding: 10px 12px 10px 36px;
     border: none;
-    border-radius: var(--radius-md);
-    background-color: var(--color-bg);
+    border-radius: var(--woof-radius-md);
+    background-color: var(--woof-color-neutral-50);
     font-size: 16px;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     box-sizing: border-box;
     outline: none;
 }
 
 .search-input-wrapper input::placeholder {
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
 }
 
 .search-input-wrapper input:focus {
-    background-color: var(--color-bg);
+    background-color: var(--woof-color-neutral-50);
 }
 
 .close-search {
     background: none;
     border: none;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
@@ -331,7 +331,7 @@
 }
 
 .close-search:hover {
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
 }
 
 #search-results {
@@ -350,14 +350,14 @@
     display: flex;
     align-items: center;
     padding: 8px 12px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--woof-radius-sm);
     text-decoration: none;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     transition: background-color 0.15s;
 }
 
 .search-result-link:hover {
-    background-color: var(--color-bg-alt);
+    background-color: var(--woof-color-neutral-100);
 }
 
 .search-result-avatar {
@@ -383,14 +383,14 @@
 
 .search-result-breed {
     font-size: 13px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     line-height: 1.3;
 }
 
 .search-no-results {
     padding: 20px 12px;
     text-align: center;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     font-size: 14px;
     list-style: none;
 }
@@ -400,7 +400,7 @@
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.5px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     list-style: none;
 }
 
@@ -431,7 +431,7 @@
         top: 0;
         height: 100vh;
         z-index: 1001;
-        background-color: var(--color-surface);
+        background-color: var(--woof-surface-primary);
         display: flex;
         flex-direction: column;
         padding: 0;

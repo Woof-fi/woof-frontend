@@ -77,7 +77,7 @@
 .invite-card {
     background: linear-gradient(135deg, var(--woof-color-brand-primary-subtle) 0%, var(--woof-color-neutral-50) 100%);
     border: 1px solid var(--woof-color-brand-primary-alpha-12);
-    border-left: var(--woof-space-1) solid var(--color-primary);
+    border-left: var(--woof-space-1) solid var(--woof-color-brand-primary);
     margin-bottom: var(--woof-space-5);
     border-radius: var(--woof-radius-md);
     padding: var(--woof-space-6);
@@ -86,20 +86,20 @@
 
 .invite-card-icon {
     font-size: var(--woof-text-title-1);
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
     margin-bottom: var(--woof-space-2);
 }
 
 .invite-card-heading {
     font-size: var(--woof-text-headline);
     font-weight: var(--woof-font-weight-semibold);
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     margin: 0 0 var(--woof-space-2);
 }
 
 .invite-card-desc {
     font-size: var(--woof-text-callout);
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     margin: 0 0 var(--woof-space-4);
 }
 

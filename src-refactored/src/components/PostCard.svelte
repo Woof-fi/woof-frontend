@@ -472,8 +472,8 @@
 
 <style>
 .post {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
+    background-color: var(--woof-surface-primary);
+    border: 1px solid var(--woof-color-neutral-200);
     margin: 0 auto 20px;
     border-radius: var(--woof-radius-lg);
     max-width: 500px;
@@ -578,7 +578,7 @@ a.post-location-text:hover {
     position: relative;
     width: 100%;
     overflow: hidden;
-    background-color: var(--color-bg-secondary, #fafafa);
+    background-color: var(--woof-surface-secondary, #fafafa);
     container-type: inline-size;
 }
 
@@ -608,18 +608,18 @@ a.post-location-text:hover {
     padding: 8px;
     margin-right: 4px;
     cursor: pointer;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .post-actions button.liked i,
 .post-actions .like-button.liked i {
-    color: var(--color-like);
+    color: var(--woof-color-like);
 }
 
 .post-actions .like-count {
     font-size: 14px;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     margin-right: 12px;
     vertical-align: middle;
     background: none;
@@ -641,7 +641,7 @@ a.post-location-text:hover {
 .post-actions .comment-count {
     font-size: 14px;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     margin-right: 12px;
     vertical-align: middle;
 }
@@ -682,7 +682,7 @@ a.post-location-text:hover {
 
 .view-all-comments {
     display: block;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     font-size: 14px;
     text-decoration: none;
     margin-bottom: 6px;
@@ -721,17 +721,17 @@ a.post-location-text:hover {
 
 .comment-author {
     text-decoration: none;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .comment-content {
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .comment-time {
     display: block;
     font-size: 11px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     margin-top: 2px;
 }
 
@@ -746,7 +746,7 @@ a.post-location-text:hover {
     align-items: center;
     gap: 8px;
     margin-top: 8px;
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--woof-color-neutral-200);
     padding-top: 8px;
 }
 
@@ -756,18 +756,18 @@ a.post-location-text:hover {
     outline: none;
     font-size: 14px;
     background: transparent;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     padding: 4px 0;
 }
 
 .comment-input::placeholder {
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
 }
 
 .comment-submit {
     background: none;
     border: none;
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
@@ -784,7 +784,7 @@ a.post-location-text:hover {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     padding: 4px;
     border-radius: var(--woof-radius-xs);
     font-size: 12px;
@@ -800,7 +800,7 @@ a.post-location-text:hover {
 }
 
 .comment-options-btn:hover {
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 @media (hover: hover) {

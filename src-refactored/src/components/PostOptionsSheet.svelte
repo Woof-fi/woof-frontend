@@ -284,7 +284,7 @@
     display: flex;
     align-items: center;
     padding: var(--woof-space-3) var(--woof-space-3) var(--woof-space-2);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
 }
 
 .sheet-back {
@@ -386,7 +386,7 @@
     padding: 0 var(--woof-space-5);
     background: none;
     border: none;
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--woof-color-neutral-200);
     font-size: var(--woof-text-body);
     color: var(--woof-color-neutral-900);
     cursor: pointer;

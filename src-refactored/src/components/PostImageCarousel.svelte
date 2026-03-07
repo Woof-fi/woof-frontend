@@ -156,7 +156,7 @@
     position: relative;
     width: 100%;
     overflow: hidden;
-    background-color: var(--color-bg-secondary, #fafafa);
+    background-color: var(--woof-surface-secondary, #fafafa);
     container-type: inline-size;
     touch-action: pan-y;
 }

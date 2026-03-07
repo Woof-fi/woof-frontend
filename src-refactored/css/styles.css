@@ -6,8 +6,8 @@
 
 /* ── Bare element selector — rendered by Navigation but left global for safety ── */
 header {
-    background-color: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
+    background-color: var(--woof-surface-primary);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
     padding: 0;
     height: var(--header-height);
     box-sizing: border-box;
@@ -25,7 +25,7 @@ header {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
 }
 
 .tab-link {
@@ -33,14 +33,14 @@ header {
     background-color: transparent;
     font-size: 16px;
     font-weight: bold;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     border: none;
     cursor: pointer;
     position: relative;
 }
 
 .tab-link.active {
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
 }
 
 .tab-link::before {
@@ -56,7 +56,7 @@ header {
 }
 
 .tab-link.active::before {
-    background-color: var(--color-primary);
+    background-color: var(--woof-color-brand-primary);
 }
 
 .tab-content {
@@ -73,10 +73,10 @@ header {
     justify-content: center;
     max-width: 500px;
     margin: 0 auto;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
     position: sticky;
     top: 0;
-    background: var(--color-surface);
+    background: var(--woof-surface-primary);
     z-index: 10;
 }
 
@@ -88,18 +88,18 @@ header {
     border-bottom: 2px solid transparent;
     font-size: 14px;
     font-weight: 600;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     cursor: pointer;
     transition: color 0.2s, border-color 0.2s;
 }
 
 .feed-tab:hover {
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .feed-tab.active {
-    color: var(--color-primary);
-    border-bottom-color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
+    border-bottom-color: var(--woof-color-brand-primary);
 }
 
 /* ── Button variants — multiple modals + forms ── */
@@ -119,25 +119,25 @@ header {
 }
 
 .btn-primary {
-    background-color: var(--color-primary);
+    background-color: var(--woof-color-brand-primary);
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: var(--color-primary-hover);
+    background-color: var(--woof-color-brand-primary-dark);
     transform: translateY(-1px);
     box-shadow: var(--woof-shadow-brand);
 }
 
 .btn-secondary {
     background-color: transparent;
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
+    color: var(--woof-color-neutral-900);
+    border: 1px solid var(--woof-color-neutral-200);
     padding: 11px 24px;
 }
 
 .btn-secondary:hover {
-    background-color: var(--color-bg-alt);
+    background-color: var(--woof-color-neutral-100);
 }
 
 /* ── Empty state — shared across all views ── */
@@ -194,7 +194,7 @@ header {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     margin-bottom: 6px;
 }
 
@@ -206,7 +206,7 @@ header {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     font-size: var(--woof-text-callout);
     font-weight: var(--woof-font-weight-medium);
     padding: var(--woof-space-2) var(--woof-space-3);
@@ -216,8 +216,8 @@ header {
 }
 
 .back-btn:hover {
-    background: var(--color-bg-alt);
-    color: var(--color-text);
+    background: var(--woof-color-neutral-100);
+    color: var(--woof-color-neutral-900);
 }
 
 /* ── Skeleton loading — Feed + ProfileView ── */
@@ -227,10 +227,10 @@ header {
 }
 
 .skeleton {
-    background: linear-gradient(90deg, var(--color-border, #e0e0e0) 25%, #f5f5f5 50%, var(--color-border, #e0e0e0) 75%);
+    background: linear-gradient(90deg, var(--woof-color-neutral-200, #e0e0e0) 25%, #f5f5f5 50%, var(--woof-color-neutral-200, #e0e0e0) 75%);
     background-size: 200px 100%;
     animation: skeleton-shimmer 1.5s ease-in-out infinite;
-    border-radius: var(--radius-sm, 4px);
+    border-radius: var(--woof-radius-sm, 4px);
 }
 
 .skeleton-text {
@@ -253,9 +253,9 @@ header {
 }
 
 .post-skeleton {
-    background: var(--color-bg, #fff);
-    border: 1px solid var(--color-border, #e0e0e0);
-    border-radius: var(--radius-md, 8px);
+    background: var(--woof-color-neutral-50, #fff);
+    border: 1px solid var(--woof-color-neutral-200, #e0e0e0);
+    border-radius: var(--woof-radius-md, 8px);
     margin-bottom: 16px;
     overflow: hidden;
 }
@@ -317,7 +317,7 @@ header {
     align-items: center;
     justify-content: center;
     padding: 40px 0;
-    color: var(--color-text-muted, #888);
+    color: var(--woof-color-neutral-400, #888);
 }
 
 .loading .fa-spinner {
@@ -337,19 +337,19 @@ header {
 
 .welcome-card-icon {
     font-size: 48px;
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
     margin-bottom: 12px;
 }
 
 .welcome-card h2 {
     margin: 0 0 8px;
     font-size: 20px;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .welcome-card p {
     margin: 0 0 20px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     font-size: 14px;
 }
 
@@ -377,7 +377,7 @@ header {
 
 .tour-icon {
     font-size: 48px;
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
     margin-bottom: 16px;
 }
 
@@ -387,7 +387,7 @@ header {
 }
 
 .tour-step p {
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     font-size: 14px;
     margin: 0 0 24px;
     line-height: 1.5;
@@ -404,11 +404,11 @@ header {
     width: 8px;
     height: 8px;
     border-radius: var(--woof-radius-full);
-    background: var(--color-border);
+    background: var(--woof-color-neutral-200);
 }
 
 .tour-dot.active {
-    background: var(--color-primary);
+    background: var(--woof-color-brand-primary);
 }
 
 .tour-actions {
@@ -420,21 +420,21 @@ header {
 .tour-skip {
     background: none;
     border: none;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     cursor: pointer;
     font-size: 14px;
     padding: 10px 20px;
 }
 
 .tour-skip:hover {
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
 }
 
 /* ── Form hint text ── */
 .form-hint {
     display: block;
     margin-top: 4px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     font-size: 12px;
 }
 
@@ -470,7 +470,7 @@ header {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: var(--color-overlay);
+    background-color: var(--woof-surface-overlay);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }
@@ -483,10 +483,10 @@ header {
 }
 
 .modal-content {
-    background-color: var(--color-surface);
+    background-color: var(--woof-surface-primary);
     margin: var(--woof-space-5) auto;
     padding: 24px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--woof-color-neutral-200);
     width: 80%;
     max-width: 500px;
     max-height: calc(100vh - var(--woof-space-5) * 2);
@@ -497,7 +497,7 @@ header {
 }
 
 .close {
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -506,7 +506,7 @@ header {
 
 .close:hover,
 .close:focus {
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     text-decoration: none;
     cursor: pointer;
 }
@@ -522,14 +522,14 @@ header {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .modal-close {
     background: none;
     border: none;
     font-size: 28px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     cursor: pointer;
     padding: 0;
     line-height: 1;
@@ -537,7 +537,7 @@ header {
 }
 
 .modal-close:hover {
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 /* ============================================================================
@@ -574,10 +574,10 @@ input[type="datetime-local"]:focus {
 .modal select {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-sm);
+    background-color: var(--woof-color-neutral-50);
+    color: var(--woof-color-neutral-900);
     font-family: inherit;
     font-size: 14px;
     line-height: 1.4;
@@ -589,7 +589,7 @@ input[type="datetime-local"]:focus {
 
 .modal input::placeholder,
 .modal textarea::placeholder {
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
 }
 
 .modal input[type="text"]:focus,
@@ -599,9 +599,9 @@ input[type="datetime-local"]:focus {
 .modal textarea:focus,
 .modal select:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--woof-color-brand-primary);
     box-shadow: 0 0 0 3px var(--woof-color-brand-primary-alpha-15);
-    background-color: var(--color-surface);
+    background-color: var(--woof-surface-primary);
 }
 
 .modal textarea {
@@ -619,10 +619,10 @@ input[type="datetime-local"]:focus {
 .modal input[type="file"] {
     width: 100%;
     padding: 10px 12px;
-    border: 2px dashed var(--color-border);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-bg);
-    color: var(--color-text-muted);
+    border: 2px dashed var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-sm);
+    background-color: var(--woof-color-neutral-50);
+    color: var(--woof-color-neutral-400);
     font-family: inherit;
     font-size: 14px;
     cursor: pointer;
@@ -631,13 +631,13 @@ input[type="datetime-local"]:focus {
 }
 
 .modal input[type="file"]:hover {
-    border-color: var(--color-primary);
+    border-color: var(--woof-color-brand-primary);
     background-color: var(--woof-color-brand-primary-alpha-05);
 }
 
 .modal input[type="file"]:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--woof-color-brand-primary);
 }
 
 .modal form .btn-primary {
@@ -672,14 +672,14 @@ input[type="datetime-local"]:focus {
     padding: 0;
     font-family: inherit;
     font-size: inherit;
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
     cursor: pointer;
     text-decoration: underline;
     display: inline;
 }
 
 .link-btn:hover {
-    color: var(--color-primary-dark, var(--color-primary));
+    color: var(--woof-color-brand-primary-dark, var(--woof-color-brand-primary));
     opacity: 0.85;
 }
 

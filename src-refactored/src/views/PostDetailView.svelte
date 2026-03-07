@@ -91,6 +91,6 @@
 .post-detail-loading {
     text-align: center;
     padding: 48px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
 }
 </style>

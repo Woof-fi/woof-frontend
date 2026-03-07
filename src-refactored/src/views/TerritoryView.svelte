@@ -1004,7 +1004,7 @@
 }
 
 .territory-dog-link:hover {
-    background-color: var(--color-hover, rgba(0, 0, 0, 0.03));
+    background-color: var(--woof-color-neutral-100, rgba(0, 0, 0, 0.03));
 }
 
 .territory-dog-avatar {
@@ -1023,27 +1023,27 @@
 .territory-dog-name {
     font-weight: 600;
     font-size: 14px;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     display: block;
 }
 
 .territory-dog-breed {
     display: block;
     font-size: 13px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     margin-top: 2px;
 }
 
 .territory-dog-meta {
     font-size: 12px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     flex-shrink: 0;
 }
 
 .territory-loading {
     text-align: center;
     padding: 32px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
 }
 
 .load-more {

@@ -863,11 +863,11 @@ a.profile-sheet-territory i {
 .profile-tabs {
     display: flex;
     justify-content: center;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
     margin-bottom: 0;
     position: sticky;
     top: 0;
-    background: var(--color-surface);
+    background: var(--woof-surface-primary);
     z-index: 10;
 }
 
@@ -882,7 +882,7 @@ a.profile-sheet-territory i {
     border: none;
     font-size: 13px;
     font-weight: 600;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     cursor: pointer;
     position: relative;
     text-transform: uppercase;
@@ -895,7 +895,7 @@ a.profile-sheet-territory i {
 }
 
 .profile-tabs .tab-link.active {
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
 }
 
 .profile-tabs .tab-link::after {
@@ -910,7 +910,7 @@ a.profile-sheet-territory i {
 }
 
 .profile-tabs .tab-link.active::after {
-    background-color: var(--color-primary);
+    background-color: var(--woof-color-brand-primary);
 }
 
 /* Posts grid */
@@ -994,7 +994,7 @@ a.profile-sheet-territory i {
 }
 
 .friend-link:hover {
-    background-color: var(--color-hover, rgba(0, 0, 0, 0.03));
+    background-color: var(--woof-color-neutral-100, rgba(0, 0, 0, 0.03));
 }
 
 .friend-avatar {
@@ -1013,13 +1013,13 @@ a.profile-sheet-territory i {
 .friend-name {
     font-weight: 600;
     font-size: 14px;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .friend-breed {
     display: block;
     font-size: 13px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
 }
 
 /* Health records */
@@ -1193,7 +1193,7 @@ a.profile-sheet-territory i {
     border-radius: var(--woof-radius-full);
     font-size: 13px;
     font-weight: 600;
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
 }
 
 .health-card-actions {
@@ -1237,7 +1237,7 @@ a.profile-sheet-territory i {
 .private-content {
     text-align: center;
     padding: 40px 20px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
 }
 
 .private-content i {
@@ -1249,10 +1249,10 @@ a.profile-sheet-territory i {
 /* Message button on profile */
 .message-profile-btn {
     padding: 8px 16px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-btn-radius);
-    background: var(--color-surface);
-    color: var(--color-text);
+    background: var(--woof-surface-primary);
+    color: var(--woof-color-neutral-900);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -1260,7 +1260,7 @@ a.profile-sheet-territory i {
 }
 
 .message-profile-btn:hover {
-    background-color: var(--color-bg-alt);
+    background-color: var(--woof-color-neutral-100);
 }
 
 /* Follow button */
@@ -1268,7 +1268,7 @@ a.profile-sheet-territory i {
     padding: 6px 20px;
     border: none;
     border-radius: var(--woof-btn-radius);
-    background: var(--color-primary);
+    background: var(--woof-color-brand-primary);
     color: var(--woof-color-neutral-0);
     font-size: var(--woof-text-subheadline);
     font-weight: 600;
@@ -1278,13 +1278,13 @@ a.profile-sheet-territory i {
 }
 
 .follow-btn:hover {
-    background: var(--color-primary-hover);
+    background: var(--woof-color-brand-primary-dark);
 }
 
 .follow-btn.following {
-    background: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
+    background: var(--woof-surface-primary);
+    color: var(--woof-color-neutral-900);
+    border: 1px solid var(--woof-color-neutral-200);
 }
 
 .follow-btn.following:hover {
@@ -1301,9 +1301,9 @@ a.profile-sheet-territory i {
 /* Edit profile button */
 .edit-profile-btn {
     padding: 6px 16px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-btn-radius);
-    background: var(--color-surface);
+    background: var(--woof-surface-primary);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -1311,7 +1311,7 @@ a.profile-sheet-territory i {
 }
 
 .edit-profile-btn:hover {
-    background: var(--color-bg-alt);
+    background: var(--woof-color-neutral-100);
 }
 
 @media (max-width: 768px) {

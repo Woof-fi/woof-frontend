@@ -257,30 +257,30 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: var(--color-surface);
+    background: var(--woof-surface-primary);
 }
 
 .conversations-panel {
     width: 280px;
     min-width: 240px;
     flex-shrink: 0;
-    border-right: 1px solid var(--color-border);
+    border-right: 1px solid var(--woof-color-neutral-200);
     display: flex;
     flex-direction: column;
-    background: var(--color-bg-alt);
+    background: var(--woof-color-neutral-100);
 }
 
 .conversations-header {
     padding: 20px;
-    border-bottom: 1px solid var(--color-border);
-    background: var(--color-surface);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
+    background: var(--woof-surface-primary);
 }
 
 .conversations-header h2 {
     margin: 0;
     font-size: var(--woof-text-headline);
     font-weight: var(--woof-font-weight-bold);
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .conversations-list {
@@ -295,16 +295,16 @@
     padding: 12px 16px;
     cursor: pointer;
     transition: background-color 0.15s;
-    border-bottom: 1px solid var(--color-bg-alt);
+    border-bottom: 1px solid var(--woof-color-neutral-100);
     position: relative;
 }
 
 .conv-item:hover {
-    background-color: var(--color-bg-alt);
+    background-color: var(--woof-color-neutral-100);
 }
 
 .conv-item.active {
-    background-color: var(--color-bg-alt);
+    background-color: var(--woof-color-neutral-100);
 }
 
 .conv-item.unread {
@@ -317,7 +317,7 @@
 
 .conv-item.unread .conv-preview {
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .conv-avatar {
@@ -343,7 +343,7 @@
 .conv-name {
     font-weight: var(--woof-font-weight-semibold);
     font-size: var(--woof-text-subhead);
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -351,21 +351,21 @@
 
 .conv-time {
     font-size: 11px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     flex-shrink: 0;
     margin-left: 8px;
 }
 
 .conv-preview {
     font-size: 13px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .conv-badge {
-    background-color: var(--color-primary);
+    background-color: var(--woof-color-brand-primary);
     color: white;
     font-size: 11px;
     font-weight: 700;
@@ -382,14 +382,14 @@
 .conv-empty {
     text-align: center;
     padding: 40px 20px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
 }
 
 .conv-empty i {
     font-size: 48px;
     margin-bottom: 12px;
     display: block;
-    color: var(--color-border);
+    color: var(--woof-color-neutral-200);
 }
 
 .conv-empty p {
@@ -405,7 +405,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    background: var(--color-surface);
+    background: var(--woof-surface-primary);
 }
 
 .thread-header {
@@ -413,9 +413,9 @@
     align-items: center;
     gap: 12px;
     padding: 16px 20px;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
     min-height: 61px;
-    background: var(--color-surface);
+    background: var(--woof-surface-primary);
     flex-shrink: 0;
 }
 
@@ -424,7 +424,7 @@
     background: none;
     border: none;
     font-size: 18px;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     cursor: pointer;
     padding: 4px 8px;
 }
@@ -432,7 +432,7 @@
 .thread-title {
     font-weight: var(--woof-font-weight-semibold);
     font-size: var(--woof-text-headline);
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .thread-messages {
@@ -442,7 +442,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    background: var(--color-bg);
+    background: var(--woof-color-neutral-50);
 }
 
 .thread-empty {
@@ -451,7 +451,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     text-align: center;
     padding: var(--woof-space-8);
     gap: var(--woof-space-3);
@@ -459,7 +459,7 @@
 
 .thread-empty i {
     font-size: 48px;
-    color: var(--color-border);
+    color: var(--woof-color-neutral-200);
     opacity: 0.7;
 }
 
@@ -473,15 +473,15 @@
 
 .msg-mine {
     align-self: flex-end;
-    background-color: var(--color-primary);
+    background-color: var(--woof-color-brand-primary);
     color: white;
     border-bottom-right-radius: 4px;
 }
 
 .msg-theirs {
     align-self: flex-start;
-    background-color: var(--color-bg-alt);
-    color: var(--color-text);
+    background-color: var(--woof-color-neutral-100);
+    color: var(--woof-color-neutral-900);
     border-bottom-left-radius: 4px;
 }
 
@@ -506,29 +506,29 @@
     align-items: center;
     gap: var(--woof-space-2);
     padding: 12px 20px;
-    border-top: 1px solid var(--color-border);
-    background: var(--color-surface);
+    border-top: 1px solid var(--woof-color-neutral-200);
+    background: var(--woof-surface-primary);
     flex-shrink: 0;
 }
 
 .thread-input input {
     flex: 1;
     padding: 10px 16px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-full);
     font-size: var(--woof-text-body);
     font-family: inherit;
     outline: none;
-    background: var(--color-bg);
+    background: var(--woof-color-neutral-50);
     transition: border-color var(--woof-duration-fast);
 }
 
 .thread-input input:focus {
-    border-color: var(--color-primary);
+    border-color: var(--woof-color-brand-primary);
 }
 
 .thread-input button {
-    background: var(--color-primary);
+    background: var(--woof-color-brand-primary);
     color: white;
     border: none;
     width: 40px;
@@ -555,7 +555,7 @@
 .messages-loading {
     text-align: center;
     padding: 40px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     font-size: 20px;
 }
 
@@ -572,7 +572,7 @@
     .conversations-panel {
         width: 100%;
         min-width: 100%;
-        background: var(--color-surface);
+        background: var(--woof-surface-primary);
     }
 
     .thread-panel {
@@ -581,7 +581,7 @@
         left: 0;
         right: 0;
         bottom: 56px;
-        background: var(--color-surface);
+        background: var(--woof-surface-primary);
         z-index: 50;
         transform: translateX(100%);
         transition: transform 0.25s ease;
@@ -592,7 +592,7 @@
     }
 
     .thread-messages {
-        background: var(--color-surface);
+        background: var(--woof-surface-primary);
     }
 
     .thread-back-btn {

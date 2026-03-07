@@ -417,7 +417,7 @@
     padding: 0;
     margin: var(--woof-space-2) 0 0;
     font-size: var(--woof-text-caption-1);
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
 }
 
 .password-requirements li {
@@ -426,7 +426,7 @@
 
 .password-requirements li::before {
     content: '○ ';
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
 }
 
 .password-requirements li.met {
@@ -441,7 +441,7 @@
 .auth-tabs {
     display: flex;
     margin-bottom: var(--woof-space-5);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--woof-color-neutral-200);
 }
 
 .auth-tab {
@@ -452,19 +452,19 @@
     border-bottom: 2px solid transparent;
     font-size: var(--woof-text-callout);
     font-weight: 600;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     cursor: pointer;
     transition: color var(--woof-duration-fast), border-color var(--woof-duration-fast);
     text-align: center;
 }
 
 .auth-tab:hover {
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
 }
 
 .auth-tab.active {
-    color: var(--color-primary);
-    border-bottom-color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
+    border-bottom-color: var(--woof-color-brand-primary);
 }
 
 .auth-secondary-action {
@@ -476,14 +476,14 @@
 
 .auth-age-notice {
     font-size: var(--woof-text-caption-1);
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     text-align: center;
     margin: var(--woof-space-2) 0 var(--woof-space-1);
     line-height: 1.5;
 }
 
 .auth-age-notice a {
-    color: var(--color-primary);
+    color: var(--woof-color-brand-primary);
     text-decoration: none;
 }
 

@@ -475,7 +475,7 @@
     padding: 8px 20px;
     border: none;
     border-radius: var(--woof-btn-radius);
-    background: var(--color-primary);
+    background: var(--woof-color-brand-primary);
     color: var(--woof-color-neutral-0);
     font-size: var(--woof-text-subheadline);
     font-weight: 600;
@@ -486,13 +486,13 @@
 }
 
 .follow-btn:hover {
-    background: var(--color-primary-hover);
+    background: var(--woof-color-brand-primary-dark);
 }
 
 .follow-btn.following {
-    background: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
+    background: var(--woof-surface-primary);
+    color: var(--woof-color-neutral-900);
+    border: 1px solid var(--woof-color-neutral-200);
 }
 
 .follow-btn.following:hover {
@@ -584,7 +584,7 @@
 }
 
 .breed-dog-link:hover {
-    background-color: var(--color-hover, rgba(0, 0, 0, 0.03));
+    background-color: var(--woof-color-neutral-100, rgba(0, 0, 0, 0.03));
 }
 
 .breed-dog-avatar {
@@ -603,14 +603,14 @@
 .breed-dog-name {
     font-weight: 600;
     font-size: 14px;
-    color: var(--color-text);
+    color: var(--woof-color-neutral-900);
     display: block;
 }
 
 .breed-dog-location {
     display: block;
     font-size: 13px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     margin-top: 2px;
     text-decoration: none;
 }
@@ -630,14 +630,14 @@
 
 .breed-dog-meta {
     font-size: 12px;
-    color: var(--color-text-muted);
+    color: var(--woof-color-neutral-400);
     flex-shrink: 0;
 }
 
 .breed-loading {
     text-align: center;
     padding: 32px;
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
 }
 
 .load-more {

@@ -348,26 +348,26 @@
     align-items: center;
     gap: var(--woof-space-2);
     padding: var(--woof-space-2) var(--woof-space-3);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-full);
-    background: var(--color-surface);
+    background: var(--woof-surface-primary);
     font-size: var(--woof-text-footnote);
     font-weight: var(--woof-font-weight-medium);
-    color: var(--color-text-secondary);
+    color: var(--woof-color-neutral-500);
     cursor: pointer;
     white-space: nowrap;
     transition: all var(--woof-duration-fast);
 }
 
 .health-type-tab:hover {
-    border-color: var(--color-text-secondary);
-    background: var(--color-bg-alt);
+    border-color: var(--woof-color-neutral-500);
+    background: var(--woof-color-neutral-100);
 }
 
 .health-type-tab.active {
-    background: var(--color-primary);
+    background: var(--woof-color-brand-primary);
     color: var(--woof-color-neutral-0);
-    border-color: var(--color-primary);
+    border-color: var(--woof-color-brand-primary);
 }
 
 .health-type-tab i {
