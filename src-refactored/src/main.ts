@@ -5,7 +5,8 @@ import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
 import '@fontsource/inter/800.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import '@fortawesome/fontawesome-svg-core/styles.css';  // FA SVG core styles (sizing, animation)
+import '../js/icons.js';  // Registers only the ~84 icons we actually use
 import '../css/global.css';
 import '../css/styles.css';
 import { showToast } from '../js/utils.js';

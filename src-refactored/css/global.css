@@ -33,4 +33,4 @@ html {
     min-height: 100vh;
 }
 
-/* Font Awesome loaded from npm (@fortawesome/fontawesome-free) via main.ts import */
+/* Font Awesome: SVG+JS (tree-shaken, ~84 icons) — see js/icons.js */
