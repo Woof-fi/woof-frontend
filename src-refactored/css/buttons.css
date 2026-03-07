@@ -1,0 +1,81 @@
+/* ============================================================================
+   BUTTONS — primary, secondary, back, link
+   ============================================================================ */
+
+/* ── Button variants — multiple modals + forms ── */
+.btn-primary,
+.btn-secondary {
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--woof-btn-radius);
+    font-weight: var(--woof-font-weight-semibold);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: var(--woof-text-headline);
+    height: var(--woof-btn-height-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background-color: var(--woof-color-brand-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--woof-color-brand-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--woof-shadow-brand);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--woof-color-neutral-900);
+    border: 1px solid var(--woof-color-neutral-200);
+    padding: 11px 24px;
+}
+
+.btn-secondary:hover {
+    background-color: var(--woof-color-neutral-100);
+}
+
+/* ── Back button — PostDetailView + MessagesView thread back ── */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--woof-color-neutral-400);
+    font-size: var(--woof-text-callout);
+    font-weight: var(--woof-font-weight-medium);
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border-radius: var(--woof-radius-md);
+    transition: background var(--woof-duration-fast) ease,
+                color var(--woof-duration-fast) ease;
+}
+
+.back-btn:hover {
+    background: var(--woof-color-neutral-100);
+    color: var(--woof-color-neutral-900);
+}
+
+/* ── Link button — AuthModal + other inline text links ── */
+.link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--woof-color-brand-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    display: inline;
+}
+
+.link-btn:hover {
+    color: var(--woof-color-brand-primary-dark, var(--woof-color-brand-primary));
+    opacity: 0.85;
+}

@@ -1,5 +1,6 @@
 <script>
     import { fly, fade } from 'svelte/transition';
+    import { reduceMotion } from '../../js/motion.js';
     import { toasts } from '../../js/toast-store.svelte.js';
 </script>
 
@@ -9,8 +10,8 @@
             class="toast toast-{toast.type}"
             data-testid="toast"
             role="alert"
-            in:fly={{ y: 12, duration: 200 }}
-            out:fade={{ duration: 150 }}
+            in:fly={reduceMotion({ y: 12, duration: 200 })}
+            out:fade={reduceMotion({ duration: 150 })}
         >
             <span>{toast.message}</span>
             {#if toast.action}

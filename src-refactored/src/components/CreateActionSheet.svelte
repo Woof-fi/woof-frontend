@@ -1,5 +1,6 @@
 <script>
     import { fly, fade } from 'svelte/transition';
+    import { reduceMotion } from '../../js/motion.js';
     import { modals, closeCreateActionSheet, openCreateActionSheet, openCreatePostModal, openHealthRecordModal, openCreateDogModal } from '../../js/modal-store.svelte.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { getMyDogs } from '../../js/api.js';
@@ -84,12 +85,12 @@
     /** Custom out transitions that skip animation when doing instant close */
     function sheetOut(node) {
         if (instantClose) return { duration: 0 };
-        return fly(node, { y: 500, duration: 200, opacity: 1 });
+        return fly(node, reduceMotion({ y: 500, duration: 200, opacity: 1 }));
     }
 
     function backdropOut(node) {
         if (instantClose) return { duration: 0 };
-        return fade(node, { duration: 150 });
+        return fade(node, reduceMotion({ duration: 150 }));
     }
 </script>
 
@@ -98,7 +99,7 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
         class="action-sheet-backdrop"
-        in:fade={{ duration: 150 }}
+        in:fade={reduceMotion({ duration: 150 })}
         out:backdropOut
         onclick={close}
     ></div>
@@ -108,11 +109,11 @@
         role="dialog"
         aria-modal="true"
         aria-label="Create new content"
-        in:fly={{ y: 500, duration: 280, opacity: 1 }}
+        in:fly={reduceMotion({ y: 500, duration: 280, opacity: 1 })}
         out:sheetOut
     >
         {#if view === 'menu'}
-            <div class="menu-view" in:fade={{ duration: 100, delay: 60 }}>
+            <div class="menu-view" in:fade={reduceMotion({ duration: 100, delay: 60 })}>
                 <div class="sheet-handle"></div>
                 <div class="sheet-title">Create</div>
 
@@ -157,12 +158,12 @@
             </div>
 
         {:else if view === 'visit'}
-            <div in:fade={{ duration: 100, delay: 60 }}>
+            <div in:fade={reduceMotion({ duration: 100, delay: 60 })}>
                 <QuickVisitForm onback={handleBack} onclose={close} oncloseinstant={closeAndOpen} />
             </div>
 
         {:else if view === 'pick-dog-health'}
-            <div class="dog-picker-view" in:fade={{ duration: 100, delay: 60 }}>
+            <div class="dog-picker-view" in:fade={reduceMotion({ duration: 100, delay: 60 })}>
                 <div class="sheet-header-row">
                     <button class="back-btn" onclick={handleBack} aria-label={t('common.back')}>
                         <i class="fas fa-arrow-left"></i>

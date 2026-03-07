@@ -1,0 +1,108 @@
+/* ============================================================================
+   ONBOARDING — welcome card + onboarding tour (used by onboarding-tour.js)
+   ============================================================================ */
+
+/* ── Welcome card + Onboarding tour — used by onboarding-tour.js ── */
+.welcome-card {
+    background: linear-gradient(135deg, var(--woof-color-brand-primary-subtle) 0%, var(--woof-color-neutral-100) 100%);
+    border: 1px solid var(--woof-color-brand-primary-alpha-12);
+    border-radius: var(--woof-radius-lg);
+    padding: 32px 24px;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.welcome-card-icon {
+    font-size: 48px;
+    color: var(--woof-color-brand-primary);
+    margin-bottom: 12px;
+}
+
+.welcome-card h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    color: var(--woof-color-neutral-900);
+}
+
+.welcome-card p {
+    margin: 0 0 20px;
+    color: var(--woof-color-neutral-500);
+    font-size: 14px;
+}
+
+.welcome-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.onboarding-tour {
+    align-items: center;
+    justify-content: center;
+}
+
+.onboarding-tour-content {
+    max-width: 400px;
+    margin: 0;
+    width: min(80%, 400px);
+}
+
+.tour-step {
+    text-align: center;
+    padding: 24px;
+}
+
+.tour-icon {
+    font-size: 48px;
+    color: var(--woof-color-brand-primary);
+    margin-bottom: 16px;
+}
+
+.tour-step h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.tour-step p {
+    color: var(--woof-color-neutral-500);
+    font-size: 14px;
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+
+.tour-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.tour-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-neutral-200);
+}
+
+.tour-dot.active {
+    background: var(--woof-color-brand-primary);
+}
+
+.tour-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.tour-skip {
+    background: none;
+    border: none;
+    color: var(--woof-color-neutral-400);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 10px 20px;
+}
+
+.tour-skip:hover {
+    color: var(--woof-color-neutral-500);
+}

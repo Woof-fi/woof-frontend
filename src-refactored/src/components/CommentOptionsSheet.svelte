@@ -1,5 +1,6 @@
 <script>
     import { fly, fade } from 'svelte/transition';
+    import { reduceMotion } from '../../js/motion.js';
     import { modals, closeCommentOptionsSheet, openAuthModal, openEditCommentModal } from '../../js/modal-store.svelte.js';
     import { reportContent, deleteComment } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
@@ -87,7 +88,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
     class="action-sheet-backdrop"
-    transition:fade={{ duration: 150 }}
+    transition:fade={reduceMotion({ duration: 150 })}
     onclick={closeCommentOptionsSheet}
 ></div>
 
@@ -96,11 +97,11 @@
     role="dialog"
     aria-modal="true"
     aria-label={t('post.commentOptions')}
-    in:fly={{ y: 500, duration: 280, opacity: 1 }}
-    out:fly={{ y: 500, duration: 200, opacity: 1 }}
+    in:fly={reduceMotion({ y: 500, duration: 280, opacity: 1 })}
+    out:fly={reduceMotion({ y: 500, duration: 200, opacity: 1 })}
 >
     {#if view === 'options'}
-        <div in:fade={{ duration: 100, delay: 60 }}>
+        <div in:fade={reduceMotion({ duration: 100, delay: 60 })}>
             {#if isOwnComment}
                 <button class="action-sheet-item" onclick={handleEdit}>
                     <i class="fas fa-pen" aria-hidden="true"></i> {t('post.editComment')}
@@ -117,7 +118,7 @@
         </div>
 
     {:else if view === 'report'}
-        <div in:fade={{ duration: 100, delay: 60 }}>
+        <div in:fade={reduceMotion({ duration: 100, delay: 60 })}>
             <div class="sheet-subview-header">
                 <button class="sheet-back" onclick={() => (view = 'options')} aria-label={t('post.back')}>
                     <i class="fas fa-arrow-left"></i>
@@ -133,7 +134,7 @@
         </div>
 
     {:else if view === 'confirm-delete'}
-        <div class="action-sheet-delete-confirm" in:fade={{ duration: 120, delay: 60 }}>
+        <div class="action-sheet-delete-confirm" in:fade={reduceMotion({ duration: 120, delay: 60 })}>
             <p class="action-sheet-delete-title">{t('post.deleteCommentConfirm')}</p>
             <p class="action-sheet-delete-subtitle">{t('post.cantBeUndone')}</p>
             <button

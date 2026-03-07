@@ -1,5 +1,6 @@
 <script>
     import { fly, fade } from 'svelte/transition';
+    import { reduceMotion } from '../../../js/motion.js';
     import { openCreatePostModal } from '../../../js/modal-store.svelte.js';
     import QuickVisitForm from './QuickVisitForm.svelte';
     import QuickHealthForm from './QuickHealthForm.svelte';
@@ -23,7 +24,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
     class="action-sheet-backdrop"
-    transition:fade={{ duration: 150 }}
+    transition:fade={reduceMotion({ duration: 150 })}
     onclick={() => onclose?.()}
 ></div>
 
@@ -32,11 +33,11 @@
     role="dialog"
     aria-modal="true"
     aria-label="Create new content"
-    in:fly={{ y: 500, duration: 280, opacity: 1 }}
-    out:fly={{ y: 500, duration: 200, opacity: 1 }}
+    in:fly={reduceMotion({ y: 500, duration: 280, opacity: 1 })}
+    out:fly={reduceMotion({ y: 500, duration: 200, opacity: 1 })}
 >
     {#if view === 'menu'}
-        <div class="menu-view" in:fade={{ duration: 100, delay: 60 }}>
+        <div class="menu-view" in:fade={reduceMotion({ duration: 100, delay: 60 })}>
             <div class="sheet-handle"></div>
             <div class="sheet-title">Create</div>
 
@@ -77,12 +78,12 @@
         </div>
 
     {:else if view === 'visit'}
-        <div in:fade={{ duration: 100, delay: 60 }}>
+        <div in:fade={reduceMotion({ duration: 100, delay: 60 })}>
             <QuickVisitForm onback={handleBack} onclose={onclose} />
         </div>
 
     {:else if view === 'health'}
-        <div in:fade={{ duration: 100, delay: 60 }}>
+        <div in:fade={reduceMotion({ duration: 100, delay: 60 })}>
             <QuickHealthForm onback={handleBack} onclose={onclose} />
         </div>
     {/if}

@@ -1,0 +1,145 @@
+/* ============================================================================
+   FORMS — form groups, inputs, selects, textareas, labels, hints
+   ============================================================================ */
+
+/* ── Form groups — shared across AuthModal + CreatePostModal + HealthRecordModal ── */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--woof-color-neutral-900);
+    margin-bottom: 6px;
+}
+
+/* ── Form hint text ── */
+.form-hint {
+    display: block;
+    margin-top: 4px;
+    color: var(--woof-color-neutral-400);
+    font-size: 12px;
+}
+
+/* ============================================================================
+   DATE / DATETIME INPUTS — global polish
+   ============================================================================ */
+input[type="date"],
+input[type="datetime-local"] {
+    width: 100%;
+    padding: var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    font-family: var(--woof-font-family);
+    color: var(--woof-color-neutral-900);
+    background: var(--woof-color-neutral-0);
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color var(--woof-duration-fast);
+}
+
+input[type="date"]:focus,
+input[type="datetime-local"]:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+    box-shadow: 0 0 0 3px var(--woof-color-brand-primary-subtle);
+}
+
+.modal input[type="text"],
+.modal input[type="email"],
+.modal input[type="password"],
+.modal input[type="number"],
+.modal textarea,
+.modal select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-sm);
+    background-color: var(--woof-color-neutral-50);
+    color: var(--woof-color-neutral-900);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.modal input::placeholder,
+.modal textarea::placeholder {
+    color: var(--woof-color-neutral-400);
+}
+
+.modal input[type="text"]:focus,
+.modal input[type="email"]:focus,
+.modal input[type="password"]:focus,
+.modal input[type="number"]:focus,
+.modal textarea:focus,
+.modal select:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+    box-shadow: 0 0 0 3px var(--woof-color-brand-primary-alpha-15);
+    background-color: var(--woof-surface-primary);
+}
+
+.modal textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238e8e8e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+.modal input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px dashed var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-sm);
+    background-color: var(--woof-color-neutral-50);
+    color: var(--woof-color-neutral-400);
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.modal input[type="file"]:hover {
+    border-color: var(--woof-color-brand-primary);
+    background-color: var(--woof-color-brand-primary-alpha-05);
+}
+
+.modal input[type="file"]:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+}
+
+.modal form .btn-primary {
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* ── Mobile: modal inputs need 16px to prevent iOS zoom ── */
+@media (max-width: 768px) {
+    .modal input[type="text"],
+    .modal input[type="email"],
+    .modal input[type="password"],
+    .modal input[type="number"],
+    .modal textarea,
+    .modal select {
+        font-size: 16px;
+    }
+}

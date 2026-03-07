@@ -1,5 +1,6 @@
 <script>
     import { fly, fade } from 'svelte/transition';
+    import { reduceMotion } from '../../js/motion.js';
     import { modals, closePostOptionsSheet, openAuthModal, openEditPostModal } from '../../js/modal-store.svelte.js';
     import { reportContent, deletePost, toggleBookmark, getBookmarkStatus } from '../../js/api.js';
     import { followDog, unfollowDog, getFollowStatus } from '../../js/api.js';
@@ -154,7 +155,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
     class="action-sheet-backdrop"
-    transition:fade={{ duration: 150 }}
+    transition:fade={reduceMotion({ duration: 150 })}
     onclick={closePostOptionsSheet}
 ></div>
 
@@ -163,11 +164,11 @@
     role="dialog"
     aria-modal="true"
     aria-label={t('post.postOptions')}
-    in:fly={{ y: 500, duration: 280, opacity: 1 }}
-    out:fly={{ y: 500, duration: 200, opacity: 1 }}
+    in:fly={reduceMotion({ y: 500, duration: 280, opacity: 1 })}
+    out:fly={reduceMotion({ y: 500, duration: 200, opacity: 1 })}
 >
     {#if view === 'options'}
-        <div in:fade={{ duration: 100, delay: 60 }}>
+        <div in:fade={reduceMotion({ duration: 100, delay: 60 })}>
             {#if isOwnPost}
                 <button class="action-sheet-item" onclick={() => { const editData = { id: postId, caption: data?.caption }; closePostOptionsSheet(); openEditPostModal(editData); }}>
                     <i class="fas fa-pen"></i> {t('post.editCaption')}
@@ -217,7 +218,7 @@
         </div>
 
     {:else if view === 'report'}
-        <div in:fade={{ duration: 100, delay: 60 }}>
+        <div in:fade={reduceMotion({ duration: 100, delay: 60 })}>
             <div class="sheet-subview-header">
                 <button class="sheet-back" onclick={() => view = 'options'} aria-label={t('post.back')}>
                     <i class="fas fa-arrow-left"></i>
@@ -233,7 +234,7 @@
         </div>
 
     {:else if view === 'confirm-delete'}
-        <div class="action-sheet-delete-confirm" in:fade={{ duration: 120, delay: 60 }}>
+        <div class="action-sheet-delete-confirm" in:fade={reduceMotion({ duration: 120, delay: 60 })}>
             <p class="action-sheet-delete-title">{t('post.deletePostConfirm')}</p>
             <p class="action-sheet-delete-subtitle">{t('post.cantBeUndone')}</p>
             <button

@@ -1,0 +1,171 @@
+/* ============================================================================
+   UTILITIES — empty states, skeleton loading, loading spinner, route progress
+   ============================================================================ */
+
+/* ── Empty state — shared across all views ── */
+.woof-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--woof-space-10) var(--woof-space-5);
+    gap: var(--woof-space-3);
+}
+
+.woof-empty-state-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-neutral-100);
+    color: var(--woof-color-neutral-400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: var(--woof-space-1);
+}
+
+.woof-empty-state-icon--error {
+    background: var(--woof-color-brand-primary-subtle);
+    color: var(--woof-color-brand-primary);
+}
+
+.woof-empty-state-icon--mint {
+    background: var(--woof-color-fresh-mint-light);
+    color: var(--woof-color-fresh-mint-dark);
+}
+
+.woof-empty-state p {
+    margin: 0;
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-500);
+    text-align: center;
+    line-height: var(--woof-lh-body);
+    max-width: 280px;
+}
+
+/* ── Skeleton loading — Feed + ProfileView ── */
+@keyframes skeleton-shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--woof-color-neutral-200, #e0e0e0) 25%, #f5f5f5 50%, var(--woof-color-neutral-200, #e0e0e0) 75%);
+    background-size: 200px 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--woof-radius-sm, 4px);
+}
+
+.skeleton-text {
+    height: 14px;
+    width: 80%;
+    margin: 6px 0;
+}
+
+.skeleton-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--woof-radius-full);
+    flex-shrink: 0;
+}
+
+.skeleton-image {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 0;
+}
+
+.post-skeleton {
+    background: var(--woof-color-neutral-50, #fff);
+    border: 1px solid var(--woof-color-neutral-200, #e0e0e0);
+    border-radius: var(--woof-radius-md, 8px);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.post-header-skeleton {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+}
+
+.post-header-skeleton .skeleton-text {
+    width: 120px;
+}
+
+.post-actions-skeleton {
+    padding: 12px 16px;
+}
+
+.post-actions-skeleton .skeleton-text {
+    width: 60%;
+    height: 12px;
+}
+
+.profile-skeleton {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 24px;
+}
+
+.profile-skeleton .skeleton-circle {
+    width: 120px;
+    height: 120px;
+}
+
+.skeleton-details {
+    flex: 1;
+    padding-top: 8px;
+}
+
+.skeleton-details .skeleton-text:first-child {
+    height: 20px;
+    width: 160px;
+    margin-bottom: 12px;
+}
+
+.skeleton-details .skeleton-text:nth-child(2) {
+    width: 200px;
+}
+
+.skeleton-details .skeleton-text:nth-child(3) {
+    width: 140px;
+}
+
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    color: var(--woof-color-neutral-400, #888);
+}
+
+.loading .fa-spinner {
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+/* ── Router progress bar ── */
+.route-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0;
+    background: var(--woof-color-brand-primary);
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 1;
+    transition: none;
+}
+.route-progress.loading {
+    width: 70%;
+    transition: width 0.3s ease-out;
+}
+.route-progress.done {
+    width: 100%;
+    opacity: 0;
+    transition: width 0.15s ease-out, opacity 0.2s 0.1s ease-out;
+}
