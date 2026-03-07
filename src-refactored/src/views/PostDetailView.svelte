@@ -52,6 +52,7 @@
                 profilePic={post.dogPhoto || '/images/dog_profile_pic.jpg'}
                 username={post.dogName || t('feed.unknownDog')}
                 imageUrl={post.imageUrl}
+                imageUrls={post.imageUrls || []}
                 caption={post.caption || ''}
                 dogSlug={post.dogSlug || ''}
                 dogId={post.dogId || ''}

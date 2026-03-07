@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-03-06
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed
+**Last Updated:** 2026-03-07
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed, 13B Multi-Image Posts
 **Current:** Tier 2 — Major Features (15A Sentry next)
 
 ---
@@ -129,16 +129,18 @@ Custom Svelte 5 `$state`-based i18n store (svelte-i18n incompatible with runes).
 - **Following feed fix**: Tuned own-post visibility in Following tab (initially excluded, later re-included as part of Personalized Feed).
 - **Visit profile fix**: PostOptionsSheet falls back to `dogId` when `dogSlug` is empty, with early return guard.
 
-#### 13B: Multi-Image Posts — Large
+#### 13B: Multi-Image Posts — DONE
 
 *Merges existing Phase 9B. Capped at 5 images (not 10).*
 
-- `post_images` table (`post_id FK, image_url, position, created_at`)
-- Keep `image_url` on posts as cover image for backward compatibility
-- Carousel/swipe UI on PostCard (CSS scroll-snap), dot indicators
-- Redesigned CreatePostModal: multi-image selection, thumbnails with reorder/delete
-- Batch presigned URL upload, parallel S3 uploads
-- Feed stays lightweight (cover image + count badge); full carousel on PostDetailView
+- `post_images` table (`post_id FK, image_url, position, created_at`), migration 030
+- `posts.image_url` kept as nullable cover image for backward compatibility + OG tags
+- PostImageCarousel.svelte: touch swipe with CSS translateX, dot indicators, counter badge, double-tap like
+- CreatePostModal: multi-image selection (gallery multi-select), preview grid with remove + "Cover" badge, parallel S3 uploads
+- API: `image_urls` array in CreatePostSchema (1-5 URLs), transaction-based createPost, `array_agg` subquery in all feed/detail/bookmark/breed/territory queries
+- Shared `mapPostRow` used by all controllers (including bookmarks refactored). Legacy single-image posts backward compatible via fallback wrapping
+- Serialized async moderation (Rekognition) per image to prevent race conditions
+- 450 backend + 160 frontend tests
 
 #### 13C: Dark Mode — Large
 
@@ -401,7 +403,7 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Test coverage gaps | Medium | 441 backend + 160 frontend tests. Image upload, Search, Navigation, CreatePostModal covered. Major views (ProfileView, FeedView) still untested |
+| Test coverage gaps | Medium | 450 backend + 160 frontend tests. Image upload, Search, Navigation, CreatePostModal, multi-image posts covered. Major views (ProfileView, FeedView) still untested |
 | i18n key parity validation | Low | Pre-commit hook or CI check to ensure EN and FI locale files have identical keys |
 | Extract shared controller utilities | Low | ✅ `getFirstDogId()` extracted to dogService. ✅ `parsePagination()` extracted. ✅ `mapPostRow()` extracted. "Verify dog ownership" still in 5+ controllers. |
 | OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |

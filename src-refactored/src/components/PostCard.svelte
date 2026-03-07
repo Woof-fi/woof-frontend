@@ -7,6 +7,7 @@
     import { openPostOptionsSheet, openCommentOptionsSheet, openLikerListModal } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
+    import PostImageCarousel from './PostImageCarousel.svelte';
 
     let {
         id = '',
@@ -14,6 +15,7 @@
         username = '',
         caption = '',
         imageUrl = '',
+        imageUrls = [],
         dogSlug = '',
         dogId = '',
         isOwnPost = false,
@@ -242,6 +244,9 @@
         return timeAgo(createdAt);
     }
 
+    // --- Multi-image detection ---
+    const isMultiImage = $derived(imageUrls && imageUrls.length > 1);
+
     // --- Edited indicator ---
     // svelte-ignore state_referenced_locally
     const isEdited = createdAt && updatedAt
@@ -307,31 +312,46 @@
         {/if}
     </div>
 
-    <!-- Post image (double-tap to like) -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="post-image" onclick={handleImageDoubleTap}>
-        <img
-            src={imageUrl}
-            srcset="{imageVariant(imageUrl, 'medium')} 600w, {imageUrl} 1200w"
-            sizes="(max-width: 540px) 100vw, 500px"
-            alt="Post by {username}"
-            loading="lazy"
-            onerror={(e) => {
-                if (e.target.srcset) {
-                    e.target.srcset = '';
-                    e.target.src = imageUrl;
-                } else if (e.target.src !== FALLBACK_POST) {
-                    e.target.src = FALLBACK_POST;
-                }
-            }}
-        />
-        {#if showDoubleTapHeart}
-            <div class="double-tap-heart" aria-hidden="true">
-                <i class="fas fa-heart"></i>
-            </div>
-        {/if}
-    </div>
+    <!-- Post image(s) -->
+    {#if isMultiImage}
+        <div class="post-image">
+            <PostImageCarousel
+                imageUrls={imageUrls}
+                username={username}
+                ondoubletap={handleImageDoubleTap}
+            />
+            {#if showDoubleTapHeart}
+                <div class="double-tap-heart" aria-hidden="true">
+                    <i class="fas fa-heart"></i>
+                </div>
+            {/if}
+        </div>
+    {:else}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div class="post-image" onclick={handleImageDoubleTap}>
+            <img
+                src={imageUrl}
+                srcset="{imageVariant(imageUrl, 'medium')} 600w, {imageUrl} 1200w"
+                sizes="(max-width: 540px) 100vw, 500px"
+                alt="Post by {username}"
+                loading="lazy"
+                onerror={(e) => {
+                    if (e.target.srcset) {
+                        e.target.srcset = '';
+                        e.target.src = imageUrl;
+                    } else if (e.target.src !== FALLBACK_POST) {
+                        e.target.src = FALLBACK_POST;
+                    }
+                }}
+            />
+            {#if showDoubleTapHeart}
+                <div class="double-tap-heart" aria-hidden="true">
+                    <i class="fas fa-heart"></i>
+                </div>
+            {/if}
+        </div>
+    {/if}
 
     <!-- Actions -->
     <div class="post-actions">

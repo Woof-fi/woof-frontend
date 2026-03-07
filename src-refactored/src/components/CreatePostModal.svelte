@@ -13,16 +13,19 @@
     import { t } from '../../js/i18n-store.svelte.js';
     import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
 
+    const MAX_IMAGES = 5;
+
     // Local visibility — controlled by async open checks
     let visible = $state(false);
     let loading = $state(false);
     let dogs = $state([]);
     let selectedDogId = $state('');
     let caption = $state('');
-    let previewUrl = $state(null);
-    let selectedFile = $state(null);
     let submitting = $state(false);
     let showDogSelect = $state(true);
+
+    // Multi-image state: array of { file, previewUrl }
+    let selectedImages = $state([]);
 
     let cameraInputEl = $state(null);
     let galleryInputEl = $state(null);
@@ -93,8 +96,8 @@
 
     function resetForm() {
         caption = '';
-        previewUrl = null;
-        selectedFile = null;
+        selectedImages.forEach(img => URL.revokeObjectURL(img.previewUrl));
+        selectedImages = [];
         selectedDogId = '';
         dogs = [];
         showDogSelect = true;
@@ -108,39 +111,55 @@
         if (e.target === e.currentTarget) close();
     }
 
-    function handleFileSelect(file) {
-        if (!file) return;
-        if (!isValidFileType(file)) {
-            showToast(t('postCreate.invalidFileType'), 'error');
+    function addFiles(files) {
+        const remaining = MAX_IMAGES - selectedImages.length;
+        if (remaining <= 0) {
+            showToast(t('postCreate.maxImages', { max: MAX_IMAGES }), 'error');
             return;
         }
-        if (!isValidFileSize(file, 10)) {
-            showToast(t('postCreate.fileTooLarge'), 'error');
-            return;
+
+        const newImages = [];
+        for (let i = 0; i < Math.min(files.length, remaining); i++) {
+            const file = files[i];
+            if (!isValidFileType(file)) {
+                showToast(t('postCreate.invalidFileType'), 'error');
+                continue;
+            }
+            if (!isValidFileSize(file, 10)) {
+                showToast(t('postCreate.fileTooLarge'), 'error');
+                continue;
+            }
+            newImages.push({ file, previewUrl: URL.createObjectURL(file) });
         }
-        selectedFile = file;
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = URL.createObjectURL(file);
+
+        if (newImages.length > 0) {
+            selectedImages = [...selectedImages, ...newImages];
+        }
+
+        if (files.length > remaining) {
+            showToast(t('postCreate.maxImages', { max: MAX_IMAGES }), 'error');
+        }
+    }
+
+    function removeImage(index) {
+        URL.revokeObjectURL(selectedImages[index].previewUrl);
+        selectedImages = selectedImages.filter((_, i) => i !== index);
     }
 
     function handleCameraChange(e) {
-        handleFileSelect(e.target.files[0]);
+        if (e.target.files.length > 0) addFiles(e.target.files);
+        e.target.value = '';
     }
 
     function handleGalleryChange(e) {
-        const file = e.target.files[0];
-        if (file && cameraInputEl) {
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            cameraInputEl.files = dt.files;
-        }
-        handleFileSelect(file);
+        if (e.target.files.length > 0) addFiles(e.target.files);
+        e.target.value = '';
     }
 
     async function handleSubmit(e) {
         e.preventDefault();
 
-        if (!selectedFile) {
+        if (selectedImages.length === 0) {
             showToast(t('postCreate.selectImage'), 'error');
             return;
         }
@@ -152,9 +171,12 @@
 
         submitting = true;
         try {
-            showToast(t('postCreate.uploadingImage'), 'info');
-            const imageUrl = await uploadImage(selectedFile);
-            const post = await createPost(selectedDogId, imageUrl, caption);
+            showToast(t(selectedImages.length > 1 ? 'postCreate.uploadingImages' : 'postCreate.uploadingImage'), 'info');
+            // Upload all images in parallel
+            const imageUrls = await Promise.all(
+                selectedImages.map(img => uploadImage(img.file))
+            );
+            const post = await createPost(selectedDogId, imageUrls, caption);
             close();
             bumpFeedVersion();
             showToast(t('common.postCreated'), 'success', { label: t('common.view'), href: `/post/${post.id}` });
@@ -202,13 +224,19 @@
                 {/if}
 
                 <div class="form-group">
-                    <label for="post-image-camera">{t('postCreate.image')}</label>
+                    <label for="post-image-camera">
+                        {t('postCreate.image')}
+                        {#if selectedImages.length > 0}
+                            <span class="image-count">{selectedImages.length}/{MAX_IMAGES}</span>
+                        {/if}
+                    </label>
                     <div class="image-source-buttons">
                         <button
                             type="button"
                             id="post-image-camera"
                             class="btn-secondary image-source-btn"
                             onclick={() => cameraInputEl?.click()}
+                            disabled={selectedImages.length >= MAX_IMAGES}
                         >
                             <i class="fas fa-camera"></i> {t('postCreate.takePhoto')}
                         </button>
@@ -217,6 +245,7 @@
                             id="post-image-gallery"
                             class="btn-secondary image-source-btn"
                             onclick={() => galleryInputEl?.click()}
+                            disabled={selectedImages.length >= MAX_IMAGES}
                         >
                             <i class="fas fa-images"></i> {t('postCreate.gallery')}
                         </button>
@@ -234,19 +263,34 @@
                         type="file"
                         id="post-image-gallery-input"
                         accept="image/*"
+                        multiple
                         style="display:none"
                         bind:this={galleryInputEl}
                         onchange={handleGalleryChange}
                     />
-                    <div id="image-preview" class="image-preview">
-                        {#if previewUrl}
-                            <img
-                                src={previewUrl}
-                                alt="Post preview"
-                                class="preview-img"
-                            />
-                        {/if}
-                    </div>
+
+                    {#if selectedImages.length > 0}
+                        <div class="image-preview-grid">
+                            {#each selectedImages as img, i (img.previewUrl)}
+                                <div class="preview-item">
+                                    <img src={img.previewUrl} alt="Preview {i + 1}" class="preview-img" />
+                                    <button
+                                        type="button"
+                                        class="preview-remove"
+                                        aria-label={t('common.remove')}
+                                        onclick={() => removeImage(i)}
+                                    >
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    {#if i === 0}
+                                        <span class="preview-cover-badge">{t('postCreate.cover')}</span>
+                                    {/if}
+                                </div>
+                            {/each}
+                        </div>
+                    {:else}
+                        <div id="image-preview" class="image-preview"></div>
+                    {/if}
                 </div>
 
                 <div class="form-group">
@@ -285,8 +329,8 @@
 
 .image-source-buttons {
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: var(--woof-space-3);
+    margin-bottom: var(--woof-space-3);
 }
 
 #post-image-camera {
@@ -304,26 +348,38 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border: 2px dashed var(--color-border);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
+    gap: var(--woof-space-2);
+    padding: var(--woof-space-3) var(--woof-space-4);
+    border: 2px dashed var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-sm);
+    background: var(--woof-surface-primary);
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    transition: all 0.2s;
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-medium);
+    color: var(--woof-color-neutral-500);
+    transition: all var(--woof-duration-fast);
 }
 
-.image-source-btn:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+.image-source-btn:hover:not(:disabled) {
+    border-color: var(--woof-color-brand-primary);
+    color: var(--woof-color-brand-primary);
     background: var(--woof-color-brand-primary-alpha-05);
 }
 
+.image-source-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
 .image-source-btn i {
-    font-size: 18px;
+    font-size: var(--woof-text-title-3);
+}
+
+.image-count {
+    font-weight: normal;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    margin-left: var(--woof-space-1);
 }
 
 .image-preview {
@@ -337,12 +393,63 @@
     justify-content: center;
 }
 
-.preview-img {
-    max-width: 100%;
-    max-height: 300px;
+/* Multi-image preview grid */
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--woof-space-2);
+    margin-bottom: var(--woof-space-4);
+}
+
+.preview-item {
+    position: relative;
+    aspect-ratio: 1;
     border-radius: var(--woof-radius-md);
-    margin-top: var(--woof-space-2);
-    object-fit: contain;
+    overflow: hidden;
+}
+
+.preview-item .preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
+    border-radius: var(--woof-radius-md);
+}
+
+.preview-remove {
+    position: absolute;
+    top: var(--woof-space-1);
+    right: var(--woof-space-1);
+    width: 24px;
+    height: 24px;
+    border-radius: var(--woof-radius-full);
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--woof-color-neutral-0);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    padding: 0;
+    transition: background var(--woof-duration-fast);
+}
+
+.preview-remove:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.preview-cover-badge {
+    position: absolute;
+    bottom: var(--woof-space-1);
+    left: var(--woof-space-1);
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--woof-color-neutral-0);
+    font-size: 10px;
+    font-weight: var(--woof-font-weight-semibold);
+    padding: 2px var(--woof-space-1);
+    border-radius: var(--woof-radius-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 </style>

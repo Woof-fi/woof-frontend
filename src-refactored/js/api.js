@@ -243,24 +243,19 @@ export async function healthCheck() {
 }
 
 /**
- * Create a new post
+ * Create a new post (supports multi-image)
  * @param {string} dogId - Dog ID
- * @param {string} imageUrl - S3 image URL
+ * @param {string|string[]} imageUrls - Single URL or array of S3 image URLs
  * @param {string} caption - Post caption
  * @returns {Promise<object>} - Created post object
  */
-export async function createPost(dogId, imageUrl, caption) {
-    try {
-        const data = await apiRequest('/api/posts', {
-            method: 'POST',
-            body: JSON.stringify({ dog_id: dogId, image_url: imageUrl, caption })
-        });
-        return data.post;
-    } catch (error) {
-        console.error('Failed to create post:', error);
-        showToast(t('common.failedCreatePost'), 'error');
-        throw error;
-    }
+export async function createPost(dogId, imageUrls, caption) {
+    const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
+    const data = await apiRequest('/api/posts', {
+        method: 'POST',
+        body: JSON.stringify({ dog_id: dogId, image_urls: urls, caption })
+    });
+    return data.post;
 }
 
 /**

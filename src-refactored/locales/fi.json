@@ -190,7 +190,10 @@
     "selectDogError": "Valitse koira",
     "invalidFileType": "Vain JPEG, PNG, GIF ja WebP kuvat ovat sallittuja",
     "fileTooLarge": "Kuvan koko saa olla enintään 10 Mt",
-    "uploadingImage": "Ladataan kuvaa..."
+    "uploadingImage": "Ladataan kuvaa...",
+    "uploadingImages": "Ladataan kuvia...",
+    "maxImages": "Enintään {max} kuvaa per julkaisu",
+    "cover": "Kansi"
   },
   "postEdit": {
     "title": "Muokkaa kuvatekstiä",

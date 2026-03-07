@@ -205,7 +205,7 @@ describe('CreatePostModal', () => {
 
         await waitFor(() => {
             expect(apiModule.uploadImage).toHaveBeenCalled();
-            expect(apiModule.createPost).toHaveBeenCalledWith('dog-1', 'https://cdn.woofapp.fi/posts/test.jpg', '');
+            expect(apiModule.createPost).toHaveBeenCalledWith('dog-1', ['https://cdn.woofapp.fi/posts/test.jpg'], '');
             expect(storeModule.bumpFeedVersion).toHaveBeenCalled();
         });
     });

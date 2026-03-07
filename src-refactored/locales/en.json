@@ -190,7 +190,10 @@
     "selectDogError": "Please select a dog",
     "invalidFileType": "Only JPEG, PNG, GIF and WebP images are allowed",
     "fileTooLarge": "Image must be under 10 MB",
-    "uploadingImage": "Uploading image..."
+    "uploadingImage": "Uploading image...",
+    "uploadingImages": "Uploading images...",
+    "maxImages": "Maximum {max} images per post",
+    "cover": "Cover"
   },
   "postEdit": {
     "title": "Edit Caption",
