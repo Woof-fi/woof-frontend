@@ -53,6 +53,7 @@
             bumpFeedVersion();
         } catch (err) {
             console.error('Failed to update post:', err);
+            showToast(t('common.error'), 'error');
         } finally {
             submitting = false;
         }

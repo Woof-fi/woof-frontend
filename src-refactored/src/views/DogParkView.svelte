@@ -164,6 +164,7 @@
         } catch (e) {
             loadError = true;
             console.error('Failed to load dog park:', e);
+            showToast(t('common.failedLoad'), 'error');
         }
         loading = false;
     }
@@ -175,6 +176,7 @@
             followerCount = park.followerCount || 0;
         } catch (e) {
             console.error('Failed to reload park:', e);
+            showToast(t('common.failedLoad'), 'error');
         }
     }
 
@@ -206,6 +208,7 @@
             bumpParkVersion();
         } catch (e) {
             console.error('Follow action failed:', e);
+            showToast(t('common.error'), 'error');
         }
         followLoading = false;
     }
@@ -295,6 +298,7 @@
             visits = visits.filter(v => v.id !== visitId);
         } catch (e) {
             console.error('Failed to cancel visit:', e);
+            showToast(t('common.error'), 'error');
         }
     }
 

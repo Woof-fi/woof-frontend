@@ -9,7 +9,7 @@ header {
     background-color: var(--woof-surface-primary);
     border-bottom: 1px solid var(--woof-color-neutral-200);
     padding: 0;
-    height: var(--header-height);
+    height: var(--woof-header-height);
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -649,7 +649,7 @@ input[type="datetime-local"]:focus {
 .main-container {
     display: flex;
     flex-grow: 1;
-    margin-top: var(--header-height);
+    margin-top: var(--woof-header-height);
     justify-content: center;
     max-width: 100%;
     overflow-x: hidden;

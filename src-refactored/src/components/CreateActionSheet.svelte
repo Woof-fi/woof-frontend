@@ -164,7 +164,7 @@
         {:else if view === 'pick-dog-health'}
             <div class="dog-picker-view" in:fade={{ duration: 100, delay: 60 }}>
                 <div class="sheet-header-row">
-                    <button class="back-btn" onclick={handleBack}>
+                    <button class="back-btn" onclick={handleBack} aria-label={t('common.back')}>
                         <i class="fas fa-arrow-left"></i>
                     </button>
                     <h3 class="sheet-header-title">Select a dog</h3>

@@ -168,6 +168,7 @@
     class:active={modals.searchPanelOpen}
     inert={!modals.searchPanelOpen || undefined}
     onclick={handleOverlayClick}
+    role="presentation"
 >
     <div class="search-bar">
         <div class="search-input-wrapper">
@@ -253,10 +254,10 @@
 <style>
 .search-panel {
     position: fixed;
-    top: var(--header-height);
+    top: var(--woof-header-height);
     left: 280px;
     width: 400px;
-    height: calc(100vh - var(--header-height));
+    height: calc(100vh - var(--woof-header-height));
     background-color: var(--woof-surface-primary);
     border-right: 1px solid var(--woof-color-neutral-200);
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);

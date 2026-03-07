@@ -6,6 +6,7 @@
     import { modals, closeLikerListModal as storeClose } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
 
     let dogs = $state([]);
     let loading = $state(true);
@@ -44,6 +45,7 @@
             }
         } catch (e) {
             console.error('Failed to load likers:', e);
+            showToast(t('common.failedLoad'), 'error');
             dogs = [];
         } finally {
             loading = false;
@@ -68,6 +70,7 @@
             }
         } catch (e) {
             console.error('Follow toggle failed:', e);
+            showToast(t('common.error'), 'error');
         } finally {
             followInFlight = new Set([...followInFlight].filter(id => id !== dog.id));
         }

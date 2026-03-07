@@ -678,7 +678,7 @@
 
 .nav-drawer {
     position: fixed;
-    top: var(--header-height);
+    top: var(--woof-header-height);
     left: 0;
     bottom: 0;
     width: 280px;
@@ -697,7 +697,7 @@
     padding: var(--woof-space-3) var(--woof-space-4);
     border-bottom: 1px solid var(--woof-color-neutral-200);
     gap: var(--woof-space-3);
-    min-height: var(--header-height);
+    min-height: var(--woof-header-height);
     box-sizing: border-box;
 }
 

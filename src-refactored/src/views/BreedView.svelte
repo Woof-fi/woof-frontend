@@ -96,6 +96,7 @@
                 postsLoading = false;
                 loadError = true;
                 console.error('Breed load error:', e);
+                showToast(t('common.failedLoad'), 'error');
             }
         })();
 
@@ -118,6 +119,7 @@
             dogsCursor = result.nextCursor;
         } catch (e) {
             console.error('Failed to load breed dogs:', e);
+            showToast(t('common.failedLoad'), 'error');
             dogs = [];
         } finally {
             dogsLoading = false;
@@ -134,6 +136,7 @@
             postsCursor = result.nextCursor;
         } catch (e) {
             console.error('Failed to load more posts:', e);
+            showToast(t('common.failedLoad'), 'error');
         } finally {
             postsLoadingMore = false;
         }
@@ -148,6 +151,7 @@
             dogsCursor = result.nextCursor;
         } catch (e) {
             console.error('Failed to load more dogs:', e);
+            showToast(t('common.failedLoad'), 'error');
         } finally {
             dogsLoadingMore = false;
         }

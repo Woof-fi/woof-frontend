@@ -679,7 +679,7 @@
                                             </div>
                                         {:else}
                                             <span class="admin-park-name">{localName(park)}</span>
-                                            <button class="admin-park-edit-btn" onclick={() => startParkEdit(park)} title="Rename">
+                                            <button class="admin-park-edit-btn" onclick={() => startParkEdit(park)} title="Rename" aria-label="Edit park name">
                                                 <i class="fas fa-pencil"></i>
                                             </button>
                                             <span class="admin-park-type-badge">{parkTypeLabel(park.parkType)}</span>
@@ -713,6 +713,7 @@
                                                 class="admin-action-btn admin-action-btn--neutral"
                                                 disabled={!!parksBusy[park.id]}
                                                 onclick={() => handleAssignTerritory(park)}
+                                                aria-label="Save territory assignment"
                                             >
                                                 <i class="fas fa-floppy-disk"></i>
                                             </button>

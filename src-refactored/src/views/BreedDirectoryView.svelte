@@ -1,6 +1,7 @@
 <script>
     import { getAllBreeds, getPopularBreeds } from '../../js/api.js';
     import { t, localName } from '../../js/i18n-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
 
     let allBreeds = $state([]);
     let popularBreeds = $state([]);
@@ -29,6 +30,7 @@
                 popularBreeds = popular;
             } catch (e) {
                 console.error('Failed to load breeds:', e);
+                showToast(t('common.failedLoad'), 'error');
             } finally {
                 if (active) loading = false;
             }

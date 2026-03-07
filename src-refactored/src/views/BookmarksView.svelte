@@ -3,6 +3,7 @@
     import { isAuthenticated } from '../../js/auth.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import PostCard from '../components/PostCard.svelte';
     import { viewport } from '../actions/viewport.ts';
 
@@ -22,6 +23,7 @@
             nextCursor = result.nextCursor;
         } catch (e) {
             console.error('Failed to load more bookmarks:', e);
+            showToast(t('common.failedLoad'), 'error');
         } finally {
             loading = false;
         }
@@ -55,6 +57,7 @@
                 }
             } catch (e) {
                 console.error('Failed to load bookmarks:', e);
+                showToast(t('common.failedLoad'), 'error');
             } finally {
                 if (!cleanup) loading = false;
             }

@@ -245,7 +245,7 @@
 <style>
 .messages-page {
     position: fixed;
-    top: var(--header-height);
+    top: var(--woof-header-height);
     left: 280px;
     right: 0;
     bottom: 0;
@@ -577,7 +577,7 @@
 
     .thread-panel {
         position: fixed;
-        top: var(--header-height);
+        top: var(--woof-header-height);
         left: 0;
         right: 0;
         bottom: 56px;
