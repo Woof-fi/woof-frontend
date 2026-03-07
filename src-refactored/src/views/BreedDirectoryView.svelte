@@ -278,12 +278,6 @@
     color: var(--woof-color-neutral-900);
 }
 
-.breed-alpha-fi {
-    display: block;
-    font-size: 12px;
-    color: var(--woof-color-neutral-500);
-    margin-top: 1px;
-}
 
 .breed-alpha-arrow {
     font-size: 12px;

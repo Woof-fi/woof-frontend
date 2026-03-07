@@ -464,7 +464,7 @@
                         </div>
 
                         <div class="park-edit-field">
-                            <label>Amenities</label>
+                            <span class="park-edit-label">Amenities</span>
                             <div class="park-edit-amenities">
                                 {#each amenityKeys as key}
                                     <button
@@ -615,7 +615,7 @@
                                             <div class="park-visit-note">{visit.note}</div>
                                         {/if}
                                         {#if visit.isMine}
-                                            <button class="park-visit-cancel" onclick={() => handleCancelVisit(visit.id)}>
+                                            <button class="park-visit-cancel" aria-label="Cancel visit" onclick={() => handleCancelVisit(visit.id)}>
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         {/if}
@@ -1219,7 +1219,8 @@
     gap: var(--woof-space-1);
 }
 
-.park-edit-field label {
+.park-edit-field label,
+.park-edit-label {
     font-size: var(--woof-text-caption-1);
     font-weight: var(--woof-font-weight-semibold);
     color: var(--woof-color-neutral-600);

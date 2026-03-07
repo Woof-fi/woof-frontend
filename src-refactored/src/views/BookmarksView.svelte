@@ -190,11 +190,6 @@
     line-height: 1.5;
 }
 
-.bookmarks-empty-inline-icon {
-    font-size: var(--woof-text-body);
-    color: var(--woof-color-neutral-500);
-    vertical-align: baseline;
-}
 
 .bookmarks-empty-btn {
     display: inline-flex;

@@ -160,7 +160,7 @@
 
 <div class="quick-form">
     <div class="quick-form-header">
-        <button class="back-btn" onclick={() => onback?.()}>
+        <button class="back-btn" aria-label="Back" onclick={() => onback?.()}>
             <i class="fas fa-arrow-left"></i>
         </button>
         <h3 class="quick-form-title">Schedule a park visit</h3>
@@ -190,7 +190,7 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Park</label>
+                <span class="form-label">Park</span>
 
                 {#if selectedPark}
                     <!-- Selected park display -->
@@ -201,7 +201,7 @@
                                 <span class="selected-park-city">{selectedPark.city}</span>
                             {/if}
                         </div>
-                        <button type="button" class="clear-park-btn" onclick={clearPark}>
+                        <button type="button" class="clear-park-btn" aria-label="Clear park selection" onclick={clearPark}>
                             <i class="fas fa-times"></i>
                         </button>
                     </div>

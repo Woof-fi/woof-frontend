@@ -456,7 +456,7 @@
                                     />
                                 </a>
                             {:else if report.target_type === 'post'}
-                                <a href="/post/{report.target_id}" data-link class="admin-report-image admin-report-image--text-only">
+                                <a href="/post/{report.target_id}" data-link class="admin-report-image admin-report-image--text-only" aria-label="View reported post">
                                     <i class="fas fa-file-lines"></i>
                                 </a>
                             {/if}

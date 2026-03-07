@@ -29,7 +29,7 @@
 
 <div class="quick-form">
     <div class="quick-form-header">
-        <button class="back-btn" onclick={() => onback?.()}>
+        <button class="back-btn" aria-label="Back" onclick={() => onback?.()}>
             <i class="fas fa-arrow-left"></i>
         </button>
         <h3 class="quick-form-title">Log a health record</h3>
