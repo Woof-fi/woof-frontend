@@ -2,7 +2,8 @@
     import { updateDog, uploadImage } from '../../js/api.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
-    import { showToast, isValidFileType, isValidFileSize } from '../../js/utils.js';
+    import { showToast } from '../../js/utils.js';
+    import { validateAndPreview, revokePreview } from '../../js/file-handler.js';
     import { modals, closeEditDogModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpProfileVersion } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
@@ -71,7 +72,7 @@
         if (!modals.editDogModalOpen) return;
         storeClose();
         photoFile = null;
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        revokePreview(previewUrl);
         previewUrl = null;
     }
 
@@ -86,24 +87,19 @@
     function handlePhotoChange(e) {
         const file = e.target.files[0];
         if (!file) {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            revokePreview(previewUrl);
             previewUrl = null;
             photoFile = null;
             return;
         }
-        if (!isValidFileType(file)) {
-            showToast(t('postCreate.invalidFileType'), 'error');
+        const result = validateAndPreview(file);
+        if (!result) {
             e.target.value = '';
             return;
         }
-        if (!isValidFileSize(file, 10)) {
-            showToast(t('postCreate.fileTooLarge'), 'error');
-            e.target.value = '';
-            return;
-        }
-        photoFile = file;
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = URL.createObjectURL(file);
+        revokePreview(previewUrl);
+        photoFile = result.file;
+        previewUrl = result.previewUrl;
     }
 
     async function handleSubmit(e) {

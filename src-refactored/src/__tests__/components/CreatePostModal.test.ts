@@ -36,6 +36,7 @@ vi.mock('../../../js/ui.js', () => ({
 vi.mock('../../../js/utils.js', () => ({
     isValidFileType: vi.fn().mockReturnValue(true),
     isValidFileSize: vi.fn().mockReturnValue(true),
+    showToast: vi.fn(),
 }));
 vi.mock('../../../js/toast-store.svelte.js', () => ({
     showToast: vi.fn(),
@@ -154,8 +155,6 @@ describe('CreatePostModal', () => {
         const utilsModule = await import('../../../js/utils.js');
         vi.mocked(utilsModule.isValidFileType).mockReturnValue(false);
 
-        const toastStore = await import('../../../js/toast-store.svelte.js');
-
         mockModals.createPostModalOpen = true;
         const { container } = render(CreatePostModal);
 
@@ -168,7 +167,7 @@ describe('CreatePostModal', () => {
         const badFile = new File(['data'], 'doc.pdf', { type: 'application/pdf' });
         await fireEvent.change(fileInput, { target: { files: [badFile] } });
 
-        expect(toastStore.showToast).toHaveBeenCalled();
+        expect(utilsModule.showToast).toHaveBeenCalled();
     });
 
     it('successful post creation calls uploadImage and createPost', async () => {

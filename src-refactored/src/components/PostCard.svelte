@@ -8,6 +8,10 @@
     import { store } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
     import PostImageCarousel from './PostImageCarousel.svelte';
+    import PostHeader from './PostHeader.svelte';
+    import PostActions from './PostActions.svelte';
+    import PostComments from './PostComments.svelte';
+    import PostTimestamp from './PostTimestamp.svelte';
 
     let {
         id = '',
@@ -53,8 +57,7 @@
     // --- Timestamp toggle ---
     let showFullDate = $state(false);
 
-    const FALLBACK_AVATAR = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23cccccc" width="150" height="150"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EDog%3C/text%3E%3C/svg%3E';
-    const FALLBACK_POST   = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23cccccc" width="400" height="400"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="30" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
+    const FALLBACK_POST = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23cccccc" width="400" height="400"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="30" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
 
     function isOwnComment(comment) {
         return store.userDogIds.length > 0 && store.userDogIds.includes(comment.dogId);
@@ -230,87 +233,29 @@
         }
     }
 
-    // --- Timestamp ---
-    // svelte-ignore state_referenced_locally
-    const createdDate = createdAt ? new Date(createdAt) : null;
-    function formattedTimestamp() {
-        if (!createdDate) return '';
-        if (showFullDate) {
-            return createdDate.toLocaleString(undefined, {
-                month: 'long', day: 'numeric', year: 'numeric',
-                hour: 'numeric', minute: '2-digit'
-            });
-        }
-        return timeAgo(createdAt);
-    }
-
     // --- Multi-image detection ---
     const isMultiImage = $derived(imageUrls && imageUrls.length > 1);
-
-    // --- Edited indicator ---
-    // svelte-ignore state_referenced_locally
-    const isEdited = createdAt && updatedAt
-        ? (new Date(updatedAt).getTime() - new Date(createdAt).getTime()) > 60000
-        : false;
 </script>
 
 <div class="post">
     <!-- Header -->
-    <div class="post-header">
-        {#if dogSlug}
-            <a href="/dog/{dogSlug}" data-link class="post-avatar-link">
-                <img
-                    src={profilePic || FALLBACK_AVATAR}
-                    alt="{username}'s profile picture"
-                    onerror={(e) => { if (e.target.src !== FALLBACK_AVATAR) e.target.src = FALLBACK_AVATAR; }}
-                />
-            </a>
-        {:else}
-            <img
-                src={profilePic || FALLBACK_AVATAR}
-                alt="{username}'s profile picture"
-                onerror={(e) => { if (e.target.src !== FALLBACK_AVATAR) e.target.src = FALLBACK_AVATAR; }}
-            />
-        {/if}
-        <div class="post-author-info">
-            {#if dogSlug}
-                <a href="/dog/{dogSlug}" data-link class="post-author-name">{username}</a>
-            {:else}
-                <strong>{username}</strong>
-            {/if}
-            <span class="post-meta-line">
-                {#if breedSlug}
-                    <a href="/breed/{breedSlug}" data-link class="post-breed-link">{breedName}</a>
-                {:else if breedName}
-                    <span>{breedName}</span>
-                {/if}
-                {#if territoryName}
-                    {#if breedSlug || breedName}
-                        <span class="post-meta-dot">&middot;</span>
-                    {/if}
-                    {@const territoryDisplay = territoryType === 'sub_district' && territoryParentName && territoryGrandparentName
-                        ? `${territoryName}, ${territoryParentName}, ${territoryGrandparentName}`
-                        : territoryType === 'district' && territoryParentName
-                            ? `${territoryName}, ${territoryParentName}`
-                            : territoryName}
-                    {#if territoryUrlPath}
-                        <a href="/territory/{territoryUrlPath}" data-link class="post-location-text">{territoryDisplay}</a>
-                    {:else}
-                        <span class="post-location-text">{territoryDisplay}</span>
-                    {/if}
-                {/if}
-            </span>
-        </div>
-        {#if id}
-            <button
-                class="post-options-btn"
-                aria-label={t('post.postOptions')}
-                onclick={() => openPostOptionsSheet({ postId: id, dogId, dogSlug, isOwnPost, caption })}
-            >
-                <i class="fas fa-ellipsis" aria-hidden="true"></i>
-            </button>
-        {/if}
-    </div>
+    <PostHeader
+        {dogSlug}
+        {username}
+        {profilePic}
+        {breedName}
+        {breedSlug}
+        {territoryName}
+        {territoryType}
+        {territoryParentName}
+        {territoryGrandparentName}
+        {territoryUrlPath}
+        {isOwnPost}
+        {id}
+        {dogId}
+        {caption}
+        onOptionsClick={() => openPostOptionsSheet({ postId: id, dogId, dogSlug, isOwnPost, caption })}
+    />
 
     <!-- Post image(s) -->
     {#if isMultiImage}
@@ -354,28 +299,17 @@
     {/if}
 
     <!-- Actions -->
-    <div class="post-actions">
-        <div class="post-actions-left">
-            <button
-                class="like-button"
-                class:liked={liked}
-                aria-label={liked ? t('post.unlikePost') : t('post.likePost')}
-                onclick={handleLike}
-            >
-                <i class={liked ? 'fas fa-heart' : 'far fa-heart'} aria-hidden="true"></i>
-            </button>
-            <button class="like-count" onclick={() => likes > 0 && openLikerListModal(id)} disabled={likes === 0}>{likes > 0 ? likes : ''}</button>
-            <button class="comment-button" aria-label={t('post.commentOnPost')} onclick={handleCommentClick}>
-                <i class="far fa-comment" aria-hidden="true"></i>
-            </button>
-            <span class="comment-count">{commentCount_ > 0 ? commentCount_ : ''}</span>
-        </div>
-        {#if id}
-            <button class="share-button" aria-label={t('post.sharePost')} onclick={handleShare}>
-                <i class="far fa-paper-plane" aria-hidden="true"></i>
-            </button>
-        {/if}
-    </div>
+    <PostActions
+        {liked}
+        {likes}
+        {likeInFlight}
+        commentCount={commentCount_}
+        postId={id}
+        onLike={handleLike}
+        onCommentClick={handleCommentClick}
+        onShare={handleShare}
+        onLikeCountClick={() => likes > 0 && openLikerListModal(id)}
+    />
 
     <!-- Caption -->
     {#if caption}
@@ -385,89 +319,27 @@
     {/if}
 
     <!-- Comments section -->
-    <div class="post-comments-section">
-        {#if isAuthenticated()}
-            {#if commentCount_ > 0 && id}
-                <button class="view-all-comments" onclick={handleViewComments}>
-                    {commentsVisible
-                        ? t('post.hideComments')
-                        : commentCount_ === 1
-                            ? t('post.viewOneComment')
-                            : t('post.viewComments', { count: commentCount_ })}
-                </button>
-            {/if}
-
-            {#if commentsVisible}
-                <div class="comments-list">
-                    {#each comments as comment (comment.id)}
-                        <div class="comment-item">
-                            <div class="comment-item-row">
-                                <div class="comment-item-content">
-                                    <a href="/dog/{comment.dogSlug || comment.dogId}" data-link class="comment-author">
-                                        <strong>{comment.dogName}</strong>
-                                    </a>
-                                    <span class="comment-content"> {comment.content}</span>
-                                    <span class="comment-time">
-                                        {timeAgo(comment.createdAt)}
-                                        {#if comment.updatedAt && comment.createdAt && (new Date(comment.updatedAt).getTime() - new Date(comment.createdAt).getTime()) > 60000}
-                                            <span class="comment-edited">{t('post.edited')}</span>
-                                        {/if}
-                                    </span>
-                                </div>
-                                <button
-                                    type="button"
-                                    class="comment-options-btn"
-                                    aria-label={t('post.commentOptions')}
-                                    onclick={(e) => handleCommentOptions(e, comment)}
-                                >
-                                    <i class="fas fa-ellipsis" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                        </div>
-                    {/each}
-                </div>
-            {/if}
-
-            {#if id}
-                <div class="comment-form">
-                    <input
-                        type="text"
-                        name="comment"
-                        class="comment-input"
-                        placeholder={t('post.addComment')}
-                        maxlength="2200"
-                        autocomplete="off"
-                        data-comment-input={id}
-                        bind:value={commentInput}
-                        onkeydown={handleCommentKeydown}
-                    />
-                    <button
-                        class="comment-submit"
-                        disabled={!commentInput.trim() || submittingComment}
-                        onclick={handleSubmitComment}
-                    >{t('post.postComment')}</button>
-                </div>
-            {/if}
-        {/if}
-    </div>
+    <PostComments
+        postId={id}
+        isAuthenticated={isAuthenticated()}
+        commentCount={commentCount_}
+        {comments}
+        {commentsVisible}
+        {commentsLoaded}
+        bind:commentInput={commentInput}
+        {submittingComment}
+        onViewComments={handleViewComments}
+        onSubmitComment={handleSubmitComment}
+        onCommentKeydown={handleCommentKeydown}
+        onCommentOptionsClick={handleCommentOptions}
+    />
 
     <!-- Timestamp -->
-    {#if createdDate}
-        <div class="post-timestamp-container">
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-            <time
-                class="post-timestamp"
-                datetime={createdDate.toISOString()}
-                title={createdDate.toLocaleString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
-                style="cursor:pointer"
-                onclick={() => showFullDate = !showFullDate}
-            >{formattedTimestamp()}</time>
-            {#if isEdited}
-                <span class="post-edited-indicator">{t('post.edited')}</span>
-            {/if}
-        </div>
-    {/if}
+    <PostTimestamp
+        {createdAt}
+        {updatedAt}
+        bind:showFullDate={showFullDate}
+    />
 </div>
 
 <style>
@@ -480,98 +352,6 @@
     width: 100%;
     overflow: hidden;
     box-shadow: var(--woof-shadow-sm);
-}
-
-.post-header {
-    padding: var(--woof-space-2) var(--woof-space-3);
-    display: flex;
-    align-items: center;
-    gap: 0;
-}
-
-.post-header img {
-    width: 36px;
-    height: 36px;
-    border-radius: var(--woof-radius-full);
-    margin-right: var(--woof-space-2);
-    flex-shrink: 0;
-}
-
-.post-avatar-link {
-    flex-shrink: 0;
-}
-
-.post-author-name {
-    font-weight: var(--woof-font-weight-semibold);
-    color: var(--woof-color-neutral-900);
-    text-decoration: none;
-}
-
-.post-author-name:hover {
-    text-decoration: underline;
-}
-
-.post-author-info {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    line-height: 1.3;
-}
-
-.post-meta-line {
-    display: flex;
-    align-items: center;
-    gap: var(--woof-space-1);
-    font-size: var(--woof-text-caption-1);
-    color: var(--woof-color-neutral-500);
-    min-width: 0;
-}
-
-.post-breed-link {
-    color: var(--woof-color-neutral-500);
-    text-decoration: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.post-breed-link:hover {
-    color: var(--woof-color-brand-primary);
-    text-decoration: underline;
-}
-
-.post-meta-dot {
-    flex-shrink: 0;
-    color: var(--woof-color-neutral-400);
-}
-
-.post-location-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-decoration: none;
-    color: inherit;
-}
-
-a.post-location-text:hover {
-    text-decoration: underline;
-}
-
-.post-timestamp-container {
-    padding: 0 10px 10px;
-}
-
-.post-timestamp {
-    font-size: 10px;
-    color: var(--woof-color-neutral-500);
-    text-transform: uppercase;
-    letter-spacing: 0.2px;
-}
-
-.post-edited-indicator {
-    font-size: 10px;
-    color: var(--woof-color-neutral-400);
-    margin-left: var(--woof-space-1);
 }
 
 .post-image {
@@ -587,67 +367,6 @@ a.post-location-text:hover {
     display: block;
     object-fit: cover;
     max-height: calc(100cqi * 1.25);
-}
-
-.post-actions {
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.post-actions-left {
-    display: flex;
-    align-items: center;
-}
-
-.post-actions button {
-    background: none;
-    border: none;
-    font-size: 24px;
-    padding: 8px;
-    margin-right: 4px;
-    cursor: pointer;
-    color: var(--woof-color-neutral-900);
-}
-
-.post-actions button.liked i,
-.post-actions .like-button.liked i {
-    color: var(--woof-color-like);
-}
-
-.post-actions .like-count {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--woof-color-neutral-900);
-    margin-right: 12px;
-    vertical-align: middle;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    font-family: inherit;
-}
-
-.post-actions .like-count:disabled {
-    cursor: default;
-    opacity: 1;
-}
-
-.post-actions .like-button {
-    transition: transform 0.2s ease;
-}
-
-.post-actions .comment-count {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--woof-color-neutral-900);
-    margin-right: 12px;
-    vertical-align: middle;
-}
-
-.share-button {
-    margin-right: 0;
 }
 
 /* Double-tap heart animation */
@@ -674,161 +393,5 @@ a.post-location-text:hover {
 
 .post-caption {
     padding: 0 10px 10px;
-}
-
-.post-comments-section {
-    padding: 0 10px 8px;
-}
-
-.view-all-comments {
-    display: block;
-    color: var(--woof-color-neutral-400);
-    font-size: 14px;
-    text-decoration: none;
-    margin-bottom: 6px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-    font-family: inherit;
-    text-align: left;
-}
-
-.comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.comment-item {
-    font-size: 14px;
-    line-height: 1.4;
-    position: relative;
-}
-
-.comment-item-row {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--woof-space-2);
-}
-
-.comment-item-content {
-    flex: 1;
-    min-width: 0;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
-.comment-author {
-    text-decoration: none;
-    color: var(--woof-color-neutral-900);
-}
-
-.comment-content {
-    color: var(--woof-color-neutral-900);
-}
-
-.comment-time {
-    display: block;
-    font-size: 11px;
-    color: var(--woof-color-neutral-400);
-    margin-top: 2px;
-}
-
-.comment-edited {
-    color: var(--woof-color-neutral-400);
-    font-style: italic;
-    margin-left: 4px;
-}
-
-.comment-form {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-    border-top: 1px solid var(--woof-color-neutral-200);
-    padding-top: 8px;
-}
-
-.comment-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: 14px;
-    background: transparent;
-    color: var(--woof-color-neutral-900);
-    padding: 4px 0;
-}
-
-.comment-input::placeholder {
-    color: var(--woof-color-neutral-400);
-}
-
-.comment-submit {
-    background: none;
-    border: none;
-    color: var(--woof-color-brand-primary);
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    padding: 4px 0;
-}
-
-.comment-submit:disabled {
-    opacity: 0.4;
-    cursor: default;
-}
-
-/* Comment options button */
-.comment-options-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--woof-color-neutral-400);
-    padding: 4px;
-    border-radius: var(--woof-radius-xs);
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 24px;
-    min-height: 24px;
-    flex-shrink: 0;
-    transition: color var(--woof-duration-fast), opacity var(--woof-duration-fast);
-    opacity: 1;
-    margin-top: 2px;
-}
-
-.comment-options-btn:hover {
-    color: var(--woof-color-neutral-900);
-}
-
-@media (hover: hover) {
-    .comment-options-btn {
-        opacity: 0;
-    }
-    .comment-item:hover .comment-options-btn {
-        opacity: 1;
-    }
-}
-
-/* Post options button */
-.post-options-btn {
-    margin-left: auto;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--woof-color-neutral-500);
-    font-size: var(--woof-font-size-base);
-    padding: var(--woof-space-1) var(--woof-space-2);
-    border-radius: var(--woof-radius-sm);
-    line-height: 1;
-    display: flex;
-    align-items: center;
-}
-
-.post-options-btn:hover {
-    color: var(--woof-color-neutral-900);
-    background: var(--woof-color-neutral-100);
 }
 </style>

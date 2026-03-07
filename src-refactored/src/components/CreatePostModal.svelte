@@ -3,7 +3,7 @@
     import { isAuthenticated } from '../../js/auth.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
-    import { isValidFileType, isValidFileSize } from '../../js/utils.js';
+    import { validateAndPreview, revokePreview } from '../../js/file-handler.js';
     import { showToast } from '../../js/toast-store.svelte.js';
     import { focusTrap } from '../actions/focus-trap.ts';
     import {
@@ -103,7 +103,7 @@
 
     function resetForm() {
         caption = '';
-        selectedImages.forEach(img => URL.revokeObjectURL(img.previewUrl));
+        selectedImages.forEach(img => revokePreview(img.previewUrl));
         selectedImages = [];
         selectedDogId = '';
         dogs = [];
@@ -127,16 +127,8 @@
 
         const newImages = [];
         for (let i = 0; i < Math.min(files.length, remaining); i++) {
-            const file = files[i];
-            if (!isValidFileType(file)) {
-                showToast(t('postCreate.invalidFileType'), 'error');
-                continue;
-            }
-            if (!isValidFileSize(file, 10)) {
-                showToast(t('postCreate.fileTooLarge'), 'error');
-                continue;
-            }
-            newImages.push({ file, previewUrl: URL.createObjectURL(file) });
+            const result = validateAndPreview(files[i]);
+            if (result) newImages.push(result);
         }
 
         if (newImages.length > 0) {
@@ -149,7 +141,7 @@
     }
 
     function removeImage(index) {
-        URL.revokeObjectURL(selectedImages[index].previewUrl);
+        revokePreview(selectedImages[index].previewUrl);
         selectedImages = selectedImages.filter((_, i) => i !== index);
     }
 
