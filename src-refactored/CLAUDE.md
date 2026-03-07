@@ -11,7 +11,8 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - **State store**: `js/svelte-store.svelte.js` — Svelte 5 `$state` rune store for cross-component state (authUser, unreadCount, currentDog). Svelte components import from here.
 - **Svelte 5 runes**: Use `$props()`, `$state()`, `$derived()`, `$effect()` exclusively. No `writable`, `createEventDispatcher`, or `$on` — those are Svelte 4.
 - **Callback props**: Inter-component events use callback props (e.g., `onopenAuthModal = null` in `$props()`). Call with `onopenAuthModal?.()`.
-- **Component styles**: Live in `<style>` blocks inside each `.svelte` file (Svelte scopes them at build time). Global styles (resets, tokens, layout root) live in `css/global.css`. `css/styles.css` is being incrementally decomposed — do not add new styles there; add them to the relevant component's `<style>` block instead.
+- **Component styles**: Live in `<style>` blocks inside each `.svelte` file (Svelte scopes them at build time). Global styles (resets, tokens, layout root) live in `css/global.css`. `css/styles.css` is a barrel file importing feature modules (layout, buttons, forms, modals, utilities, onboarding) — do not add new styles there; add them to the relevant component's `<style>` block instead.
+- **Icons**: Font Awesome via SVG+JS (`js/icons.js`). Uses `<i class="fas fa-*">` in templates — `dom.watch()` auto-replaces with inline SVGs. To add new icon: import in `js/icons.js` + add to `library.add()`.
 - **Design system**: Always use `--woof-*` CSS custom properties for all colors, spacing, radius, shadows, and typography. Never hardcode hex values or pixel sizes that have a token equivalent. Brand primary is `--woof-color-brand-primary` (`#C9403F`). Full reference: `docs/design/index.html` and `docs/design/foundations.md`.
 - **Backend**: `https://api.woofapp.fi` (Express on Elastic Beanstalk)
 
@@ -23,7 +24,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `src/router/Router.svelte` — SPA router; renders view components
 
 ### Svelte Components (`src/components/`)
-- `PostCard.svelte` — Post card with optimistic like toggle (reverts on API error), inline comments, fallback images, clickable territory links
+- `PostCard.svelte` — Post card orchestrator (composes PostHeader, PostActions, PostComments, PostTimestamp); handles optimistic like toggle, double-tap, auth checks
 - `Feed.svelte` — Infinite scroll (IntersectionObserver sentinel), content gate (4 posts for unauth), invite cards at positions 5/25/45
 - `Navigation.svelte` — Header + nav drawer (fixed sidebar on desktop, slide-in on mobile) + bottom nav; 60s unread-count polling; auth-reactive
 - `AuthModal.svelte` — 5 modes: login / register / verify / forgot / reset. Mode config as const object, `$derived` active config.
@@ -39,10 +40,20 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `Toast.svelte` — Renders toast notifications from `js/toast-store.svelte.js`
 - `PostOptionsSheet.svelte` — Instagram-style bottom action sheet (own post: delete/share; others: report/bookmark/follow); multi-view: options → report → confirm-delete
 - `CommentOptionsSheet.svelte` — Action sheet for comments (own: delete with confirm; others: report)
+- `PostHeader.svelte` — Post header (avatar, name, breed, territory, options button)
+- `PostActions.svelte` — Like/comment/share button bar
+- `PostComments.svelte` — Comments list + input form + "view all" toggle
+- `PostTimestamp.svelte` — Clickable relative/absolute time toggle
+- `ProfileHeader.svelte` — Dog profile hero + name/breed/stats/bio
+- `ProfileTabs.svelte` — Posts/Friends/Health tab bar
+- `PostsGrid.svelte` — Photo grid with load-more
+- `FriendsTab.svelte` — Mutual friends list
+- `HealthTab.svelte` — Health records timeline with filters
+- `ProfileFollowBar.svelte` — Sticky follow/message bar
 
 ### Svelte Views (`src/views/`)
 - `HomeView.svelte` — Tabbed feed (For You / Following); tab switch triggers Feed re-render
-- `ProfileView.svelte` — Full Svelte 5: fetches dog, posts, follow status, friends, health records; calls openEditDogModal/openHealthRecordModal from modal-store
+- `ProfileView.svelte` — Dog profile orchestrator (composes ProfileHeader, ProfileTabs, PostsGrid, FriendsTab, HealthTab, ProfileFollowBar); manages state + API calls
 - `PostDetailView.svelte` — Single post view
 - `MessagesView.svelte` — Two-panel messaging with 10s polling
 - `NotificationsView.svelte` — Notification feed at `/notifications`; marks all read on visit; 60s polling via Navigation bell badge
@@ -56,6 +67,9 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `js/auth.js` — Cognito token management
 - `js/config.js` — App config + Cognito IDs
 - `js/utils.js` — escapeHTML, timeAgo, isValidFileType, showToast, imageVariant
+- `js/icons.js` — Font Awesome SVG icon registry (tree-shaken, ~84 icons). To add new icon: import + library.add()
+- `js/motion.js` — prefers-reduced-motion utility for Svelte transitions
+- `js/file-handler.js` — Shared file validation + preview (validateAndPreview, revokePreview)
 
 ### Vanilla JS (support modules)
 - `js/svelte-store.svelte.js` — Svelte 5 `$state` store (authUser, unreadCount, currentDog + version signals dogVersion/feedVersion/profileVersion/healthVersion)
@@ -136,7 +150,7 @@ npm run verify-deploy   # checks production JS bundle contains expected git comm
 
 ### Unit Tests (Vitest)
 ```bash
-npm test              # Run all unit tests (160 tests, 14 suites)
+npm test              # Run all unit tests (160+ tests, 14 suites)
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage
 ```
