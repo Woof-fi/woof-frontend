@@ -461,7 +461,8 @@
     "totalCheckins": "Check-ins",
     "uniqueParks": "Parks visited",
     "loginToCheckIn": "Log in to check in",
-    "confirmCheckIn": "Confirm check-in"
+    "confirmCheckIn": "Confirm check-in",
+    "howLong": "How long?"
   },
   "admin": {
     "pending": "Pending",

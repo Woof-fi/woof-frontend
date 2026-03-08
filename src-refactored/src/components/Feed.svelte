@@ -317,6 +317,7 @@
                 parkName={item.parkName}
                 parkSlug={item.parkSlug}
                 note={item.note}
+                plannedDurationMinutes={item.plannedDurationMinutes}
                 createdAt={item.createdAt}
             />
         {:else}

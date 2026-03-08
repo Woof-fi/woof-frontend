@@ -16,8 +16,18 @@
     } = $props();
 
     let submitting = $state(false);
-    let showDogPicker = $state(false);
+    let showCheckinForm = $state(false);
+    let selectedDogId = $state('');
+    let note = $state('');
+    let duration = $state(30);
     let authed = $derived(store.authUser !== null);
+
+    const DURATIONS = [
+        { value: 30, label: '30min' },
+        { value: 60, label: '1h' },
+        { value: 90, label: '1h 30min' },
+        { value: 120, label: '2h' },
+    ];
 
     let myCheckin = $derived(() => {
         if (!authed || myDogs.length === 0) return null;
@@ -27,13 +37,16 @@
 
     let isCheckedIn = $derived(myCheckin() != null);
 
-    async function handleCheckIn(dogId) {
+    async function handleCheckIn() {
+        const dogId = selectedDogId || myDogs[0]?.id;
         if (!dogId) return;
         submitting = true;
-        showDogPicker = false;
         try {
-            await checkInAtPark(parkId, { dogId });
+            await checkInAtPark(parkId, { dogId, note: note.trim() || undefined, plannedDurationMinutes: duration });
             showToast(t('dogPark.checkedIn'), 'success');
+            showCheckinForm = false;
+            note = '';
+            selectedDogId = '';
             onCheckin?.();
         } catch (e) {
             const msg = e?.data?.error || t('dogPark.checkInFailed');
@@ -57,32 +70,80 @@
     }
 
     function handleCheckinClick() {
-        if (myDogs.length === 1) {
-            handleCheckIn(myDogs[0].id);
-        } else {
-            showDogPicker = !showDogPicker;
+        showCheckinForm = !showCheckinForm;
+        if (showCheckinForm && myDogs.length === 1) {
+            selectedDogId = myDogs[0].id;
         }
     }
 </script>
 
 {#if authed && myDogs.length > 0}
     <div class="park-action-sticky">
-        {#if showDogPicker}
-            <div class="dog-picker">
-                <p class="dog-picker-label">{t('dogPark.selectDogToCheckIn')}</p>
-                <div class="dog-picker-list">
-                    {#each myDogs as dog (dog.id)}
-                        <button class="dog-picker-option" onclick={() => handleCheckIn(dog.id)}>
-                            <img
-                                src={dog.profilePhoto || '/images/dog_profile_pic.jpg'}
-                                alt={dog.name}
-                                class="dog-picker-photo"
-                                onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
-                            />
-                            <span>{dog.name}</span>
-                        </button>
-                    {/each}
+        {#if showCheckinForm}
+            <div class="checkin-panel">
+                {#if myDogs.length === 1}
+                    <div class="checkin-single-dog">
+                        <img
+                            src={myDogs[0].profilePhoto || '/images/dog_profile_pic.jpg'}
+                            alt={myDogs[0].name}
+                            class="checkin-dog-photo"
+                            onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
+                        />
+                        <span class="checkin-single-dog-name">{myDogs[0].name}</span>
+                    </div>
+                {:else}
+                    <p class="checkin-panel-label">{t('dogPark.selectDogToCheckIn')}</p>
+                    <div class="checkin-dog-list">
+                        {#each myDogs as dog (dog.id)}
+                            <button
+                                class="checkin-dog-option"
+                                class:checkin-dog-option--selected={selectedDogId === dog.id}
+                                onclick={() => { selectedDogId = dog.id; }}
+                            >
+                                <img
+                                    src={dog.profilePhoto || '/images/dog_profile_pic.jpg'}
+                                    alt={dog.name}
+                                    class="checkin-dog-photo"
+                                    onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
+                                />
+                                <span>{dog.name}</span>
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
+                <div class="checkin-duration-section">
+                    <p class="checkin-panel-label">{t('dogPark.howLong')}</p>
+                    <div class="checkin-duration-row">
+                        {#each DURATIONS as d (d.value)}
+                            <button
+                                class="duration-chip"
+                                class:duration-chip--selected={duration === d.value}
+                                onclick={() => { duration = d.value; }}
+                            >
+                                {d.label}
+                            </button>
+                        {/each}
+                    </div>
                 </div>
+                <input
+                    type="text"
+                    class="checkin-note-input"
+                    placeholder={t('dogPark.checkinNote')}
+                    bind:value={note}
+                    maxlength="500"
+                    onkeydown={(e) => { if (e.key === 'Enter') handleCheckIn(); }}
+                />
+                <button
+                    class="checkin-confirm-btn"
+                    onclick={handleCheckIn}
+                    disabled={submitting || (myDogs.length > 1 && !selectedDogId)}
+                >
+                    {#if submitting}
+                        <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.confirmCheckIn')}</span>
+                    {:else}
+                        <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.confirmCheckIn')}</span>
+                    {/if}
+                </button>
             </div>
         {/if}
         <div class="park-action-buttons">
@@ -215,8 +276,8 @@
     cursor: not-allowed;
 }
 
-/* Dog picker for multi-dog users */
-.dog-picker {
+/* Check-in form panel */
+.checkin-panel {
     max-width: 640px;
     margin: 0 auto var(--woof-space-2);
     background: var(--woof-surface-primary);
@@ -224,20 +285,24 @@
     box-shadow: var(--woof-shadow-lg);
     padding: var(--woof-space-3);
     pointer-events: all;
-}
-
-.dog-picker-label {
-    font-size: var(--woof-text-caption-1);
-    color: var(--woof-color-neutral-500);
-    margin: 0 0 var(--woof-space-2);
-}
-
-.dog-picker-list {
     display: flex;
+    flex-direction: column;
     gap: var(--woof-space-2);
 }
 
-.dog-picker-option {
+.checkin-panel-label {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    margin: 0;
+}
+
+.checkin-dog-list {
+    display: flex;
+    gap: var(--woof-space-2);
+    flex-wrap: wrap;
+}
+
+.checkin-dog-option {
     display: flex;
     align-items: center;
     gap: var(--woof-space-2);
@@ -253,16 +318,125 @@
     transition: all var(--woof-duration-fast);
 }
 
-.dog-picker-option:hover {
+.checkin-dog-option:hover {
     border-color: var(--woof-color-brand-primary);
     background: var(--woof-color-brand-primary-subtle);
 }
 
-.dog-picker-photo {
+.checkin-dog-option--selected {
+    border-color: var(--woof-color-brand-primary);
+    background: var(--woof-color-brand-primary-subtle);
+}
+
+.checkin-dog-photo {
     width: 32px;
     height: 32px;
     border-radius: var(--woof-radius-full);
     object-fit: cover;
+}
+
+.checkin-single-dog {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+}
+
+.checkin-single-dog-name {
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-semibold);
+    color: var(--woof-color-neutral-900);
+}
+
+.checkin-duration-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-1);
+}
+
+.checkin-duration-row {
+    display: flex;
+    gap: var(--woof-space-1);
+}
+
+.duration-chip {
+    padding: var(--woof-space-2) var(--woof-space-3);
+    min-width: 48px;
+    border: 1.5px solid var(--woof-color-neutral-200);
+    background: none;
+    border-radius: var(--woof-radius-full);
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-medium);
+    font-family: inherit;
+    color: var(--woof-color-neutral-600);
+    cursor: pointer;
+    transition: all var(--woof-duration-fast);
+    white-space: nowrap;
+    text-align: center;
+}
+
+.duration-chip:hover {
+    border-color: var(--woof-color-brand-primary);
+    color: var(--woof-color-brand-primary);
+}
+
+.duration-chip--selected {
+    background: var(--woof-color-brand-primary);
+    border-color: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
+}
+
+.duration-chip--selected:hover {
+    background: var(--woof-color-brand-primary-dark);
+    border-color: var(--woof-color-brand-primary-dark);
+}
+
+.checkin-note-input {
+    width: 100%;
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    font-family: inherit;
+    color: var(--woof-color-neutral-900);
+    background: var(--woof-surface-primary);
+    transition: border-color var(--woof-duration-fast);
+    box-sizing: border-box;
+}
+
+.checkin-note-input:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+}
+
+.checkin-note-input::placeholder {
+    color: var(--woof-color-neutral-400);
+}
+
+.checkin-confirm-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--woof-space-2);
+    width: 100%;
+    padding: var(--woof-space-2) var(--woof-space-3);
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
+    border: none;
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-semibold);
+    font-family: inherit;
+    cursor: pointer;
+    transition: background var(--woof-duration-fast);
+}
+
+.checkin-confirm-btn:hover {
+    background: var(--woof-color-brand-primary-dark);
+}
+
+.checkin-confirm-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 @media (max-width: 768px) {

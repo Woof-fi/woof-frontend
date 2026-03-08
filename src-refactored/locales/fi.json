@@ -461,7 +461,8 @@
     "totalCheckins": "Kirjautumiset",
     "uniqueParks": "Vieraillut puistot",
     "loginToCheckIn": "Kirjaudu sisään kirjautuaksesi puistoon",
-    "confirmCheckIn": "Vahvista kirjautuminen"
+    "confirmCheckIn": "Vahvista kirjautuminen",
+    "howLong": "Kuinka kauan?"
   },
   "admin": {
     "pending": "Odottaa",

@@ -8,8 +8,17 @@
         parkName = '',
         parkSlug = '',
         note = null,
+        plannedDurationMinutes = null,
         createdAt = '',
     } = $props();
+
+    function formatDuration(minutes) {
+        if (!minutes) return '';
+        if (minutes < 60) return `${minutes}min`;
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return m > 0 ? `${h}h ${m}min` : `${h}h`;
+    }
 
     const FALLBACK_AVATAR = '/images/dog_profile_pic.jpg';
 
@@ -47,6 +56,9 @@
             <a href="/dog/{dogSlug}" data-link class="checkin-dog-name">{dogName}</a>
             <span class="checkin-action-text"> {t('feed.checkedInAt')} </span>
             <a href="/dog-park/{parkSlug}" data-link class="checkin-park-name">{parkName}</a>
+            {#if plannedDurationMinutes}
+                <span class="checkin-duration"> · ~{formatDuration(plannedDurationMinutes)}</span>
+            {/if}
         </p>
         {#if note}
             <p class="checkin-note">"{note}"</p>
@@ -130,6 +142,11 @@
     font-size: var(--woof-text-caption-1);
     color: var(--woof-color-neutral-400);
     white-space: nowrap;
+}
+
+.checkin-duration {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-400);
 }
 
 .checkin-note {

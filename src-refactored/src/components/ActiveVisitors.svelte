@@ -5,6 +5,13 @@
         checkins = [],
         loading = false,
     } = $props();
+
+    function formatDuration(minutes) {
+        if (minutes < 60) return `${minutes}min`;
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return m > 0 ? `${h}h ${m}min` : `${h}h`;
+    }
 </script>
 
 <div class="active-visitors">
@@ -44,6 +51,12 @@
                     <span class="active-visitor-name">
                         {checkin.dog?.name || checkin.dogName || ''}
                     </span>
+                    {#if checkin.plannedDurationMinutes}
+                        <span class="active-visitor-duration">~{formatDuration(checkin.plannedDurationMinutes)}</span>
+                    {/if}
+                    {#if checkin.note}
+                        <span class="active-visitor-note">{checkin.note.length > 30 ? checkin.note.slice(0, 30) + '...' : checkin.note}</span>
+                    {/if}
                 </a>
             {/each}
         </div>
@@ -147,6 +160,23 @@
     font-size: var(--woof-text-caption-1);
     color: var(--woof-color-neutral-700);
     font-weight: var(--woof-font-weight-medium);
+    text-align: center;
+    max-width: 64px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.active-visitor-duration {
+    font-size: var(--woof-text-footnote);
+    color: var(--woof-color-neutral-400);
+    white-space: nowrap;
+}
+
+.active-visitor-note {
+    font-size: var(--woof-text-footnote);
+    color: var(--woof-color-neutral-400);
+    font-style: italic;
     text-align: center;
     max-width: 64px;
     overflow: hidden;
