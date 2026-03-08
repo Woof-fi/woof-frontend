@@ -1,5 +1,6 @@
 <script>
     import { t } from '../../js/i18n-store.svelte.js';
+    import { icon } from '@fortawesome/fontawesome-svg-core';
 
     let {
         liked = false,
@@ -12,6 +13,11 @@
         onShare = null,
         onLikeCountClick = null,
     } = $props();
+
+    // Generate heart SVG directly from FA JS API to avoid dom.watch() stale SVG issue
+    let heartHtml = $derived(
+        icon({ prefix: liked ? 'fas' : 'far', iconName: 'heart' })?.html?.[0] || ''
+    );
 </script>
 
 <div class="post-actions">
@@ -22,7 +28,7 @@
             aria-label={liked ? t('post.unlikePost') : t('post.likePost')}
             onclick={() => onLike?.()}
         >
-            <i class={liked ? 'fas fa-heart' : 'far fa-heart'} aria-hidden="true"></i>
+            {@html heartHtml}
         </button>
         <button class="like-count" onclick={() => onLikeCountClick?.()} disabled={likes === 0}>{likes > 0 ? likes : ''}</button>
         <button class="comment-button" aria-label={t('post.commentOnPost')} onclick={() => onCommentClick?.()}>
@@ -60,8 +66,11 @@
     color: var(--woof-color-neutral-900);
 }
 
-.post-actions button.liked i,
-.post-actions .like-button.liked i {
+.post-actions .like-button {
+    transition: transform 0.2s ease;
+}
+
+.post-actions .like-button.liked {
     color: var(--woof-color-like);
 }
 
@@ -81,10 +90,6 @@
 .post-actions .like-count:disabled {
     cursor: default;
     opacity: 1;
-}
-
-.post-actions .like-button {
-    transition: transform 0.2s ease;
 }
 
 .post-actions .comment-count {
