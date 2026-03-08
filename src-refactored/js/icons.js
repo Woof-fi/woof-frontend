@@ -32,6 +32,7 @@ import {
     faCalendarPlus,
     faCamera,
     faChair,
+    faCloudArrowUp,
     faCheck,
     faChevronLeft,
     faChevronRight,
@@ -121,7 +122,7 @@ library.add(
     // Solid
     faArrowDown, faArrowLeft, faArrowRight, faArrowUpRightFromSquare,
     faBars, faBellSolid, faBookmarkSolid, faCakeCandles, faCalendar,
-    faCalendarCheck, faCalendarPlus, faCamera, faChair, faCheck,
+    faCalendarCheck, faCalendarPlus, faCamera, faChair, faCheck, faCloudArrowUp,
     faChevronLeft, faChevronRight, faCircleCheck, faCircleExclamation,
     faCircleUser, faClipboardCheck, faClockSolid, faCommentSolid,
     faCommentDots, faComments, faCompass, faDog, faDroplet, faEllipsis,

@@ -402,7 +402,12 @@
     "address": "Osoite",
     "coordinates": "Koordinaatit",
     "photos": "Kuvat",
-    "noPhotosYet": "Ole ensimmäinen, joka lisää kuvan!",
+    "noPhotosYet": "Ei vielä kuvia. Ole ensimmäinen!",
+    "addPhoto": "Lisää kuva",
+    "photoCaption": "Kuvateksti (valinnainen)",
+    "uploadPhoto": "Lataa",
+    "photoUploaded": "Kuva ladattu!",
+    "photoUploadFailed": "Kuvan lataus epäonnistui",
     "osmAttribution": "Puistotiedot OpenStreetMapin tekijöiltä",
     "municipalAttribution": "Tiedot: Helsingin kaupunki (CC BY 4.0)",
     "suggestTitle": "Ehdota koirapuistoa",
@@ -615,6 +620,19 @@
     "failedLoadFeed": "Syötteen lataus epäonnistui. Yritä uudelleen.",
     "view": "Näytä",
     "back": "Takaisin"
+  },
+  "checkin": {
+    "options": "Kirjautumisen asetukset",
+    "deleteCheckin": "Poista kirjautuminen",
+    "deleteCheckinConfirm": "Haluatko varmasti poistaa tämän kirjautumisen?",
+    "checkinDeleted": "Kirjautuminen poistettu",
+    "failedDeleteCheckin": "Kirjautumisen poisto epäonnistui",
+    "keepCheckin": "Säilytä kirjautuminen",
+    "share": "Jaa",
+    "copyLink": "Kopioi linkki",
+    "report": "Ilmianna kirjautuminen",
+    "linkCopied": "Linkki kopioitu!",
+    "linkCopyFailed": "Linkin kopiointi epäonnistui"
   },
   "language": {
     "en": "EN",

@@ -2,14 +2,18 @@
     import { t } from '../../js/i18n-store.svelte.js';
 
     let {
+        checkinId = '',
         dogName = '',
         dogPhoto = '',
         dogSlug = '',
+        dogId = '',
         parkName = '',
         parkSlug = '',
         note = null,
         plannedDurationMinutes = null,
         createdAt = '',
+        isOwnCheckin = false,
+        onOptionsClick = null,
     } = $props();
 
     function formatDuration(minutes) {
@@ -65,6 +69,15 @@
         {/if}
     </div>
     <span class="checkin-time">{timeAgo}</span>
+    {#if onOptionsClick}
+        <button
+            class="checkin-options-btn"
+            aria-label={t('checkin.options')}
+            onclick={(e) => { e.stopPropagation(); onOptionsClick(); }}
+        >
+            <span class="btn-content"><i class="fas fa-ellipsis"></i></span>
+        </button>
+    {/if}
 </div>
 
 <style>
@@ -155,5 +168,22 @@
     line-height: var(--woof-lh-caption);
     color: var(--woof-color-neutral-500);
     font-style: italic;
+}
+
+.checkin-options-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: var(--woof-space-1);
+    cursor: pointer;
+    color: var(--woof-color-neutral-400);
+    font-size: var(--woof-text-body);
+    line-height: 1;
+    border-radius: var(--woof-radius-sm);
+    transition: color var(--woof-duration-fast);
+}
+
+.checkin-options-btn:hover {
+    color: var(--woof-color-neutral-600);
 }
 </style>

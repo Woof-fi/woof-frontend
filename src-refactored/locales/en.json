@@ -402,7 +402,12 @@
     "address": "Address",
     "coordinates": "Coordinates",
     "photos": "Photos",
-    "noPhotosYet": "Be the first to add a photo!",
+    "noPhotosYet": "No photos yet. Be the first to add one!",
+    "addPhoto": "Add photo",
+    "photoCaption": "Caption (optional)",
+    "uploadPhoto": "Upload",
+    "photoUploaded": "Photo uploaded!",
+    "photoUploadFailed": "Failed to upload photo",
     "osmAttribution": "Park data from OpenStreetMap contributors",
     "municipalAttribution": "Data: City of Helsinki (CC BY 4.0)",
     "suggestTitle": "Suggest a Dog Park",
@@ -615,6 +620,19 @@
     "failedLoadFeed": "Failed to load feed. Please try again.",
     "view": "View",
     "back": "Back"
+  },
+  "checkin": {
+    "options": "Check-in options",
+    "deleteCheckin": "Delete check-in",
+    "deleteCheckinConfirm": "Are you sure you want to delete this check-in?",
+    "checkinDeleted": "Check-in deleted",
+    "failedDeleteCheckin": "Failed to delete check-in",
+    "keepCheckin": "Keep check-in",
+    "share": "Share",
+    "copyLink": "Copy link",
+    "report": "Report check-in",
+    "linkCopied": "Link copied!",
+    "linkCopyFailed": "Could not copy link"
   },
   "language": {
     "en": "EN",

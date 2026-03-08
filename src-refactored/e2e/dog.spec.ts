@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { createTestUser, adminDeleteUser } from './helpers/cognito';
-import { adminLoginOnly } from './helpers/auth';
+import { adminLoginOnly, ensureDrawerVisible } from './helpers/auth';
+import { API_BASE } from './helpers/config';
 import type { TestUser } from './helpers/cognito';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEST_IMAGE = path.join(__dirname, 'fixtures', 'test-dog.png');
-const API_BASE = 'https://api.woofapp.fi';
 
 let testUser: TestUser;
 
@@ -37,7 +37,9 @@ test.describe('Dog CRUD', () => {
     testUser = await adminLoginOnly(page, testUser);
 
     // After login with no dogs, nav drawer should show "Add a Pet"
+    await ensureDrawerVisible(page);
     const addPetBtn = page.locator('.nav-drawer-links button.nav-btn', { hasText: 'Add a Pet' });
+    await addPetBtn.scrollIntoViewIfNeeded();
     await expect(addPetBtn).toBeVisible({ timeout: 10_000 });
 
     // Click "Add a Pet" to open create dog modal
@@ -70,8 +72,12 @@ test.describe('Dog CRUD', () => {
     // Modal should close
     await expect(page.locator('#create-dog-modal')).toBeHidden({ timeout: 15_000 });
 
+    // On mobile the drawer closes when the modal opens — reopen it
+    await ensureDrawerVisible(page);
+
     // Nav drawer should now show the dog's name instead of "Add a Pet"
     const dogNavLink = page.locator('.nav-drawer-links a', { hasText: 'E2E TestDog' });
+    await dogNavLink.first().scrollIntoViewIfNeeded();
     await expect(dogNavLink).toContainText('E2E TestDog', { timeout: 10_000 });
 
     // Click the dog profile link to view the profile

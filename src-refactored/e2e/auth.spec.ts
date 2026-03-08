@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { createTestUser, adminConfirmUser, adminCreateUser, adminDeleteUser, adminGetUser } from './helpers/cognito';
+import { waitForAppReady, ensureDrawerVisible } from './helpers/auth';
+import { API_BASE } from './helpers/config';
 import type { TestUser } from './helpers/cognito';
 
 let testUser: TestUser;
@@ -7,14 +9,6 @@ let savedAuthToken: string | null = null;
 
 /** The nav drawer footer auth button (Login/Logout) */
 const AUTH_LINK = '.nav-drawer-footer .nav-drawer-row';
-
-/** Wait for the Woof app to fully initialize */
-async function waitForAppReady(page: Page) {
-  await page.waitForFunction(() => {
-    const btn = document.querySelector('.nav-drawer-footer .nav-drawer-row');
-    return btn && btn.innerHTML.includes('<i ');
-  }, { timeout: 10_000 });
-}
 
 test.beforeEach(() => {
   testUser = createTestUser();
@@ -27,7 +21,7 @@ test.afterEach(async ({ page }) => {
   try {
     const token = savedAuthToken || await page.evaluate(() => localStorage.getItem('auth_token'));
     if (token) {
-      await page.request.delete('https://api.woofapp.fi/api/auth/me', {
+      await page.request.delete(`${API_BASE}/api/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
     }
@@ -49,6 +43,7 @@ test.describe('Auth flow', () => {
     await waitForAppReady(page);
 
     // 1. Open auth modal
+    await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
     await expect(page.locator('#auth-modal')).toBeVisible();
 
@@ -92,6 +87,7 @@ test.describe('Auth flow', () => {
 
     // 9. Modal should close and nav should show Logout
     await expect(page.locator('#auth-modal')).toBeHidden({ timeout: 15_000 });
+    await ensureDrawerVisible(page);
     await expect(page.locator(AUTH_LINK)).toContainText('Logout');
 
     // Save token before logout clears localStorage (needed for afterEach DB cleanup)
@@ -99,9 +95,11 @@ test.describe('Auth flow', () => {
 
     // 10. Logout
     page.on('dialog', (dialog) => dialog.accept());
+    await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
 
     // 11. Should redirect to home and show Login again
+    await ensureDrawerVisible(page);
     await expect(page.locator(AUTH_LINK)).toContainText('Login', { timeout: 10_000 });
   });
 
@@ -111,6 +109,7 @@ test.describe('Auth flow', () => {
 
     await page.goto('/');
     await waitForAppReady(page);
+    await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
 
     // Try login with wrong password
@@ -118,8 +117,8 @@ test.describe('Auth flow', () => {
     await page.fill('#auth-password', 'WrongPass1!');
     await page.click('#auth-submit');
 
-    // Should show error toast
-    await expect(page.locator('[data-testid="toast"]')).toBeVisible({ timeout: 10_000 });
+    // Should show error toast (may be multiple toasts from background API errors)
+    await expect(page.locator('[data-testid="toast"]').first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('register with existing email shows error', async ({ page }) => {
@@ -128,6 +127,7 @@ test.describe('Auth flow', () => {
 
     await page.goto('/');
     await waitForAppReady(page);
+    await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
 
     // Try to register with the same email via UI
@@ -137,13 +137,14 @@ test.describe('Auth flow', () => {
     await page.fill('#auth-name', testUser.name);
     await page.click('#auth-submit');
 
-    // Should show error toast about existing account
-    await expect(page.locator('[data-testid="toast"]')).toBeVisible({ timeout: 10_000 });
+    // Should show error toast about existing account (may be multiple toasts)
+    await expect(page.locator('[data-testid="toast"]').first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('auth modal UI states are correct', async ({ page }) => {
     await page.goto('/');
     await waitForAppReady(page);
+    await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
 
     // Login mode (default)
@@ -180,6 +181,7 @@ test.describe('Auth flow', () => {
   test('modal closes on outside click', async ({ page }) => {
     await page.goto('/');
     await waitForAppReady(page);
+    await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
     await expect(page.locator('#auth-modal')).toBeVisible();
 
@@ -191,6 +193,7 @@ test.describe('Auth flow', () => {
   test('modal closes on X button', async ({ page }) => {
     await page.goto('/');
     await waitForAppReady(page);
+    await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
     await expect(page.locator('#auth-modal')).toBeVisible();
 

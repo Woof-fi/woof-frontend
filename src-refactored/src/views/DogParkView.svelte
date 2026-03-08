@@ -1,11 +1,13 @@
 <script>
-    import { getDogPark, updateAdminDogPark, getAllTerritories, followDogPark, unfollowDogPark, suggestParkAmenity, scheduleParkVisit, cancelParkVisit, getUpcomingParkVisits, getMyDogs, getActiveCheckins } from '../../js/api.js';
+    import { getDogPark, updateAdminDogPark, getAllTerritories, followDogPark, unfollowDogPark, suggestParkAmenity, scheduleParkVisit, cancelParkVisit, getUpcomingParkVisits, getMyDogs, getActiveCheckins, uploadImage, uploadParkPhoto } from '../../js/api.js';
     import { t, localName, locale } from '../../js/i18n-store.svelte.js';
     import { store, bumpParkVersion } from '../../js/svelte-store.svelte.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast } from '../../js/utils.js';
+    import { validateAndPreview, revokePreview } from '../../js/file-handler.js';
     import ActiveVisitors from '../components/ActiveVisitors.svelte';
     import ParkActionBar from '../components/ParkActionBar.svelte';
+    import PostImageCarousel from '../components/PostImageCarousel.svelte';
 
     let { params = {} } = $props();
 
@@ -35,6 +37,12 @@
     let amenitySuggestForm = $state({});
     let amenitySuggestSubmitting = $state(false);
     let amenitySuggestSuccess = $state(false);
+
+    // Photo upload state
+    let photoUploading = $state(false);
+    let photoPreview = $state(null);
+    let photoFile = $state(null);
+    let photoCaption = $state('');
 
     // Admin edit state
     let isAdmin = $derived(
@@ -354,6 +362,40 @@
         return m ? `${h}h ${m}min` : `${h}h`;
     }
 
+    // Photo upload handlers
+    function handlePhotoSelect(e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const result = validateAndPreview(file, 10);
+        if (!result) return;
+        photoFile = result.file;
+        photoPreview = result.previewUrl;
+        photoCaption = '';
+        e.target.value = '';
+    }
+
+    async function handlePhotoUpload() {
+        if (!photoFile || !park?.id) return;
+        photoUploading = true;
+        try {
+            const publicUrl = await uploadImage(photoFile, 'parks');
+            await uploadParkPhoto(park.id, publicUrl, photoCaption.trim());
+            cancelPhotoUpload();
+            await reloadPark(params.slug);
+            showToast(t('dogPark.photoUploaded'), 'success');
+        } catch (err) {
+            showToast(t('dogPark.photoUploadFailed'), 'error');
+        }
+        photoUploading = false;
+    }
+
+    function cancelPhotoUpload() {
+        revokePreview(photoPreview);
+        photoPreview = null;
+        photoFile = null;
+        photoCaption = '';
+    }
+
     $effect(() => {
         const slug = params.slug;
         if (slug) {
@@ -404,7 +446,12 @@
     {:else}
         <!-- Hero -->
         <div class="park-hero">
-            {#if park.images && park.images.length > 0}
+            {#if park.images && park.images.length > 1}
+                <PostImageCarousel
+                    imageUrls={park.images.map(img => img.imageUrl)}
+                    username={localName(park)}
+                />
+            {:else if park.images && park.images.length === 1}
                 <img src={park.images[0].imageUrl} alt={localName(park)} class="park-hero-img" />
             {:else}
                 <div class="park-hero-gradient">
@@ -710,23 +757,62 @@
                 {/if}
 
                 <!-- Photos -->
-                {#if park.images && park.images.length > 0}
-                    <div class="park-section">
+                <div class="park-section">
+                    <div class="park-section-header">
                         <h2 class="park-section-title">{t('dogPark.photos')}</h2>
+                        {#if authed}
+                            <label class="park-photo-add-btn">
+                                <span class="btn-content"><i class="fas fa-camera"></i></span> {t('dogPark.addPhoto')}
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    class="sr-only"
+                                    onchange={handlePhotoSelect}
+                                />
+                            </label>
+                        {/if}
+                    </div>
+
+                    {#if photoPreview}
+                        <div class="park-photo-upload-preview">
+                            <img src={photoPreview} alt="Preview" class="park-photo-preview-img" />
+                            <input
+                                type="text"
+                                class="park-photo-caption-input"
+                                bind:value={photoCaption}
+                                placeholder={t('dogPark.photoCaption')}
+                                maxlength="500"
+                            />
+                            <div class="park-photo-upload-actions">
+                                <button class="park-photo-upload-btn" onclick={handlePhotoUpload} disabled={photoUploading}>
+                                    {#if photoUploading}
+                                        <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.uploadPhoto')}</span>
+                                    {:else}
+                                        <span class="btn-content"><i class="fas fa-cloud-arrow-up"></i> {t('dogPark.uploadPhoto')}</span>
+                                    {/if}
+                                </button>
+                                <button class="park-photo-cancel-btn" onclick={cancelPhotoUpload} disabled={photoUploading}>
+                                    {t('common.cancel')}
+                                </button>
+                            </div>
+                        </div>
+                    {/if}
+
+                    {#if park.images && park.images.length > 0}
                         <div class="park-photos-grid">
                             {#each park.images as img (img.id)}
                                 <div class="park-photo">
-                                    <img src={img.imageUrl} alt={img.caption || ''} loading="lazy" />
+                                    <img src={img.imageUrl} alt={img.caption || localName(park)} loading="lazy" />
                                 </div>
                             {/each}
                         </div>
-                    </div>
-                {:else}
-                    <div class="park-photos-empty">
-                        <i class="fas fa-camera"></i>
-                        <span>{t('dogPark.noPhotosYet')}</span>
-                    </div>
-                {/if}
+                    {:else if !photoPreview}
+                        <div class="park-photos-empty">
+                            <i class="fas fa-camera"></i>
+                            <span>{t('dogPark.noPhotosYet')}</span>
+                        </div>
+                    {/if}
+                </div>
 
                 <!-- Attribution -->
                 {#if park.source === 'osm'}
@@ -1164,6 +1250,152 @@
 
 .park-photos-empty i {
     font-size: 18px;
+}
+
+/* Photo upload */
+.park-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--woof-space-3);
+}
+
+.park-section-header .park-section-title {
+    margin-bottom: 0;
+}
+
+.park-photo-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+    padding: var(--woof-space-1) var(--woof-space-3);
+    border: 1.5px solid var(--woof-color-brand-primary);
+    background: none;
+    border-radius: var(--woof-radius-full);
+    font-size: var(--woof-text-caption-1);
+    font-weight: var(--woof-font-weight-medium);
+    color: var(--woof-color-brand-primary);
+    cursor: pointer;
+    transition: all var(--woof-duration-fast);
+}
+
+.park-photo-add-btn:hover {
+    background: var(--woof-color-brand-primary-subtle);
+}
+
+.park-photo-upload-preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-2);
+    margin-bottom: var(--woof-space-3);
+    padding: var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-lg);
+    background: var(--woof-surface-secondary);
+}
+
+.park-photo-preview-img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: var(--woof-radius-md);
+}
+
+.park-photo-caption-input {
+    width: 100%;
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    font-family: inherit;
+    color: var(--woof-color-neutral-900);
+    background: var(--woof-surface-primary);
+    box-sizing: border-box;
+}
+
+.park-photo-caption-input:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+}
+
+.park-photo-caption-input::placeholder {
+    color: var(--woof-color-neutral-400);
+}
+
+.park-photo-upload-actions {
+    display: flex;
+    gap: var(--woof-space-2);
+}
+
+.park-photo-upload-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--woof-space-2);
+    padding: var(--woof-space-2) var(--woof-space-3);
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
+    border: none;
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-semibold);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.park-photo-upload-btn:hover {
+    background: var(--woof-color-brand-primary-dark);
+}
+
+.park-photo-upload-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.park-photo-cancel-btn {
+    padding: var(--woof-space-2) var(--woof-space-3);
+    background: none;
+    color: var(--woof-color-neutral-600);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.park-photo-cancel-btn:hover {
+    background: var(--woof-color-neutral-100);
+}
+
+.park-photo-cancel-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Screen-reader only (hides file input) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Hero carousel overrides */
+.park-hero :global(.carousel) {
+    height: 100%;
+    max-height: 240px;
+}
+
+.park-hero :global(.carousel-slide img) {
+    object-fit: cover;
+    height: 100%;
+    max-height: 240px;
 }
 
 /* Attribution */

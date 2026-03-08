@@ -473,17 +473,17 @@ export async function updateComment(commentId, content) {
 /**
  * Upload image to S3
  * @param {File} file - Image file to upload
+ * @param {string} [folder] - Optional S3 folder (e.g., 'parks')
  * @returns {Promise<string>} - Public URL of uploaded image
  */
-export async function uploadImage(file) {
+export async function uploadImage(file, folder) {
     try {
         // Get presigned URL from backend
+        const body = { filename: file.name, contentType: file.type };
+        if (folder) body.folder = folder;
         const urlData = await apiRequest('/api/upload/presigned-url', {
             method: 'POST',
-            body: JSON.stringify({
-                filename: file.name,
-                contentType: file.type
-            })
+            body: JSON.stringify(body)
         });
 
         // Upload directly to S3 using presigned URL
@@ -1303,6 +1303,15 @@ export async function checkOutFromPark(checkinId) {
 }
 
 /**
+ * Delete a check-in
+ * @param {string} checkinId - Check-in ID
+ * @returns {Promise<object>}
+ */
+export async function deleteCheckin(checkinId) {
+    return apiRequest(`/api/dog-parks/checkins/${checkinId}`, { method: 'DELETE' });
+}
+
+/**
  * Get active check-ins at a park
  * @param {string} parkId - Park ID
  * @returns {Promise<object[]>} - Array of active check-in objects
@@ -1333,6 +1342,20 @@ export async function getCheckinHistory(parkId, cursor = null, limit = 20) {
 export async function getMyCheckinCount() {
     const data = await apiRequest('/api/dog-parks/checkins/my-count');
     return data;
+}
+
+/**
+ * Upload a photo for a dog park
+ * @param {string} parkId - Park UUID
+ * @param {string} imageUrl - S3 public URL of the uploaded image
+ * @param {string} [caption] - Optional photo caption
+ * @returns {Promise<object>} - Created photo record
+ */
+export async function uploadParkPhoto(parkId, imageUrl, caption) {
+    return apiRequest(`/api/dog-parks/${parkId}/photos`, {
+        method: 'POST',
+        body: JSON.stringify({ imageUrl, caption: caption || undefined }),
+    });
 }
 
 // Export APIError for use in other modules

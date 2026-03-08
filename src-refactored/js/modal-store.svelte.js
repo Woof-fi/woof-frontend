@@ -30,6 +30,8 @@ export let modals = $state({
     likerListModalOpen: false,
     likerListData: null,            // { postId }
     createActionSheetOpen: false,
+    checkinOptionsSheetOpen: false,
+    checkinOptionsSheetData: null,     // { checkinId, dogId, dogSlug, parkSlug, isOwnCheckin }
 });
 
 export function openAuthModal() { modals.authModalOpen = true; }
@@ -61,6 +63,8 @@ export function openLikerListModal(postId) { modals.likerListData = { postId }; 
 export function closeLikerListModal() { modals.likerListModalOpen = false; modals.likerListData = null; }
 export function openCreateActionSheet() { modals.createActionSheetOpen = true; }
 export function closeCreateActionSheet() { modals.createActionSheetOpen = false; }
+export function openCheckinOptionsSheet(data) { modals.checkinOptionsSheetData = data; modals.checkinOptionsSheetOpen = true; }
+export function closeCheckinOptionsSheet() { modals.checkinOptionsSheetOpen = false; modals.checkinOptionsSheetData = null; }
 export function closeAllModals() {
     modals.authModalOpen = false;
     modals.createPostModalOpen = false;
@@ -84,4 +88,6 @@ export function closeAllModals() {
     modals.likerListModalOpen = false;
     modals.likerListData = null;
     modals.createActionSheetOpen = false;
+    modals.checkinOptionsSheetOpen = false;
+    modals.checkinOptionsSheetData = null;
 }

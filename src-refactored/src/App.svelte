@@ -20,6 +20,7 @@
     import Search from './components/Search.svelte';
     import PostOptionsSheet from './components/PostOptionsSheet.svelte';
     import CommentOptionsSheet from './components/CommentOptionsSheet.svelte';
+    import CheckinOptionsSheet from './components/CheckinOptionsSheet.svelte';
     import FollowListModal from './components/FollowListModal.svelte';
     import LikerListModal from './components/LikerListModal.svelte';
     import CreateActionSheet from './components/CreateActionSheet.svelte';
@@ -98,6 +99,9 @@
         {/if}
         {#if modals.commentOptionsSheetOpen}
             <CommentOptionsSheet />
+        {/if}
+        {#if modals.checkinOptionsSheetOpen}
+            <CheckinOptionsSheet />
         {/if}
         <CreateActionSheet />
         <Toast />

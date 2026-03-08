@@ -1,7 +1,7 @@
 <script>
     import { getFeed, getMyDogs, getAllDogs, getFollowingVisits, getNewDogsInFollowedAreas } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
-    import { openCreateDogModal } from '../../js/modal-store.svelte.js';
+    import { openCreateDogModal, openCheckinOptionsSheet } from '../../js/modal-store.svelte.js';
     import { showToast } from '../../js/utils.js';
     import { store, setFeedTab } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
@@ -311,14 +311,24 @@
             <InviteCard />
         {:else if item.type === 'checkin'}
             <CheckinCard
+                checkinId={item.id}
                 dogName={item.dogName}
                 dogPhoto={item.dogPhoto}
                 dogSlug={item.dogSlug}
+                dogId={item.dogId}
                 parkName={item.parkName}
                 parkSlug={item.parkSlug}
                 note={item.note}
                 plannedDurationMinutes={item.plannedDurationMinutes}
                 createdAt={item.createdAt}
+                isOwnCheckin={myDogs.some(d => d.id === item.dogId)}
+                onOptionsClick={() => openCheckinOptionsSheet({
+                    checkinId: item.id,
+                    dogId: item.dogId,
+                    dogSlug: item.dogSlug,
+                    parkSlug: item.parkSlug,
+                    isOwnCheckin: myDogs.some(d => d.id === item.dogId),
+                })}
             />
         {:else}
             <PostCard

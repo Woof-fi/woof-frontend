@@ -13,8 +13,15 @@ test.describe('Territory browsing', () => {
         await expect(page.locator('h1')).toHaveText('Territories', { timeout: 10_000 });
         await expect(page.locator('.territory-directory-search input')).toBeVisible();
 
-        // Wait for municipality list to load
-        await expect(page.locator('.territory-alpha-item').first()).toBeVisible({ timeout: 15_000 });
+        // Wait for municipality list to load (retry on rate limit — API may return 0 results)
+        try {
+            await expect(page.locator('.territory-alpha-item').first()).toBeVisible({ timeout: 10_000 });
+        } catch {
+            // Rate limit recovery: wait and reload
+            await page.waitForTimeout(5_000);
+            await page.reload();
+            await expect(page.locator('.territory-alpha-item').first()).toBeVisible({ timeout: 15_000 });
+        }
         const count = await page.locator('.territory-alpha-item').count();
         expect(count).toBeGreaterThan(100); // We have 307 municipalities
 
@@ -67,9 +74,15 @@ test.describe('Territory browsing', () => {
     });
 
     test('breadcrumb navigation through territory hierarchy', async ({ page }) => {
-        // Start at municipality
+        // Start at municipality (retry on rate limit)
         await page.goto('/territory/helsinki');
-        await expect(page.locator('.territory-sheet-name')).toHaveText('Helsinki', { timeout: 15_000 });
+        try {
+            await expect(page.locator('.territory-sheet-name')).toHaveText('Helsinki', { timeout: 10_000 });
+        } catch {
+            await page.waitForTimeout(5_000);
+            await page.reload();
+            await expect(page.locator('.territory-sheet-name')).toHaveText('Helsinki', { timeout: 15_000 });
+        }
 
         // Breadcrumb: Territories > Helsinki
         await expect(page.locator('.territory-breadcrumb a', { hasText: 'Territories' })).toBeVisible();

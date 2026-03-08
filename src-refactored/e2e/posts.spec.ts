@@ -3,9 +3,9 @@
  */
 import { test, expect } from '@playwright/test';
 import { createTestUser, adminCreateUser, adminDeleteUser } from './helpers/cognito';
+import { ensureDrawerVisible } from './helpers/auth';
+import { API_BASE } from './helpers/config';
 import type { TestUser } from './helpers/cognito';
-
-const API_BASE = 'https://api.woofapp.fi';
 const AUTH_LINK = '.nav-drawer-footer .nav-drawer-row';
 
 let testUser: TestUser;
@@ -23,13 +23,15 @@ async function loginUser(page: import('@playwright/test').Page, user: TestUser):
     await page.goto('/');
     await page.waitForFunction(() => {
         const btn = document.querySelector('.nav-drawer-footer .nav-drawer-row');
-        return btn && btn.innerHTML.includes('<i ');
+        return btn && (btn.innerHTML.includes('<i ') || btn.innerHTML.includes('<svg'));
     }, { timeout: 10_000 });
+    await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
     await page.fill('#auth-email', user.email);
     await page.fill('#auth-password', user.password);
     await page.click('#auth-submit');
     await expect(page.locator('#auth-modal')).toBeHidden({ timeout: 15_000 });
+    await ensureDrawerVisible(page);
     await expect(page.locator(AUTH_LINK)).toContainText('Logout');
     const token = (await page.evaluate(() => localStorage.getItem('auth_token'))) ?? '';
     await page.request.post(`${API_BASE}/api/auth/sync`, {
@@ -39,10 +41,21 @@ async function loginUser(page: import('@playwright/test').Page, user: TestUser):
 }
 
 test.beforeAll(async ({ request }) => {
-    // Look up the "Mixed Breed" breed_id once for all tests
-    const res = await request.get(`${API_BASE}/api/breeds/mixed-breed`);
-    const data = await res.json();
-    mixedBreedId = data.breed.id;
+    // Look up the "Mixed Breed" breed_id once for all tests (retry with backoff)
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            const res = await request.get(`${API_BASE}/api/breeds/mixed-breed`);
+            if (res.ok()) {
+                const data = await res.json();
+                if (data.breed?.id) {
+                    mixedBreedId = data.breed.id;
+                    return;
+                }
+            }
+        } catch { /* retry */ }
+        await new Promise(r => setTimeout(r, 3_000 * (attempt + 1)));
+    }
+    throw new Error('Failed to look up Mixed Breed breed_id after 3 attempts');
 });
 
 test.beforeEach(() => {
