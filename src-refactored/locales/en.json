@@ -102,7 +102,8 @@
     "headingTo": "heading to",
     "justJoinedIn": "just joined in",
     "today": "Today",
-    "tomorrow": "Tomorrow"
+    "tomorrow": "Tomorrow",
+    "checkedInAt": "checked in at"
   },
   "post": {
     "unlikePost": "Unlike post",
@@ -443,7 +444,24 @@
     "followToSchedule": "Follow this park to schedule visits",
     "loginToFollow": "Log in to follow parks",
     "visitScheduled": "Visit scheduled!",
-    "visitCancelled": "Visit cancelled"
+    "visitCancelled": "Visit cancelled",
+    "checkIn": "Check in",
+    "checkOut": "Check out",
+    "checkedIn": "Checked in!",
+    "checkedOut": "Checked out!",
+    "checkInFailed": "Check-in failed",
+    "activeNow": "At the park now",
+    "noActiveCheckins": "No dogs at the park right now",
+    "checkinHistory": "Recent visitors",
+    "noCheckinHistory": "No check-ins yet",
+    "alreadyCheckedIn": "Already checked in",
+    "selectDogToCheckIn": "Select your dog to check in",
+    "checkinNote": "Add a note (optional)",
+    "checkedInAgo": "Checked in {time} ago",
+    "totalCheckins": "Check-ins",
+    "uniqueParks": "Parks visited",
+    "loginToCheckIn": "Log in to check in",
+    "confirmCheckIn": "Confirm check-in"
   },
   "admin": {
     "pending": "Pending",

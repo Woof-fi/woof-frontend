@@ -6,6 +6,7 @@
     import { store, setFeedTab } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
     import PostCard from './PostCard.svelte';
+    import CheckinCard from './CheckinCard.svelte';
     import InviteCard from './InviteCard.svelte';
     import ParkVisitCard from './ParkVisitCard.svelte';
     import NewDogCard from './NewDogCard.svelte';
@@ -308,6 +309,16 @@
     {#each visibleItems as item (item.id ?? item._key ?? item)}
         {#if item.type === 'invite'}
             <InviteCard />
+        {:else if item.type === 'checkin'}
+            <CheckinCard
+                dogName={item.dogName}
+                dogPhoto={item.dogPhoto}
+                dogSlug={item.dogSlug}
+                parkName={item.parkName}
+                parkSlug={item.parkSlug}
+                note={item.note}
+                createdAt={item.createdAt}
+            />
         {:else}
             <PostCard
                 id={item.id}

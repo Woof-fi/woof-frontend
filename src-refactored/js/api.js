@@ -1274,5 +1274,66 @@ export async function getUpcomingParkVisits(parkId) {
     return data.visits || [];
 }
 
+// ============================================================================
+// PARK CHECK-INS
+// ============================================================================
+
+/**
+ * Check in at a dog park
+ * @param {string} parkId - Park ID
+ * @param {object} data - Check-in data { dogId, note? }
+ * @returns {Promise<object>} - Check-in object
+ */
+export async function checkInAtPark(parkId, data) {
+    return apiRequest(`/api/dog-parks/${parkId}/checkins`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
+}
+
+/**
+ * Check out from a dog park
+ * @param {string} checkinId - Check-in ID
+ * @returns {Promise<object>}
+ */
+export async function checkOutFromPark(checkinId) {
+    return apiRequest(`/api/dog-parks/checkins/${checkinId}/checkout`, {
+        method: 'POST',
+    });
+}
+
+/**
+ * Get active check-ins at a park
+ * @param {string} parkId - Park ID
+ * @returns {Promise<object[]>} - Array of active check-in objects
+ */
+export async function getActiveCheckins(parkId) {
+    const data = await apiRequest(`/api/dog-parks/${parkId}/checkins/active`);
+    return data.checkins || [];
+}
+
+/**
+ * Get check-in history for a park (paginated)
+ * @param {string} parkId - Park ID
+ * @param {string|null} cursor - Pagination cursor
+ * @param {number} limit - Check-ins per page
+ * @returns {Promise<{checkins: object[], nextCursor: string|null}>}
+ */
+export async function getCheckinHistory(parkId, cursor = null, limit = 20) {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (cursor) params.set('cursor', cursor);
+    const data = await apiRequest(`/api/dog-parks/${parkId}/checkins?${params}`);
+    return data;
+}
+
+/**
+ * Get current user's check-in count and unique parks visited
+ * @returns {Promise<{totalCheckins: number, uniqueParks: number}>}
+ */
+export async function getMyCheckinCount() {
+    const data = await apiRequest('/api/dog-parks/checkins/my-count');
+    return data;
+}
+
 // Export APIError for use in other modules
 export { APIError };

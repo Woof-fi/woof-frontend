@@ -102,7 +102,8 @@
     "headingTo": "menossa",
     "justJoinedIn": "liittyi juuri alueelle",
     "today": "Tänään",
-    "tomorrow": "Huomenna"
+    "tomorrow": "Huomenna",
+    "checkedInAt": "kirjautui sisään puistoon"
   },
   "post": {
     "unlikePost": "Poista tykkäys",
@@ -443,7 +444,24 @@
     "followToSchedule": "Seuraa puistoa ilmoittaaksesi käynnin",
     "loginToFollow": "Kirjaudu seurataksesi puistoja",
     "visitScheduled": "Käynti ilmoitettu!",
-    "visitCancelled": "Käynti peruutettu"
+    "visitCancelled": "Käynti peruutettu",
+    "checkIn": "Kirjaudu sisään",
+    "checkOut": "Kirjaudu ulos",
+    "checkedIn": "Kirjauduttu sisään!",
+    "checkedOut": "Kirjauduttu ulos!",
+    "checkInFailed": "Sisäänkirjautuminen epäonnistui",
+    "activeNow": "Puistossa nyt",
+    "noActiveCheckins": "Ei koiria puistossa juuri nyt",
+    "checkinHistory": "Viimeaikaiset kävijät",
+    "noCheckinHistory": "Ei kirjautumisia vielä",
+    "alreadyCheckedIn": "Jo kirjautuneena",
+    "selectDogToCheckIn": "Valitse koirasi kirjautumista varten",
+    "checkinNote": "Lisää viesti (valinnainen)",
+    "checkedInAgo": "Kirjautunut {time} sitten",
+    "totalCheckins": "Kirjautumiset",
+    "uniqueParks": "Vieraillut puistot",
+    "loginToCheckIn": "Kirjaudu sisään kirjautuaksesi puistoon",
+    "confirmCheckIn": "Vahvista kirjautuminen"
   },
   "admin": {
     "pending": "Odottaa",

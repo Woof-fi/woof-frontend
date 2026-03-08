@@ -1,9 +1,11 @@
 <script>
-    import { getDogPark, updateAdminDogPark, getAllTerritories, followDogPark, unfollowDogPark, suggestParkAmenity, scheduleParkVisit, cancelParkVisit, getUpcomingParkVisits, getMyDogs } from '../../js/api.js';
+    import { getDogPark, updateAdminDogPark, getAllTerritories, followDogPark, unfollowDogPark, suggestParkAmenity, scheduleParkVisit, cancelParkVisit, getUpcomingParkVisits, getMyDogs, getActiveCheckins } from '../../js/api.js';
     import { t, localName, locale } from '../../js/i18n-store.svelte.js';
     import { store, bumpParkVersion } from '../../js/svelte-store.svelte.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast } from '../../js/utils.js';
+    import CheckinButton from '../components/CheckinButton.svelte';
+    import ActiveVisitors from '../components/ActiveVisitors.svelte';
 
     let { params = {} } = $props();
 
@@ -23,6 +25,10 @@
     let visitSubmitting = $state(false);
     let myDogs = $state([]);
     let visitForm = $state({ dogId: '', arrivalAt: '', durationMinutes: 60, note: '' });
+
+    // Check-in state
+    let activeCheckins = $state([]);
+    let checkinsLoading = $state(true);
 
     // Amenity suggestion state
     let showAmenitySuggest = $state(false);
@@ -191,6 +197,21 @@
         visitsLoading = false;
     }
 
+    async function loadActiveCheckins() {
+        if (!park) return;
+        checkinsLoading = true;
+        try {
+            activeCheckins = await getActiveCheckins(park.id);
+        } catch {
+            activeCheckins = [];
+        }
+        checkinsLoading = false;
+    }
+
+    async function handleCheckinRefresh() {
+        await loadActiveCheckins();
+    }
+
     // Follow / Unfollow
     async function handleFollow() {
         if (!authed) return;
@@ -331,9 +352,19 @@
         }
     });
 
-    // Load visits once park is loaded
+    // Load visits and active checkins once park is loaded
     $effect(() => {
-        if (park?.id) loadVisits();
+        if (park?.id) {
+            loadVisits();
+            loadActiveCheckins();
+        }
+    });
+
+    // Load user's dogs when authed (needed for CheckinButton)
+    $effect(() => {
+        if (authed && park?.id && myDogs.length === 0) {
+            getMyDogs().then(dogs => { myDogs = dogs; }).catch(() => {});
+        }
     });
 </script>
 
@@ -395,6 +426,13 @@
                                 <i class="fas fa-pencil"></i>
                             </button>
                         {/if}
+                        <CheckinButton
+                            parkId={park.id}
+                            {myDogs}
+                            {activeCheckins}
+                            onCheckin={handleCheckinRefresh}
+                            onCheckout={handleCheckinRefresh}
+                        />
                         {#if authed}
                             <button
                                 class="park-follow-btn"
@@ -589,6 +627,11 @@
                                 {/if}
                             </div>
                         {/if}
+                    </div>
+
+                    <!-- Active Check-ins -->
+                    <div class="park-section">
+                        <ActiveVisitors checkins={activeCheckins} loading={checkinsLoading} />
                     </div>
 
                     <!-- Upcoming Visits -->
