@@ -4,7 +4,6 @@
     import { store, bumpParkVersion } from '../../js/svelte-store.svelte.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast } from '../../js/utils.js';
-    import CheckinButton from '../components/CheckinButton.svelte';
     import ActiveVisitors from '../components/ActiveVisitors.svelte';
     import ParkActionBar from '../components/ParkActionBar.svelte';
 
@@ -213,10 +212,6 @@
         await loadActiveCheckins();
     }
 
-    function scrollToCheckin() {
-        const el = document.getElementById('park-checkin-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
 
     // Follow / Unfollow
     async function handleFollow() {
@@ -234,8 +229,16 @@
             }
             bumpParkVersion();
         } catch (e) {
-            console.error('Follow action failed:', e);
-            showToast(t('common.error'), 'error');
+            // Handle stale state: if already following/not following, sync state
+            const msg = e?.data?.error || e?.message || '';
+            if (/already following/i.test(msg)) {
+                isFollowing = true;
+            } else if (/not following/i.test(msg)) {
+                isFollowing = false;
+            } else {
+                console.error('Follow action failed:', e);
+                showToast(t('common.error'), 'error');
+            }
         }
         followLoading = false;
     }
@@ -366,10 +369,12 @@
         }
     });
 
-    // Load user's dogs when authed (needed for CheckinButton)
+    // Load user's dogs when authed (needed for check-in and visits)
+    let dogsLoaded = $state(false);
     $effect(() => {
-        if (authed && park?.id && myDogs.length === 0) {
-            getMyDogs().then(dogs => { myDogs = dogs; }).catch(() => {});
+        if (authed && park?.id && !dogsLoaded) {
+            dogsLoaded = true;
+            getMyDogs().then(dogs => { myDogs = dogs; }).catch(() => { myDogs = []; });
         }
     });
 </script>
@@ -614,15 +619,6 @@
 
                     <!-- Active Check-ins -->
                     <div class="park-section">
-                        <div class="park-checkin-inline" id="park-checkin-section">
-                            <CheckinButton
-                                parkId={park.id}
-                                {myDogs}
-                                {activeCheckins}
-                                onCheckin={handleCheckinRefresh}
-                                onCheckout={handleCheckinRefresh}
-                            />
-                        </div>
                         <ActiveVisitors checkins={activeCheckins} loading={checkinsLoading} />
                     </div>
 
@@ -747,12 +743,13 @@
             </div>
         </div>
         <ParkActionBar
+            parkId={park.id}
             {myDogs}
             {activeCheckins}
             {isFollowing}
             {followLoading}
             onFollowToggle={handleFollow}
-            onCheckinClick={scrollToCheckin}
+            onCheckin={handleCheckinRefresh}
             onCheckout={handleCheckinRefresh}
         />
     {/if}

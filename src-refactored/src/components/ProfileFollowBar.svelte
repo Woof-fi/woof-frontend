@@ -18,11 +18,11 @@
             onclick={onFollowToggle}
         >
             {#if followLoading}
-                <i class="fas fa-spinner fa-spin"></i>
+                <span class="btn-content"><span class="woof-spinner"></span></span>
             {:else if isFollowing}
-                <i class="fas fa-user-check"></i> {t('profile.followingBtn')}
+                <span class="btn-content"><i class="fas fa-user-check"></i> {t('profile.followingBtn')}</span>
             {:else}
-                <i class="fas fa-user-plus"></i> {t('profile.followBtn')}
+                <span class="btn-content"><i class="fas fa-user-plus"></i> {t('profile.followBtn')}</span>
             {/if}
         </button>
         <button
@@ -105,6 +105,10 @@
     background: var(--woof-color-brand-primary-subtle);
     color: var(--woof-color-brand-primary);
     border-color: var(--woof-color-brand-primary);
+}
+
+.btn-content {
+    display: contents;
 }
 
 .follow-btn:disabled {

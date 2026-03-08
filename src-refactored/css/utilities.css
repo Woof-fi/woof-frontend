@@ -148,6 +148,25 @@
     margin-bottom: 12px;
 }
 
+/* ── CSS-only spinner — use instead of FA fa-spinner in toggle buttons ── */
+/* FA's dom.watch() replaces <i> with <svg>; Svelte can't track that swap,
+   leaving orphaned SVGs when conditionals toggle. This avoids FA entirely. */
+@keyframes woof-spin {
+    to { transform: rotate(360deg); }
+}
+
+.woof-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: var(--woof-radius-full);
+    animation: woof-spin 0.6s linear infinite;
+    vertical-align: -0.125em;
+    flex-shrink: 0;
+}
+
 /* ── Router progress bar ── */
 .route-progress {
     position: fixed;

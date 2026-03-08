@@ -87,11 +87,10 @@
             disabled={submitting}
         >
             {#if submitting}
-                <i class="fas fa-spinner fa-spin"></i>
+                <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkOut')}</span>
             {:else}
-                <i class="fas fa-right-from-bracket"></i>
+                <span class="btn-content"><i class="fas fa-right-from-bracket"></i> {t('dogPark.checkOut')}</span>
             {/if}
-            {t('dogPark.checkOut')}
         </button>
     {:else}
         <button
@@ -100,11 +99,10 @@
             disabled={submitting}
         >
             {#if submitting}
-                <i class="fas fa-spinner fa-spin"></i>
+                <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkIn')}</span>
             {:else}
-                <i class="fas fa-paw"></i>
+                <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.checkIn')}</span>
             {/if}
-            {t('dogPark.checkIn')}
         </button>
     {/if}
 
@@ -144,11 +142,10 @@
                 disabled={submitting || (myDogs.length > 1 && !selectedDogId)}
             >
                 {#if submitting}
-                    <i class="fas fa-spinner fa-spin"></i>
+                    <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.confirmCheckIn')}</span>
                 {:else}
-                    <i class="fas fa-paw"></i>
+                    <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.confirmCheckIn')}</span>
                 {/if}
-                {t('dogPark.confirmCheckIn')}
             </button>
         </div>
     {/if}
@@ -199,6 +196,10 @@
     color: var(--woof-color-neutral-400);
     border: 2px solid var(--woof-color-neutral-200);
     cursor: default;
+}
+
+.btn-content {
+    display: contents;
 }
 
 .checkin-btn:disabled {

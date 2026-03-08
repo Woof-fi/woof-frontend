@@ -152,7 +152,7 @@
                                     onclick={() => handleFollowToggle(dog)}
                                 >
                                     {#if followInFlight.has(dog.id)}
-                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span class="woof-spinner"></span>
                                     {:else if followingSet.has(dog.id)}
                                         {t('profile.followingBtn')}
                                     {:else}
