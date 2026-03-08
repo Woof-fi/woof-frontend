@@ -558,20 +558,22 @@
         data-link
         onclick={!authed ? handleAddPetUnauthenticated : authed && dogs.length === 0 ? handleAddPetAuthenticated : undefined}
     >
-        {#if authed && dogs.length === 1}
-            <img
-                src={dogs[0].profilePhoto || '/images/dog_profile_pic.jpg'}
-                alt={dogs[0].name}
-                class="profile-pic"
-                onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
-            />
-        {:else if authed && dogs.length > 1}
-            <i class="fas fa-paw"></i>
-        {:else if authed && dogs.length === 0}
-            <i class="fas fa-plus-circle"></i>
-        {:else}
-            <i class="fas fa-circle-user"></i>
-        {/if}
+        {#key `${authed}-${dogs.length}`}
+            {#if authed && dogs.length === 1}
+                <img
+                    src={dogs[0].profilePhoto || '/images/dog_profile_pic.jpg'}
+                    alt={dogs[0].name}
+                    class="profile-pic"
+                    onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
+                />
+            {:else if authed && dogs.length > 1}
+                <i class="fas fa-paw"></i>
+            {:else if authed && dogs.length === 0}
+                <i class="fas fa-plus-circle"></i>
+            {:else}
+                <i class="fas fa-circle-user"></i>
+            {/if}
+        {/key}
     </a>
 </nav>
 

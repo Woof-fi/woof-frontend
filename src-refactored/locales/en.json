@@ -84,7 +84,7 @@
     "errGeneric": "Something went wrong. Please try again."
   },
   "feed": {
-    "refreshing": "Refreshing\u2026",
+    "refreshing": "Refreshing…",
     "releaseToRefresh": "Release to refresh",
     "pullToRefresh": "Pull to refresh",
     "refreshFailed": "Refresh failed",
@@ -142,14 +142,14 @@
     "reasonNotDog": "Not a dog",
     "reasonViolence": "Violence",
     "reasonOther": "Other",
-    "back": "\u2190 Back",
+    "back": "← Back",
     "deletePostConfirm": "Delete this post?",
     "deleteCommentConfirm": "Delete this comment?",
     "cantBeUndone": "This can't be undone.",
     "delete": "Delete",
     "keepPost": "Keep post",
     "keepComment": "Keep comment",
-    "deleting": "Deleting\u2026",
+    "deleting": "Deleting…",
     "deleteComment": "Delete comment",
     "reportCommentBtn": "Report comment",
     "commentOptions": "Comment options",
@@ -463,9 +463,9 @@
     "failedDeleteComment": "Failed to delete comment",
     "reports": "Reports",
     "flagged": "Flagged",
-    "loadingReports": "Loading reports\u2026",
+    "loadingReports": "Loading reports…",
     "noReports": "No {status} reports",
-    "loadingFlagged": "Loading flagged posts\u2026",
+    "loadingFlagged": "Loading flagged posts…",
     "noFlaggedPosts": "No flagged posts",
     "deletePost": "Delete post",
     "deleteComment": "Delete comment",
@@ -534,7 +534,39 @@
     "noteNotes": "Details...",
     "date": "Date *",
     "value": "Value",
-    "notes": "Notes"
+    "notes": "Notes",
+    "weightLabel": "Weight (kg) *",
+    "weightInputPlaceholder": "e.g., 25.5"
+  },
+  "create": {
+    "title": "Create",
+    "ariaLabel": "Create new content",
+    "postPhoto": "Post a photo",
+    "postPhotoDesc": "Share a moment with your dog",
+    "scheduleVisit": "Schedule a park visit",
+    "scheduleVisitDesc": "Let others know when you'll be there",
+    "logHealth": "Log a health record",
+    "logHealthDesc": "Track vet visits, weight, and more",
+    "selectDog": "Select a dog"
+  },
+  "visit": {
+    "title": "Schedule a park visit",
+    "dog": "Dog",
+    "park": "Park",
+    "time": "Time",
+    "duration": "Duration",
+    "dur15": "15 min",
+    "dur30": "30 min",
+    "dur1h": "1h",
+    "dur1h30": "1h 30min",
+    "dur2h": "2h",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Anyone want to join?",
+    "submit": "Schedule Visit",
+    "searchAllParks": "Or search all parks...",
+    "searchParks": "Search parks...",
+    "noParksFound": "No parks found",
+    "clearPark": "Clear park selection"
   },
   "time": {
     "justNow": "just now",
@@ -562,7 +594,8 @@
     "failedCreatePost": "Failed to create post. Please try again.",
     "failedLoad": "Something went wrong. Please try again.",
     "failedLoadFeed": "Failed to load feed. Please try again.",
-    "view": "View"
+    "view": "View",
+    "back": "Back"
   },
   "language": {
     "en": "EN",

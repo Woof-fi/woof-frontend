@@ -38,14 +38,6 @@
     }
 </script>
 
-<div class="profile-hero" id="profile-hero">
-    <img
-        src={dog.profilePhoto || '/images/dog_profile_pic.jpg'}
-        alt={dog.name}
-        class="profile-hero-img"
-        onerror={fallbackImg}
-    />
-</div>
 <div class="profile-header-content">
     <div class="profile-sheet-namerow">
         <div>
@@ -104,24 +96,6 @@
 </div>
 
 <style>
-.profile-hero {
-    width: 100%;
-    height: 48vh;
-    min-height: 240px;
-    max-height: 380px;
-    overflow: hidden;
-    background: var(--woof-color-neutral-200);
-    position: relative;
-}
-
-.profile-hero-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 20%;
-    display: block;
-}
-
 .profile-header-content {
     padding: 0;
 }

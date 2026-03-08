@@ -295,19 +295,28 @@
             </div>
         </div>
     {:else}
-        <ProfileHeader
-            {dog}
-            postsCount={posts.length}
-            {postsLoading}
-            {followerCount}
-            {followingCount}
-            isOwner={dog.isOwner}
-            onEditClick={handleEditDog}
-            onFollowersClick={() => openFollowListModal(dog.id, 'followers')}
-            onFollowingClick={() => openFollowListModal(dog.id, 'following')}
-        />
+        <div class="profile-hero" id="profile-hero">
+            <img
+                src={dog.profilePhoto || '/images/dog_profile_pic.jpg'}
+                alt={dog.name}
+                class="profile-hero-img"
+                onerror={(e) => { if (!e.currentTarget.src.endsWith('/images/dog_profile_pic.jpg')) e.currentTarget.src = '/images/dog_profile_pic.jpg'; }}
+            />
+        </div>
         <div class="profile-sheet">
-            <div class="profile-container"></div>
+            <div class="profile-container">
+                <ProfileHeader
+                    {dog}
+                    postsCount={posts.length}
+                    {postsLoading}
+                    {followerCount}
+                    {followingCount}
+                    isOwner={dog.isOwner}
+                    onEditClick={handleEditDog}
+                    onFollowersClick={() => openFollowListModal(dog.id, 'followers')}
+                    onFollowingClick={() => openFollowListModal(dog.id, 'following')}
+                />
+            </div>
 
             <ProfileTabs
                 {activeTab}
@@ -377,6 +386,14 @@
     overflow: hidden;
     background: var(--woof-color-neutral-200);
     position: relative;
+}
+
+.profile-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
 }
 
 .profile-sheet {

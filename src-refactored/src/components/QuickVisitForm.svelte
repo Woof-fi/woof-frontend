@@ -160,10 +160,10 @@
 
 <div class="quick-form">
     <div class="quick-form-header">
-        <button class="back-btn" aria-label="Back" onclick={() => onback?.()}>
+        <button class="back-btn" aria-label={t('common.back')} onclick={() => onback?.()}>
             <i class="fas fa-arrow-left"></i>
         </button>
-        <h3 class="quick-form-title">Schedule a park visit</h3>
+        <h3 class="quick-form-title">{t('visit.title')}</h3>
     </div>
 
     {#if loading}
@@ -173,7 +173,7 @@
     {:else}
         <form onsubmit={handleSubmit}>
             <div class="form-group">
-                <label class="form-label" for="visit-dog">Dog</label>
+                <label class="form-label" for="visit-dog">{t('visit.dog')}</label>
                 {#if hasManyDogs}
                     <select id="visit-dog" class="form-select" bind:value={selectedDog}>
                         <option value="">--</option>
@@ -190,7 +190,7 @@
             </div>
 
             <div class="form-group">
-                <span class="form-label">Park</span>
+                <span class="form-label">{t('visit.park')}</span>
 
                 {#if selectedPark}
                     <!-- Selected park display -->
@@ -201,7 +201,7 @@
                                 <span class="selected-park-city">{selectedPark.city}</span>
                             {/if}
                         </div>
-                        <button type="button" class="clear-park-btn" aria-label="Clear park selection" onclick={clearPark}>
+                        <button type="button" class="clear-park-btn" aria-label={t('visit.clearPark')} onclick={clearPark}>
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -223,7 +223,7 @@
                         <input
                             type="text"
                             class="search-input"
-                            placeholder={followedParks.length > 0 ? 'Or search all parks...' : 'Search parks...'}
+                            placeholder={followedParks.length > 0 ? t('visit.searchAllParks') : t('visit.searchParks')}
                             value={searchQuery}
                             oninput={handleSearchInput}
                             onfocus={handleSearchFocus}
@@ -249,7 +249,7 @@
                                     </button>
                                 {/each}
                             {:else if !searching}
-                                <div class="no-results">No parks found</div>
+                                <div class="no-results">{t('visit.noParksFound')}</div>
                             {/if}
                         </div>
                     {/if}
@@ -258,7 +258,7 @@
 
             <div class="form-row">
                 <div class="form-group form-group-half">
-                    <label class="form-label" for="visit-time">Time</label>
+                    <label class="form-label" for="visit-time">{t('visit.time')}</label>
                     <input
                         id="visit-time"
                         type="datetime-local"
@@ -268,24 +268,24 @@
                 </div>
 
                 <div class="form-group form-group-half">
-                    <label class="form-label" for="visit-duration">Duration</label>
+                    <label class="form-label" for="visit-duration">{t('visit.duration')}</label>
                     <select id="visit-duration" class="form-select" bind:value={duration}>
-                        <option value={15}>15 min</option>
-                        <option value={30}>30 min</option>
-                        <option value={60}>1h</option>
-                        <option value={90}>1h 30min</option>
-                        <option value={120}>2h</option>
+                        <option value={15}>{t('visit.dur15')}</option>
+                        <option value={30}>{t('visit.dur30')}</option>
+                        <option value={60}>{t('visit.dur1h')}</option>
+                        <option value={90}>{t('visit.dur1h30')}</option>
+                        <option value={120}>{t('visit.dur2h')}</option>
                     </select>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="visit-note">Note (optional)</label>
+                <label class="form-label" for="visit-note">{t('visit.noteLabel')}</label>
                 <input
                     id="visit-note"
                     type="text"
                     class="form-input"
-                    placeholder="Anyone want to join?"
+                    placeholder={t('visit.notePlaceholder')}
                     maxlength="500"
                     bind:value={note}
                 />
@@ -297,7 +297,7 @@
                 {:else}
                     <i class="fas fa-calendar-check"></i>
                 {/if}
-                Schedule Visit
+                {t('visit.submit')}
             </button>
         </form>
     {/if}
@@ -441,8 +441,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: var(--woof-avatar-xs);
+    height: var(--woof-avatar-xs);
     flex-shrink: 0;
     transition: color var(--woof-duration-fast), background var(--woof-duration-fast);
 }

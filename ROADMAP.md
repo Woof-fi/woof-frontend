@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-03-07
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed, 13B Multi-Image Posts
+**Last Updated:** 2026-03-08
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed, 13B Multi-Image Posts, UX Audit (Batches A-F + Phase 2)
 **Current:** Tier 2 — Major Features (15A Sentry next)
 
 ---
@@ -141,6 +141,18 @@ Custom Svelte 5 `$state`-based i18n store (svelte-i18n incompatible with runes).
 - Shared `mapPostRow` used by all controllers (including bookmarks refactored). Legacy single-image posts backward compatible via fallback wrapping
 - Serialized async moderation (Rekognition) per image to prevent race conditions
 - 450 backend + 160 frontend tests
+
+#### UX Audit Phase 2 — DONE
+
+Comprehensive UX audit follow-up with production bug fixes and codebase cleanup:
+- **Bug fixes**: Navigation bottom nav SVG orphan (FA dom.watch() + Svelte conditional conflict — fixed with `{#key}` block), ProfileView layout overlap (hero image moved out of ProfileHeader, back into ProfileView with correct DOM hierarchy)
+- **P0 i18n**: Replaced 26+ hardcoded English strings in CreateActionSheet, QuickVisitForm, HealthRecordModal with `t()` calls. Added matching Finnish translations.
+- **P1 Focus traps**: Added `use:focusTrap` to 8 modals (FollowList, LikerList, EditPost, EditComment, EditDog, CreateDog, HealthRecord, SuggestPark)
+- **P1 SuggestParkModal fix**: Added scroll lock, Escape handler, correct pushModalState lifecycle, focus trap
+- **P1 Component dedup**: Created shared `DogListModal.svelte` (follow state, rendering, CSS). FollowListModal + LikerListModal reduced to thin wrappers (~58% code reduction, eliminated ~380 lines of duplication)
+- **P2 CSS cleanup**: Replaced hardcoded px in global modals.css with design tokens, extracted `.photo-preview-img` class (replacing inline styles in CreateDogModal/EditDogModal)
+- **P2 Toast standardization**: 8 modals switched from `utils.js` to canonical `toast-store.svelte.js` import
+- **P3 Navigation fix**: PostOptionsSheet changed from `PopStateEvent` to `CustomEvent('routechange')`
 
 #### 13C: Dark Mode — Large
 

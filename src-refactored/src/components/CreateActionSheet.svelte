@@ -108,22 +108,22 @@
         class="action-sheet"
         role="dialog"
         aria-modal="true"
-        aria-label="Create new content"
+        aria-label={t('create.ariaLabel')}
         in:fly={reduceMotion({ y: 500, duration: 280, opacity: 1 })}
         out:sheetOut
     >
         {#if view === 'menu'}
             <div class="menu-view" in:fade={reduceMotion({ duration: 100, delay: 60 })}>
                 <div class="sheet-handle"></div>
-                <div class="sheet-title">Create</div>
+                <div class="sheet-title">{t('create.title')}</div>
 
                 <button class="action-sheet-item" onclick={handlePostPhoto}>
                     <span class="action-icon action-icon-photo">
                         <i class="fas fa-camera"></i>
                     </span>
                     <span class="action-text">
-                        <span class="action-label">Post a photo</span>
-                        <span class="action-desc">Share a moment with your dog</span>
+                        <span class="action-label">{t('create.postPhoto')}</span>
+                        <span class="action-desc">{t('create.postPhotoDesc')}</span>
                     </span>
                     <i class="fas fa-chevron-right action-chevron"></i>
                 </button>
@@ -133,8 +133,8 @@
                         <i class="fas fa-calendar-plus"></i>
                     </span>
                     <span class="action-text">
-                        <span class="action-label">Schedule a park visit</span>
-                        <span class="action-desc">Let others know when you'll be there</span>
+                        <span class="action-label">{t('create.scheduleVisit')}</span>
+                        <span class="action-desc">{t('create.scheduleVisitDesc')}</span>
                     </span>
                     <i class="fas fa-chevron-right action-chevron"></i>
                 </button>
@@ -148,13 +148,13 @@
                         {/if}
                     </span>
                     <span class="action-text">
-                        <span class="action-label">Log a health record</span>
-                        <span class="action-desc">Track vet visits, weight, and more</span>
+                        <span class="action-label">{t('create.logHealth')}</span>
+                        <span class="action-desc">{t('create.logHealthDesc')}</span>
                     </span>
                     <i class="fas fa-chevron-right action-chevron"></i>
                 </button>
 
-                <button class="cancel-btn" onclick={close}>Cancel</button>
+                <button class="cancel-btn" onclick={close}>{t('common.cancel')}</button>
             </div>
 
         {:else if view === 'visit'}
@@ -168,7 +168,7 @@
                     <button class="back-btn" onclick={handleBack} aria-label={t('common.back')}>
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h3 class="sheet-header-title">Select a dog</h3>
+                    <h3 class="sheet-header-title">{t('create.selectDog')}</h3>
                 </div>
                 {#each healthDogs as dog (dog.id)}
                     <button class="action-sheet-item" onclick={() => handleDogSelect(dog.id)}>
@@ -193,7 +193,7 @@
                         <i class="fas fa-chevron-right action-chevron"></i>
                     </button>
                 {/each}
-                <button class="cancel-btn" onclick={close}>Cancel</button>
+                <button class="cancel-btn" onclick={close}>{t('common.cancel')}</button>
             </div>
         {/if}
     </div>

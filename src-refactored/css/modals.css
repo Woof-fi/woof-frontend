@@ -1,7 +1,8 @@
 /* ============================================================================
    MODALS — backdrop, content, headers, close buttons
    Shared across AuthModal, CreateDogModal, EditDogModal, CreatePostModal,
-   HealthRecordModal
+   EditPostModal, EditCommentModal, HealthRecordModal, DogListModal,
+   FollowListModal, LikerListModal, SuggestParkModal
    ============================================================================ */
 
 .modal {
@@ -28,7 +29,7 @@
 .modal-content {
     background-color: var(--woof-surface-primary);
     margin: var(--woof-space-5) auto;
-    padding: 24px;
+    padding: var(--woof-space-5);
     border: 1px solid var(--woof-color-neutral-200);
     width: 80%;
     max-width: 500px;
@@ -42,7 +43,7 @@
 .close {
     color: var(--woof-color-neutral-400);
     float: right;
-    font-size: 28px;
+    font-size: var(--woof-text-title-1);
     font-weight: bold;
     cursor: pointer;
 }
@@ -58,27 +59,34 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: var(--woof-space-5);
 }
 
 .modal-header h2 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--woof-text-headline);
+    font-weight: var(--woof-font-weight-semibold);
     color: var(--woof-color-neutral-900);
 }
 
 .modal-close {
     background: none;
     border: none;
-    font-size: 28px;
+    font-size: var(--woof-text-title-1);
     color: var(--woof-color-neutral-400);
     cursor: pointer;
     padding: 0;
     line-height: 1;
-    transition: color 0.2s;
+    transition: color var(--woof-duration-fast);
 }
 
 .modal-close:hover {
     color: var(--woof-color-neutral-900);
+}
+
+/* Photo preview images in dog create/edit forms */
+.photo-preview-img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: var(--woof-radius-sm);
 }

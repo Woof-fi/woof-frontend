@@ -534,7 +534,39 @@
     "noteNotes": "Yksityiskohdat...",
     "date": "Päivämäärä *",
     "value": "Arvo",
-    "notes": "Muistiinpanot"
+    "notes": "Muistiinpanot",
+    "weightLabel": "Paino (kg) *",
+    "weightInputPlaceholder": "esim. 25,5"
+  },
+  "create": {
+    "title": "Luo",
+    "ariaLabel": "Luo uutta sisältöä",
+    "postPhoto": "Julkaise kuva",
+    "postPhotoDesc": "Jaa hetki koirasi kanssa",
+    "scheduleVisit": "Ilmoita puistokäynti",
+    "scheduleVisitDesc": "Kerro muille milloin olet tulossa",
+    "logHealth": "Kirjaa terveystietue",
+    "logHealthDesc": "Seuraa eläinlääkärikäyntejä, painoa ja muuta",
+    "selectDog": "Valitse koira"
+  },
+  "visit": {
+    "title": "Ilmoita puistokäynti",
+    "dog": "Koira",
+    "park": "Puisto",
+    "time": "Aika",
+    "duration": "Kesto",
+    "dur15": "15 min",
+    "dur30": "30 min",
+    "dur1h": "1t",
+    "dur1h30": "1t 30min",
+    "dur2h": "2t",
+    "noteLabel": "Viesti (valinnainen)",
+    "notePlaceholder": "Haluaako joku tulla mukaan?",
+    "submit": "Ilmoita käynti",
+    "searchAllParks": "Tai hae kaikkia puistoja...",
+    "searchParks": "Hae puistoja...",
+    "noParksFound": "Puistoja ei löytynyt",
+    "clearPark": "Tyhjennä puistovalinta"
   },
   "time": {
     "justNow": "juuri nyt",
@@ -562,7 +594,8 @@
     "failedCreatePost": "Julkaisun luonti epäonnistui. Yritä uudelleen.",
     "failedLoad": "Jokin meni pieleen. Yritä uudelleen.",
     "failedLoadFeed": "Syötteen lataus epäonnistui. Yritä uudelleen.",
-    "view": "Näytä"
+    "view": "Näytä",
+    "back": "Takaisin"
   },
   "language": {
     "en": "EN",

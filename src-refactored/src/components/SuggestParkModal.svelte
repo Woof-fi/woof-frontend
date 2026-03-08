@@ -1,8 +1,10 @@
 <script>
     import { suggestDogPark } from '../../js/api.js';
-    import { showToast } from '../../js/utils.js';
+    import { showToast } from '../../js/toast-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
+    import { toggleBodyScroll } from '../../js/ui.js';
+    import { focusTrap } from '../actions/focus-trap.ts';
 
     let { territoryId = null, territoryName = '', onclose, onsuccess } = $props();
 
@@ -15,11 +17,21 @@
     let longitude = $state('');
     let submitting = $state(false);
 
-    pushModalState('suggestPark', () => onclose?.());
+    $effect(() => {
+        pushModalState();
+        toggleBodyScroll(true);
+        return () => {
+            popModalState();
+            toggleBodyScroll(false);
+        };
+    });
 
     function close() {
-        popModalState();
         onclose?.();
+    }
+
+    function handleKey(e) {
+        if (e.key === 'Escape') close();
     }
 
     async function submit() {
@@ -52,6 +64,8 @@
     }
 </script>
 
+<svelte:window onkeydown={handleKey} />
+
 <div
     class="modal"
     style:display="block"
@@ -61,7 +75,7 @@
     tabindex="-1"
     aria-modal="true"
 >
-    <div class="modal-content suggest-park-modal">
+    <div class="modal-content suggest-park-modal" use:focusTrap>
         <div class="modal-header">
             <h2>{t('dogPark.suggestTitle')}</h2>
             <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
@@ -116,7 +130,7 @@
 <style>
 .suggest-park-modal {
     max-width: 480px;
-    width: 90vw;
+    width: 90%;
 }
 
 .suggest-territory-hint {

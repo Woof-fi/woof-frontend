@@ -6,7 +6,7 @@
     import { followDog, unfollowDog, getFollowStatus } from '../../js/api.js';
     import { CONFIG } from '../../js/config.js';
     import { isAuthenticated } from '../../js/auth.js';
-    import { showToast } from '../../js/utils.js';
+    import { showToast } from '../../js/toast-store.svelte.js';
     import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
 
@@ -57,7 +57,7 @@
     function goToPost() {
         closePostOptionsSheet();
         history.pushState({}, '', `/post/${postId}`);
-        window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
+        window.dispatchEvent(new CustomEvent('routechange'));
     }
 
     function visitProfile() {
@@ -65,7 +65,7 @@
         if (!slug) return;
         closePostOptionsSheet();
         history.pushState({}, '', `/dog/${slug}`);
-        window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
+        window.dispatchEvent(new CustomEvent('routechange'));
     }
 
     // Share URL goes through the backend's OG preview endpoint so social media

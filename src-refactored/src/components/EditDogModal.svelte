@@ -2,11 +2,12 @@
     import { updateDog, uploadImage } from '../../js/api.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
-    import { showToast } from '../../js/utils.js';
+    import { showToast } from '../../js/toast-store.svelte.js';
     import { validateAndPreview, revokePreview } from '../../js/file-handler.js';
     import { modals, closeEditDogModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpProfileVersion } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
+    import { focusTrap } from '../actions/focus-trap.ts';
     import BreedAutocomplete from './BreedAutocomplete.svelte';
     import TerritoryAutocomplete from './TerritoryAutocomplete.svelte';
 
@@ -153,7 +154,7 @@
     tabindex="-1"
     aria-modal="true"
 >
-    <div class="modal-content">
+    <div class="modal-content" use:focusTrap>
         <div class="modal-header">
             <h2>{t('dog.editProfile')}</h2>
             <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
@@ -223,13 +224,13 @@
                             <img
                                 src={previewUrl}
                                 alt="Preview"
-                                style="max-width:200px;max-height:200px;border-radius:var(--woof-radius-sm);"
+                                class="photo-preview-img"
                             />
                         {:else if currentPhotoUrl}
                             <img
                                 src={currentPhotoUrl}
                                 alt="Current profile"
-                                style="max-width:200px;max-height:200px;border-radius:var(--woof-radius-sm);"
+                                class="photo-preview-img"
                             />
                         {/if}
                     </div>

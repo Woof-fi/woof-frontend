@@ -6,6 +6,7 @@
     import { modals, closeHealthRecordModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpHealthVersion } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
+    import { focusTrap } from '../actions/focus-trap.ts';
 
     let submitting = $state(false);
     let isEditMode = $state(false);
@@ -182,7 +183,7 @@
     tabindex="-1"
     aria-modal="true"
 >
-    <div class="modal-content health-modal-content">
+    <div class="modal-content health-modal-content" use:focusTrap>
         <div class="modal-header">
             <button class="modal-back" aria-label={t('common.back')} onclick={handleBack}>
                 <i class="fas fa-arrow-left"></i>
@@ -245,14 +246,14 @@
                         </div>
                         {#if typeConfig.showWeight}
                             <div class="form-group form-group-flex" id="health-record-value-group">
-                                <label for="health-record-value">Weight (kg) *</label>
+                                <label for="health-record-value">{t('health.weightLabel')}</label>
                                 <input
                                     type="number"
                                     id="health-record-value"
                                     min="0.1"
                                     max="200"
                                     step="0.1"
-                                    placeholder="e.g., 25.5"
+                                    placeholder={t('health.weightInputPlaceholder')}
                                     bind:value={weightValue}
                                 />
                             </div>
