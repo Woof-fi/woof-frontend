@@ -43,7 +43,7 @@
                 <a href="/dog/{visit.dog.slug}" data-link class="visit-dog-name">{visit.dog.name}</a>
                 <span class="visit-heading-text">{t('feed.headingTo')}</span>
             </div>
-            <a href="/parks/{visit.park.slug}" data-link class="visit-park">
+            <a href="/dog-park/{visit.park.slug}" data-link class="visit-park">
                 <i class="fas fa-location-dot visit-park-icon"></i>
                 <span class="visit-park-name">{visit.park.name}</span>
             </a>

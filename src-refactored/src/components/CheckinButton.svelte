@@ -210,16 +210,18 @@
 .checkin-form {
     position: absolute;
     top: calc(100% + var(--woof-space-2));
-    right: 0;
+    left: 0;
     background: var(--woof-surface-primary);
     border-radius: var(--woof-radius-lg);
     box-shadow: var(--woof-shadow-lg);
     padding: var(--woof-space-3);
     z-index: 20;
-    min-width: 260px;
+    width: calc(100vw - 32px);
+    max-width: 300px;
     display: flex;
     flex-direction: column;
     gap: var(--woof-space-2);
+    box-sizing: border-box;
 }
 
 .checkin-form-label {

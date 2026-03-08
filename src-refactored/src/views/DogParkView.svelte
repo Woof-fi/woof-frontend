@@ -6,6 +6,7 @@
     import { showToast } from '../../js/utils.js';
     import CheckinButton from '../components/CheckinButton.svelte';
     import ActiveVisitors from '../components/ActiveVisitors.svelte';
+    import ParkActionBar from '../components/ParkActionBar.svelte';
 
     let { params = {} } = $props();
 
@@ -210,6 +211,11 @@
 
     async function handleCheckinRefresh() {
         await loadActiveCheckins();
+    }
+
+    function scrollToCheckin() {
+        const el = document.getElementById('park-checkin-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     // Follow / Unfollow
@@ -420,34 +426,11 @@
                         <h1 class="park-name">{localName(park)}</h1>
                         <span class="park-type-pill">{parkTypeLabel(park.parkType)}</span>
                     </div>
-                    <div class="park-header-right">
-                        {#if isAdmin && !editing}
-                            <button class="park-edit-btn" onclick={startEdit} title="Edit park">
-                                <i class="fas fa-pencil"></i>
-                            </button>
-                        {/if}
-                        <CheckinButton
-                            parkId={park.id}
-                            {myDogs}
-                            {activeCheckins}
-                            onCheckin={handleCheckinRefresh}
-                            onCheckout={handleCheckinRefresh}
-                        />
-                        {#if authed}
-                            <button
-                                class="park-follow-btn"
-                                class:following={isFollowing}
-                                onclick={handleFollow}
-                                disabled={followLoading}
-                            >
-                                {#if isFollowing}
-                                    <i class="fas fa-heart"></i> {t('dogPark.followingPark')}
-                                {:else}
-                                    <i class="far fa-heart"></i> {t('dogPark.follow')}
-                                {/if}
-                            </button>
-                        {/if}
-                    </div>
+                    {#if isAdmin && !editing}
+                        <button class="park-edit-btn" onclick={startEdit} title="Edit park">
+                            <i class="fas fa-pencil"></i>
+                        </button>
+                    {/if}
                 </div>
 
                 <!-- Follower count -->
@@ -631,6 +614,15 @@
 
                     <!-- Active Check-ins -->
                     <div class="park-section">
+                        <div class="park-checkin-inline" id="park-checkin-section">
+                            <CheckinButton
+                                parkId={park.id}
+                                {myDogs}
+                                {activeCheckins}
+                                onCheckin={handleCheckinRefresh}
+                                onCheckout={handleCheckinRefresh}
+                            />
+                        </div>
                         <ActiveVisitors checkins={activeCheckins} loading={checkinsLoading} />
                     </div>
 
@@ -754,6 +746,15 @@
                 {/if}
             </div>
         </div>
+        <ParkActionBar
+            {myDogs}
+            {activeCheckins}
+            {isFollowing}
+            {followLoading}
+            onFollowToggle={handleFollow}
+            onCheckinClick={scrollToCheckin}
+            onCheckout={handleCheckinRefresh}
+        />
     {/if}
 </div>
 
@@ -841,9 +842,10 @@
 /* Header */
 .park-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--woof-space-3);
+    gap: var(--woof-space-2) var(--woof-space-3);
     margin-bottom: var(--woof-space-2);
 }
 
@@ -853,13 +855,7 @@
     gap: var(--woof-space-3);
     flex-wrap: wrap;
     min-width: 0;
-}
-
-.park-header-right {
-    display: flex;
-    align-items: center;
-    gap: var(--woof-space-2);
-    flex-shrink: 0;
+    flex: 1 1 100%;
 }
 
 .park-name {
@@ -880,38 +876,6 @@
     font-size: var(--woof-text-caption-1);
     font-weight: var(--woof-font-weight-semibold);
     white-space: nowrap;
-}
-
-/* Follow button */
-.park-follow-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--woof-space-1);
-    padding: var(--woof-space-2) var(--woof-space-4);
-    border-radius: var(--woof-radius-full);
-    font-size: var(--woof-text-caption-1);
-    font-weight: var(--woof-font-weight-semibold);
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.15s;
-    border: 1px solid var(--woof-color-brand-primary);
-    background: var(--woof-color-brand-primary);
-    color: white;
-    white-space: nowrap;
-}
-
-.park-follow-btn:hover {
-    opacity: 0.9;
-}
-
-.park-follow-btn.following {
-    background: transparent;
-    color: var(--woof-color-brand-primary);
-}
-
-.park-follow-btn:disabled {
-    opacity: 0.5;
-    cursor: default;
 }
 
 .park-follower-count {

@@ -40,9 +40,9 @@
 .profile-follow-sticky {
     position: fixed;
     bottom: 0;
-    left: 0;
+    left: 280px;
     right: 0;
-    padding: 12px 20px 16px 300px;
+    padding: 12px 20px 16px 20px;
     background: linear-gradient(to top, rgba(255,255,255,1) 55%, rgba(255,255,255,0));
     z-index: 50;
     pointer-events: none;
@@ -130,8 +130,9 @@
 
 @media (max-width: 768px) {
     .profile-follow-sticky {
+        left: 0;
         bottom: 56px;
-        padding: 12px 20px 12px;
+        padding: 12px 20px 12px 20px;
     }
 }
 </style>
