@@ -165,14 +165,11 @@ Comprehensive UX audit follow-up with production bug fixes and codebase cleanup:
 - Full component audit for hardcoded colors
 - Depends on: 12C (new colors need dark variants)
 
-#### 13D: Dog Tagging — Medium
+#### 13D: Dog Tagging + Park Location — DONE (2026-03-09)
 
-- `@nelly` autocomplete in caption textarea (CreatePostModal)
-- `post_tags` table (`post_id FK, tagged_dog_id FK, tagged_by_dog_id FK`)
-- `tag_privacy` setting on dogs table (`everyone`/`followers`/`nobody`, default `everyone`)
-- Tagged dogs shown as clickable names on PostCard
-- Self-removal: tagged dog owner can remove their tag from any post
-- New `tag` notification type
+- **Dog tagging**: search-based picker in CreatePostModal (max 10), `post_tags` table, tagged dogs shown as clickable links on PostCard, `tag` notification type, dog search endpoint
+- **Park location**: collapsible park picker in CreatePostModal (followed parks chips + search), `dog_park_id` FK on posts, park name displayed in PostHeader meta line with location-dot icon
+- Migration 034, EN+FI i18n, all feed/detail/bookmark/breed/territory queries updated
 
 #### 13E: Stories — Large
 
