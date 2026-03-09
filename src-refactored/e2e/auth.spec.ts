@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { createTestUser, adminConfirmUser, adminCreateUser, adminDeleteUser, adminGetUser } from './helpers/cognito';
+import { createTestUser, adminCreateUser, adminDeleteUser } from './helpers/cognito';
 import { waitForAppReady, ensureDrawerVisible } from './helpers/auth';
 import { API_BASE } from './helpers/config';
 import type { TestUser } from './helpers/cognito';
@@ -34,11 +34,12 @@ test.afterEach(async ({ page }) => {
 });
 
 test.describe('Auth flow', () => {
-  // NOTE: The happy path after registration is: enter the real emailed verification code
-  // → confirmRegistration succeeds → auto-login fires → modal closes automatically.
-  // That path cannot be automated (we can't intercept the Cognito email), so this test
-  // exercises the fallback: admin-confirm via CLI + back-to-login button → manual login.
-  test('register → admin confirm (back-to-login fallback) → login → logout', async ({ page }) => {
+  // Uses adminCreateUser to bypass Cognito signUp (avoids rate limits).
+  // Registration UI states are already tested by 'auth modal UI states are correct'.
+  test('login → logout', async ({ page }) => {
+    // Create user via admin API (bypasses Cognito signUp rate limits)
+    adminCreateUser(testUser);
+
     await page.goto('/');
     await waitForAppReady(page);
 
@@ -46,46 +47,14 @@ test.describe('Auth flow', () => {
     await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
     await expect(page.locator('#auth-modal')).toBeVisible();
-
-    // 2. Switch to Register tab
-    await page.click('.auth-tab[data-tab="register"]');
-    await expect(page.locator('#auth-modal-title')).toHaveText('Register');
-    await expect(page.locator('#auth-name-group')).toBeVisible();
-
-    // 3. Fill registration form
-    await page.fill('#auth-email', testUser.email);
-    await page.fill('#auth-password', testUser.password);
-    await page.fill('#auth-name', testUser.name);
-
-    // 4. Submit — should switch to verify mode
-    await page.click('#auth-submit');
-    await expect(page.locator('#auth-modal-title')).toHaveText('Verify Email', { timeout: 15_000 });
-    await expect(page.locator('#auth-verify-group')).toBeVisible();
-    await expect(page.locator('#auth-email-group')).toBeHidden();
-    await expect(page.locator('#auth-password-group')).toBeHidden();
-
-    // 5. Verify user was created in Cognito as UNCONFIRMED
-    const userBefore = adminGetUser(testUser.email);
-    expect(userBefore).not.toBeNull();
-    expect(userBefore!.status).toBe('UNCONFIRMED');
-
-    // 6. Admin-confirm the user (bypasses email verification)
-    adminConfirmUser(testUser.email);
-    const userAfter = adminGetUser(testUser.email);
-    expect(userAfter!.status).toBe('CONFIRMED');
-
-    // 7. Go back to login (fallback path — real users would enter the code for auto-login)
-    await page.click('#back-to-login-btn');
     await expect(page.locator('#auth-modal-title')).toHaveText('Login');
-    await expect(page.locator('#auth-email-group')).toBeVisible();
-    await expect(page.locator('#auth-password-group')).toBeVisible();
 
-    // 8. Login with the registered credentials
+    // 2. Login
     await page.fill('#auth-email', testUser.email);
     await page.fill('#auth-password', testUser.password);
     await page.click('#auth-submit');
 
-    // 9. Modal should close and nav should show Logout
+    // 3. Modal should close and nav should show Logout
     await expect(page.locator('#auth-modal')).toBeHidden({ timeout: 15_000 });
     await ensureDrawerVisible(page);
     await expect(page.locator(AUTH_LINK)).toContainText('Logout');
@@ -93,12 +62,12 @@ test.describe('Auth flow', () => {
     // Save token before logout clears localStorage (needed for afterEach DB cleanup)
     savedAuthToken = await page.evaluate(() => localStorage.getItem('auth_token'));
 
-    // 10. Logout
+    // 4. Logout
     page.on('dialog', (dialog) => dialog.accept());
     await ensureDrawerVisible(page);
     await page.click(AUTH_LINK);
 
-    // 11. Should redirect to home and show Login again
+    // 5. Should redirect to home and show Login again
     await ensureDrawerVisible(page);
     await expect(page.locator(AUTH_LINK)).toContainText('Login', { timeout: 10_000 });
   });
