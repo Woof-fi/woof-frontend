@@ -67,6 +67,7 @@
             case 'comment':    return t('notifications.commented');
             case 'follow':     return t('notifications.followed');
             case 'park_visit': return `${t('notifications.parkVisit')}${notif.park?.name ? ` ${notif.park.name}` : ''}`;
+            case 'tag':        return t('notifications.taggedInPost');
             default:           return '';
         }
     }
@@ -78,7 +79,7 @@
             href = `/dog/${notif.actorDog.slug}`;
         } else if (notif.type === 'park_visit' && notif.park?.slug) {
             href = `/dog-park/${notif.park.slug}`;
-        } else if (notif.targetId && (notif.type === 'like' || notif.type === 'comment')) {
+        } else if (notif.targetId && (notif.type === 'like' || notif.type === 'comment' || notif.type === 'tag')) {
             href = `/post/${notif.targetId}`;
         }
         if (!href) return;
@@ -321,7 +322,7 @@
                             </time>
                         </div>
 
-                        {#if notif.postImageUrl && (notif.type === 'like' || notif.type === 'comment')}
+                        {#if notif.postImageUrl && (notif.type === 'like' || notif.type === 'comment' || notif.type === 'tag')}
                             <img
                                 src={imageVariant(notif.postImageUrl, 'thumb')}
                                 alt="Post thumbnail"

@@ -16,6 +16,9 @@ vi.mock('../../../js/api.js', () => ({
     getMyDogs: vi.fn().mockResolvedValue([]),
     createPost: vi.fn().mockResolvedValue({ id: 'post-1' }),
     uploadImage: vi.fn().mockResolvedValue('https://cdn.woofapp.fi/posts/test.jpg'),
+    getFollowingDogParks: vi.fn().mockResolvedValue([]),
+    searchDogParks: vi.fn().mockResolvedValue({ parks: [] }),
+    searchDogs: vi.fn().mockResolvedValue([]),
 }));
 vi.mock('../../../js/auth.js', () => ({
     isAuthenticated: vi.fn().mockReturnValue(true),
@@ -43,6 +46,7 @@ vi.mock('../../../js/toast-store.svelte.js', () => ({
 }));
 vi.mock('../../../js/i18n-store.svelte.js', () => ({
     t: vi.fn((key: string) => key),
+    localName: vi.fn((item: any) => item?.name || ''),
 }));
 vi.mock('../../../js/svelte-store.svelte.js', () => ({
     bumpFeedVersion: vi.fn(),
@@ -204,7 +208,7 @@ describe('CreatePostModal', () => {
 
         await waitFor(() => {
             expect(apiModule.uploadImage).toHaveBeenCalled();
-            expect(apiModule.createPost).toHaveBeenCalledWith('dog-1', ['https://cdn.woofapp.fi/posts/test.jpg'], '');
+            expect(apiModule.createPost).toHaveBeenCalledWith('dog-1', ['https://cdn.woofapp.fi/posts/test.jpg'], '', null, []);
             expect(storeModule.bumpFeedVersion).toHaveBeenCalled();
         });
     });

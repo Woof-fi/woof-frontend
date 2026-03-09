@@ -35,6 +35,10 @@
         territoryParentName = '',
         territoryGrandparentName = '',
         territoryUrlPath = '',
+        parkName = '',
+        parkNameFi = '',
+        parkSlug = '',
+        taggedDogs = [],
         onopenAuthModal = null,
     } = $props();
 
@@ -250,6 +254,9 @@
         {territoryParentName}
         {territoryGrandparentName}
         {territoryUrlPath}
+        {parkName}
+        {parkNameFi}
+        {parkSlug}
         {isOwnPost}
         {id}
         {dogId}
@@ -315,6 +322,16 @@
     {#if caption}
         <div class="post-caption">
             <p><strong>{username}</strong> {caption}</p>
+        </div>
+    {/if}
+
+    <!-- Tagged dogs -->
+    {#if taggedDogs && taggedDogs.length > 0}
+        <div class="post-tagged-dogs">
+            <i class="fas fa-tag post-tag-icon" aria-hidden="true"></i>
+            {#each taggedDogs as dog, i (dog.id)}
+                <a href="/dog/{dog.slug}" data-link class="post-tagged-link">{dog.name}</a>{#if i < taggedDogs.length - 1}<span class="post-tag-sep">,</span>{/if}
+            {/each}
         </div>
     {/if}
 
@@ -393,5 +410,38 @@
 
 .post-caption {
     padding: 0 10px 10px;
+}
+
+.post-tagged-dogs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
+    padding: 0 var(--woof-space-3) var(--woof-space-2);
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+    line-height: 1.4;
+}
+
+.post-tag-icon {
+    font-size: 0.75em;
+    color: var(--woof-color-neutral-400);
+    margin-right: 2px;
+    flex-shrink: 0;
+}
+
+.post-tagged-link {
+    color: var(--woof-color-neutral-700);
+    text-decoration: none;
+    font-weight: var(--woof-font-weight-medium);
+}
+
+.post-tagged-link:hover {
+    color: var(--woof-color-brand-primary);
+    text-decoration: underline;
+}
+
+.post-tag-sep {
+    color: var(--woof-color-neutral-400);
 }
 </style>

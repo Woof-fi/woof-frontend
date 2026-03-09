@@ -68,6 +68,10 @@
                 territoryParentName={post.territoryParentName || ''}
                 territoryGrandparentName={post.territoryGrandparentName || ''}
                 territoryUrlPath={post.territoryUrlPath || ''}
+                parkName={post.parkName || ''}
+                parkNameFi={post.parkNameFi || ''}
+                parkSlug={post.parkSlug || ''}
+                taggedDogs={post.taggedDogs || []}
                 onopenAuthModal={onopenAuthModal}
             />
         {/if}

@@ -249,11 +249,14 @@ export async function healthCheck() {
  * @param {string} caption - Post caption
  * @returns {Promise<object>} - Created post object
  */
-export async function createPost(dogId, imageUrls, caption) {
+export async function createPost(dogId, imageUrls, caption, dogParkId = null, taggedDogIds = []) {
     const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
+    const body = { dog_id: dogId, image_urls: urls, caption: caption || undefined };
+    if (dogParkId) body.dog_park_id = dogParkId;
+    if (taggedDogIds.length > 0) body.tagged_dog_ids = taggedDogIds;
     const data = await apiRequest('/api/posts', {
         method: 'POST',
-        body: JSON.stringify({ dog_id: dogId, image_urls: urls, caption })
+        body: JSON.stringify(body)
     });
     return data.post;
 }
@@ -1227,6 +1230,21 @@ export async function getNewDogsInFollowedAreas() {
  * @param {string} query - Search term (min 2 chars)
  * @returns {Promise<object[]>} - Array of matching park objects
  */
+/**
+ * Search dogs by name
+ * @param {string} query - Search term (min 2 chars)
+ * @returns {Promise<object[]>} - Array of matching dog objects
+ */
+export async function searchDogs(query) {
+    try {
+        const data = await apiRequest(`/api/dogs/search?q=${encodeURIComponent(query)}`);
+        return data.dogs || [];
+    } catch (error) {
+        console.error('Failed to search dogs:', error);
+        return [];
+    }
+}
+
 export async function searchDogParks(query) {
     try {
         const data = await apiRequest(`/api/dog-parks/search?q=${encodeURIComponent(query)}`, { cache: 'default' });

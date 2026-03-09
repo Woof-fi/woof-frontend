@@ -353,6 +353,10 @@
                 territoryParentName={item.territoryParentName || ''}
                 territoryGrandparentName={item.territoryGrandparentName || ''}
                 territoryUrlPath={item.territoryUrlPath || ''}
+                parkName={item.parkName || ''}
+                parkNameFi={item.parkNameFi || ''}
+                parkSlug={item.parkSlug || ''}
+                taggedDogs={item.taggedDogs || []}
                 onopenAuthModal={handleOpenAuthModal}
             />
         {/if}

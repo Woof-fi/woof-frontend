@@ -194,7 +194,14 @@
     "uploadingImage": "Ladataan kuvaa...",
     "uploadingImages": "Ladataan kuvia...",
     "maxImages": "Enintään {max} kuvaa per julkaisu",
-    "cover": "Kansi"
+    "cover": "Kansi",
+    "parkLocationOptional": "Sijainti (valinnainen)",
+    "searchPark": "Hae puistoja...",
+    "tagDogsOptional": "Merkitse koirat (valinnainen)",
+    "searchDogs": "Hae koiria...",
+    "maxTags": "Enintään {max} koiraa voidaan merkitä",
+    "removePark": "Poista sijainti",
+    "removeTag": "Poista"
   },
   "postEdit": {
     "title": "Muokkaa kuvatekstiä",
@@ -294,6 +301,7 @@
     "liked": "tykkäsi julkaisustasi",
     "commented": "kommentoi julkaisuasi",
     "followed": "alkoi seurata sinua",
+    "taggedInPost": "merkitsi koiran {dogName} julkaisuun",
     "parkVisit": "aikoo käydä puistossa",
     "loadMore": "Lataa lisää",
     "userAvatar": "Käyttäjän kuva",

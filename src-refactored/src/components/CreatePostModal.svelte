@@ -1,5 +1,5 @@
 <script>
-    import { getMyDogs, createPost, uploadImage } from '../../js/api.js';
+    import { getMyDogs, createPost, uploadImage, searchDogParks, getFollowingDogParks, searchDogs } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
@@ -10,7 +10,7 @@
         modals, closeCreatePostModal as storeClose,
         openAuthModal, openCreateDogModal,
     } from '../../js/modal-store.svelte.js';
-    import { t } from '../../js/i18n-store.svelte.js';
+    import { t, localName } from '../../js/i18n-store.svelte.js';
     import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
 
     const MAX_IMAGES = 5;
@@ -29,6 +29,24 @@
 
     let cameraInputEl = $state(null);
     let galleryInputEl = $state(null);
+
+    // Park location state
+    let selectedPark = $state(null);
+    let parkQuery = $state('');
+    let parkResults = $state([]);
+    let followedParks = $state([]);
+    let parkSearching = $state(false);
+    let showParkSection = $state(false);
+    let parkDebounceTimer = $state(null);
+
+    // Dog tagging state
+    let taggedDogs = $state([]);
+    let dogQuery = $state('');
+    let dogResults = $state([]);
+    let dogSearching = $state(false);
+    let showTagSection = $state(false);
+    let dogDebounceTimer = $state(null);
+    const MAX_TAGS = 10;
 
     // Watch store state — run async open checks or propagate close
     $effect(() => {
@@ -74,6 +92,9 @@
                 }
 
                 loading = false;
+
+                // Load followed parks for quick selection
+                getFollowingDogParks().then(parks => { followedParks = parks; }).catch(() => {});
             })();
         } else if (!modals.createPostModalOpen && visible) {
             // Store requested close (e.g. back button via closeAllModals)
@@ -108,6 +129,15 @@
         selectedDogId = '';
         dogs = [];
         showDogSelect = true;
+        selectedPark = null;
+        parkQuery = '';
+        parkResults = [];
+        followedParks = [];
+        taggedDogs = [];
+        dogQuery = '';
+        dogResults = [];
+        showParkSection = false;
+        showTagSection = false;
     }
 
     function handleKey(e) {
@@ -155,6 +185,60 @@
         e.target.value = '';
     }
 
+    function handleParkSearch(e) {
+        parkQuery = e.target.value;
+        clearTimeout(parkDebounceTimer);
+        if (parkQuery.trim().length < 2) { parkResults = []; return; }
+        parkSearching = true;
+        parkDebounceTimer = setTimeout(async () => {
+            try { parkResults = await searchDogParks(parkQuery.trim()); }
+            catch { parkResults = []; }
+            parkSearching = false;
+        }, 300);
+    }
+
+    function selectPark(park) {
+        selectedPark = park;
+        parkQuery = '';
+        parkResults = [];
+    }
+
+    function clearPark() {
+        selectedPark = null;
+    }
+
+    function handleDogSearch(e) {
+        dogQuery = e.target.value;
+        clearTimeout(dogDebounceTimer);
+        if (dogQuery.trim().length < 2) { dogResults = []; return; }
+        dogSearching = true;
+        dogDebounceTimer = setTimeout(async () => {
+            try {
+                const results = await searchDogs(dogQuery.trim());
+                dogResults = results.filter(d =>
+                    d.id !== selectedDogId && !taggedDogs.some(td => td.id === d.id)
+                );
+            } catch { dogResults = []; }
+            dogSearching = false;
+        }, 300);
+    }
+
+    function addDogTag(dog) {
+        if (taggedDogs.length >= MAX_TAGS) {
+            showToast(t('postCreate.maxTags', { max: MAX_TAGS }), 'error');
+            return;
+        }
+        if (!taggedDogs.some(td => td.id === dog.id)) {
+            taggedDogs = [...taggedDogs, dog];
+        }
+        dogQuery = '';
+        dogResults = [];
+    }
+
+    function removeDogTag(dogId) {
+        taggedDogs = taggedDogs.filter(d => d.id !== dogId);
+    }
+
     async function handleSubmit(e) {
         e.preventDefault();
 
@@ -175,7 +259,13 @@
             const imageUrls = await Promise.all(
                 selectedImages.map(img => uploadImage(img.file))
             );
-            const post = await createPost(selectedDogId, imageUrls, caption);
+            const post = await createPost(
+                selectedDogId,
+                imageUrls,
+                caption,
+                selectedPark?.id || null,
+                taggedDogs.map(d => d.id)
+            );
             close();
             bumpFeedVersion();
             showToast(t('common.postCreated'), 'success', { label: t('common.view'), href: `/post/${post.id}` });
@@ -302,6 +392,116 @@
                         maxlength="500"
                         bind:value={caption}
                     ></textarea>
+                </div>
+
+                <!-- Park Location (optional) -->
+                <div class="form-group">
+                    <button type="button" class="section-toggle" onclick={() => showParkSection = !showParkSection}>
+                        <i class="fas fa-location-dot"></i>
+                        {t('postCreate.parkLocationOptional')}
+                        {#if selectedPark}
+                            <span class="section-badge">{localName(selectedPark)}</span>
+                        {/if}
+                        <i class="fas {showParkSection ? 'fa-chevron-up' : 'fa-chevron-down'} toggle-arrow"></i>
+                    </button>
+                    {#if showParkSection}
+                        <div class="section-content">
+                            {#if selectedPark}
+                                <div class="selected-chip">
+                                    <i class="fas fa-location-dot"></i>
+                                    <span>{localName(selectedPark)}</span>
+                                    <button type="button" class="chip-remove" onclick={clearPark} aria-label={t('postCreate.removePark')}>
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            {:else}
+                                {#if followedParks.length > 0}
+                                    <div class="quick-chips">
+                                        {#each followedParks.slice(0, 5) as park (park.id)}
+                                            <button type="button" class="quick-chip" onclick={() => selectPark(park)}>
+                                                {localName(park)}
+                                            </button>
+                                        {/each}
+                                    </div>
+                                {/if}
+                                <div class="search-container">
+                                    <input
+                                        type="text"
+                                        placeholder={t('postCreate.searchPark')}
+                                        value={parkQuery}
+                                        oninput={handleParkSearch}
+                                        class="search-input"
+                                    />
+                                    {#if parkSearching}
+                                        <i class="fas fa-spinner fa-spin search-spinner"></i>
+                                    {/if}
+                                </div>
+                                {#if parkResults.length > 0}
+                                    <div class="search-results">
+                                        {#each parkResults as park (park.id)}
+                                            <button type="button" class="search-result" onclick={() => selectPark(park)}>
+                                                <span class="result-name">{localName(park)}</span>
+                                            </button>
+                                        {/each}
+                                    </div>
+                                {/if}
+                            {/if}
+                        </div>
+                    {/if}
+                </div>
+
+                <!-- Tag Dogs (optional) -->
+                <div class="form-group">
+                    <button type="button" class="section-toggle" onclick={() => showTagSection = !showTagSection}>
+                        <i class="fas fa-tag"></i>
+                        {t('postCreate.tagDogsOptional')}
+                        {#if taggedDogs.length > 0}
+                            <span class="section-badge">{taggedDogs.length}</span>
+                        {/if}
+                        <i class="fas {showTagSection ? 'fa-chevron-up' : 'fa-chevron-down'} toggle-arrow"></i>
+                    </button>
+                    {#if showTagSection}
+                        <div class="section-content">
+                            {#if taggedDogs.length > 0}
+                                <div class="tagged-dogs-chips">
+                                    {#each taggedDogs as dog (dog.id)}
+                                        <div class="selected-chip">
+                                            <span>{dog.name}</span>
+                                            <button type="button" class="chip-remove" onclick={() => removeDogTag(dog.id)} aria-label={t('postCreate.removeTag')}>
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    {/each}
+                                </div>
+                            {/if}
+                            {#if taggedDogs.length < MAX_TAGS}
+                                <div class="search-container">
+                                    <input
+                                        type="text"
+                                        placeholder={t('postCreate.searchDogs')}
+                                        value={dogQuery}
+                                        oninput={handleDogSearch}
+                                        class="search-input"
+                                    />
+                                    {#if dogSearching}
+                                        <i class="fas fa-spinner fa-spin search-spinner"></i>
+                                    {/if}
+                                </div>
+                                {#if dogResults.length > 0}
+                                    <div class="search-results">
+                                        {#each dogResults as dog (dog.id)}
+                                            <button type="button" class="search-result" onclick={() => addDogTag(dog)}>
+                                                <span class="result-name">{dog.name}</span>
+                                                {#if dog.breedName}
+                                                    <span class="result-meta">{dog.breedName}</span>
+                                                {/if}
+                                            </button>
+                                        {/each}
+                                    </div>
+                                {/if}
+                            {/if}
+                        </div>
+                    {/if}
                 </div>
 
                 <button type="submit" class="btn-primary" disabled={submitting}>
@@ -487,5 +687,173 @@
     border-radius: var(--woof-radius-xs);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* Park picker + Dog tagger */
+.section-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    width: 100%;
+    padding: var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-sm);
+    background: var(--woof-surface-primary);
+    cursor: pointer;
+    font-size: var(--woof-text-body);
+    color: var(--woof-color-neutral-600);
+    transition: all var(--woof-duration-fast);
+}
+
+.section-toggle:hover {
+    border-color: var(--woof-color-brand-primary);
+    color: var(--woof-color-brand-primary);
+}
+
+.toggle-arrow {
+    margin-left: auto;
+    font-size: var(--woof-text-caption-1);
+}
+
+.section-badge {
+    background: var(--woof-color-brand-primary);
+    color: var(--woof-color-neutral-0);
+    font-size: var(--woof-text-caption-1);
+    padding: 1px var(--woof-space-2);
+    border-radius: var(--woof-radius-full);
+    font-weight: var(--woof-font-weight-semibold);
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.section-content {
+    margin-top: var(--woof-space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-2);
+}
+
+.quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--woof-space-1);
+}
+
+.quick-chip {
+    padding: var(--woof-space-1) var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-surface-primary);
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-700);
+    cursor: pointer;
+    transition: all var(--woof-duration-fast);
+}
+
+.quick-chip:hover {
+    border-color: var(--woof-color-brand-primary);
+    color: var(--woof-color-brand-primary);
+    background: var(--woof-color-brand-primary-alpha-05);
+}
+
+.selected-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+    padding: var(--woof-space-1) var(--woof-space-2);
+    background: var(--woof-color-neutral-100);
+    border-radius: var(--woof-radius-full);
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-700);
+}
+
+.chip-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: none;
+    color: var(--woof-color-neutral-500);
+    cursor: pointer;
+    padding: 0;
+    border-radius: var(--woof-radius-full);
+    font-size: 10px;
+}
+
+.chip-remove:hover {
+    color: var(--woof-color-neutral-900);
+    background: var(--woof-color-neutral-200);
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-sm);
+    font-size: var(--woof-text-body);
+    background: var(--woof-surface-primary);
+    box-sizing: border-box;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+}
+
+.search-spinner {
+    position: absolute;
+    right: var(--woof-space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--woof-color-neutral-400);
+    font-size: var(--woof-text-caption-1);
+}
+
+.search-results {
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-sm);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.search-result {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    width: 100%;
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: var(--woof-text-body);
+}
+
+.search-result:hover {
+    background: var(--woof-color-neutral-50);
+}
+
+.result-name {
+    font-weight: var(--woof-font-weight-medium);
+    color: var(--woof-color-neutral-900);
+}
+
+.result-meta {
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-500);
+}
+
+.tagged-dogs-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--woof-space-1);
 }
 </style>

@@ -194,7 +194,14 @@
     "uploadingImage": "Uploading image...",
     "uploadingImages": "Uploading images...",
     "maxImages": "Maximum {max} images per post",
-    "cover": "Cover"
+    "cover": "Cover",
+    "parkLocationOptional": "Location (optional)",
+    "searchPark": "Search parks...",
+    "tagDogsOptional": "Tag dogs (optional)",
+    "searchDogs": "Search dogs...",
+    "maxTags": "Maximum {max} dogs can be tagged",
+    "removePark": "Remove location",
+    "removeTag": "Remove"
   },
   "postEdit": {
     "title": "Edit Caption",
@@ -294,6 +301,7 @@
     "liked": "liked your post",
     "commented": "commented on your post",
     "followed": "started following you",
+    "taggedInPost": "tagged {dogName} in a post",
     "parkVisit": "is planning to visit",
     "loadMore": "Load more",
     "userAvatar": "User avatar",

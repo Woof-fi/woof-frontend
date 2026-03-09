@@ -1,5 +1,5 @@
 <script>
-    import { t } from '../../js/i18n-store.svelte.js';
+    import { t, localName } from '../../js/i18n-store.svelte.js';
 
     let {
         dogSlug = '',
@@ -12,12 +12,17 @@
         territoryParentName = '',
         territoryGrandparentName = '',
         territoryUrlPath = '',
+        parkName = '',
+        parkNameFi = '',
+        parkSlug = '',
         isOwnPost = false,
         id = '',
         dogId = '',
         caption = '',
         onOptionsClick = null,
     } = $props();
+
+    const parkDisplayName = $derived(localName({ name: parkName, nameFi: parkNameFi }));
 
     const FALLBACK_AVATAR = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="150" height="150"%3E%3Crect fill="%23cccccc" width="150" height="150"/%3E%3Ctext fill="%23666666" font-family="Arial" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EDog%3C/text%3E%3C/svg%3E';
 </script>
@@ -64,6 +69,15 @@
                 {:else}
                     <span class="post-location-text">{territoryDisplay}</span>
                 {/if}
+            {/if}
+            {#if parkSlug && parkDisplayName}
+                {#if breedSlug || breedName || territoryName}
+                    <span class="post-meta-dot">&middot;</span>
+                {/if}
+                <a href="/dog-park/{parkSlug}" data-link class="post-park-link">
+                    <i class="fas fa-location-dot post-park-icon" aria-hidden="true"></i>
+                    {parkDisplayName}
+                </a>
             {/if}
         </span>
     </div>
@@ -152,6 +166,28 @@
 
 a.post-location-text:hover {
     text-decoration: underline;
+}
+
+.post-park-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--woof-color-neutral-500);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.post-park-link:hover {
+    color: var(--woof-color-brand-primary);
+    text-decoration: underline;
+}
+
+.post-park-icon {
+    font-size: 0.7em;
+    flex-shrink: 0;
 }
 
 .post-options-btn {
