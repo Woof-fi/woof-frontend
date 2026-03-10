@@ -67,7 +67,7 @@
             case 'comment':    return t('notifications.commented');
             case 'follow':     return t('notifications.followed');
             case 'park_visit': return `${t('notifications.parkVisit')}${notif.park?.name ? ` ${notif.park.name}` : ''}`;
-            case 'tag':        return t('notifications.taggedInPost');
+            case 'tag':        return t('notifications.taggedInPost', { dogName: notif.relatedDog?.name || t('notifications.yourDog') });
             default:           return '';
         }
     }
