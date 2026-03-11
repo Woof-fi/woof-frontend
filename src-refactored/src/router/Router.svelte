@@ -14,6 +14,7 @@
     import TerritoryView from '../views/TerritoryView.svelte';
     import BookmarksView from '../views/BookmarksView.svelte';
     import DogParkView from '../views/DogParkView.svelte';
+    import SettingsView from '../views/SettingsView.svelte';
     import ProtoView from '../proto/ProtoView.svelte';
 
     let { onopenAuthModal = null } = $props();
@@ -82,6 +83,7 @@
         { path: '/admin/:section',  component: AdminView,          paramNames: ['section'] },
         { path: '/admin',          component: AdminView,          paramNames: [] },
         { path: '/notifications',  component: NotificationsView,  paramNames: [] },
+        { path: '/settings',       component: SettingsView,       paramNames: [] },
         { path: '/privacy',        component: PrivacyView,        paramNames: [] },
         { path: '/terms',          component: TermsView,          paramNames: [] },
         { path: '/proto/:name',    component: ProtoView,          paramNames: ['name'] },
@@ -198,6 +200,8 @@
         <AdminView params={matched.params} />
     {:else if matched.component === NotificationsView}
         <NotificationsView onopenAuthModal={onopenAuthModal} />
+    {:else if matched.component === SettingsView}
+        <SettingsView onopenAuthModal={onopenAuthModal} />
     {:else if matched.component === PrivacyView}
         <PrivacyView />
     {:else if matched.component === TermsView}

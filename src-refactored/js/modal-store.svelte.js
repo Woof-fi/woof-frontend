@@ -32,6 +32,7 @@ export let modals = $state({
     createActionSheetOpen: false,
     checkinOptionsSheetOpen: false,
     checkinOptionsSheetData: null,     // { checkinId, dogId, dogSlug, parkSlug, isOwnCheckin }
+    changePasswordModalOpen: false,
 });
 
 export function openAuthModal() { modals.authModalOpen = true; }
@@ -65,6 +66,8 @@ export function openCreateActionSheet() { modals.createActionSheetOpen = true; }
 export function closeCreateActionSheet() { modals.createActionSheetOpen = false; }
 export function openCheckinOptionsSheet(data) { modals.checkinOptionsSheetData = data; modals.checkinOptionsSheetOpen = true; }
 export function closeCheckinOptionsSheet() { modals.checkinOptionsSheetOpen = false; modals.checkinOptionsSheetData = null; }
+export function openChangePasswordModal() { modals.changePasswordModalOpen = true; }
+export function closeChangePasswordModal() { modals.changePasswordModalOpen = false; }
 export function closeAllModals() {
     modals.authModalOpen = false;
     modals.createPostModalOpen = false;
@@ -90,4 +93,5 @@ export function closeAllModals() {
     modals.createActionSheetOpen = false;
     modals.checkinOptionsSheetOpen = false;
     modals.checkinOptionsSheetData = null;
+    modals.changePasswordModalOpen = false;
 }

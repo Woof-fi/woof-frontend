@@ -353,6 +353,48 @@ export async function confirmNewPassword(email, code, newPassword) {
 }
 
 /**
+ * Change password for the currently authenticated user.
+ * Requires a valid Cognito session (user must be logged in).
+ * @param {string} oldPassword - Current password
+ * @param {string} newPassword - New password
+ * @returns {Promise<void>}
+ */
+export async function changePassword(oldPassword, newPassword) {
+    if (MOCK_AUTH) {
+        showToast(t('settings.passwordChanged'), 'success');
+        return;
+    }
+
+    const cognitoUser = userPool.getCurrentUser();
+    if (!cognitoUser) {
+        throw new Error('No authenticated user');
+    }
+
+    // Cognito requires an active session for changePassword
+    await new Promise((resolve, reject) => {
+        cognitoUser.getSession((err, session) => {
+            if (err || !session?.isValid()) {
+                reject(err || new Error('Invalid session'));
+                return;
+            }
+            resolve(session);
+        });
+    });
+
+    return new Promise((resolve, reject) => {
+        cognitoUser.changePassword(oldPassword, newPassword, (err, result) => {
+            if (err) {
+                showToast(sanitizeAuthError(err), 'error');
+                reject(err);
+                return;
+            }
+            showToast(t('settings.passwordChanged'), 'success');
+            resolve(result);
+        });
+    });
+}
+
+/**
  * Logout — signs out of Cognito and clears local state
  */
 export function logout() {

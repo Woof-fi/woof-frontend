@@ -1376,5 +1376,13 @@ export async function uploadParkPhoto(parkId, imageUrl, caption) {
     });
 }
 
+/**
+ * Delete the current user's account (cascades all data)
+ * @returns {Promise<void>}
+ */
+export async function deleteMyAccount() {
+    return apiRequest('/api/auth/me', { method: 'DELETE' });
+}
+
 // Export APIError for use in other modules
 export { APIError };

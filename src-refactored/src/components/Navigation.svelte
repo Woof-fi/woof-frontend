@@ -3,7 +3,7 @@
     import { isAuthenticated, logout } from '../../js/auth.js';
     import { openCreateDogModal, openSearchPanel, openCreateActionSheet } from '../../js/modal-store.svelte.js';
     import { store, setAuthUser, setFeedTab, setNotifUnreadCount, setCurrentDog, setUserDogIds } from '../../js/svelte-store.svelte.js';
-    import { t, localName, locale, setLocale } from '../../js/i18n-store.svelte.js';
+    import { t, localName } from '../../js/i18n-store.svelte.js';
 
     let { onopenAuthModal = null } = $props();
 
@@ -397,6 +397,11 @@
                     <i class="fas fa-bookmark"></i> {t('nav.favourites')}
                 </a>
             </li>
+            <li>
+                <a href="/settings" data-link onclick={closeDrawer} class:active={activePath.startsWith('/settings')}>
+                    <i class="fas fa-gear"></i> {t('nav.settings')}
+                </a>
+            </li>
         {:else}
             <li>
                 <button type="button" class="nav-btn" onclick={handleAddPetUnauthenticated}>
@@ -491,24 +496,6 @@
     {/if}
 
     <div class="nav-drawer-footer">
-        <div class="lang-picker" role="radiogroup" aria-label="Language">
-            <button
-                type="button"
-                class="lang-btn"
-                class:active={locale.current === 'en'}
-                onclick={() => setLocale('en')}
-                aria-checked={locale.current === 'en'}
-                role="radio"
-            >{t('language.en')}</button>
-            <button
-                type="button"
-                class="lang-btn"
-                class:active={locale.current === 'fi'}
-                onclick={() => setLocale('fi')}
-                aria-checked={locale.current === 'fi'}
-                role="radio"
-            >{t('language.fi')}</button>
-        </div>
         <button type="button" class="nav-drawer-row" onclick={handleAuthLink}>
             {#if authed}
                 <i class="fas fa-right-from-bracket"></i> {t('nav.logout')}
@@ -1075,42 +1062,6 @@
     .bottom-nav {
         display: none;
     }
-}
-
-/* Language picker */
-.lang-picker {
-    display: flex;
-    gap: 0;
-    margin: 0 var(--woof-space-3) var(--woof-space-2);
-    border-radius: var(--woof-radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--woof-color-neutral-200);
-}
-
-.lang-btn {
-    flex: 1;
-    padding: var(--woof-space-1) var(--woof-space-3);
-    font-size: var(--woof-text-caption-1);
-    font-weight: var(--woof-font-weight-semibold);
-    font-family: inherit;
-    color: var(--woof-color-neutral-500);
-    background: var(--woof-surface-primary);
-    border: none;
-    cursor: pointer;
-    transition: background var(--woof-duration-fast), color var(--woof-duration-fast);
-}
-
-.lang-btn:first-child {
-    border-right: 1px solid var(--woof-color-neutral-200);
-}
-
-.lang-btn:hover {
-    background: var(--woof-color-neutral-100);
-}
-
-.lang-btn.active {
-    background: var(--woof-color-brand-primary);
-    color: var(--woof-color-neutral-0);
 }
 
 /* Desktop floating FAB (right side) */

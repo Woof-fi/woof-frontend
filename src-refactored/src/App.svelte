@@ -24,6 +24,7 @@
     import FollowListModal from './components/FollowListModal.svelte';
     import LikerListModal from './components/LikerListModal.svelte';
     import CreateActionSheet from './components/CreateActionSheet.svelte';
+    import ChangePasswordModal from './components/ChangePasswordModal.svelte';
 
     // When the API layer detects an expired session that can't be refreshed,
     // clear the Svelte store so the UI updates reactively (e.g. nav shows login).
@@ -104,6 +105,7 @@
             <CheckinOptionsSheet />
         {/if}
         <CreateActionSheet />
+        <ChangePasswordModal />
         <Toast />
     {/snippet}
 </SiteGate>

@@ -138,18 +138,6 @@ describe('Navigation', () => {
         });
     });
 
-    it('language toggle calls setLocale', async () => {
-        const i18nModule = await import('../../../js/i18n-store.svelte.js');
-
-        const { container } = render(Navigation);
-        const langBtns = container.querySelectorAll('.lang-btn');
-        expect(langBtns.length).toBe(2);
-
-        // Click the second button (FI)
-        await fireEvent.click(langBtns[1]);
-        expect(i18nModule.setLocale).toHaveBeenCalledWith('fi');
-    });
-
     it('renders bottom nav with home, search, create, profile', () => {
         const { container } = render(Navigation);
         const bottomNav = container.querySelector('.bottom-nav');
