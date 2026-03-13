@@ -10,6 +10,16 @@ import '../js/icons.js';  // Registers only the ~84 icons we actually use
 import '../css/global.css';
 import '../css/styles.css';
 import { showToast } from '../js/utils.js';
+import * as Sentry from '@sentry/svelte';
+
+// Sentry error tracking (production only)
+if (window.location.hostname === 'woofapp.fi') {
+    Sentry.init({
+        dsn: 'https://f6de0d63e48d76dc8ba1a1a811cfe6a9@o4511038509547520.ingest.de.sentry.io/4511038547820624',
+        sendDefaultPii: true,
+        environment: 'production',
+    });
+}
 
 // Build metadata (injected at build time by Vite)
 declare const __BUILD_COMMIT__: string;
