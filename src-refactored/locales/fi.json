@@ -530,7 +530,14 @@
     "noAmenitySuggestions": "Ei odottavia varusteluehdotuksia",
     "amenityApproved": "Varusteluehdotus hyväksytty",
     "amenityRejected": "Varusteluehdotus hylätty",
-    "currentValue": "Nykyinen"
+    "currentValue": "Nykyinen",
+    "feedback": "Palaute",
+    "loadingFeedback": "Ladataan palautetta\u2026",
+    "noFeedback": "Ei palautetta viel\u00e4",
+    "failedLoadFeedback": "Palautteen lataus ep\u00e4onnistui",
+    "categoryBug": "Bugi",
+    "categoryFeature": "Toive",
+    "categoryGeneral": "Yleinen"
   },
   "health": {
     "vetVisit": "Eläinlääkärikäynti",
@@ -667,6 +674,21 @@
     "deleteConfirm": "Poista tilini",
     "deleting": "Poistetaan...",
     "deleteFailed": "Tilin poisto epäonnistui. Yritä uudelleen."
+  },
+  "feedback": {
+    "title": "Palaute",
+    "sectionTitle": "Palaute",
+    "description": "Auta meitä parantamaan Woofia! Kerro bugeista, toiveista tai ajatuksistasi.",
+    "giveFeedback": "Anna palautetta Woofista",
+    "category_bug": "Bugi",
+    "category_feature": "Toive",
+    "category_general": "Yleinen",
+    "placeholder": "Kerro meille mitä mielessäsi on...",
+    "submit": "Lähetä",
+    "sending": "Lähetetään...",
+    "sent": "Kiitos palautteestasi!",
+    "failed": "Palautteen lähetys epäonnistui. Yritä uudelleen.",
+    "charCount": "{current}/{max}"
   },
   "language": {
     "en": "EN",

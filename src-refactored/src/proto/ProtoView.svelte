@@ -1,8 +1,8 @@
 <script>
     import ProtoHub from './proto-hub/ProtoHub.svelte';
-    import ProtoCreateButton from './proto-create/ProtoCreateButton.svelte';
-    import ProtoFeed from './proto-feed/ProtoFeed.svelte';
-    import ProtoDashboard from './proto-dashboard/ProtoDashboard.svelte';
+    import ProtoEmails from './proto-emails/ProtoEmails.svelte';
+    import ProtoSEO from './proto-seo/ProtoSEO.svelte';
+    import ProtoFeedback from './proto-feedback/ProtoFeedback.svelte';
     import { store } from '../../js/svelte-store.svelte.js';
 
     let { params = {} } = $props();
@@ -17,12 +17,12 @@
     </div>
 
     <main class="proto-wrapper">
-        {#if view === 'create'}
-            <ProtoCreateButton />
-        {:else if view === 'feed'}
-            <ProtoFeed />
-        {:else if view === 'dashboard'}
-            <ProtoDashboard />
+        {#if view === 'emails'}
+            <ProtoEmails />
+        {:else if view === 'seo'}
+            <ProtoSEO />
+        {:else if view === 'feedback'}
+            <ProtoFeedback />
         {:else}
             <ProtoHub />
         {/if}

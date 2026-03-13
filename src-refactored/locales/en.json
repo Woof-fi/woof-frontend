@@ -530,7 +530,14 @@
     "noAmenitySuggestions": "No pending amenity suggestions",
     "amenityApproved": "Amenity suggestion approved",
     "amenityRejected": "Amenity suggestion rejected",
-    "currentValue": "Current"
+    "currentValue": "Current",
+    "feedback": "Feedback",
+    "loadingFeedback": "Loading feedback\u2026",
+    "noFeedback": "No feedback yet",
+    "failedLoadFeedback": "Failed to load feedback",
+    "categoryBug": "Bug",
+    "categoryFeature": "Feature",
+    "categoryGeneral": "General"
   },
   "health": {
     "vetVisit": "Vet Visit",
@@ -667,6 +674,21 @@
     "deleteConfirm": "Delete My Account",
     "deleting": "Deleting...",
     "deleteFailed": "Failed to delete account. Please try again."
+  },
+  "feedback": {
+    "title": "Feedback",
+    "sectionTitle": "Feedback",
+    "description": "Help us improve Woof! Share bugs, feature ideas, or general thoughts.",
+    "giveFeedback": "Give feedback about Woof",
+    "category_bug": "Bug",
+    "category_feature": "Feature",
+    "category_general": "General",
+    "placeholder": "Tell us what's on your mind...",
+    "submit": "Send",
+    "sending": "Sending...",
+    "sent": "Thanks for your feedback!",
+    "failed": "Failed to send feedback. Please try again.",
+    "charCount": "{current}/{max}"
   },
   "language": {
     "en": "EN",

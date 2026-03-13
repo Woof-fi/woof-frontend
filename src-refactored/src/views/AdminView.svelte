@@ -1,11 +1,11 @@
 <script>
-    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration, getAdminPendingParks, getAdminUnmatchedParks, updateAdminDogPark, deleteAdminDogPark, getAllTerritories, getAdminPendingAmenitySuggestions, reviewAmenitySuggestion } from '../../js/api.js';
+    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration, getAdminPendingParks, getAdminUnmatchedParks, updateAdminDogPark, deleteAdminDogPark, getAllTerritories, getAdminPendingAmenitySuggestions, reviewAmenitySuggestion, getAdminFeedback } from '../../js/api.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { showToast, timeAgo } from '../../js/utils.js';
     import { t, localName } from '../../js/i18n-store.svelte.js';
 
     let { params = {} } = $props();
-    const VALID_SECTIONS = ['reports', 'flagged', 'dogparks'];
+    const VALID_SECTIONS = ['reports', 'flagged', 'dogparks', 'feedback'];
     let section = $derived(VALID_SECTIONS.includes(params.section) ? params.section : 'reports');
 
     function navigateSection(s) {
@@ -59,6 +59,13 @@
     let amenitySuggestions = $state([]);
     let amenityBusy      = $state({});
 
+    // ---- Feedback ----
+    let feedbackItems       = $state([]);
+    let feedbackLoading     = $state(false);
+    let feedbackCategoryFilter = $state('');
+    let feedbackNextCursor  = $state(null);
+    let feedbackLoadingMore = $state(false);
+
     function formatTerritoryLabel(terr) {
         if (terr.type === 'sub_district' && terr.parentName && terr.grandparentName) {
             return `${localName(terr)}, ${terr.parentName}, ${terr.grandparentName}`;
@@ -91,6 +98,15 @@
     $effect(() => {
         if (section === 'dogparks') {
             loadDogParks();
+        }
+    });
+
+    $effect(() => {
+        if (section === 'feedback') {
+            const _f = feedbackCategoryFilter;
+            feedbackItems = [];
+            feedbackNextCursor = null;
+            loadFeedback();
         }
     });
 
@@ -256,6 +272,42 @@
         }
     }
 
+    async function loadFeedback() {
+        feedbackLoading = true;
+        try {
+            const data = await getAdminFeedback({
+                category: feedbackCategoryFilter || undefined,
+                limit: 20,
+            });
+            feedbackItems = data.feedback ?? [];
+            feedbackNextCursor = data.nextCursor ?? null;
+        } catch (err) {
+            showToast(err?.status === 403 ? t('admin.accessDenied') : t('admin.failedLoadFeedback'), 'error');
+        } finally {
+            feedbackLoading = false;
+        }
+    }
+
+    async function loadMoreFeedback() {
+        if (!feedbackNextCursor || feedbackLoadingMore) return;
+        feedbackLoadingMore = true;
+        try {
+            const data = await getAdminFeedback({
+                category: feedbackCategoryFilter || undefined,
+                cursor: feedbackNextCursor,
+                limit: 20,
+            });
+            feedbackItems = [...feedbackItems, ...(data.feedback ?? [])];
+            feedbackNextCursor = data.nextCursor ?? null;
+        } catch {
+            showToast(t('admin.failedLoadMore'), 'error');
+        } finally {
+            feedbackLoadingMore = false;
+        }
+    }
+
+    const FEEDBACK_CATEGORY_LABELS = { bug: 'Bug', feature: 'Feature', general: 'General' };
+
     async function handleApprovePark(park) {
         parksBusy = { ...parksBusy, [park.id]: true };
         try {
@@ -416,6 +468,16 @@
                 onclick={() => navigateSection('dogparks')}
             >
                 <i class="fas fa-tree"></i> {t('admin.dogParks')}
+            </button>
+            <button
+                class="admin-section-tab"
+                class:active={section === 'feedback'}
+                onclick={() => navigateSection('feedback')}
+            >
+                <i class="fas fa-comment-dots"></i> {t('admin.feedback')}
+                {#if feedbackItems.length > 0}
+                    <span class="admin-section-badge">{feedbackItems.length}</span>
+                {/if}
             </button>
         </div>
 
@@ -836,6 +898,65 @@
                             </div>
                         {/each}
                     </div>
+                {/if}
+            {/if}
+
+        {:else if section === 'feedback'}
+            <!-- Category filter -->
+            <div class="admin-filter-tabs">
+                {#each [{ value: '', label: t('admin.all') }, { value: 'bug', label: t('admin.categoryBug') }, { value: 'feature', label: t('admin.categoryFeature') }, { value: 'general', label: t('admin.categoryGeneral') }] as f (f.value)}
+                    <button
+                        class="admin-filter-tab"
+                        class:active={feedbackCategoryFilter === f.value}
+                        onclick={() => feedbackCategoryFilter = f.value}
+                    >
+                        {f.label}
+                    </button>
+                {/each}
+            </div>
+
+            {#if feedbackLoading}
+                <div class="admin-loading">
+                    <i class="fas fa-spinner fa-spin"></i> {t('admin.loadingFeedback')}
+                </div>
+            {:else if feedbackItems.length === 0}
+                <div class="admin-empty">
+                    <i class="fas fa-circle-check"></i>
+                    <p>{t('admin.noFeedback')}</p>
+                </div>
+            {:else}
+                <div class="admin-report-list">
+                    {#each feedbackItems as fb (fb.id)}
+                        <div class="admin-report-card">
+                            <div class="admin-report-meta">
+                                <span class="admin-feedback-category admin-feedback-category--{fb.category}">
+                                    {#if fb.category === 'bug'}
+                                        <i class="fas fa-bug"></i>
+                                    {:else if fb.category === 'feature'}
+                                        <i class="fas fa-lightbulb"></i>
+                                    {:else}
+                                        <i class="fas fa-comment"></i>
+                                    {/if}
+                                    {FEEDBACK_CATEGORY_LABELS[fb.category] || fb.category}
+                                </span>
+                                <span class="admin-report-time">{timeAgo(fb.created_at)}</span>
+                            </div>
+                            <p class="admin-feedback-message">{fb.message}</p>
+                            <p class="admin-feedback-email">
+                                <i class="fas fa-envelope"></i> {fb.user_email}
+                            </p>
+                        </div>
+                    {/each}
+                </div>
+
+                {#if feedbackNextCursor}
+                    <button class="admin-load-more" onclick={loadMoreFeedback} disabled={feedbackLoadingMore}>
+                        {#if feedbackLoadingMore}
+                            <i class="fas fa-spinner fa-spin"></i>
+                        {:else}
+                            Load more
+                        {/if}
+                    </button>
                 {/if}
             {/if}
         {/if}
@@ -1401,5 +1522,69 @@
     background: var(--woof-color-neutral-0);
     font-size: var(--woof-text-footnote);
     color: var(--woof-color-neutral-700);
+}
+
+/* Feedback section */
+.admin-feedback-category {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+    padding: 2px var(--woof-space-2);
+    border-radius: var(--woof-radius-full);
+    font-size: var(--woof-text-caption-2);
+    font-weight: var(--woof-font-weight-semibold);
+}
+
+.admin-feedback-category--bug {
+    background: color-mix(in srgb, var(--woof-color-brand-primary) 12%, transparent);
+    color: var(--woof-color-brand-primary);
+}
+
+.admin-feedback-category--feature {
+    background: color-mix(in srgb, var(--woof-color-fresh-mint-dark) 12%, transparent);
+    color: var(--woof-color-fresh-mint-dark);
+}
+
+.admin-feedback-category--general {
+    background: var(--woof-color-neutral-100);
+    color: var(--woof-color-neutral-600);
+}
+
+.admin-feedback-message {
+    margin: var(--woof-space-2) 0;
+    font-size: var(--woof-text-callout);
+    color: var(--woof-color-neutral-800);
+    line-height: var(--woof-lh-callout);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.admin-feedback-email {
+    margin: 0;
+    font-size: var(--woof-text-caption-1);
+    color: var(--woof-color-neutral-400);
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+}
+
+.admin-load-more {
+    display: block;
+    width: 100%;
+    padding: var(--woof-space-3);
+    margin-top: var(--woof-space-3);
+    border: 1px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    background: var(--woof-surface-primary);
+    color: var(--woof-color-brand-primary);
+    font-size: var(--woof-text-callout);
+    font-weight: var(--woof-font-weight-medium);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.admin-load-more:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 </style>

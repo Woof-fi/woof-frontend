@@ -141,11 +141,13 @@
 
                 <button class="action-sheet-item" onclick={handleHealthClick} disabled={healthLoading}>
                     <span class="action-icon action-icon-health">
-                        {#if healthLoading}
-                            <i class="fas fa-spinner fa-spin"></i>
-                        {:else}
-                            <i class="fas fa-heart-pulse"></i>
-                        {/if}
+                        {#key healthLoading}
+                            {#if healthLoading}
+                                <i class="fas fa-spinner fa-spin"></i>
+                            {:else}
+                                <i class="fas fa-heart-pulse"></i>
+                            {/if}
+                        {/key}
                     </span>
                     <span class="action-text">
                         <span class="action-label">{t('create.logHealth')}</span>

@@ -292,11 +292,13 @@
             </div>
 
             <button type="submit" class="submit-btn" disabled={submitting || !selectedDog || !selectedPark || !visitTime}>
-                {#if submitting}
-                    <i class="fas fa-spinner fa-spin"></i>
-                {:else}
-                    <i class="fas fa-calendar-check"></i>
-                {/if}
+                {#key submitting}
+                    {#if submitting}
+                        <i class="fas fa-spinner fa-spin"></i>
+                    {:else}
+                        <i class="fas fa-calendar-check"></i>
+                    {/if}
+                {/key}
                 {t('visit.submit')}
             </button>
         </form>

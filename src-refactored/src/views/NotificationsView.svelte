@@ -68,6 +68,7 @@
             case 'follow':     return t('notifications.followed');
             case 'park_visit': return `${t('notifications.parkVisit')}${notif.park?.name ? ` ${notif.park.name}` : ''}`;
             case 'tag':        return t('notifications.taggedInPost', { dogName: notif.relatedDog?.name || t('notifications.yourDog') });
+            case 'system':     return notif.message || '';
             default:           return '';
         }
     }
@@ -75,7 +76,9 @@
     /** Navigate to the relevant resource when tapping a notification */
     function handleNotifClick(notif) {
         let href = null;
-        if (notif.type === 'follow' && notif.actorDog?.slug) {
+        if (notif.type === 'system' && notif.url) {
+            href = notif.url;
+        } else if (notif.type === 'follow' && notif.actorDog?.slug) {
             href = `/dog/${notif.actorDog.slug}`;
         } else if (notif.type === 'park_visit' && notif.park?.slug) {
             href = `/dog-park/${notif.park.slug}`;
@@ -199,6 +202,19 @@
     background: var(--woof-color-neutral-200);
 }
 
+.notification-system-icon {
+    width: var(--woof-avatar-sm);
+    height: var(--woof-avatar-sm);
+    border-radius: var(--woof-radius-full);
+    background: var(--woof-color-brand-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: white;
+    font-size: var(--woof-text-caption-1);
+}
+
 .notifications-empty {
     text-align: center;
     padding: var(--woof-space-16) var(--woof-space-4);
@@ -302,17 +318,28 @@
                         onclick={() => handleNotifClick(notif)}
                         aria-label="{notif.actorDog?.name ?? 'Someone'} {notifText(notif)}"
                     >
-                        <img
-                            src={notif.actorDog?.profilePhoto || FALLBACK_AVATAR}
-                            alt={notif.actorDog?.name ?? t('notifications.userAvatar')}
-                            class="notification-avatar"
-                            onerror={(e) => { e.target.src = FALLBACK_AVATAR; }}
-                        />
+                        {#if notif.type === 'system'}
+                            <div class="notification-system-icon" aria-hidden="true">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                        {:else}
+                            <img
+                                src={notif.actorDog?.profilePhoto || FALLBACK_AVATAR}
+                                alt={notif.actorDog?.name ?? t('notifications.userAvatar')}
+                                class="notification-avatar"
+                                onerror={(e) => { e.target.src = FALLBACK_AVATAR; }}
+                            />
+                        {/if}
 
                         <div class="notification-body">
                             <span class="notification-text">
-                                <strong>{notif.actorDog?.name ?? 'Someone'}</strong>
-                                {' '}{notifText(notif)}
+                                {#if notif.type === 'system'}
+                                    <strong>Woof</strong>
+                                    {' '}{notifText(notif)}
+                                {:else}
+                                    <strong>{notif.actorDog?.name ?? 'Someone'}</strong>
+                                    {' '}{notifText(notif)}
+                                {/if}
                             </span>
                             <time
                                 class="notification-time"

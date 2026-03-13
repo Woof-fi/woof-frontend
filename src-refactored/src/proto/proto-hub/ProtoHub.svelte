@@ -1,24 +1,24 @@
 <script>
     const prototypes = [
         {
-            name: 'create',
-            title: 'Unified Create Button',
-            desc: 'The + button opens a menu: post a photo, schedule a park visit, or log a health record. Surfaces hidden features from the main action button.',
-            icon: 'fa-plus-circle',
+            name: 'emails',
+            title: 'Email Templates',
+            desc: 'Transactional and digest email templates: welcome onboarding, new follower notifications, and weekly territory highlights. Finnish mock data.',
+            icon: 'fa-envelope',
             color: 'var(--woof-color-brand-primary)',
         },
         {
-            name: 'feed',
-            title: 'Personalized Feed',
-            desc: 'Two-tab feed: "Following" shows posts from dogs you follow, scheduled visits at your parks, and new dogs in your districts. "All" shows everything else.',
-            icon: 'fa-stream',
+            name: 'seo',
+            title: 'SEO Park Pages',
+            desc: 'SEO-optimized landing pages for dog parks by city. Structured data, meta tags, amenity icons, and visitor stats for search engine visibility.',
+            icon: 'fa-magnifying-glass',
             color: 'var(--woof-color-fresh-mint-dark)',
         },
         {
-            name: 'dashboard',
-            title: 'Dashboard Home',
-            desc: 'Replace the feed-only home with a dashboard: upcoming visits, territory activity, nearby parks, and a mini feed below.',
-            icon: 'fa-th-large',
+            name: 'feedback',
+            title: 'Feedback & Broadcasts',
+            desc: 'In-app feedback modal (bug reports, feature requests) and admin broadcast notification system. Preview the full user flow.',
+            icon: 'fa-comment-dots',
             color: 'var(--woof-color-gold)',
         },
     ];

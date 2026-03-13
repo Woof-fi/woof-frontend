@@ -86,11 +86,13 @@
             onclick={handleClick}
             disabled={submitting}
         >
-            {#if submitting}
-                <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkOut')}</span>
-            {:else}
-                <span class="btn-content"><i class="fas fa-right-from-bracket"></i> {t('dogPark.checkOut')}</span>
-            {/if}
+            {#key submitting}
+                {#if submitting}
+                    <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkOut')}</span>
+                {:else}
+                    <span class="btn-content"><i class="fas fa-right-from-bracket"></i> {t('dogPark.checkOut')}</span>
+                {/if}
+            {/key}
         </button>
     {:else}
         <button
@@ -98,11 +100,13 @@
             onclick={handleClick}
             disabled={submitting}
         >
-            {#if submitting}
-                <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkIn')}</span>
-            {:else}
-                <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.checkIn')}</span>
-            {/if}
+            {#key submitting}
+                {#if submitting}
+                    <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkIn')}</span>
+                {:else}
+                    <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.checkIn')}</span>
+                {/if}
+            {/key}
         </button>
     {/if}
 
@@ -141,11 +145,13 @@
                 onclick={handleCheckIn}
                 disabled={submitting || (myDogs.length > 1 && !selectedDogId)}
             >
-                {#if submitting}
-                    <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.confirmCheckIn')}</span>
-                {:else}
-                    <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.confirmCheckIn')}</span>
-                {/if}
+                {#key submitting}
+                    {#if submitting}
+                        <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.confirmCheckIn')}</span>
+                    {:else}
+                        <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.confirmCheckIn')}</span>
+                    {/if}
+                {/key}
             </button>
         </div>
     {/if}

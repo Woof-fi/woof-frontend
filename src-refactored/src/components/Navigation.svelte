@@ -497,11 +497,13 @@
 
     <div class="nav-drawer-footer">
         <button type="button" class="nav-drawer-row" onclick={handleAuthLink}>
-            {#if authed}
-                <i class="fas fa-right-from-bracket"></i> {t('nav.logout')}
-            {:else}
-                <i class="fas fa-circle-user"></i> {t('nav.login')}
-            {/if}
+            {#key authed}
+                {#if authed}
+                    <i class="fas fa-right-from-bracket"></i> {t('nav.logout')}
+                {:else}
+                    <i class="fas fa-circle-user"></i> {t('nav.login')}
+                {/if}
+            {/key}
         </button>
         <div class="nav-legal-links">
             <a href="/privacy" data-link onclick={closeDrawer}>{t('nav.privacy')}</a>

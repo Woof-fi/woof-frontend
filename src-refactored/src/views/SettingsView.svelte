@@ -2,7 +2,7 @@
     import { isAuthenticated, logout, getCurrentUser } from '../../js/auth.js';
     import { deleteMyAccount } from '../../js/api.js';
     import { store, setAuthUser } from '../../js/svelte-store.svelte.js';
-    import { openChangePasswordModal } from '../../js/modal-store.svelte.js';
+    import { openChangePasswordModal, openFeedbackModal } from '../../js/modal-store.svelte.js';
     import { t, locale, setLocale } from '../../js/i18n-store.svelte.js';
     import { showToast } from '../../js/utils.js';
 
@@ -84,7 +84,21 @@
             </div>
         </section>
 
-        <!-- Section 2: Account -->
+        <!-- Section 2: Feedback -->
+        <section class="settings-section">
+            <h2 class="settings-section-title">{t('feedback.sectionTitle')}</h2>
+            <div class="settings-card">
+                <button type="button" class="settings-row settings-row-action" onclick={openFeedbackModal}>
+                    <span class="settings-row-icon-text">
+                        <i class="fas fa-comment-dots"></i>
+                        {t('feedback.giveFeedback')}
+                    </span>
+                    <i class="fas fa-chevron-right settings-row-chevron"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 3: Account -->
         <section class="settings-section">
             <h2 class="settings-section-title">{t('settings.account')}</h2>
             <div class="settings-card">
@@ -104,7 +118,7 @@
             </div>
         </section>
 
-        <!-- Section 3: Account Actions -->
+        <!-- Section 4: Account Actions -->
         <section class="settings-section">
             <h2 class="settings-section-title">{t('settings.accountActions')}</h2>
             <div class="settings-card">

@@ -1377,6 +1377,32 @@ export async function uploadParkPhoto(parkId, imageUrl, caption) {
 }
 
 /**
+ * Submit user feedback
+ * @param {string} category - bug, feature, or general
+ * @param {string} message - Feedback message
+ * @returns {Promise<object>} - Created feedback record
+ */
+export async function submitFeedback(category, message) {
+    return apiRequest('/api/feedback', {
+        method: 'POST',
+        body: JSON.stringify({ category, message }),
+    });
+}
+
+/**
+ * Get all feedback (admin only, paginated)
+ * @param {object} [options] - { category, cursor, limit }
+ * @returns {Promise<{feedback: Array, nextCursor: string|null}>}
+ */
+export async function getAdminFeedback({ category, cursor, limit = 20 } = {}) {
+    const params = new URLSearchParams();
+    if (category) params.set('category', category);
+    if (cursor) params.set('cursor', cursor);
+    params.set('limit', String(limit));
+    return apiRequest(`/api/admin/feedback?${params}`);
+}
+
+/**
  * Delete the current user's account (cascades all data)
  * @returns {Promise<void>}
  */

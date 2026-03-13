@@ -17,13 +17,15 @@
             disabled={followLoading}
             onclick={onFollowToggle}
         >
-            {#if followLoading}
-                <span class="btn-content"><span class="woof-spinner"></span></span>
-            {:else if isFollowing}
-                <span class="btn-content"><i class="fas fa-user-check"></i> {t('profile.followingBtn')}</span>
-            {:else}
-                <span class="btn-content"><i class="fas fa-user-plus"></i> {t('profile.followBtn')}</span>
-            {/if}
+            {#key `${followLoading}-${isFollowing}`}
+                {#if followLoading}
+                    <span class="btn-content"><span class="woof-spinner"></span></span>
+                {:else if isFollowing}
+                    <span class="btn-content"><i class="fas fa-user-check"></i> {t('profile.followingBtn')}</span>
+                {:else}
+                    <span class="btn-content"><i class="fas fa-user-plus"></i> {t('profile.followBtn')}</span>
+                {/if}
+            {/key}
         </button>
         <button
             class="message-profile-btn icon-only"
