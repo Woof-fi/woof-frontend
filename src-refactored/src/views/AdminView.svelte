@@ -1,5 +1,5 @@
 <script>
-    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration, getAdminPendingParks, getAdminUnmatchedParks, updateAdminDogPark, deleteAdminDogPark, getAllTerritories, getAdminPendingAmenitySuggestions, reviewAmenitySuggestion, getAdminFeedback } from '../../js/api.js';
+    import { getReports, updateReportStatus, adminDeletePost, adminDeleteComment, banUser, unbanUser, getFlaggedPosts, updatePostModeration, getAdminPendingParks, getAdminUnmatchedParks, updateAdminDogPark, deleteAdminDogPark, getAllTerritories, getAdminPendingAmenitySuggestions, reviewAmenitySuggestion, getAdminFeedback, markFeedbackRead, markFeedbackUnread, getUnreadFeedbackCount } from '../../js/api.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { showToast, timeAgo } from '../../js/utils.js';
     import { t, localName } from '../../js/i18n-store.svelte.js';
@@ -63,6 +63,9 @@
     let feedbackItems       = $state([]);
     let feedbackLoading     = $state(false);
     let feedbackCategoryFilter = $state('');
+    let feedbackStatusFilter = $state('unread');
+    let feedbackUnreadCount  = $state(0);
+    let feedbackBusy         = $state({});
     let feedbackNextCursor  = $state(null);
     let feedbackLoadingMore = $state(false);
 
@@ -104,9 +107,11 @@
     $effect(() => {
         if (section === 'feedback') {
             const _f = feedbackCategoryFilter;
+            const _s = feedbackStatusFilter;
             feedbackItems = [];
             feedbackNextCursor = null;
             loadFeedback();
+            loadUnreadFeedbackCount();
         }
     });
 
@@ -277,6 +282,7 @@
         try {
             const data = await getAdminFeedback({
                 category: feedbackCategoryFilter || undefined,
+                status: feedbackStatusFilter || undefined,
                 limit: 20,
             });
             feedbackItems = data.feedback ?? [];
@@ -294,6 +300,7 @@
         try {
             const data = await getAdminFeedback({
                 category: feedbackCategoryFilter || undefined,
+                status: feedbackStatusFilter || undefined,
                 cursor: feedbackNextCursor,
                 limit: 20,
             });
@@ -303,6 +310,34 @@
             showToast(t('admin.failedLoadMore'), 'error');
         } finally {
             feedbackLoadingMore = false;
+        }
+    }
+
+    async function loadUnreadFeedbackCount() {
+        try {
+            const data = await getUnreadFeedbackCount();
+            feedbackUnreadCount = data.count ?? 0;
+        } catch { /* ignore */ }
+    }
+
+    async function handleToggleFeedbackRead(fb) {
+        feedbackBusy = { ...feedbackBusy, [fb.id]: true };
+        try {
+            if (fb.read_at) {
+                await markFeedbackUnread(fb.id);
+                fb.read_at = null;
+            } else {
+                const res = await markFeedbackRead(fb.id);
+                fb.read_at = res.feedback.read_at;
+            }
+            // Update count
+            feedbackUnreadCount += fb.read_at ? -1 : 1;
+            // Trigger reactivity
+            feedbackItems = [...feedbackItems];
+        } catch {
+            showToast(t('admin.failedUpdateFeedback'), 'error');
+        } finally {
+            feedbackBusy = { ...feedbackBusy, [fb.id]: false };
         }
     }
 
@@ -475,8 +510,8 @@
                 onclick={() => navigateSection('feedback')}
             >
                 <i class="fas fa-comment-dots"></i> {t('admin.feedback')}
-                {#if feedbackItems.length > 0}
-                    <span class="admin-section-badge">{feedbackItems.length}</span>
+                {#if feedbackUnreadCount > 0}
+                    <span class="admin-section-badge">{feedbackUnreadCount}</span>
                 {/if}
             </button>
         </div>
@@ -902,6 +937,23 @@
             {/if}
 
         {:else if section === 'feedback'}
+            <!-- Status filter (unread / read / all) -->
+            <div class="admin-filter-tabs">
+                {#each [
+                    { value: 'unread', label: t('admin.unread') },
+                    { value: 'read', label: t('admin.read') },
+                    { value: '', label: t('admin.all') }
+                ] as f (f.value)}
+                    <button
+                        class="admin-filter-tab"
+                        class:active={feedbackStatusFilter === f.value}
+                        onclick={() => feedbackStatusFilter = f.value}
+                    >
+                        {f.label}
+                    </button>
+                {/each}
+            </div>
+
             <!-- Category filter -->
             <div class="admin-filter-tabs">
                 {#each [{ value: '', label: t('admin.all') }, { value: 'bug', label: t('admin.categoryBug') }, { value: 'feature', label: t('admin.categoryFeature') }, { value: 'general', label: t('admin.categoryGeneral') }] as f (f.value)}
@@ -927,7 +979,7 @@
             {:else}
                 <div class="admin-report-list">
                     {#each feedbackItems as fb (fb.id)}
-                        <div class="admin-report-card">
+                        <div class="admin-report-card" class:admin-feedback-read={fb.read_at}>
                             <div class="admin-report-meta">
                                 <span class="admin-feedback-category admin-feedback-category--{fb.category}">
                                     {#if fb.category === 'bug'}
@@ -945,6 +997,22 @@
                             <p class="admin-feedback-email">
                                 <i class="fas fa-envelope"></i> {fb.user_email}
                             </p>
+                            <div class="admin-feedback-actions">
+                                <button
+                                    class="admin-feedback-toggle-read"
+                                    onclick={() => handleToggleFeedbackRead(fb)}
+                                    disabled={feedbackBusy[fb.id]}
+                                    title={fb.read_at ? t('admin.markUnread') : t('admin.markRead')}
+                                >
+                                    {#key fb.read_at}
+                                    {#if fb.read_at}
+                                        <i class="fas fa-envelope-open"></i> {t('admin.markUnread')}
+                                    {:else}
+                                        <i class="fas fa-envelope"></i> {t('admin.markRead')}
+                                    {/if}
+                                    {/key}
+                                </button>
+                            </div>
                         </div>
                     {/each}
                 </div>
@@ -1568,22 +1636,37 @@
     gap: var(--woof-space-1);
 }
 
-.admin-load-more {
-    display: block;
-    width: 100%;
-    padding: var(--woof-space-3);
-    margin-top: var(--woof-space-3);
+.admin-feedback-read {
+    opacity: 0.6;
+    background: var(--woof-color-neutral-50);
+}
+
+.admin-feedback-actions {
+    margin-top: var(--woof-space-2);
+    display: flex;
+    gap: var(--woof-space-2);
+}
+
+.admin-feedback-toggle-read {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--woof-space-1);
+    padding: var(--woof-space-1) var(--woof-space-2);
     border: 1px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-md);
     background: var(--woof-surface-primary);
-    color: var(--woof-color-brand-primary);
-    font-size: var(--woof-text-callout);
-    font-weight: var(--woof-font-weight-medium);
-    font-family: inherit;
+    color: var(--woof-color-neutral-500);
+    font-size: var(--woof-text-caption-2);
     cursor: pointer;
+    transition: all 0.15s ease;
 }
 
-.admin-load-more:disabled {
+.admin-feedback-toggle-read:hover {
+    border-color: var(--woof-color-neutral-300);
+    color: var(--woof-color-neutral-700);
+}
+
+.admin-feedback-toggle-read:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }

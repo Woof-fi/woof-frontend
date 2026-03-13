@@ -1394,12 +1394,36 @@ export async function submitFeedback(category, message) {
  * @param {object} [options] - { category, cursor, limit }
  * @returns {Promise<{feedback: Array, nextCursor: string|null}>}
  */
-export async function getAdminFeedback({ category, cursor, limit = 20 } = {}) {
+export async function getAdminFeedback({ category, status, cursor, limit = 20 } = {}) {
     const params = new URLSearchParams();
     if (category) params.set('category', category);
+    if (status) params.set('status', status);
     if (cursor) params.set('cursor', cursor);
     params.set('limit', String(limit));
     return apiRequest(`/api/admin/feedback?${params}`);
+}
+
+/**
+ * Mark feedback as read
+ * @param {string} id - Feedback ID
+ */
+export async function markFeedbackRead(id) {
+    return apiRequest(`/api/admin/feedback/${id}/read`, { method: 'PATCH' });
+}
+
+/**
+ * Mark feedback as unread
+ * @param {string} id - Feedback ID
+ */
+export async function markFeedbackUnread(id) {
+    return apiRequest(`/api/admin/feedback/${id}/unread`, { method: 'PATCH' });
+}
+
+/**
+ * Get unread feedback count
+ */
+export async function getUnreadFeedbackCount() {
+    return apiRequest('/api/admin/feedback/unread-count');
 }
 
 /**

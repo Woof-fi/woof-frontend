@@ -537,7 +537,12 @@
     "failedLoadFeedback": "Failed to load feedback",
     "categoryBug": "Bug",
     "categoryFeature": "Feature",
-    "categoryGeneral": "General"
+    "categoryGeneral": "General",
+    "unread": "Unread",
+    "read": "Read",
+    "markRead": "Mark read",
+    "markUnread": "Mark unread",
+    "failedUpdateFeedback": "Failed to update feedback"
   },
   "health": {
     "vetVisit": "Vet Visit",

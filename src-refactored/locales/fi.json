@@ -537,7 +537,12 @@
     "failedLoadFeedback": "Palautteen lataus ep\u00e4onnistui",
     "categoryBug": "Bugi",
     "categoryFeature": "Toive",
-    "categoryGeneral": "Yleinen"
+    "categoryGeneral": "Yleinen",
+    "unread": "Lukematon",
+    "read": "Luettu",
+    "markRead": "Merkitse luetuksi",
+    "markUnread": "Merkitse lukemattomaksi",
+    "failedUpdateFeedback": "Palautteen päivitys epäonnistui"
   },
   "health": {
     "vetVisit": "Eläinlääkärikäynti",
