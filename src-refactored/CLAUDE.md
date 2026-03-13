@@ -12,14 +12,16 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - **Svelte 5 runes**: Use `$props()`, `$state()`, `$derived()`, `$effect()` exclusively. No `writable`, `createEventDispatcher`, or `$on` — those are Svelte 4.
 - **Callback props**: Inter-component events use callback props (e.g., `onopenAuthModal = null` in `$props()`). Call with `onopenAuthModal?.()`.
 - **Component styles**: Live in `<style>` blocks inside each `.svelte` file (Svelte scopes them at build time). Global styles (resets, tokens, layout root) live in `css/global.css`. `css/styles.css` is a barrel file importing feature modules (layout, buttons, forms, modals, utilities, onboarding) — do not add new styles there; add them to the relevant component's `<style>` block instead.
-- **Icons**: Font Awesome via SVG+JS (`js/icons.js`). Uses `<i class="fas fa-*">` in templates — `dom.watch()` auto-replaces with inline SVGs. To add new icon: import in `js/icons.js` + add to `library.add()`.
+- **Icons**: Font Awesome via SVG+JS (`js/icons.js`). Uses `<i class="fas fa-*">` in templates — `dom.watch()` auto-replaces with inline SVGs. To add new icon: import in `js/icons.js` + add to `library.add()`. **Important:** When FA icons swap inside Svelte conditionals (e.g. spinner ↔ regular icon), wrap in `{#key condition}` to force DOM teardown — otherwise `dom.watch()` leaves orphaned SVGs.
+- **Error tracking**: Sentry (`@sentry/svelte`) initialized in `main.ts`, production only (gated on `window.location.hostname === 'woofapp.fi'`).
+- **Analytics**: Umami (privacy-friendly, no cookies) via `<script>` tag in `index.html`.
 - **Design system**: Always use `--woof-*` CSS custom properties for all colors, spacing, radius, shadows, and typography. Never hardcode hex values or pixel sizes that have a token equivalent. Brand primary is `--woof-color-brand-primary` (`#C9403F`). Full reference: `docs/design/index.html` and `docs/design/foundations.md`.
 - **Backend**: `https://api.woofapp.fi` (Express on Elastic Beanstalk)
 
 ## Key Files
 
 ### Svelte Entry
-- `src/main.ts` — `mount(App, { target: document.getElementById('app')! })` + service worker update detection (auto-reload toast on new SW activation) + build metadata logging (`window.__BUILD__` with commit hash + build time, injected by Vite `define`)
+- `src/main.ts` — `mount(App, { target: document.getElementById('app')! })` + Sentry init (`@sentry/svelte`, production only) + service worker update detection (auto-reload toast on new SW activation) + build metadata logging (`window.__BUILD__` with commit hash + build time, injected by Vite `define`)
 - `src/App.svelte` — App shell: wraps everything in `SiteGate` (password gate), imports `Navigation.svelte` + `Router.svelte`, handles auth modal open events
 - `src/router/Router.svelte` — SPA router; renders view components
 
@@ -50,6 +52,22 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `FriendsTab.svelte` — Mutual friends list
 - `HealthTab.svelte` — Health records timeline with filters
 - `ProfileFollowBar.svelte` — Sticky follow/message bar
+- `CreateActionSheet.svelte` — Bottom action sheet for create FAB (New post, Schedule park visit, Add health record)
+- `QuickVisitForm.svelte` — Park visit scheduling form with live park search
+- `PostImageCarousel.svelte` — Multi-image swipe carousel with dots, counter badge, double-tap like
+- `CheckinButton.svelte` — Park check-in/out dropdown form
+- `CheckinCard.svelte` — Park check-in card in feed (compact PostCard style)
+- `ActiveVisitors.svelte` — Active park visitors display
+- `CheckinOptionsSheet.svelte` — Action sheet for check-ins (own: delete/share; others: report)
+- `DogListModal.svelte` — Shared dog list modal (used by FollowListModal + LikerListModal)
+- `FollowListModal.svelte` — Followers/following list (thin wrapper around DogListModal)
+- `LikerListModal.svelte` — Who liked a post (thin wrapper around DogListModal)
+- `EditPostModal.svelte` — Edit post caption
+- `EditCommentModal.svelte` — Edit comment text
+- `FeedbackModal.svelte` — Feedback submission (bug/feature/general category pills, textarea with char count)
+- `ChangePasswordModal.svelte` — Change password via Cognito with requirements checklist
+- `ParkVisitCard.svelte` — Upcoming park visit highlight in Following feed
+- `NewDogCard.svelte` — New dogs in area section in Following feed
 
 ### Svelte Views (`src/views/`)
 - `HomeView.svelte` — Tabbed feed (For You / Following); tab switch triggers Feed re-render
@@ -61,6 +79,18 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `PrivacyView.svelte` — GDPR Privacy Policy at `/privacy`
 - `TerritoryView.svelte` — Territory page with hero image, breadcrumb nav, stats, child territories grid, Posts/Dogs tabs; SEO-friendly nested URLs (`/territory/helsinki/oulunkyla/patola`)
 - `TermsView.svelte` — Terms of Service at `/terms`
+- `SettingsView.svelte` — Account settings at `/settings` (app preferences, account, account actions)
+- `DogParkView.svelte` — Dog park detail page with check-ins, photos, amenities, followers
+- `BreedView.svelte` — Breed detail page with breed info, feed, follow
+- `TerritoryDirectoryView.svelte` — Territory directory at `/territories` with municipality search
+- `BookmarksView.svelte` — Bookmarked posts feed at `/bookmarks`
+
+### Proto Pages (`src/proto/`)
+- `ProtoView.svelte` — Proto page router (admin-only access)
+- `proto-hub/ProtoHub.svelte` — Proto hub with 3 concept cards
+- `proto-emails/ProtoEmails.svelte` — Email template previews (welcome, follower digest, weekly highlights)
+- `proto-seo/ProtoSEO.svelte` — SEO park page preview with JSON-LD
+- `proto-feedback/ProtoFeedback.svelte` — Feedback modal + broadcast notification preview
 
 ### Vanilla JS (stable core — modify only to add new API functions or utility helpers)
 - `js/api.js` — All API calls (add new endpoint functions here; never call fetch directly from components)
@@ -150,7 +180,7 @@ npm run verify-deploy   # checks production JS bundle contains expected git comm
 
 ### Unit Tests (Vitest)
 ```bash
-npm test              # Run all unit tests (160+ tests, 14 suites)
+npm test              # Run all unit tests (169 tests, 15 suites)
 npm run test:watch    # Watch mode
 npm run test:coverage # With coverage
 ```
@@ -208,3 +238,5 @@ Production uses hardcoded defaults in `js/config.js`.
 - **S3 bucket** `woof-prod-photos`: No public access — photos served exclusively via CloudFront CDN (`cdn.woofapp.fi`). Uploads via presigned PUT URLs only.
 - **Source maps**: Disabled in production (`vite.config.ts`: `sourcemap: false`).
 - **SES**: Domain `woofapp.fi` verified in SES (eu-north-1). MAIL FROM: `mail.woofapp.fi`.
+- **Sentry**: `@sentry/svelte` for frontend error tracking (production only). DSN configured in `main.ts`.
+- **Umami**: Privacy-friendly analytics (no cookies). Script tag in `index.html`.

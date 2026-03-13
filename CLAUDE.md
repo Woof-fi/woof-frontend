@@ -82,7 +82,7 @@ src-refactored/
 ## Testing
 
 ```bash
-npm test                  # Vitest unit tests (160+ tests, 14 suites)
+npm test                  # Vitest unit tests (169 tests, 15 suites)
 npm run test:e2e:headed   # Playwright E2E against production (always headed)
 ```
 

@@ -1,8 +1,8 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-03-08
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed, 13B Multi-Image Posts, UX Audit (Batches A-F + Phase 2)
-**Current:** Tier 2 — Major Features (15A Sentry next)
+**Last Updated:** 2026-03-13
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed, 13B Multi-Image Posts, UX Audit (Batches A-F + Phase 2), Park Check-ins 1A+Options+Photos, 13D Dog Tagging+Park Location, AS-1 Account Settings, 15A Sentry, Feedback System, Umami Analytics
+**Current:** Tier 2 — Major Features
 
 ---
 
@@ -154,6 +154,34 @@ Comprehensive UX audit follow-up with production bug fixes and codebase cleanup:
 - **P2 Toast standardization**: 8 modals switched from `utils.js` to canonical `toast-store.svelte.js` import
 - **P3 Navigation fix**: PostOptionsSheet changed from `PopStateEvent` to `CustomEvent('routechange')`
 
+#### Park Check-ins Phase 1A + Options + Photos — DONE (2026-03-08)
+
+`park_checkins` table (migration 031, auto-expire 2h). Check-in/out with optional message, active visitors, history. CheckinCard in feed, notifications to park followers. CheckinOptionsSheet (delete/share/report). Park photo uploads with Rekognition moderation. DogParkView hero carousel. 30 new backend tests.
+
+#### 13D: Dog Tagging + Park Location — DONE (2026-03-09)
+
+Search-based dog tagger in CreatePostModal (max 10), `post_tags` table, tagged dogs shown as clickable links on PostCard. Park picker with followed parks chips + search, `dog_park_id` FK on posts. Migration 034, EN+FI i18n.
+
+#### AS-1: Account Settings — DONE (2026-03-11)
+
+`/settings` page with 3 sections: App Preferences (language picker moved from nav drawer), Account (change password via Cognito with requirements checklist), Account Actions (delete account with CASCADE, neutral styling). ChangePasswordModal with focus trap. 10 SettingsView tests.
+
+#### 15A: Error Tracking (Sentry) — DONE (2026-03-13)
+
+`@sentry/svelte` frontend (production only, gated on hostname). `@sentry/node` backend with `Sentry.setupExpressErrorHandler()`. Both verified in production.
+
+#### Feedback System — DONE (2026-03-13)
+
+`POST /api/feedback` (authenticated, bug/feature/general categories). FeedbackModal accessible from Settings page. Admin `GET /api/admin/feedback` (paginated, filterable). Admin broadcast notifications: `POST /api/admin/notifications/broadcast` → system notification to all active users. NotificationsView renders system notifications with message + optional URL. Migrations 036 (feedback table), 037 (notification system type). 16 new backend tests.
+
+#### Umami Analytics — DONE (2026-03-13)
+
+Privacy-friendly analytics (no cookies) via `<script>` tag in `index.html`.
+
+#### FA SVG Orphan Fixes — DONE (2026-03-13)
+
+`{#key}` blocks in 5 components (Navigation, CreateActionSheet, ProfileFollowBar, QuickVisitForm, CheckinButton) to prevent `dom.watch()` from leaving ghost SVGs when Svelte conditionals flip.
+
 #### 13C: Dark Mode — Large
 
 - **Prerequisite: hardcoded hex sweep** — 21 Svelte component files have inline `#RGB` values that must be replaced with `--woof-*` tokens before theme switching can work. Also replace hardcoded `font-size`/`font-weight` px values in `styles.css` with token variables.
@@ -181,13 +209,6 @@ Design system documentation already complete (tokens, CSS, motion specs).
 - Full-screen story viewer: progress bars, tap left/right to navigate, swipe down to dismiss
 - Same S3 presigned URL upload flow as posts
 - Scheduled cleanup of expired story images
-
-#### AS-1: Account Settings — Medium
-
-*Merges partial Phase 7E (account settings).*
-
-- `/settings` route and SettingsView.svelte
-- Sections: Theme (light/dark/system), Language (EN/FI), Privacy (public/private per dog), Notifications (email digest preferences), Account (change password via Cognito, delete account)
 
 ---
 
@@ -228,9 +249,9 @@ Features that change the fundamental social model.
 
 ### Tier 4: Infrastructure (Medium Priority, ship alongside Tier 2-3)
 
-#### 15A: Error Tracking (Sentry) — Small
+#### 15A: Error Tracking (Sentry) — DONE
 
-*Existing Phase 6E.* `@sentry/svelte` frontend, `@sentry/node` backend, sourcemaps.
+*See Completed Phases above.*
 
 #### 15B: WebSocket Messaging — Medium
 
@@ -376,11 +397,11 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 | 5 | 12E | Bookmarks feed | Small |
 | 6 | 12F | Dog date of birth migration | Small |
 | 7 | 13A | i18n (EN + FI) | Large |
-| 8 | 15A | Sentry error tracking | Small |
-| 9 | 13B | Multi-image posts | Large |
+| 8 | 15A | Sentry error tracking | ~~Small~~ DONE |
+| 9 | 13B | Multi-image posts | ~~Large~~ DONE |
 | 10 | 13C | Dark mode | Large |
-| 11 | AS-1 | Account settings | Medium |
-| 12 | 13D | Dog tagging | Medium |
+| 11 | AS-1 | Account settings | ~~Medium~~ DONE |
+| 12 | 13D | Dog tagging + park location | ~~Medium~~ DONE |
 | 13 | EF-1 | Dog birthday celebrations | Small |
 | 14 | EF-2 | Puppy milestones | Medium |
 | 15 | 13E | Stories | Large |
@@ -412,7 +433,7 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Test coverage gaps | Medium | 450 backend + 160 frontend tests. Image upload, Search, Navigation, CreatePostModal, multi-image posts covered. Major views (ProfileView, FeedView) still untested |
+| Test coverage gaps | Medium | 501 backend + 169 frontend tests. Image upload, Search, Navigation, CreatePostModal, multi-image posts, feedback, broadcast covered. Major views (ProfileView, FeedView) still untested |
 | i18n key parity validation | Low | Pre-commit hook or CI check to ensure EN and FI locale files have identical keys |
 | Extract shared controller utilities | Low | ✅ `getFirstDogId()` extracted to dogService. ✅ `parsePagination()` extracted. ✅ `mapPostRow()` extracted. "Verify dog ownership" still in 5+ controllers. |
 | OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |
