@@ -1,12 +1,15 @@
 <script>
     import { isAuthenticated, logout, getCurrentUser } from '../../js/auth.js';
-    import { deleteMyAccount } from '../../js/api.js';
+    import { deleteMyAccount, getMyDogs } from '../../js/api.js';
     import { store, setAuthUser } from '../../js/svelte-store.svelte.js';
-    import { openChangePasswordModal, openFeedbackModal } from '../../js/modal-store.svelte.js';
-    import { t, locale, setLocale } from '../../js/i18n-store.svelte.js';
+    import { openChangePasswordModal, openFeedbackModal, openCreateDogModal } from '../../js/modal-store.svelte.js';
+    import { t, localName, locale, setLocale } from '../../js/i18n-store.svelte.js';
     import { showToast } from '../../js/utils.js';
 
     let { onopenAuthModal = null } = $props();
+
+    // My dogs state
+    let myDogs = $state([]);
 
     // Delete account state
     let deleteConfirmText = $state('');
@@ -17,6 +20,18 @@
     let authed = $derived(store.authUser !== null);
     let userEmail = $derived(store.authUser?.email || getCurrentUser()?.email || '');
     let canDeleteAccount = $derived(deleteConfirmText === 'DELETE' && !deletingAccount);
+
+    async function fetchMyDogs() {
+        if (store.authUser) {
+            myDogs = await getMyDogs();
+        }
+    }
+
+    $effect(() => {
+        // Re-fetch when dogVersion changes (new dog created/edited)
+        void store.dogVersion;
+        fetchMyDogs();
+    });
 
     function handleLogout() {
         logout();
@@ -84,7 +99,44 @@
             </div>
         </section>
 
-        <!-- Section 2: Feedback -->
+        <!-- Section 2: My Dogs -->
+        <section class="settings-section">
+            <h2 class="settings-section-title">{t('settings.myDogs')}</h2>
+            <div class="settings-card">
+                {#each myDogs as dog, i}
+                    {#if i > 0}
+                        <div class="settings-divider"></div>
+                    {/if}
+                    <a href="/dog/{dog.slug}" data-link class="settings-row settings-row-action dog-row">
+                        <div class="dog-row-info">
+                            <img
+                                src={dog.photo_url || '/images/dog_profile_pic.jpg'}
+                                alt={dog.name}
+                                class="dog-row-avatar"
+                            />
+                            <div class="dog-row-text">
+                                <span class="dog-row-name">{dog.name}</span>
+                                {#if dog.breed_name}
+                                    <span class="dog-row-breed">{localName({ name: dog.breed_name, nameFi: dog.breed_name_fi })}</span>
+                                {/if}
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right settings-row-chevron"></i>
+                    </a>
+                {/each}
+
+                {#if myDogs.length > 0}
+                    <div class="settings-divider"></div>
+                {/if}
+
+                <button type="button" class="dog-add-btn" onclick={openCreateDogModal}>
+                    <i class="fas fa-plus"></i>
+                    {t('settings.addNewDog')}
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 3: Feedback -->
         <section class="settings-section">
             <h2 class="settings-section-title">{t('feedback.sectionTitle')}</h2>
             <div class="settings-card">
@@ -98,7 +150,7 @@
             </div>
         </section>
 
-        <!-- Section 3: Account -->
+        <!-- Section 4: Account -->
         <section class="settings-section">
             <h2 class="settings-section-title">{t('settings.account')}</h2>
             <div class="settings-card">
@@ -118,7 +170,7 @@
             </div>
         </section>
 
-        <!-- Section 4: Account Actions -->
+        <!-- Section 5: Account Actions -->
         <section class="settings-section">
             <h2 class="settings-section-title">{t('settings.accountActions')}</h2>
             <div class="settings-card">
@@ -424,6 +476,66 @@
     .btn-danger:disabled {
         opacity: 0.4;
         cursor: not-allowed;
+    }
+
+    /* Dog rows */
+    .dog-row {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .dog-row-info {
+        display: flex;
+        align-items: center;
+        gap: var(--woof-space-3);
+        min-width: 0;
+    }
+
+    .dog-row-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--woof-radius-full);
+        object-fit: cover;
+        flex-shrink: 0;
+        background: var(--woof-color-neutral-100);
+    }
+
+    .dog-row-text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .dog-row-name {
+        font-weight: var(--woof-font-weight-semibold);
+        color: var(--woof-color-neutral-900);
+    }
+
+    .dog-row-breed {
+        font-size: var(--woof-text-caption-1);
+        color: var(--woof-text-secondary);
+    }
+
+    .dog-add-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--woof-space-2);
+        width: 100%;
+        padding: var(--woof-space-3) var(--woof-space-4);
+        background: none;
+        border: none;
+        border-top: 1px dashed var(--woof-color-neutral-200);
+        font-size: var(--woof-text-callout);
+        font-weight: var(--woof-font-weight-medium);
+        font-family: inherit;
+        color: var(--woof-color-brand-primary);
+        cursor: pointer;
+        transition: background-color var(--woof-duration-fast);
+    }
+
+    .dog-add-btn:hover {
+        background: var(--woof-color-neutral-50);
     }
 
     /* Mobile font size to prevent iOS zoom */

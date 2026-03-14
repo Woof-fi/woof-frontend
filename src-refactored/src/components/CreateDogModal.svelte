@@ -126,6 +126,15 @@
                 history.pushState({}, '', `/dog/${createdDog.slug}`);
                 window.dispatchEvent(new CustomEvent('routechange'));
             }
+
+            // Show multi-dog hint once after first dog creation
+            const hintKey = 'woof_shown_multi_dog_hint';
+            if (!localStorage.getItem(hintKey)) {
+                localStorage.setItem(hintKey, '1');
+                setTimeout(() => {
+                    showToast(t('dog.multiDogHint'), 'info', 5000);
+                }, 2000);
+            }
         } catch (err) {
             console.error('Failed to create dog:', err);
             showToast(t('common.error'), 'error');

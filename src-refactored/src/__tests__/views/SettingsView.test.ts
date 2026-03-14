@@ -29,6 +29,7 @@ vi.mock('../../../js/auth.js', () => ({
 
 vi.mock('../../../js/api.js', () => ({
     deleteMyAccount: vi.fn().mockResolvedValue(undefined),
+    getMyDogs: vi.fn().mockResolvedValue([]),
 }));
 
 vi.mock('../../../js/utils.js', () => ({
@@ -37,6 +38,7 @@ vi.mock('../../../js/utils.js', () => ({
 
 vi.mock('../../../js/modal-store.svelte.js', () => ({
     openChangePasswordModal: mockOpenChangePasswordModal,
+    openCreateDogModal: vi.fn(),
 }));
 
 describe('SettingsView', () => {

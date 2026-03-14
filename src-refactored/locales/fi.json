@@ -247,7 +247,8 @@
     "failedLoadDogs": "Koirien lataus epäonnistui. Yritä uudelleen.",
     "profileDeleted": "Profiili poistettu onnistuneesti.",
     "failedDelete": "Profiilin poisto epäonnistui. Yritä uudelleen.",
-    "profileUpdatedApi": "Profiili päivitetty onnistuneesti!"
+    "profileUpdatedApi": "Profiili päivitetty onnistuneesti!",
+    "multiDogHint": "Voit lisätä lisää koiria myöhemmin Asetuksista!"
   },
   "profile": {
     "posts": "Julkaisut",
@@ -270,7 +271,8 @@
     "noFollowing": "Ei seurattavia vielä",
     "loginToFollow": "Kirjaudu seurataksesi koiria",
     "actionFailed": "Toiminto epäonnistui. Yritä uudelleen.",
-    "loadMore": "Lataa lisää julkaisuja"
+    "loadMore": "Lataa lisää julkaisuja",
+    "sameOwner": "Saman omistajan koirat"
   },
   "bookmarks": {
     "title": "Suosikit",
@@ -678,7 +680,9 @@
     "deleteInstruction": "Kirjoita DELETE vahvistaaksesi",
     "deleteConfirm": "Poista tilini",
     "deleting": "Poistetaan...",
-    "deleteFailed": "Tilin poisto epäonnistui. Yritä uudelleen."
+    "deleteFailed": "Tilin poisto epäonnistui. Yritä uudelleen.",
+    "myDogs": "Koirani",
+    "addNewDog": "Lisää uusi koira"
   },
   "feedback": {
     "title": "Palaute",
@@ -698,5 +702,18 @@
   "language": {
     "en": "EN",
     "fi": "FI"
+  },
+  "dogSwitcher": {
+    "label": "Vaihda aktiivinen koira",
+    "switchedTo": "Vaihdettu: {name}",
+    "viewProfile": "Näytä profiili"
+  },
+  "follow": {
+    "pickDogs": "Seuraa koiralla:",
+    "alreadyFollowing": "Seuraa jo",
+    "followCount": "Seuraa ({count} koiraa)",
+    "followSuccess": "Seurataan nyt!",
+    "ownerHasOtherDogs": "Koiran {name} omistajalla on myös {names}. Tutustu heihin!",
+    "followedBy": "Seuraajat: {names}"
   }
 }

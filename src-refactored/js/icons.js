@@ -53,6 +53,7 @@ import {
     faDroplet,
     faEllipsis,
     faEnvelope,
+    faEnvelopeOpen,
     faEnvelopeOpenText,
     faEye,
     faEyeSlash,
@@ -117,6 +118,7 @@ import {
 import {
     faBell,
     faBookmark,
+    faCircle,
     faClock,
     faComment,
     faHeart,
@@ -135,7 +137,7 @@ library.add(
     faBug,
     faBullhorn,
     faCommentDots, faComments, faCompass, faDog, faDroplet, faEllipsis,
-    faEnvelope, faEnvelopeOpenText, faEye, faEyeSlash, faFileLines, faFlag, faFlask,
+    faEnvelope, faEnvelopeOpen, faEnvelopeOpenText, faEye, faEyeSlash, faFileLines, faFlag, faFlask,
     faFloppyDisk, faGear, faHand, faHeartSolid, faHeartPulse, faHourglassSolid,
     faHouse, faImage, faImages, faLightbulb, faLink, faLocationDot,
     faLock, faMagnifyingGlass, faMapPin, faNoteSticky, faPaperPlaneSolid,
@@ -147,7 +149,7 @@ library.add(
     faUmbrella, faUser, faUserCheck, faUserGroup, faUserPlus,
     faUserSlash, faUsers, faWeightScale,
     // Regular
-    faBell, faBookmark, faClock, faComment, faHeart, faHourglass,
+    faBell, faBookmark, faCircle, faClock, faComment, faHeart, faHourglass,
     faPaperPlane,
 );
 

@@ -49,7 +49,9 @@ vi.mock('../../../js/i18n-store.svelte.js', () => ({
     localName: vi.fn((item: any) => item?.name || ''),
 }));
 vi.mock('../../../js/svelte-store.svelte.js', () => ({
+    store: { currentDog: { id: 'dog-1', name: 'Nelli' } },
     bumpFeedVersion: vi.fn(),
+    setCurrentDog: vi.fn(),
 }));
 
 const oneDog = [{ id: 'dog-1', name: 'Nelli', slug: 'nelli-1', profilePhoto: null }];

@@ -69,11 +69,12 @@
 
         followInFlight = new Set([...followInFlight, dog.id]);
         try {
+            const activeDogId = store.currentDog?.id;
             if (followingSet.has(dog.id)) {
-                await unfollowDog(dog.id);
+                await unfollowDog(dog.id, activeDogId);
                 followingSet = new Set([...followingSet].filter(id => id !== dog.id));
             } else {
-                await followDog(dog.id);
+                await followDog(dog.id, activeDogId);
                 followingSet = new Set([...followingSet, dog.id]);
             }
         } catch (e) {

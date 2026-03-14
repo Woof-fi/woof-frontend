@@ -111,7 +111,7 @@
         <div class="modal-body">
             <form id="change-password-form" onsubmit={handleSubmit}>
                 <!-- Hidden username for password managers & accessibility -->
-                <input type="email" autocomplete="username" value={store.authUser?.email ?? ''} hidden aria-hidden="true" tabindex="-1" />
+                <input type="email" id="cp-username" name="username" autocomplete="username" value={store.authUser?.email ?? ''} hidden aria-hidden="true" tabindex="-1" />
                 <div class="pw-field">
                     <label for="cp-current">{t('settings.currentPassword')}</label>
                     <div class="pw-input-wrap">

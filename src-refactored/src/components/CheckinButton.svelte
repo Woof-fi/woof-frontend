@@ -65,8 +65,12 @@
             handleCheckOut();
         } else {
             showCheckinForm = !showCheckinForm;
-            if (showCheckinForm && myDogs.length === 1) {
-                selectedDogId = myDogs[0].id;
+            if (showCheckinForm) {
+                if (myDogs.length === 1) {
+                    selectedDogId = myDogs[0].id;
+                } else if (store.currentDog?.id && myDogs.some(d => d.id === store.currentDog.id)) {
+                    selectedDogId = store.currentDog.id;
+                }
             }
         }
     }

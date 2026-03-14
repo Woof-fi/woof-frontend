@@ -83,10 +83,11 @@
 
         try {
             let result;
+            const activeDogId = store.currentDog?.id;
             if (wasLiked) {
-                result = await unlikePost(id);
+                result = await unlikePost(id, activeDogId);
             } else {
-                result = await likePost(id);
+                result = await likePost(id, activeDogId);
             }
             if (result.likeCount !== undefined) likes = result.likeCount;
         } catch {
@@ -146,7 +147,7 @@
         if (!content || !id) return;
         submittingComment = true;
         try {
-            const result = await createComment(id, content);
+            const result = await createComment(id, content, store.currentDog?.id);
             commentInput = '';
             comments = [result.comment, ...comments];
             commentsLoaded = true;

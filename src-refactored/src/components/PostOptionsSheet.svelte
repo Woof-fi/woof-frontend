@@ -7,7 +7,7 @@
     import { CONFIG } from '../../js/config.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast } from '../../js/toast-store.svelte.js';
-    import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
+    import { bumpFeedVersion, store } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
 
     let data      = $derived(modals.postOptionsSheetData);
@@ -45,7 +45,7 @@
         (async () => {
             try {
                 const [f, b] = await Promise.all([
-                    getFollowStatus(dogId).catch(() => null),
+                    getFollowStatus(dogId, store.currentDog?.id).catch(() => null),
                     getBookmarkStatus(postId).catch(() => null),
                 ]);
                 isFollowing  = f?.isFollowing ?? false;
@@ -99,12 +99,13 @@
     async function handleFollow() {
         if (!isAuthenticated()) { closePostOptionsSheet(); openAuthModal(); return; }
         try {
+            const activeDogId = store.currentDog?.id;
             if (isFollowing) {
-                await unfollowDog(dogId);
+                await unfollowDog(dogId, activeDogId);
                 isFollowing = false;
                 showToast(t('post.unfollowed'), 'success');
             } else {
-                await followDog(dogId);
+                await followDog(dogId, activeDogId);
                 isFollowing = true;
                 showToast(t('post.nowFollowing'), 'success');
             }

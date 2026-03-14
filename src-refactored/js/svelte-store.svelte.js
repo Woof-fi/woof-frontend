@@ -39,7 +39,12 @@ export const getState = () => store;
 export const setAuthUser = (user) => { store.authUser = user; };
 export const setUnreadCount = (count) => { store.unreadCount = count; };
 export const setNotifUnreadCount = (count) => { store.notifUnreadCount = count; };
-export const setCurrentDog = (dog) => { store.currentDog = dog; };
+export const setCurrentDog = (dog) => {
+    store.currentDog = dog;
+    if (dog?.id) {
+        try { localStorage.setItem('woof_active_dog', dog.id); } catch {}
+    }
+};
 export const setUserDogIds = (ids) => { store.userDogIds = ids; };
 export const setFeedTab = (tab) => { store.feedTab = tab; };
 

@@ -247,7 +247,8 @@
     "failedLoadDogs": "Failed to load dogs. Please try again.",
     "profileDeleted": "Profile deleted successfully.",
     "failedDelete": "Failed to delete profile. Please try again.",
-    "profileUpdatedApi": "Profile updated successfully!"
+    "profileUpdatedApi": "Profile updated successfully!",
+    "multiDogHint": "You can add more dogs later from Settings!"
   },
   "profile": {
     "posts": "Posts",
@@ -270,7 +271,8 @@
     "noFollowing": "No following yet",
     "loginToFollow": "Please log in to follow dogs",
     "actionFailed": "Action failed. Please try again.",
-    "loadMore": "Load More Posts"
+    "loadMore": "Load More Posts",
+    "sameOwner": "Same owner"
   },
   "bookmarks": {
     "title": "Favourites",
@@ -678,7 +680,9 @@
     "deleteInstruction": "Type DELETE to confirm",
     "deleteConfirm": "Delete My Account",
     "deleting": "Deleting...",
-    "deleteFailed": "Failed to delete account. Please try again."
+    "deleteFailed": "Failed to delete account. Please try again.",
+    "myDogs": "My Dogs",
+    "addNewDog": "Add new dog"
   },
   "feedback": {
     "title": "Feedback",
@@ -698,5 +702,18 @@
   "language": {
     "en": "EN",
     "fi": "FI"
+  },
+  "dogSwitcher": {
+    "label": "Switch active dog",
+    "switchedTo": "Switched to {name}",
+    "viewProfile": "View profile"
+  },
+  "follow": {
+    "pickDogs": "Follow with:",
+    "alreadyFollowing": "Already following",
+    "followCount": "Follow ({count} dogs)",
+    "followSuccess": "Now following!",
+    "ownerHasOtherDogs": "{name}'s owner also has {names}. Check them out!",
+    "followedBy": "Followed by {names}"
   }
 }

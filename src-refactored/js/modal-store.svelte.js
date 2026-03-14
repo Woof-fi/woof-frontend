@@ -34,6 +34,8 @@ export let modals = $state({
     checkinOptionsSheetData: null,     // { checkinId, dogId, dogSlug, parkSlug, isOwnCheckin }
     changePasswordModalOpen: false,
     feedbackModalOpen: false,
+    followPickerSheetOpen: false,
+    followPickerSheetData: null,    // { targetDogId, targetDogName, onFollowed }
 });
 
 export function openAuthModal() { modals.authModalOpen = true; }
@@ -71,6 +73,8 @@ export function openChangePasswordModal() { modals.changePasswordModalOpen = tru
 export function closeChangePasswordModal() { modals.changePasswordModalOpen = false; }
 export function openFeedbackModal() { modals.feedbackModalOpen = true; }
 export function closeFeedbackModal() { modals.feedbackModalOpen = false; }
+export function openFollowPickerSheet(data) { modals.followPickerSheetData = data; modals.followPickerSheetOpen = true; }
+export function closeFollowPickerSheet() { modals.followPickerSheetOpen = false; modals.followPickerSheetData = null; }
 export function closeAllModals() {
     modals.authModalOpen = false;
     modals.createPostModalOpen = false;
@@ -98,4 +102,6 @@ export function closeAllModals() {
     modals.checkinOptionsSheetData = null;
     modals.changePasswordModalOpen = false;
     modals.feedbackModalOpen = false;
+    modals.followPickerSheetOpen = false;
+    modals.followPickerSheetData = null;
 }

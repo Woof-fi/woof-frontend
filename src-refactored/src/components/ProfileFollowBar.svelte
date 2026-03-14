@@ -4,6 +4,7 @@
     let {
         isFollowing = false,
         followLoading = false,
+        followingDogs = [],
         onFollowToggle = null,
         onMessage = null,
     } = $props();
@@ -36,6 +37,11 @@
             <i class="fas fa-envelope"></i>
         </button>
     </div>
+    {#if followingDogs.length > 0}
+        <p class="following-dogs-label">
+            {t('follow.followedBy').replace('{names}', followingDogs.map(d => d.name).join(' & '))}
+        </p>
+    {/if}
 </div>
 
 <style>
@@ -132,6 +138,14 @@
 
 .message-profile-btn:hover {
     background-color: var(--woof-color-neutral-100);
+}
+
+.following-dogs-label {
+    margin: var(--woof-space-1) 0 0;
+    text-align: center;
+    font-size: var(--woof-text-caption-2);
+    color: var(--woof-color-neutral-500);
+    pointer-events: none;
 }
 
 @media (max-width: 768px) {

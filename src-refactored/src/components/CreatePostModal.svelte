@@ -11,7 +11,7 @@
         openAuthModal, openCreateDogModal,
     } from '../../js/modal-store.svelte.js';
     import { t, localName } from '../../js/i18n-store.svelte.js';
-    import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
+    import { bumpFeedVersion, store } from '../../js/svelte-store.svelte.js';
 
     const MAX_IMAGES = 5;
 
@@ -87,7 +87,9 @@
                     selectedDogId = dogs[0].id;
                     showDogSelect = false;
                 } else {
-                    selectedDogId = '';
+                    // Pre-select active dog for multi-dog users
+                    const activeDogId = store.currentDog?.id;
+                    selectedDogId = activeDogId && dogs.some(d => d.id === activeDogId) ? activeDogId : '';
                     showDogSelect = true;
                 }
 

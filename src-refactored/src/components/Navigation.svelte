@@ -4,6 +4,7 @@
     import { openCreateDogModal, openSearchPanel, openCreateActionSheet } from '../../js/modal-store.svelte.js';
     import { store, setAuthUser, setFeedTab, setNotifUnreadCount, setCurrentDog, setUserDogIds } from '../../js/svelte-store.svelte.js';
     import { t, localName } from '../../js/i18n-store.svelte.js';
+    import DogSwitcher from './DogSwitcher.svelte';
 
     let { onopenAuthModal = null } = $props();
 
@@ -82,6 +83,15 @@
         }
     }
 
+    function handleDogSwitch() {
+        const slug = getSlug(store.currentDog);
+        if (activePath.startsWith('/dog/') && dogs.some(d => activePath === `/dog/${getSlug(d)}`)) {
+            history.pushState({}, '', `/dog/${slug}`);
+            window.dispatchEvent(new CustomEvent('routechange'));
+        }
+        closeDrawer();
+    }
+
     function handleHomeClick(e) {
         const currentUrl = window.location.pathname;
         if (currentUrl === '/') {
@@ -137,7 +147,11 @@
                     if (!active) return;
                     dogs = fetched;
                     setUserDogIds(fetched.map(d => d.id));
-                    if (fetched.length > 0) setCurrentDog(fetched[0]);
+                    if (fetched.length > 0) {
+                        const preferredDogId = localStorage.getItem('woof_active_dog');
+                        const preferred = fetched.find(d => d.id === preferredDogId);
+                        setCurrentDog(preferred || fetched[0]);
+                    }
                 } catch {
                     if (!active) return;
                     dogs = [];
@@ -280,8 +294,8 @@
     }
 
     function isProfileActive() {
-        if (dogs.length > 0) {
-            const slug = getSlug(dogs[0]);
+        if (store.currentDog) {
+            const slug = getSlug(store.currentDog);
             return activePath === `/dog/${slug}`;
         }
         return false;
@@ -426,16 +440,8 @@
                 </a>
             </li>
         {/if}
-        <li>
-            {#if !authed}
-                <button type="button" class="nav-btn" onclick={handleAddPetUnauthenticated}>
-                    <i class="fas fa-plus"></i> {t('nav.addPet')}
-                </button>
-            {:else if myDogsLoaded && dogs.length === 0}
-                <button type="button" class="nav-btn" onclick={handleAddPetAuthenticated}>
-                    <i class="fas fa-plus"></i> {t('nav.addPet')}
-                </button>
-            {:else if myDogsLoaded && dogs.length === 1}
+        {#if authed && myDogsLoaded && dogs.length === 1}
+            <li>
                 <a href="/dog/{getSlug(dogs[0])}" data-link onclick={closeDrawer} class:active={isProfileActive()}>
                     <img
                         src={dogs[0].profilePhoto || '/images/dog_profile_pic.jpg'}
@@ -445,12 +451,12 @@
                     />
                     {dogs[0].name}
                 </a>
-            {:else if myDogsLoaded && dogs.length > 1}
-                <a href="/dog/{getSlug(dogs[0])}" data-link onclick={closeDrawer}>
-                    <i class="fas fa-paw"></i> {t('nav.myPets')}
-                </a>
-            {/if}
-        </li>
+            </li>
+        {:else if authed && myDogsLoaded && dogs.length > 1}
+            <li>
+                <DogSwitcher {dogs} onswitch={handleDogSwitch} />
+            </li>
+        {/if}
     </ul>
 
     {#if authed && followedBreeds.length > 0}
@@ -539,7 +545,7 @@
         </button>
     {/if}
     <a
-        href={authed && dogs.length > 0 ? `/dog/${getSlug(dogs[0])}` : '/'}
+        href={authed && store.currentDog ? `/dog/${getSlug(store.currentDog)}` : '/'}
         id="bottom-nav-profile"
         class="bottom-nav-item"
         aria-label={t('nav.profile')}
@@ -547,16 +553,14 @@
         data-link
         onclick={!authed ? handleAddPetUnauthenticated : authed && dogs.length === 0 ? handleAddPetAuthenticated : undefined}
     >
-        {#key `${authed}-${dogs.length}`}
-            {#if authed && dogs.length === 1}
+        {#key `${authed}-${store.currentDog?.id}`}
+            {#if authed && dogs.length > 0 && store.currentDog}
                 <img
-                    src={dogs[0].profilePhoto || '/images/dog_profile_pic.jpg'}
-                    alt={dogs[0].name}
+                    src={store.currentDog.profilePhoto || '/images/dog_profile_pic.jpg'}
+                    alt={store.currentDog.name}
                     class="profile-pic"
                     onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
                 />
-            {:else if authed && dogs.length > 1}
-                <i class="fas fa-paw"></i>
             {:else if authed && dogs.length === 0}
                 <i class="fas fa-plus-circle"></i>
             {:else}

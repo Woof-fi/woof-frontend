@@ -343,9 +343,11 @@ export async function followDog(dogId, followerDogId = null) {
 /**
  * Unfollow a dog
  * @param {string} dogId - ID of the dog to unfollow
+ * @param {string} [followerDogId] - Optional: ID of your dog that should unfollow
  */
-export async function unfollowDog(dogId) {
-    return apiRequest(`/api/follows/${dogId}`, {
+export async function unfollowDog(dogId, followerDogId = null) {
+    const query = followerDogId ? `?follower_dog_id=${followerDogId}` : '';
+    return apiRequest(`/api/follows/${dogId}${query}`, {
         method: 'DELETE'
     });
 }
@@ -353,10 +355,12 @@ export async function unfollowDog(dogId) {
 /**
  * Get follow status for a dog
  * @param {string} dogId - ID of the dog to check
+ * @param {string} [followerDogId] - Optional: ID of your dog checking the follow status
  * @returns {Promise<{isFollowing: boolean, followerCount: number, followingCount: number}>}
  */
-export async function getFollowStatus(dogId) {
-    return apiRequest(`/api/follows/status/${dogId}`, { cache: 'default' });
+export async function getFollowStatus(dogId, followerDogId = null) {
+    const query = followerDogId ? `?followerDogId=${followerDogId}` : '';
+    return apiRequest(`/api/follows/status/${dogId}${query}`, { cache: 'default' });
 }
 
 /**
@@ -384,22 +388,27 @@ export async function getFollowing(dogId) {
 /**
  * Like a post
  * @param {string} postId - ID of the post to like
+ * @param {string} [dogId] - Optional: ID of the dog performing the like
  * @returns {Promise<{like: object, likeCount: number}>}
  */
-export async function likePost(postId) {
+export async function likePost(postId, dogId = null) {
+    const body = { post_id: postId };
+    if (dogId) body.dog_id = dogId;
     return apiRequest('/api/likes', {
         method: 'POST',
-        body: JSON.stringify({ post_id: postId })
+        body: JSON.stringify(body)
     });
 }
 
 /**
  * Unlike a post
  * @param {string} postId - ID of the post to unlike
+ * @param {string} [dogId] - Optional: ID of the dog performing the unlike
  * @returns {Promise<{likeCount: number}>}
  */
-export async function unlikePost(postId) {
-    return apiRequest(`/api/likes/${postId}`, {
+export async function unlikePost(postId, dogId = null) {
+    const query = dogId ? `?dog_id=${dogId}` : '';
+    return apiRequest(`/api/likes/${postId}${query}`, {
         method: 'DELETE'
     });
 }
@@ -421,12 +430,15 @@ export async function getPostLikers(postId) {
  * Create a comment on a post
  * @param {string} postId - ID of the post
  * @param {string} content - Comment text
+ * @param {string} [dogId] - Optional: ID of the dog posting the comment
  * @returns {Promise<{comment: object, commentCount: number}>}
  */
-export async function createComment(postId, content) {
+export async function createComment(postId, content, dogId = null) {
+    const body = { post_id: postId, content };
+    if (dogId) body.dog_id = dogId;
     return apiRequest('/api/comments', {
         method: 'POST',
-        body: JSON.stringify({ post_id: postId, content })
+        body: JSON.stringify(body)
     });
 }
 
@@ -1432,6 +1444,35 @@ export async function getUnreadFeedbackCount() {
  */
 export async function deleteMyAccount() {
     return apiRequest('/api/auth/me', { method: 'DELETE' });
+}
+
+// ============================================================================
+// MULTI-DOG FOLLOW
+// ============================================================================
+
+/**
+ * Get other dogs by the same owner
+ * @param {string} dogId - Dog ID to look up owner's other dogs
+ * @param {string} [followerDogId] - Optional follower dog ID to include isFollowing status per sibling
+ * @returns {Promise<object[]>} - Array of dog objects (excluding the given dog)
+ */
+export async function getOwnerDogs(dogId, followerDogId) {
+    const query = followerDogId ? `?followerDogId=${followerDogId}` : '';
+    const data = await apiRequest(`/api/dogs/${dogId}/owner-dogs${query}`);
+    return data.dogs || [];
+}
+
+/**
+ * Batch follow a dog with multiple of your dogs
+ * @param {string} dogId - Target dog ID to follow
+ * @param {string[]} followerDogIds - Array of your dog IDs that should follow the target
+ * @returns {Promise<object>} - Result with follows array
+ */
+export async function batchFollowDog(dogId, followerDogIds) {
+    return apiRequest('/api/follows/batch', {
+        method: 'POST',
+        body: JSON.stringify({ dog_id: dogId, follower_dog_ids: followerDogIds }),
+    });
 }
 
 // Export APIError for use in other modules

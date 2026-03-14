@@ -1,11 +1,11 @@
 <script>
     import { getDog, getDogBySlug, getDogPosts, getFollowStatus, followDog, unfollowDog,
              getFollowing, getFollowers, startConversation,
-             getHealthRecords, deleteHealthRecord } from '../../js/api.js';
+             getHealthRecords, deleteHealthRecord, getOwnerDogs } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { showToast } from '../../js/utils.js';
     import { showOnboardingTour, isOnboardingCompleted } from '../../js/onboarding-tour.js';
-    import { openEditDogModal, openHealthRecordModal, openFollowListModal } from '../../js/modal-store.svelte.js';
+    import { openEditDogModal, openHealthRecordModal, openFollowListModal, openFollowPickerSheet } from '../../js/modal-store.svelte.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
 
@@ -15,6 +15,7 @@
     import FriendsTab from '../components/FriendsTab.svelte';
     import HealthTab from '../components/HealthTab.svelte';
     import ProfileFollowBar from '../components/ProfileFollowBar.svelte';
+    import SiblingDogs from '../components/SiblingDogs.svelte';
 
     let { params = {}, onopenAuthModal = null } = $props();
     let slug = $derived(params.slug || 'nelli-1');
@@ -53,6 +54,8 @@
     let followingCount = $state(0);
     let isFollowing = $state(false);
     let followLoading = $state(false);
+    let followingDogsList = $state([]);
+    let siblingDogs = $state([]);
 
     let friends = $state([]);
     let friendsLoading = $state(false);
@@ -80,6 +83,8 @@
         followingCount = 0;
         isFollowing = false;
         followLoading = false;
+        followingDogsList = [];
+        siblingDogs = [];
         friends = [];
         friendsLoading = false;
         friendsLoadedOnce = false;
@@ -104,10 +109,11 @@
                 }
 
                 postsLoading = true;
-                const [postsResult, followStatus, followingList] = await Promise.all([
+                const [postsResult, followStatus, followingList, ownerDogs] = await Promise.all([
                     getDogPosts(dog.id, null, 20),
-                    getFollowStatus(dog.id),
+                    getFollowStatus(dog.id, store.currentDog?.id),
                     getFollowing(dog.id),
+                    getOwnerDogs(dog.id, store.currentDog?.id),
                 ]);
                 if (!active) return;
 
@@ -116,8 +122,10 @@
                 postsLoading = false;
                 followingCount = Array.isArray(followingList) ? followingList.length : 0;
                 followerCount = followStatus.followerCount || 0;
+                siblingDogs = ownerDogs || [];
                 if (!dog.isOwner) {
                     isFollowing = followStatus.isFollowing || false;
+                    followingDogsList = followStatus.followingDogs || [];
                 }
             } catch (e) {
                 if (!active) return;
@@ -230,26 +238,67 @@
 
     async function handleFollowToggle() {
         if (!isAuthenticated()) {
-            showToast(t('profile.loginToFollow'), 'error');
+            onopenAuthModal?.();
             return;
         }
-        followLoading = true;
-        try {
-            if (isFollowing) {
-                await unfollowDog(dog.id);
+        if (isFollowing) {
+            // Unfollow — same as before
+            followLoading = true;
+            try {
+                await unfollowDog(dog.id, store.currentDog?.id);
                 isFollowing = false;
                 followerCount = Math.max(0, followerCount - 1);
-            } else {
-                await followDog(dog.id);
-                isFollowing = true;
-                followerCount = followerCount + 1;
+                followingDogsList = [];
+            } catch {
+                showToast(t('profile.actionFailed'), 'error');
+            } finally {
+                followLoading = false;
             }
-        } catch (e) {
-            console.error('Follow toggle failed:', e);
-            showToast(t('profile.actionFailed'), 'error');
-        } finally {
-            followLoading = false;
+        } else {
+            // Check if multi-dog user
+            const myDogs = store.userDogIds || [];
+            if (myDogs.length >= 2) {
+                openFollowPickerSheet({
+                    targetDogId: dog.id,
+                    targetDogName: dog.name,
+                    onFollowed: () => {
+                        isFollowing = true;
+                        followerCount++;
+                    }
+                });
+            } else {
+                // Single dog — direct follow
+                followLoading = true;
+                try {
+                    await followDog(dog.id, store.currentDog?.id);
+                    isFollowing = true;
+                    followerCount++;
+                    showToast(t('post.nowFollowing').replace('{name}', dog.name), 'success');
+                    // Suggest owner's other dogs
+                    suggestOwnerDogs(dog.id, dog.name);
+                } catch {
+                    showToast(t('profile.actionFailed'), 'error');
+                } finally {
+                    followLoading = false;
+                }
+            }
         }
+    }
+
+    async function suggestOwnerDogs(dogId, dogName) {
+        try {
+            const ownerDogs = await getOwnerDogs(dogId, store.currentDog?.id);
+            const unfollowed = (ownerDogs || []).filter(d => !d.isFollowing && d.id !== store.currentDog?.id);
+            if (unfollowed.length > 0) {
+                const names = unfollowed.map(d => d.name).join(', ');
+                showToast(
+                    t('follow.ownerHasOtherDogs')
+                        .replace('{name}', dogName)
+                        .replace('{names}', names),
+                    'info'
+                );
+            }
+        } catch { /* ignore */ }
     }
 
     async function handleMessage() {
@@ -318,6 +367,12 @@
                 />
             </div>
 
+            {#if siblingDogs.length > 0}
+                <div class="profile-container">
+                    <SiblingDogs dogs={siblingDogs} />
+                </div>
+            {/if}
+
             <ProfileTabs
                 {activeTab}
                 onTabChange={setTab}
@@ -364,6 +419,7 @@
             <ProfileFollowBar
                 {isFollowing}
                 {followLoading}
+                followingDogs={followingDogsList}
                 onFollowToggle={handleFollowToggle}
                 onMessage={handleMessage}
             />
