@@ -125,7 +125,7 @@ export default defineConfig({
     // Proxy API requests to backend
     proxy: {
       '/api': {
-        target: 'https://api.woofapp.fi',
+        target: process.env.VITE_API_URL || 'http://localhost:3000',
         changeOrigin: true,
         secure: false
       }

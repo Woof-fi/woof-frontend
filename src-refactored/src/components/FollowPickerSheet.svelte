@@ -112,10 +112,19 @@
         popModalState();
     }
 
+    function handleKeydown(e) {
+        if (e.key === 'Escape' && modals.followPickerSheetOpen) {
+            e.preventDefault();
+            handleClose();
+        }
+    }
+
     function handleImageError(e) {
         e.target.src = '/images/dog_profile_pic.jpg';
     }
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 {#if modals.followPickerSheetOpen}
     <!-- svelte-ignore a11y_click_events_have_key_events -->

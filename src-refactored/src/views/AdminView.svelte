@@ -241,9 +241,9 @@
         try {
             await updatePostModeration(post.id, status);
             flaggedPosts = flaggedPosts.filter(p => p.id !== post.id);
-            showToast(status === 'approved' ? 'Post approved' : 'Post removed', 'success');
+            showToast(status === 'approved' ? t('admin.postApproved') : t('admin.postRemoved'), 'success');
         } catch (err) {
-            showToast(err?.status === 404 ? 'Post not found' : `Failed to ${status} post`, 'error');
+            showToast(err?.status === 404 ? t('admin.postNotFound') : t('admin.failedModeratePost'), 'error');
         } finally {
             const next = { ...flaggedBusy };
             delete next[post.id];
@@ -341,7 +341,7 @@
         }
     }
 
-    const FEEDBACK_CATEGORY_LABELS = { bug: 'Bug', feature: 'Feature', general: 'General' };
+    let FEEDBACK_CATEGORY_LABELS = $derived({ bug: t('admin.categoryBug'), feature: t('admin.categoryFeature'), general: t('admin.categoryGeneral') });
 
     async function handleApprovePark(park) {
         parksBusy = { ...parksBusy, [park.id]: true };
@@ -562,7 +562,7 @@
                                 <div class="admin-report-meta">
                                     <span class="admin-reason-badge">{REASON_LABELS[report.reason] ?? report.reason}</span>
                                     <span class="admin-type-badge" class:admin-type-badge--comment={report.target_type === 'comment'}>
-                                        {report.target_type === 'comment' ? 'Comment' : 'Post'}
+                                        {report.target_type === 'comment' ? t('admin.typeComment') : t('admin.typePost')}
                                     </span>
                                     <span class="admin-status-badge admin-status-{report.status}">{report.status}</span>
                                 </div>
@@ -583,7 +583,7 @@
                                         {:else}
                                             {report.post_dog_name}
                                         {/if}
-                                        · <a href="/post/{report.target_id}" data-link class="admin-view-link">View post</a>
+                                        · <a href="/post/{report.target_id}" data-link class="admin-view-link">{t('admin.viewPost')}</a>
                                     </p>
                                 {/if}
 
@@ -596,13 +596,13 @@
                                             {report.comment_dog_name}
                                         {/if}
                                         {#if report.comment_post_id}
-                                            · <a href="/post/{report.comment_post_id}" data-link class="admin-view-link">View post</a>
+                                            · <a href="/post/{report.comment_post_id}" data-link class="admin-view-link">{t('admin.viewPost')}</a>
                                         {/if}
                                     </p>
                                 {/if}
 
                                 <p class="admin-report-info">
-                                    Reported by <strong>{report.reporter_email}</strong>
+                                    {t('admin.reportedBy')} <strong>{report.reporter_email}</strong>
                                     · {timeAgo(report.created_at)}
                                 </p>
 
@@ -754,23 +754,23 @@
                                                 <input
                                                     type="text"
                                                     class="admin-park-edit-input"
-                                                    placeholder="Name (EN)"
+                                                    placeholder={t('admin.nameEn')}
                                                     value={parkEditNames[park.id]?.name || ''}
                                                     oninput={(e) => parkEditNames = { ...parkEditNames, [park.id]: { ...parkEditNames[park.id], name: e.target.value } }}
                                                 />
                                                 <input
                                                     type="text"
                                                     class="admin-park-edit-input"
-                                                    placeholder="Nimi (FI)"
+                                                    placeholder={t('admin.nameFi')}
                                                     value={parkEditNames[park.id]?.nameFi || ''}
                                                     oninput={(e) => parkEditNames = { ...parkEditNames, [park.id]: { ...parkEditNames[park.id], nameFi: e.target.value } }}
                                                 />
                                                 <div class="admin-park-edit-actions">
                                                     <button class="admin-action-btn admin-action-btn--neutral" onclick={() => saveParkName(park)} disabled={!!parksBusy[park.id]}>
-                                                        <i class="fas fa-floppy-disk"></i> Save
+                                                        <i class="fas fa-floppy-disk"></i> {t('common.save')}
                                                     </button>
                                                     <button class="admin-action-btn" onclick={() => cancelParkEdit(park.id)}>
-                                                        Cancel
+                                                        {t('common.cancel')}
                                                     </button>
                                                 </div>
                                             </div>
@@ -901,16 +901,16 @@
                             <div class="admin-park-card" class:busy={!!amenityBusy[suggestion.id]}>
                                 <div class="admin-park-body">
                                     <div class="admin-report-meta">
-                                        <span class="admin-park-name">{suggestion.park?.name || 'Unknown park'}</span>
+                                        <span class="admin-park-name">{suggestion.park?.name || t('admin.unknownPark')}</span>
                                     </div>
                                     <p class="admin-park-detail">
                                         <i class="fas fa-user"></i> {suggestion.userEmail}
                                     </p>
                                     <p class="admin-park-detail">
                                         <strong>{t(AMENITY_LABELS[suggestion.amenityKey] || suggestion.amenityKey)}</strong>
-                                        → {suggestion.amenityValue ? 'Yes' : 'No'}
+                                        → {suggestion.amenityValue ? t('admin.yes') : t('admin.no')}
                                         {#if suggestion.park?.currentAmenities?.[suggestion.amenityKey] !== undefined}
-                                            <span class="admin-amenity-current">({t('admin.currentValue')}: {suggestion.park.currentAmenities[suggestion.amenityKey] ? 'Yes' : 'No'})</span>
+                                            <span class="admin-amenity-current">({t('admin.currentValue')}: {suggestion.park.currentAmenities[suggestion.amenityKey] ? t('admin.yes') : t('admin.no')})</span>
                                         {/if}
                                     </p>
                                     <div class="admin-report-actions">

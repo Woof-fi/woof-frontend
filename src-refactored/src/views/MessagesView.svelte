@@ -13,6 +13,7 @@
     let messageInput = $state('');
     let otherDogName = $state('');
     let loading = $state(true);
+    let loadError = $state(false);
     let myDogId = $state(null);
     let myDogName = $state('');
     // svelte-ignore state_referenced_locally
@@ -22,8 +23,11 @@
         try {
             const data = await getConversations();
             conversations = data.conversations || [];
+            loadError = false;
         } catch (e) {
             console.error('Failed to load conversations:', e);
+            loadError = true;
+            showToast(t('messages.failedLoad'), 'error');
         }
     }
 
@@ -56,6 +60,7 @@
             window.history.pushState(null, '', `/messages/${convId}`);
         } catch (e) {
             console.error('Failed to load messages:', e);
+            showToast(t('messages.failedLoadMessages'), 'error');
         }
     }
 
@@ -86,7 +91,7 @@
             await loadConversations();
         } catch (e) {
             console.error('Failed to send message:', e);
-            showToast('Failed to send message', 'error');
+            showToast(t('messages.failedSend'), 'error');
             messageInput = content;
         }
     }
@@ -148,6 +153,11 @@
                 <div class="conversations-list" id="conversations-list">
                     {#if loading}
                         <div class="messages-loading"><i class="fas fa-spinner fa-spin"></i></div>
+                    {:else if loadError && conversations.length === 0}
+                        <div class="conv-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>{t('messages.failedLoad')}</p>
+                        </div>
                     {:else if conversations.length === 0}
                         <div class="conv-empty">
                             <i class="fas fa-envelope-open-text"></i>
@@ -177,7 +187,7 @@
                                     {#if conv.myDogName}
                                         <span class="conv-my-dog">{t('messages.messagingAs').replace('{name}', conv.myDogName)}</span>
                                     {/if}
-                                    <span class="conv-preview">{conv.lastMessage || 'No messages yet'}</span>
+                                    <span class="conv-preview">{conv.lastMessage || t('messages.noMessagesYet')}</span>
                                 </div>
                                 {#if conv.unreadCount > 0}
                                     <span class="conv-badge">{conv.unreadCount}</span>

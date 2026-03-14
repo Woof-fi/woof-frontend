@@ -449,7 +449,10 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 | Extract shared controller utilities | Low | ✅ `getFirstDogId()` extracted to dogService. ✅ `parsePagination()` extracted. ✅ `mapPostRow()` extracted. "Verify dog ownership" still in 5+ controllers. |
 | OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |
 | Re-enable coverage thresholds | Low | Disabled during active feature dev. Set to 70% minimum pre-launch. |
-| No staging environment | Low (for now) | Production is test env while user base is friends-only. Revisit before public launch |
+| No staging environment | Low (for now) | Production is test env while user base is friends-only. Add staging when onboarding CTO or before public launch. Likely a full rewrite at that point anyway, so not worth the infra setup now. |
+| Automated deploy pipeline (H-6) | Deferred | Deploys are intentionally manual with skill-driven code review, test, CI verification, and user approval. Automated pipeline would bypass this quality gate. Revisit if team grows. |
+| Typed query builder (M-1) | Deferred | `any[] + paramIdx` pattern works and is tested across all controllers. A typed builder would improve DX but touching every query is high regression risk for marginal benefit. Improve gradually per-controller. |
+| RDS SSL cert verification (H-11) | Deferred | `rejectUnauthorized: false` on RDS connection. Mitigated by VPC isolation (RDS not publicly accessible, same-VPC traffic). Proper fix: bundle AWS RDS CA cert. Do before public launch or if RDS becomes accessible. |
 
 ---
 

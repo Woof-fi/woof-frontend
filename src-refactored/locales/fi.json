@@ -320,6 +320,10 @@
     "sendFirst": "Lähetä ensimmäinen viesti!",
     "placeholder": "Kirjoita viesti...",
     "failedStart": "Keskustelun aloitus epäonnistui",
+    "failedSend": "Viestin lähetys epäonnistui",
+    "failedLoad": "Keskustelujen lataus epäonnistui",
+    "failedLoadMessages": "Viestien lataus epäonnistui",
+    "noMessagesYet": "Ei viestejä vielä",
     "loginToMessage": "Kirjaudu sisään lähettääksesi viestejä",
     "messagingAs": "koirana {name}"
   },
@@ -549,7 +553,20 @@
     "read": "Luettu",
     "markRead": "Merkitse luetuksi",
     "markUnread": "Merkitse lukemattomaksi",
-    "failedUpdateFeedback": "Palautteen päivitys epäonnistui"
+    "failedUpdateFeedback": "Palautteen päivitys epäonnistui",
+    "postApproved": "Julkaisu hyväksytty",
+    "postRemoved": "Julkaisu poistettu",
+    "postNotFound": "Julkaisua ei löytynyt",
+    "failedModeratePost": "Julkaisun moderointi epäonnistui",
+    "typeComment": "Kommentti",
+    "typePost": "Julkaisu",
+    "viewPost": "Näytä julkaisu",
+    "reportedBy": "Ilmiantanut",
+    "unknownPark": "Tuntematon puisto",
+    "yes": "Kyllä",
+    "no": "Ei",
+    "nameEn": "Nimi (EN)",
+    "nameFi": "Nimi (FI)"
   },
   "health": {
     "vetVisit": "Eläinlääkärikäynti",

@@ -320,6 +320,10 @@
     "sendFirst": "Send the first message!",
     "placeholder": "Type a message...",
     "failedStart": "Failed to start conversation",
+    "failedSend": "Failed to send message",
+    "failedLoad": "Failed to load conversations",
+    "failedLoadMessages": "Failed to load messages",
+    "noMessagesYet": "No messages yet",
     "loginToMessage": "Please log in to send messages",
     "messagingAs": "via {name}"
   },
@@ -549,7 +553,20 @@
     "read": "Read",
     "markRead": "Mark read",
     "markUnread": "Mark unread",
-    "failedUpdateFeedback": "Failed to update feedback"
+    "failedUpdateFeedback": "Failed to update feedback",
+    "postApproved": "Post approved",
+    "postRemoved": "Post removed",
+    "postNotFound": "Post not found",
+    "failedModeratePost": "Failed to moderate post",
+    "typeComment": "Comment",
+    "typePost": "Post",
+    "viewPost": "View post",
+    "reportedBy": "Reported by",
+    "unknownPark": "Unknown park",
+    "yes": "Yes",
+    "no": "No",
+    "nameEn": "Name (EN)",
+    "nameFi": "Name (FI)"
   },
   "health": {
     "vetVisit": "Vet Visit",

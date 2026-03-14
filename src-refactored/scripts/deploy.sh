@@ -82,11 +82,20 @@ echo "  Hashed assets: immutable, 1yr cache"
 echo ""
 echo "=== Purging Cloudflare cache ==="
 if [ -n "${CF_ZONE_ID:-}" ] && [ -n "${CF_API_TOKEN:-}" ]; then
+  # Build purge URL list: shell files + any workbox-*.js files from the build
+  PURGE_URLS="\"${SITE_URL}/index.html\",\"${SITE_URL}/sw.js\",\"${SITE_URL}/registerSW.js\",\"${SITE_URL}/manifest.webmanifest\""
+  for f in "$DIST"/workbox-*.js; do
+    if [ -f "$f" ]; then
+      BASENAME=$(basename "$f")
+      PURGE_URLS="${PURGE_URLS},\"${SITE_URL}/${BASENAME}\""
+    fi
+  done
+
   PURGE_RESPONSE=$(curl -s -X POST \
     "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
     -H "Authorization: Bearer ${CF_API_TOKEN}" \
     -H "Content-Type: application/json" \
-    --data "{\"files\":[\"${SITE_URL}/index.html\",\"${SITE_URL}/sw.js\",\"${SITE_URL}/registerSW.js\",\"${SITE_URL}/manifest.webmanifest\"]}")
+    --data "{\"files\":[${PURGE_URLS}]}")
 
   if echo "$PURGE_RESPONSE" | grep -q '"success":true'; then
     echo "Cloudflare cache purged for shell files"
