@@ -74,10 +74,11 @@
     role="dialog"
     tabindex="-1"
     aria-modal="true"
+    aria-labelledby="suggest-park-modal-title"
 >
     <div class="modal-content suggest-park-modal" use:focusTrap>
         <div class="modal-header">
-            <h2>{t('dogPark.suggestTitle')}</h2>
+            <h2 id="suggest-park-modal-title">{t('dogPark.suggestTitle')}</h2>
             <button class="modal-close" aria-label={t('common.close')} onclick={close}>&times;</button>
         </div>
         {#if territoryName}

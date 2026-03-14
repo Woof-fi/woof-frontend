@@ -1,6 +1,17 @@
 const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function focusTrap(node: HTMLElement) {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    // Move focus into the trap on mount (WCAG 2.4.3)
+    const initialFocusTimer = setTimeout(() => {
+        const focusable = [...node.querySelectorAll<HTMLElement>(FOCUSABLE)]
+            .filter(el => el.offsetParent !== null);
+        if (focusable.length > 0) {
+            focusable[0]!.focus();
+        }
+    }, 50);
+
     function handleKeydown(e: KeyboardEvent) {
         if (e.key !== 'Tab') return;
 
@@ -21,5 +32,11 @@ export function focusTrap(node: HTMLElement) {
     }
 
     node.addEventListener('keydown', handleKeydown);
-    return { destroy: () => node.removeEventListener('keydown', handleKeydown) };
+    return {
+        destroy: () => {
+            clearTimeout(initialFocusTimer);
+            node.removeEventListener('keydown', handleKeydown);
+            previouslyFocused?.focus();
+        }
+    };
 }

@@ -291,13 +291,14 @@
     role="dialog"
     tabindex="-1"
     aria-modal="true"
+    aria-labelledby="create-post-modal-title"
 >
     <div class="modal-content" use:focusTrap>
         <div class="modal-header">
             <button class="modal-back" aria-label={t('common.back')} onclick={handleBack}>
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <h2>{t('postCreate.title')}</h2>
+            <h2 id="create-post-modal-title">{t('postCreate.title')}</h2>
         </div>
         <div class="modal-body">
             {#if loading}

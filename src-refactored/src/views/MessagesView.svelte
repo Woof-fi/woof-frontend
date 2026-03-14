@@ -156,9 +156,8 @@
                         </div>
                     {:else}
                         {#each conversations as conv (conv.id)}
-                            <!-- svelte-ignore a11y_click_events_have_key_events -->
-                            <!-- svelte-ignore a11y_no_static_element_interactions -->
-                            <div
+                            <button
+                                type="button"
                                 class="conv-item"
                                 class:active={selectedId === conv.id}
                                 class:unread={conv.unreadCount > 0}
@@ -183,7 +182,7 @@
                                 {#if conv.unreadCount > 0}
                                     <span class="conv-badge">{conv.unreadCount}</span>
                                 {/if}
-                            </div>
+                            </button>
                         {/each}
                     {/if}
                 </div>
@@ -306,8 +305,14 @@
     padding: 12px 16px;
     cursor: pointer;
     transition: background-color 0.15s;
-    border-bottom: 1px solid var(--woof-color-neutral-100);
     position: relative;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--woof-color-neutral-100);
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    width: 100%;
 }
 
 .conv-item:hover {

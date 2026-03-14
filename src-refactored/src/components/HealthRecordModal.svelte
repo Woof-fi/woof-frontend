@@ -182,6 +182,7 @@
     role="dialog"
     tabindex="-1"
     aria-modal="true"
+    aria-labelledby="health-modal-title"
 >
     <div class="modal-content health-modal-content" use:focusTrap>
         <div class="modal-header">

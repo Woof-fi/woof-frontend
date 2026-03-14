@@ -76,13 +76,14 @@
     role="dialog"
     tabindex="-1"
     aria-modal="true"
+    aria-labelledby="feedback-modal-title"
 >
     <div class="modal-content" use:focusTrap>
         <div class="modal-header">
             <button class="modal-back" aria-label={t('common.close')} onclick={close}>
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <h2>{t('feedback.title')}</h2>
+            <h2 id="feedback-modal-title">{t('feedback.title')}</h2>
             <button
                 type="submit"
                 form="feedback-form"
