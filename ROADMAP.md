@@ -1,7 +1,7 @@
 # Woof Product Roadmap
 
-**Last Updated:** 2026-03-13
-**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed, 13B Multi-Image Posts, UX Audit (Batches A-F + Phase 2), Park Check-ins 1A+Options+Photos, 13D Dog Tagging+Park Location, AS-1 Account Settings, 15A Sentry, Feedback System, Umami Analytics
+**Last Updated:** 2026-03-14
+**Completed:** Phases 3, 4, 5A-5D, 6A-6C, 7A-7C, 8A, 9A, 10A-10E, 12A-12F (Tier 1), 13A (i18n), Bug Fixes, Territory Follows, Dog Parks Phase 1+1.5+2, Create Button Makeover, Personalized Feed, 13B Multi-Image Posts, UX Audit (Batches A-F + Phase 2), Park Check-ins 1A+Options+Photos, 13D Dog Tagging+Park Location, AS-1 Account Settings, 15A Sentry, Feedback System, Umami Analytics, Multi-Dog UX (Phases 1-5)
 **Current:** Tier 2 — Major Features
 
 ---
@@ -181,6 +181,17 @@ Privacy-friendly analytics (no cookies) via `<script>` tag in `index.html`.
 #### FA SVG Orphan Fixes — DONE (2026-03-13)
 
 `{#key}` blocks in 5 components (Navigation, CreateActionSheet, ProfileFollowBar, QuickVisitForm, CheckinButton) to prevent `dom.watch()` from leaving ghost SVGs when Svelte conditionals flip.
+
+#### Multi-Dog UX — DONE (2026-03-14)
+
+5 phases for multi-dog households:
+- **Phase 1**: Settings "My Dogs" section, DogSwitcher in nav drawer (2+ dogs), bottom nav profile button, active dog persistence (localStorage)
+- **Phase 2**: FollowPickerSheet (multi-dog follow with checkboxes), batch follow API, single-dog direct follow, self-dog filtered from picker
+- **Phase 3**: SiblingDogs.svelte (same-owner dogs on profile), smart toast filtering, auto-follow siblings on dog creation, follow status cache fix
+- **Phase 4**: Multi-dog park check-in — ParkActionBar with checkbox selection, batch check-in/out via Promise.all, merged check-in + schedule visit into unified panel with Now/Later toggle, UX polish (panel handle, section labels, brand shadow buttons, mobile scroll), multi-dog QuickVisitForm, crimson paw favicon, darker CheckinCard paw icon
+- **Phase 5**: Messages polish — "via {dogName}" in conversation list + thread header, senderDogId passed when starting/sending messages
+
+Also: express-rate-limit ipKeyGenerator fix, FeedbackModal textarea id/name attributes.
 
 #### 13C: Dark Mode — Large
 
@@ -433,7 +444,7 @@ A curated knowledge base of breed-specific health and training tips, integrated 
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Test coverage gaps | Medium | 501 backend + 169 frontend tests. Image upload, Search, Navigation, CreatePostModal, multi-image posts, feedback, broadcast covered. Major views (ProfileView, FeedView) still untested |
+| Test coverage gaps | Medium | 528 backend + 169 frontend + 24 E2E tests. Image upload, Search, Navigation, CreatePostModal, multi-image posts, feedback, broadcast covered. Major views (ProfileView, FeedView) still untested |
 | i18n key parity validation | Low | Pre-commit hook or CI check to ensure EN and FI locale files have identical keys |
 | Extract shared controller utilities | Low | ✅ `getFirstDogId()` extracted to dogService. ✅ `parsePagination()` extracted. ✅ `mapPostRow()` extracted. "Verify dog ownership" still in 5+ controllers. |
 | OpenAPI spec | Low | API documented only in CLAUDE.md prose. Structured spec helps if other devs join. |
