@@ -1,22 +1,30 @@
 const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** Check visibility without forcing layout reflow (avoids offsetParent) */
+function isVisible(el: HTMLElement): boolean {
+    if (el.hidden) return false;
+    const style = el.style;
+    return style.display !== 'none' && style.visibility !== 'hidden';
+}
+
 export function focusTrap(node: HTMLElement) {
     const previouslyFocused = document.activeElement as HTMLElement | null;
 
     // Move focus into the trap on mount (WCAG 2.4.3)
-    const initialFocusTimer = setTimeout(() => {
+    // Use rAF to wait for paint instead of setTimeout — avoids forced reflow
+    const rafId = requestAnimationFrame(() => {
         const focusable = [...node.querySelectorAll<HTMLElement>(FOCUSABLE)]
-            .filter(el => el.offsetParent !== null);
+            .filter(isVisible);
         if (focusable.length > 0) {
             focusable[0]!.focus();
         }
-    }, 50);
+    });
 
     function handleKeydown(e: KeyboardEvent) {
         if (e.key !== 'Tab') return;
 
         const focusable = [...node.querySelectorAll<HTMLElement>(FOCUSABLE)]
-            .filter(el => el.offsetParent !== null);
+            .filter(isVisible);
         if (focusable.length === 0) return;
 
         const first = focusable[0]!;
@@ -34,7 +42,7 @@ export function focusTrap(node: HTMLElement) {
     node.addEventListener('keydown', handleKeydown);
     return {
         destroy: () => {
-            clearTimeout(initialFocusTimer);
+            cancelAnimationFrame(rafId);
             node.removeEventListener('keydown', handleKeydown);
             previouslyFocused?.focus();
         }
