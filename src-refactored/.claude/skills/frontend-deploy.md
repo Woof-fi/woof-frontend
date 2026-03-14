@@ -121,5 +121,5 @@ git checkout -   # return to latest
 - **Never skip E2E tests** — they catch real production issues that unit tests miss
 - **Always verify CI** — don't assume it passes; check via GitHub API
 - **Update docs in the same commit** — avoids a second deploy cycle for doc-only changes
-- **If deploying both backend + frontend**, deploy backend FIRST (frontend may depend on new API responses)
+- **If deploying both backend + frontend**, deploy backend FIRST (frontend may depend on new API responses). E2E tests only need to run after the last deploy (frontend), not after each one
 - **Report exact test counts** — "all tests pass" is not enough; say "169/169 unit, 24/24 E2E"
