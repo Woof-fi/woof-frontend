@@ -20,7 +20,7 @@
 
 .btn-primary {
     background-color: var(--woof-color-brand-primary);
-    color: white;
+    color: var(--woof-color-neutral-0);
 }
 
 .btn-primary:hover {

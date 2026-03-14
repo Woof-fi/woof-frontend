@@ -47,18 +47,18 @@
 
 <style>
 .post-timestamp-container {
-    padding: 0 10px 10px;
+    padding: 0 var(--woof-space-2) var(--woof-space-2);
 }
 
 .post-timestamp {
-    font-size: 10px;
+    font-size: var(--woof-text-caption-2);
     color: var(--woof-color-neutral-500);
     text-transform: uppercase;
     letter-spacing: 0.2px;
 }
 
 .post-edited-indicator {
-    font-size: 10px;
+    font-size: var(--woof-text-caption-2);
     color: var(--woof-color-neutral-400);
     margin-left: var(--woof-space-1);
 }

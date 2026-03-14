@@ -4,7 +4,7 @@
 
 /* ── Form groups — shared across AuthModal + CreatePostModal + HealthRecordModal ── */
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: var(--woof-space-4);
 }
 
 .form-group:last-child {
@@ -13,18 +13,18 @@
 
 .form-group label {
     display: block;
-    font-size: 14px;
+    font-size: var(--woof-text-callout);
     font-weight: 600;
     color: var(--woof-color-neutral-900);
-    margin-bottom: 6px;
+    margin-bottom: var(--woof-space-2);
 }
 
 /* ── Form hint text ── */
 .form-hint {
     display: block;
-    margin-top: 4px;
+    margin-top: var(--woof-space-1);
     color: var(--woof-color-neutral-400);
-    font-size: 12px;
+    font-size: var(--woof-text-caption-1);
 }
 
 /* ============================================================================
@@ -60,13 +60,13 @@ input[type="datetime-local"]:focus {
 .modal textarea,
 .modal select {
     width: 100%;
-    padding: 10px 12px;
+    padding: var(--woof-space-3) var(--woof-space-3);
     border: 1px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-sm);
     background-color: var(--woof-color-neutral-50);
     color: var(--woof-color-neutral-900);
     font-family: inherit;
-    font-size: 14px;
+    font-size: var(--woof-text-callout);
     line-height: 1.4;
     box-sizing: border-box;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -105,13 +105,13 @@ input[type="datetime-local"]:focus {
 
 .modal input[type="file"] {
     width: 100%;
-    padding: 10px 12px;
+    padding: var(--woof-space-3) var(--woof-space-3);
     border: 2px dashed var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-sm);
     background-color: var(--woof-color-neutral-50);
     color: var(--woof-color-neutral-400);
     font-family: inherit;
-    font-size: 14px;
+    font-size: var(--woof-text-callout);
     cursor: pointer;
     box-sizing: border-box;
     transition: border-color 0.2s, background-color 0.2s;
