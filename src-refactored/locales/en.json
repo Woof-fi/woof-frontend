@@ -272,7 +272,8 @@
     "loginToFollow": "Please log in to follow dogs",
     "actionFailed": "Action failed. Please try again.",
     "loadMore": "Load More Posts",
-    "sameOwner": "Same owner"
+    "sameOwner": "Same owner",
+    "loadFailed": "Failed to load profile."
   },
   "bookmarks": {
     "title": "Favourites",

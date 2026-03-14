@@ -35,13 +35,13 @@
     ];
 
     // Find ALL of the user's dogs that are currently checked in
-    let myCheckins = $derived(() => {
+    let myCheckins = $derived.by(() => {
         if (!authed || myDogs.length === 0) return [];
         const myDogIds = new Set(myDogs.map(d => d.id));
         return activeCheckins.filter(c => myDogIds.has(c.dogId || c.dog_id || c.dog?.id));
     });
 
-    let checkedInCount = $derived(myCheckins().length);
+    let checkedInCount = $derived(myCheckins.length);
     let isCheckedIn = $derived(checkedInCount > 0);
     let selectedCount = $derived(selectedDogIds.size);
 
@@ -111,7 +111,7 @@
     }
 
     async function handleCheckOut() {
-        const checkins = myCheckins();
+        const checkins = myCheckins;
         if (checkins.length === 0) return;
         submitting = true;
         try {

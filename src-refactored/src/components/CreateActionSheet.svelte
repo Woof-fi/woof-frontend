@@ -5,7 +5,7 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { getMyDogs } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { t } from '../../js/i18n-store.svelte.js';
     import QuickVisitForm from './QuickVisitForm.svelte';
 

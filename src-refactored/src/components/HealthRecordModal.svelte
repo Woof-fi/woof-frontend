@@ -2,7 +2,7 @@
     import { createHealthRecord, updateHealthRecord } from '../../js/api.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { modals, closeHealthRecordModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpHealthVersion } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';

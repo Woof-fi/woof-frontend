@@ -18,14 +18,7 @@ header {
     z-index: 1000;
 }
 
-/* ── Tab styles — shared across ProfileView + preview.html ── */
-.tabs {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--woof-color-neutral-200);
-}
-
+/* ── Tab styles — used by BreedView, TerritoryView, ProfileTabs ── */
 .tab-link {
     padding: 10px 20px;
     background-color: transparent;
@@ -63,41 +56,6 @@ header {
 
 .tab-content.active {
     display: block;
-}
-
-/* ── Feed Tabs (For You / Following) — used in preview.html ── */
-.feed-tabs {
-    display: flex;
-    justify-content: center;
-    max-width: 500px;
-    margin: 0 auto;
-    border-bottom: 1px solid var(--woof-color-neutral-200);
-    position: sticky;
-    top: 0;
-    background: var(--woof-surface-primary);
-    z-index: 10;
-}
-
-.feed-tab {
-    flex: 1;
-    padding: 14px 0;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--woof-color-neutral-500);
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
-}
-
-.feed-tab:hover {
-    color: var(--woof-color-neutral-900);
-}
-
-.feed-tab.active {
-    color: var(--woof-color-brand-primary);
-    border-bottom-color: var(--woof-color-brand-primary);
 }
 
 /* ── Layout containers — App.svelte (.main-container) + Router.svelte (.content) ── */

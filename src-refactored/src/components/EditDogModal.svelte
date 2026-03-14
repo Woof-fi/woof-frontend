@@ -2,7 +2,7 @@
     import { updateDog, uploadImage } from '../../js/api.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { validateAndPreview, revokePreview } from '../../js/file-handler.js';
     import { modals, closeEditDogModal as storeClose } from '../../js/modal-store.svelte.js';
     import { bumpProfileVersion } from '../../js/svelte-store.svelte.js';

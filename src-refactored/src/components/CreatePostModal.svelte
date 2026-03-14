@@ -4,7 +4,7 @@
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { toggleBodyScroll } from '../../js/ui.js';
     import { validateAndPreview, revokePreview } from '../../js/file-handler.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { focusTrap } from '../actions/focus-trap.ts';
     import {
         modals, closeCreatePostModal as storeClose,

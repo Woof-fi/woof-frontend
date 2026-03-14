@@ -46,7 +46,7 @@ src-refactored/
 │   ├── modal-store.svelte.js   # Svelte 5 $state store for all modal/panel open state + data
 │   ├── toast-store.svelte.js   # Svelte 5 $state toast list (used via utils.js showToast)
 │   ├── modal-history.js    # pushModalState / popModalState / handleModalPopstate
-│   ├── ui.js               # Skeletons, loading states, animateIn, toggleBodyScroll
+│   ├── ui.js               # toggleBodyScroll (modal scroll lock)
 │   └── onboarding-tour.js  # First-dog onboarding tour
 ├── src/
 │   ├── main.ts             # Entry: mount(App, { target: #app })

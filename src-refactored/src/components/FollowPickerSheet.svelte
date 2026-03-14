@@ -4,7 +4,7 @@
     import { store } from '../../js/svelte-store.svelte.js';
     import { getMyDogs, getFollowStatus, batchFollowDog, getOwnerDogs } from '../../js/api.js';
     import { modals, closeFollowPickerSheet } from '../../js/modal-store.svelte.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { t } from '../../js/i18n-store.svelte.js';
     import { pushModalState, popModalState } from '../../js/modal-history.js';
     import { focusTrap } from '../actions/focus-trap.ts';

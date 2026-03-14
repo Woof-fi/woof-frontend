@@ -4,7 +4,7 @@
     import { modals, closeCheckinOptionsSheet } from '../../js/modal-store.svelte.js';
     import { reportContent, deleteCheckin } from '../../js/api.js';
     import { CONFIG } from '../../js/config.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { bumpFeedVersion } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
 

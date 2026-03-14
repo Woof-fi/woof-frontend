@@ -5,7 +5,7 @@
     import { toggleBodyScroll } from '../../js/ui.js';
     import { store } from '../../js/svelte-store.svelte.js';
     import { t } from '../../js/i18n-store.svelte.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { focusTrap } from '../actions/focus-trap.ts';
 
     /** @type {{ isOpen: boolean, title: string, ariaId: string, emptyIcon: string, emptyText: string, fetchDogs: () => Promise<Array<{id: string, slug?: string, name: string, profilePhoto?: string, breedName?: string}>>, onclose: () => void }} */

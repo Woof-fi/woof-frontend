@@ -30,12 +30,6 @@ export let store = $state({
     parkVersion: 0,
 });
 
-// Backward-compatible function API (used by existing callers)
-export const getAuthUser = () => store.authUser;
-export const getUnreadCount = () => store.unreadCount;
-export const getCurrentDog = () => store.currentDog;
-export const getState = () => store;
-
 export const setAuthUser = (user) => { store.authUser = user; };
 export const setUnreadCount = (count) => { store.unreadCount = count; };
 export const setNotifUnreadCount = (count) => { store.notifUnreadCount = count; };

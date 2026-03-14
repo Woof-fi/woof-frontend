@@ -272,7 +272,8 @@
     "loginToFollow": "Kirjaudu seurataksesi koiria",
     "actionFailed": "Toiminto epäonnistui. Yritä uudelleen.",
     "loadMore": "Lataa lisää julkaisuja",
-    "sameOwner": "Saman omistajan koirat"
+    "sameOwner": "Saman omistajan koirat",
+    "loadFailed": "Profiilin lataus epäonnistui."
   },
   "bookmarks": {
     "title": "Suosikit",

@@ -1,6 +1,6 @@
 <script>
     import { store, setCurrentDog } from '../../js/svelte-store.svelte.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { t } from '../../js/i18n-store.svelte.js';
 
     let { dogs = [], onswitch = null } = $props();

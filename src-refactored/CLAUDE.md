@@ -56,7 +56,6 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `QuickVisitForm.svelte` — Park visit scheduling form with live park search
 - `PostImageCarousel.svelte` — Multi-image swipe carousel with dots, counter badge, double-tap like
 - `ParkActionBar.svelte` — Sticky park action bar (check-in/schedule with Now/Later toggle, follow); multi-dog checkbox selection, batch operations via Promise.all
-- `CheckinButton.svelte` — Park check-in/out dropdown form (multi-dog checkbox selection)
 - `CheckinCard.svelte` — Park check-in card in feed (compact PostCard style)
 - `ActiveVisitors.svelte` — Active park visitors display
 - `CheckinOptionsSheet.svelte` — Action sheet for check-ins (own: delete/share; others: report)
@@ -97,7 +96,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `js/api.js` — All API calls (add new endpoint functions here; never call fetch directly from components)
 - `js/auth.js` — Cognito token management
 - `js/config.js` — App config + Cognito IDs
-- `js/utils.js` — escapeHTML, timeAgo, isValidFileType, showToast, imageVariant
+- `js/utils.js` — escapeHTML, debounce, timeAgo, showToast, isValidFileType, isValidFileSize, imageVariant
 - `js/icons.js` — Font Awesome SVG icon registry (tree-shaken, ~84 icons). To add new icon: import + library.add()
 - `js/motion.js` — prefers-reduced-motion utility for Svelte transitions
 - `js/file-handler.js` — Shared file validation + preview (validateAndPreview, revokePreview)
@@ -107,12 +106,8 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `js/modal-store.svelte.js` — Svelte 5 `$state` store for all modal/panel visibility and data; open*/close* functions replace old window custom events
 - `js/modal-history.js` — pushModalState / popModalState / handleModalPopstate (browser history for back-button modal close)
 - `js/toast-store.svelte.js` — Svelte 5 `$state` toast list; showToast() used via delegation from utils.js
-- `js/ui.js` — Skeletons, loading states, animateIn, toggleBodyScroll
+- `js/ui.js` — toggleBodyScroll (modal scroll lock)
 - `js/onboarding-tour.js` — First-dog onboarding tour
-
-### Dead code (descoped, do not import)
-- `js/cart-modal.js` — E-commerce feature, abandoned
-- `js/i18n.js` — i18n stub, English-only
 
 ## Auth Modal States
 `src/components/AuthModal.svelte` handles 5 modes via a single `mode` `$state`:

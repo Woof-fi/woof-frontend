@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { escapeHTML, isValidEmail, isValidFileType, isValidFileSize, imageVariant, timeAgo, formatDate } from '../../js/utils.js';
+import { escapeHTML, isValidFileType, isValidFileSize, imageVariant, timeAgo } from '../../js/utils.js';
 
 describe('Utility Functions', () => {
   describe('escapeHTML', () => {
@@ -23,24 +23,6 @@ describe('Utility Functions', () => {
 
     it('should handle empty strings', () => {
       expect(escapeHTML('')).toBe('');
-    });
-  });
-
-  describe('isValidEmail', () => {
-    it('should validate correct email addresses', () => {
-      expect(isValidEmail('test@example.com')).toBe(true);
-      expect(isValidEmail('user.name+tag@example.co.uk')).toBe(true);
-    });
-
-    it('should reject invalid email addresses', () => {
-      expect(isValidEmail('invalid')).toBe(false);
-      expect(isValidEmail('invalid@')).toBe(false);
-      expect(isValidEmail('@invalid.com')).toBe(false);
-      expect(isValidEmail('invalid@.com')).toBe(false);
-    });
-
-    it('should reject empty strings', () => {
-      expect(isValidEmail('')).toBe(false);
     });
   });
 
@@ -142,14 +124,6 @@ describe('Utility Functions', () => {
     it('uses system locale for old dates (no hardcoded en-US)', () => {
       const oldDate = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
       const result = timeAgo(oldDate.toISOString());
-      // Just verify it returns a non-empty string (locale-dependent)
-      expect(result.length).toBeGreaterThan(0);
-    });
-  });
-
-  describe('formatDate', () => {
-    it('uses system locale (no hardcoded en-US)', () => {
-      const result = formatDate('2026-01-15T12:00:00Z');
       // Just verify it returns a non-empty string (locale-dependent)
       expect(result.length).toBeGreaterThan(0);
     });

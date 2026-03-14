@@ -339,7 +339,7 @@
                     <div class="woof-empty-state-icon woof-empty-state-icon--error">
                         <i class="fas fa-circle-exclamation"></i>
                     </div>
-                    <p>Failed to load profile.</p>
+                    <p>{t('profile.loadFailed')}</p>
                 </div>
             </div>
         </div>

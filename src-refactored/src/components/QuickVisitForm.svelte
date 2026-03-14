@@ -2,7 +2,7 @@
     import { getMyDogs, getFollowingDogParks, searchDogParks, scheduleParkVisit } from '../../js/api.js';
     import { isAuthenticated } from '../../js/auth.js';
     import { openCreateDogModal } from '../../js/modal-store.svelte.js';
-    import { showToast } from '../../js/toast-store.svelte.js';
+    import { showToast } from '../../js/utils.js';
     import { localName, t } from '../../js/i18n-store.svelte.js';
 
     let { onback = null, onclose = null, oncloseinstant = null } = $props();
