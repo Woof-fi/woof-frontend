@@ -307,7 +307,7 @@
             return;
         }
         try {
-            const { conversationId } = await startConversation(dog.id);
+            const { conversationId } = await startConversation(dog.id, store.currentDog?.id);
             const path = `/messages/${conversationId}`;
             history.pushState({}, '', path);
             window.dispatchEvent(new CustomEvent('routechange'));

@@ -12,7 +12,7 @@
     let loading = $state(true);
     let submitting = $state(false);
 
-    let selectedDog = $state('');
+    let selectedDogIds = $state(new Set());
     /** @type {{ id: string, name: string, nameFi?: string, city?: string } | null} */
     let selectedPark = $state(null);
     let duration = $state(60);
@@ -27,6 +27,17 @@
 
     let hasManyDogs = $derived(dogs.length > 1);
     let singleDogName = $derived(dogs.length === 1 ? dogs[0].name : '');
+    let selectedCount = $derived(selectedDogIds.size);
+
+    function toggleDog(dogId) {
+        const next = new Set(selectedDogIds);
+        if (next.has(dogId)) {
+            next.delete(dogId);
+        } else {
+            next.add(dogId);
+        }
+        selectedDogIds = next;
+    }
 
     // Default arrival: next full hour (matching DogParkView pattern)
     function getDefaultTime() {
@@ -71,7 +82,7 @@
 
                 dogs = fetchedDogs;
                 followedParks = fetchedParks;
-                selectedDog = dogs.length === 1 ? dogs[0].id : '';
+                selectedDogIds = dogs.length === 1 ? new Set([dogs[0].id]) : new Set();
             } catch {
                 if (!active) return;
                 showToast(t('common.failedLoad'), 'error');
@@ -129,17 +140,20 @@
 
     async function handleSubmit(e) {
         e.preventDefault();
-        if (!selectedDog || !selectedPark || !visitTime) return;
+        const ids = dogs.length === 1 ? [dogs[0].id] : [...selectedDogIds];
+        if (ids.length === 0 || !selectedPark || !visitTime) return;
 
         submitting = true;
         try {
             const arrivalDate = new Date(visitTime);
-            await scheduleParkVisit(selectedPark.id, {
-                dogId: selectedDog,
-                arrivalAt: arrivalDate.toISOString(),
-                durationMinutes: duration,
-                note: note.trim() || undefined,
-            });
+            await Promise.all(ids.map(dogId =>
+                scheduleParkVisit(selectedPark.id, {
+                    dogId,
+                    arrivalAt: arrivalDate.toISOString(),
+                    durationMinutes: duration,
+                    note: note.trim() || undefined,
+                })
+            ));
             showToast(
                 t('dogPark.visitScheduled') || 'Visit scheduled!',
                 'success',
@@ -175,12 +189,23 @@
             <div class="form-group">
                 <label class="form-label" for="visit-dog">{t('visit.dog')}</label>
                 {#if hasManyDogs}
-                    <select id="visit-dog" class="form-select" bind:value={selectedDog}>
-                        <option value="">--</option>
+                    <div class="visit-dog-list" id="visit-dog">
                         {#each dogs as dog (dog.id)}
-                            <option value={dog.id}>{dog.name}</option>
+                            <button
+                                type="button"
+                                class="visit-dog-option"
+                                class:visit-dog-option--selected={selectedDogIds.has(dog.id)}
+                                onclick={() => toggleDog(dog.id)}
+                            >
+                                <span class="visit-checkbox" class:visit-checkbox--checked={selectedDogIds.has(dog.id)}>
+                                    {#if selectedDogIds.has(dog.id)}
+                                        <i class="fas fa-check"></i>
+                                    {/if}
+                                </span>
+                                <span>{dog.name}</span>
+                            </button>
                         {/each}
-                    </select>
+                    </div>
                 {:else}
                     <div class="single-dog-display" id="visit-dog">
                         <i class="fas fa-dog single-dog-icon"></i>
@@ -291,7 +316,7 @@
                 />
             </div>
 
-            <button type="submit" class="submit-btn" disabled={submitting || !selectedDog || !selectedPark || !visitTime}>
+            <button type="submit" class="submit-btn" disabled={submitting || selectedDogIds.size === 0 || !selectedPark || !visitTime}>
                 {#key submitting}
                     {#if submitting}
                         <i class="fas fa-spinner fa-spin"></i>
@@ -372,6 +397,59 @@
 .single-dog-icon {
     color: var(--woof-color-neutral-400);
     font-size: var(--woof-text-footnote);
+}
+
+/* ---- Multi-dog selection ---- */
+
+.visit-dog-list {
+    display: flex;
+    gap: var(--woof-space-2);
+    flex-wrap: wrap;
+}
+
+.visit-dog-option {
+    display: flex;
+    align-items: center;
+    gap: var(--woof-space-2);
+    padding: var(--woof-space-2) var(--woof-space-3);
+    border: 2px solid var(--woof-color-neutral-200);
+    background: none;
+    border-radius: var(--woof-radius-md);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--woof-text-body);
+    font-weight: var(--woof-font-weight-medium);
+    color: var(--woof-color-neutral-900);
+    transition: all var(--woof-duration-fast);
+}
+
+.visit-dog-option:hover {
+    border-color: var(--woof-color-brand-primary);
+    background: var(--woof-color-brand-primary-subtle);
+}
+
+.visit-dog-option--selected {
+    border-color: var(--woof-color-brand-primary);
+    background: var(--woof-color-brand-primary-subtle);
+}
+
+.visit-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--woof-color-neutral-300);
+    border-radius: var(--woof-radius-sm);
+    font-size: 11px;
+    color: var(--woof-color-neutral-0);
+    transition: all var(--woof-duration-fast);
+    flex-shrink: 0;
+}
+
+.visit-checkbox--checked {
+    background: var(--woof-color-brand-primary);
+    border-color: var(--woof-color-brand-primary);
 }
 
 /* ---- Park selection ---- */

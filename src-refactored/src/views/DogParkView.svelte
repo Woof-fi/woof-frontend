@@ -1,5 +1,5 @@
 <script>
-    import { getDogPark, updateAdminDogPark, getAllTerritories, followDogPark, unfollowDogPark, suggestParkAmenity, scheduleParkVisit, cancelParkVisit, getUpcomingParkVisits, getMyDogs, getActiveCheckins, uploadImage, uploadParkPhoto } from '../../js/api.js';
+    import { getDogPark, updateAdminDogPark, getAllTerritories, followDogPark, unfollowDogPark, suggestParkAmenity, cancelParkVisit, getUpcomingParkVisits, getMyDogs, getActiveCheckins, uploadImage, uploadParkPhoto } from '../../js/api.js';
     import { t, localName, locale } from '../../js/i18n-store.svelte.js';
     import { store, bumpParkVersion } from '../../js/svelte-store.svelte.js';
     import { isAuthenticated } from '../../js/auth.js';
@@ -23,10 +23,8 @@
     // Visits state
     let visits = $state([]);
     let visitsLoading = $state(false);
-    let showVisitForm = $state(false);
-    let visitSubmitting = $state(false);
     let myDogs = $state([]);
-    let visitForm = $state({ dogId: '', arrivalAt: '', durationMinutes: 60, note: '' });
+    let requestScheduleOpen = $state(false);
 
     // Check-in state
     let activeCheckins = $state([]);
@@ -157,16 +155,6 @@
         })
     );
 
-    // Duration options
-    const durationOptions = [
-        { value: 15, label: '15 min' },
-        { value: 30, label: '30 min' },
-        { value: 60, label: '1h' },
-        { value: 90, label: '1.5h' },
-        { value: 120, label: '2h' },
-        { value: 180, label: '3h' },
-    ];
-
     async function loadPark(slug) {
         park = null;
         loading = true;
@@ -287,47 +275,6 @@
             showToast(t('common.failedLoad'), 'error');
         }
         amenitySuggestSubmitting = false;
-    }
-
-    // Visit scheduling
-    async function openVisitForm() {
-        if (myDogs.length === 0) {
-            try {
-                myDogs = await getMyDogs();
-            } catch {
-                myDogs = [];
-            }
-        }
-        // Default arrival: next full hour
-        const now = new Date();
-        now.setHours(now.getHours() + 1, 0, 0, 0);
-        const localISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-        visitForm = {
-            dogId: myDogs.length === 1 ? myDogs[0].id : '',
-            arrivalAt: localISO,
-            durationMinutes: 60,
-            note: '',
-        };
-        showVisitForm = true;
-    }
-
-    async function submitVisit() {
-        visitSubmitting = true;
-        try {
-            const arrivalDate = new Date(visitForm.arrivalAt);
-            await scheduleParkVisit(park.id, {
-                dogId: visitForm.dogId,
-                arrivalAt: arrivalDate.toISOString(),
-                durationMinutes: visitForm.durationMinutes,
-                note: visitForm.note || undefined,
-            });
-            showVisitForm = false;
-            await loadVisits();
-        } catch (e) {
-            console.error('Failed to schedule visit:', e);
-            showToast(t('common.failedLoad'), 'error');
-        }
-        visitSubmitting = false;
     }
 
     async function handleCancelVisit(visitId) {
@@ -704,54 +651,14 @@
                             <p class="park-no-visits">{t('dogPark.noUpcomingVisits')}</p>
                         {/if}
 
-                        {#if authed && isFollowing && !showVisitForm}
-                            <button class="park-schedule-btn" onclick={openVisitForm}>
+                        {#if authed && isFollowing}
+                            <button class="park-schedule-btn" onclick={() => { requestScheduleOpen = true; }}>
                                 <i class="fas fa-calendar-plus"></i> {t('dogPark.scheduleVisit')}
                             </button>
-                        {:else if authed && !isFollowing && !showVisitForm}
+                        {:else if authed && !isFollowing}
                             <p class="park-follow-hint">{t('dogPark.followToSchedule')}</p>
                         {:else if !authed}
                             <p class="park-follow-hint">{t('dogPark.loginToFollow')}</p>
-                        {/if}
-
-                        {#if showVisitForm}
-                            <div class="park-visit-form">
-                                {#if myDogs.length > 1}
-                                    <div class="park-edit-field">
-                                        <label for="visit-dog">{t('dogPark.selectDog')}</label>
-                                        <select id="visit-dog" bind:value={visitForm.dogId}>
-                                            <option value="">--</option>
-                                            {#each myDogs as dog (dog.id)}
-                                                <option value={dog.id}>{dog.name}</option>
-                                            {/each}
-                                        </select>
-                                    </div>
-                                {/if}
-                                <div class="park-edit-field">
-                                    <label for="visit-time">{t('dogPark.arrivalTime')}</label>
-                                    <input id="visit-time" type="datetime-local" bind:value={visitForm.arrivalAt} />
-                                </div>
-                                <div class="park-edit-field">
-                                    <label for="visit-duration">{t('dogPark.duration')}</label>
-                                    <select id="visit-duration" bind:value={visitForm.durationMinutes}>
-                                        {#each durationOptions as opt}
-                                            <option value={opt.value}>{opt.label}</option>
-                                        {/each}
-                                    </select>
-                                </div>
-                                <div class="park-edit-field">
-                                    <label for="visit-note">{t('dogPark.visitNote')}</label>
-                                    <input id="visit-note" type="text" bind:value={visitForm.note} maxlength="500" />
-                                </div>
-                                <div class="park-edit-actions">
-                                    <button class="park-edit-save" onclick={submitVisit} disabled={visitSubmitting || !visitForm.dogId || !visitForm.arrivalAt}>
-                                        {visitSubmitting ? '...' : t('dogPark.scheduleVisit')}
-                                    </button>
-                                    <button class="park-edit-cancel" onclick={() => { showVisitForm = false; }}>
-                                        {t('common.cancel')}
-                                    </button>
-                                </div>
-                            </div>
                         {/if}
                     </div>
                 {/if}
@@ -837,6 +744,9 @@
             onFollowToggle={handleFollow}
             onCheckin={handleCheckinRefresh}
             onCheckout={handleCheckinRefresh}
+            onVisitScheduled={loadVisits}
+            {requestScheduleOpen}
+            onScheduleHandled={() => { requestScheduleOpen = false; }}
         />
     {/if}
 </div>
@@ -1210,16 +1120,6 @@
     color: var(--woof-color-neutral-400);
     font-size: var(--woof-text-caption-1);
     margin: 0;
-}
-
-.park-visit-form {
-    margin-top: var(--woof-space-3);
-    padding: var(--woof-space-4);
-    background: var(--woof-color-neutral-50);
-    border-radius: var(--woof-radius-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--woof-space-3);
 }
 
 /* Photos */

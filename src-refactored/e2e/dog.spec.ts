@@ -36,14 +36,22 @@ test.describe('Dog CRUD', () => {
   test('create a dog profile and verify it appears', async ({ page }) => {
     testUser = await adminLoginOnly(page, testUser);
 
-    // After login with no dogs, nav drawer should show "Add a Pet"
-    await ensureDrawerVisible(page);
-    const addPetBtn = page.locator('.nav-drawer-links button.nav-btn', { hasText: 'Add a Pet' });
-    await addPetBtn.scrollIntoViewIfNeeded();
-    await expect(addPetBtn).toBeVisible({ timeout: 10_000 });
+    // On mobile, close the nav drawer so it doesn't cover the feed
+    const viewport = page.viewportSize();
+    if (viewport && viewport.width < 768) {
+      const drawerOpen = page.locator('.nav-drawer.open');
+      if (await drawerOpen.count() > 0) {
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(300);
+      }
+    }
 
-    // Click "Add a Pet" to open create dog modal
-    await addPetBtn.click();
+    // After login with no dogs, feed shows a welcome card with "Add Your Dog" button
+    const addDogBtn = page.locator('.welcome-card button', { hasText: /Add Your Dog/i });
+    await expect(addDogBtn).toBeVisible({ timeout: 10_000 });
+
+    // Click "Add Your Dog" to open create dog modal
+    await addDogBtn.click();
     await expect(page.locator('#create-dog-modal')).toBeVisible();
 
     // Fill the form

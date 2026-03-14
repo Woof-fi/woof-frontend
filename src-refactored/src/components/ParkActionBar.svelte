@@ -1,6 +1,6 @@
 <script>
     import { t } from '../../js/i18n-store.svelte.js';
-    import { checkInAtPark, checkOutFromPark } from '../../js/api.js';
+    import { checkInAtPark, checkOutFromPark, scheduleParkVisit } from '../../js/api.js';
     import { showToast } from '../../js/utils.js';
     import { store } from '../../js/svelte-store.svelte.js';
 
@@ -13,13 +13,18 @@
         onFollowToggle = null,
         onCheckin = null,
         onCheckout = null,
+        onVisitScheduled = null,
+        requestScheduleOpen = false,
+        onScheduleHandled = null,
     } = $props();
 
     let submitting = $state(false);
     let showCheckinForm = $state(false);
-    let selectedDogId = $state('');
+    let selectedDogIds = $state(new Set());
     let note = $state('');
     let duration = $state(30);
+    let checkinMode = $state('now');
+    let visitTime = $state('');
     let authed = $derived(store.authUser !== null);
 
     const DURATIONS = [
@@ -29,24 +34,47 @@
         { value: 120, label: '2h' },
     ];
 
-    let myCheckin = $derived(() => {
-        if (!authed || myDogs.length === 0) return null;
+    // Find ALL of the user's dogs that are currently checked in
+    let myCheckins = $derived(() => {
+        if (!authed || myDogs.length === 0) return [];
         const myDogIds = new Set(myDogs.map(d => d.id));
-        return activeCheckins.find(c => myDogIds.has(c.dogId || c.dog_id || c.dog?.id));
+        return activeCheckins.filter(c => myDogIds.has(c.dogId || c.dog_id || c.dog?.id));
     });
 
-    let isCheckedIn = $derived(myCheckin() != null);
+    let checkedInCount = $derived(myCheckins().length);
+    let isCheckedIn = $derived(checkedInCount > 0);
+    let selectedCount = $derived(selectedDogIds.size);
+
+    function getDefaultScheduleTime() {
+        const now = new Date();
+        now.setHours(now.getHours() + 1, 0, 0, 0);
+        const offset = now.getTimezoneOffset();
+        const local = new Date(now.getTime() - offset * 60000);
+        return local.toISOString().slice(0, 16);
+    }
+
+    function toggleDog(dogId) {
+        const next = new Set(selectedDogIds);
+        if (next.has(dogId)) {
+            next.delete(dogId);
+        } else {
+            next.add(dogId);
+        }
+        selectedDogIds = next;
+    }
 
     async function handleCheckIn() {
-        const dogId = selectedDogId || myDogs[0]?.id;
-        if (!dogId) return;
+        const ids = myDogs.length === 1 ? [myDogs[0].id] : [...selectedDogIds];
+        if (ids.length === 0) return;
         submitting = true;
         try {
-            await checkInAtPark(parkId, { dogId, note: note.trim() || undefined, plannedDurationMinutes: duration });
+            await Promise.all(ids.map(dogId =>
+                checkInAtPark(parkId, { dogId, note: note.trim() || undefined, plannedDurationMinutes: duration })
+            ));
             showToast(t('dogPark.checkedIn'), 'success');
             showCheckinForm = false;
             note = '';
-            selectedDogId = '';
+            selectedDogIds = new Set();
             onCheckin?.();
         } catch (e) {
             const msg = e?.data?.error || t('dogPark.checkInFailed');
@@ -55,12 +83,39 @@
         submitting = false;
     }
 
-    async function handleCheckOut() {
-        const checkin = myCheckin();
-        if (!checkin) return;
+    async function handleScheduleVisit() {
+        const ids = myDogs.length === 1 ? [myDogs[0].id] : [...selectedDogIds];
+        if (ids.length === 0 || !visitTime) return;
         submitting = true;
         try {
-            await checkOutFromPark(checkin.id);
+            const arrivalDate = new Date(visitTime);
+            await Promise.all(ids.map(dogId =>
+                scheduleParkVisit(parkId, {
+                    dogId,
+                    arrivalAt: arrivalDate.toISOString(),
+                    durationMinutes: duration,
+                    note: note.trim() || undefined,
+                })
+            ));
+            showToast(t('dogPark.visitScheduled'), 'success');
+            showCheckinForm = false;
+            note = '';
+            selectedDogIds = new Set();
+            visitTime = '';
+            onVisitScheduled?.();
+        } catch (e) {
+            const msg = e?.data?.error || t('common.error');
+            showToast(msg, 'error');
+        }
+        submitting = false;
+    }
+
+    async function handleCheckOut() {
+        const checkins = myCheckins();
+        if (checkins.length === 0) return;
+        submitting = true;
+        try {
+            await Promise.all(checkins.map(c => checkOutFromPark(c.id)));
             showToast(t('dogPark.checkedOut'), 'success');
             onCheckout?.();
         } catch (e) {
@@ -71,16 +126,92 @@
 
     function handleCheckinClick() {
         showCheckinForm = !showCheckinForm;
-        if (showCheckinForm && myDogs.length === 1) {
-            selectedDogId = myDogs[0].id;
+        if (showCheckinForm) {
+            checkinMode = 'now';
+            if (myDogs.length === 1) {
+                selectedDogIds = new Set([myDogs[0].id]);
+            } else {
+                const currentId = store.currentDog?.id;
+                selectedDogIds = currentId ? new Set([currentId]) : new Set();
+            }
         }
     }
+
+    function handleConfirmAction() {
+        if (checkinMode === 'schedule') {
+            handleScheduleVisit();
+        } else {
+            handleCheckIn();
+        }
+    }
+
+    // Parent can request opening in schedule mode
+    $effect(() => {
+        if (requestScheduleOpen) {
+            showCheckinForm = true;
+            checkinMode = 'schedule';
+            visitTime = getDefaultScheduleTime();
+            if (myDogs.length === 1) {
+                selectedDogIds = new Set([myDogs[0].id]);
+            } else {
+                const currentId = store.currentDog?.id;
+                selectedDogIds = currentId ? new Set([currentId]) : new Set();
+            }
+            onScheduleHandled?.();
+        }
+    });
+
+    // Click-outside + Escape to close checkin form
+    $effect(() => {
+        if (!showCheckinForm) return;
+
+        function handleClick(e) {
+            const sticky = document.querySelector('.park-action-sticky');
+            if (sticky && !sticky.contains(e.target)) {
+                showCheckinForm = false;
+            }
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Escape') {
+                showCheckinForm = false;
+            }
+        }
+
+        document.addEventListener('click', handleClick, true);
+        document.addEventListener('keydown', handleKey);
+        return () => {
+            document.removeEventListener('click', handleClick, true);
+            document.removeEventListener('keydown', handleKey);
+        };
+    });
 </script>
 
 {#if authed && myDogs.length > 0}
     <div class="park-action-sticky">
         {#if showCheckinForm}
             <div class="checkin-panel">
+                <div class="checkin-panel-handle"></div>
+
+                <div class="checkin-mode-toggle">
+                    <button
+                        class="mode-pill"
+                        class:mode-pill--active={checkinMode === 'now'}
+                        onclick={() => { checkinMode = 'now'; }}
+                    >
+                        <i class="fas fa-paw"></i>
+                        {t('dogPark.now')}
+                    </button>
+                    <button
+                        class="mode-pill"
+                        class:mode-pill--active={checkinMode === 'schedule'}
+                        onclick={() => { checkinMode = 'schedule'; visitTime = visitTime || getDefaultScheduleTime(); }}
+                    >
+                        <i class="fas fa-calendar-plus"></i>
+                        {t('dogPark.later')}
+                    </button>
+                </div>
+
                 {#if myDogs.length === 1}
                     <div class="checkin-single-dog">
                         <img
@@ -92,27 +223,46 @@
                         <span class="checkin-single-dog-name">{myDogs[0].name}</span>
                     </div>
                 {:else}
-                    <p class="checkin-panel-label">{t('dogPark.selectDogToCheckIn')}</p>
-                    <div class="checkin-dog-list">
-                        {#each myDogs as dog (dog.id)}
-                            <button
-                                class="checkin-dog-option"
-                                class:checkin-dog-option--selected={selectedDogId === dog.id}
-                                onclick={() => { selectedDogId = dog.id; }}
-                            >
-                                <img
-                                    src={dog.profilePhoto || '/images/dog_profile_pic.jpg'}
-                                    alt={dog.name}
-                                    class="checkin-dog-photo"
-                                    onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
-                                />
-                                <span>{dog.name}</span>
-                            </button>
-                        {/each}
+                    <div class="checkin-section">
+                        <p class="checkin-section-label">{t('dogPark.selectDogToCheckIn')}</p>
+                        <div class="checkin-dog-list">
+                            {#each myDogs as dog (dog.id)}
+                                <button
+                                    class="checkin-dog-option"
+                                    class:checkin-dog-option--selected={selectedDogIds.has(dog.id)}
+                                    onclick={() => toggleDog(dog.id)}
+                                >
+                                    <span class="checkin-checkbox" class:checkin-checkbox--checked={selectedDogIds.has(dog.id)}>
+                                        {#if selectedDogIds.has(dog.id)}
+                                            <i class="fas fa-check"></i>
+                                        {/if}
+                                    </span>
+                                    <img
+                                        src={dog.profilePhoto || '/images/dog_profile_pic.jpg'}
+                                        alt={dog.name}
+                                        class="checkin-dog-photo"
+                                        onerror={(e) => { e.target.src = '/images/dog_profile_pic.jpg'; }}
+                                    />
+                                    <span>{dog.name}</span>
+                                </button>
+                            {/each}
+                        </div>
                     </div>
                 {/if}
-                <div class="checkin-duration-section">
-                    <p class="checkin-panel-label">{t('dogPark.howLong')}</p>
+
+                {#if checkinMode === 'schedule'}
+                    <div class="checkin-section">
+                        <p class="checkin-section-label">{t('dogPark.arrivalTime')}</p>
+                        <input
+                            type="datetime-local"
+                            class="checkin-time-input"
+                            bind:value={visitTime}
+                        />
+                    </div>
+                {/if}
+
+                <div class="checkin-section">
+                    <p class="checkin-section-label">{t('dogPark.howLong')}</p>
                     <div class="checkin-duration-row">
                         {#each DURATIONS as d (d.value)}
                             <button
@@ -125,25 +275,55 @@
                         {/each}
                     </div>
                 </div>
+
                 <input
                     type="text"
                     class="checkin-note-input"
                     placeholder={t('dogPark.checkinNote')}
                     bind:value={note}
                     maxlength="500"
-                    onkeydown={(e) => { if (e.key === 'Enter') handleCheckIn(); }}
+                    onkeydown={(e) => { if (e.key === 'Enter') handleConfirmAction(); }}
                 />
-                <button
-                    class="checkin-confirm-btn"
-                    onclick={handleCheckIn}
-                    disabled={submitting || (myDogs.length > 1 && !selectedDogId)}
-                >
-                    {#if submitting}
-                        <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.confirmCheckIn')}</span>
-                    {:else}
-                        <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.confirmCheckIn')}</span>
-                    {/if}
-                </button>
+
+                {#if checkinMode === 'now'}
+                    <button
+                        class="checkin-confirm-btn"
+                        onclick={handleCheckIn}
+                        disabled={submitting || (myDogs.length > 1 && selectedCount === 0)}
+                    >
+                        {#key submitting}
+                            {#if submitting}
+                                <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.confirmCheckIn')}</span>
+                            {:else}
+                                <span class="btn-content">
+                                    <i class="fas fa-paw"></i>
+                                    {#if myDogs.length > 1 && selectedCount > 1}
+                                        {t('dogPark.checkInCount', { count: selectedCount })}
+                                    {:else}
+                                        {t('dogPark.confirmCheckIn')}
+                                    {/if}
+                                </span>
+                            {/if}
+                        {/key}
+                    </button>
+                {:else}
+                    <button
+                        class="checkin-confirm-btn checkin-confirm-btn--schedule"
+                        onclick={handleScheduleVisit}
+                        disabled={submitting || (myDogs.length > 1 && selectedCount === 0) || !visitTime}
+                    >
+                        {#key submitting}
+                            {#if submitting}
+                                <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.scheduleVisit')}</span>
+                            {:else}
+                                <span class="btn-content">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    {t('dogPark.scheduleVisit')}
+                                </span>
+                            {/if}
+                        {/key}
+                    </button>
+                {/if}
             </div>
         {/if}
         <div class="park-action-buttons">
@@ -153,11 +333,20 @@
                     onclick={handleCheckOut}
                     disabled={submitting}
                 >
-                    {#if submitting}
-                        <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkOut')}</span>
-                    {:else}
-                        <span class="btn-content"><i class="fas fa-right-from-bracket"></i> {t('dogPark.checkOut')}</span>
-                    {/if}
+                    {#key submitting}
+                        {#if submitting}
+                            <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkOut')}</span>
+                        {:else}
+                            <span class="btn-content">
+                                <i class="fas fa-right-from-bracket"></i>
+                                {#if checkedInCount > 1}
+                                    {t('dogPark.checkOutCount', { count: checkedInCount })}
+                                {:else}
+                                    {t('dogPark.checkOut')}
+                                {/if}
+                            </span>
+                        {/if}
+                    {/key}
                 </button>
             {:else}
                 <button
@@ -165,11 +354,13 @@
                     onclick={handleCheckinClick}
                     disabled={submitting}
                 >
-                    {#if submitting}
-                        <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkIn')}</span>
-                    {:else}
-                        <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.checkIn')}</span>
-                    {/if}
+                    {#key submitting}
+                        {#if submitting}
+                            <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkIn')}</span>
+                        {:else}
+                            <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.checkIn')}</span>
+                        {/if}
+                    {/key}
                 </button>
             {/if}
             <button
@@ -178,13 +369,15 @@
                 onclick={onFollowToggle}
                 disabled={followLoading}
             >
-                {#if followLoading}
-                    <span class="btn-content"><span class="woof-spinner"></span></span>
-                {:else if isFollowing}
-                    <span class="btn-content"><i class="fas fa-heart"></i> {t('dogPark.followingPark')}</span>
-                {:else}
-                    <span class="btn-content"><i class="far fa-heart"></i> {t('dogPark.follow')}</span>
-                {/if}
+                {#key followLoading}
+                    {#if followLoading}
+                        <span class="btn-content"><span class="woof-spinner"></span></span>
+                    {:else if isFollowing}
+                        <span class="btn-content"><i class="fas fa-heart"></i> {t('dogPark.followingPark')}</span>
+                    {:else}
+                        <span class="btn-content"><i class="far fa-heart"></i> {t('dogPark.follow')}</span>
+                    {/if}
+                {/key}
             </button>
         </div>
     </div>
@@ -281,19 +474,37 @@
     max-width: 640px;
     margin: 0 auto var(--woof-space-2);
     background: var(--woof-surface-primary);
-    border-radius: var(--woof-radius-lg);
-    box-shadow: var(--woof-shadow-lg);
-    padding: var(--woof-space-3);
+    border-radius: var(--woof-radius-lg) var(--woof-radius-lg) var(--woof-radius-md) var(--woof-radius-md);
+    box-shadow: var(--woof-shadow-xl);
+    padding: var(--woof-space-2) var(--woof-space-4) var(--woof-space-4);
     pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    gap: var(--woof-space-3);
+}
+
+.checkin-panel-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--woof-color-neutral-300);
+    border-radius: var(--woof-radius-full);
+    margin: var(--woof-space-1) auto var(--woof-space-1);
+    flex-shrink: 0;
+}
+
+.checkin-section {
     display: flex;
     flex-direction: column;
     gap: var(--woof-space-2);
 }
 
-.checkin-panel-label {
-    font-size: var(--woof-text-caption-1);
+.checkin-section-label {
+    font-size: var(--woof-text-footnote);
+    font-weight: var(--woof-font-weight-medium);
     color: var(--woof-color-neutral-500);
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .checkin-dog-list {
@@ -328,9 +539,28 @@
     background: var(--woof-color-brand-primary-subtle);
 }
 
+.checkin-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--woof-color-neutral-300);
+    border-radius: var(--woof-radius-sm);
+    font-size: 11px;
+    color: var(--woof-color-neutral-0);
+    transition: all var(--woof-duration-fast);
+    flex-shrink: 0;
+}
+
+.checkin-checkbox--checked {
+    background: var(--woof-color-brand-primary);
+    border-color: var(--woof-color-brand-primary);
+}
+
 .checkin-dog-photo {
-    width: 32px;
-    height: 32px;
+    width: var(--woof-avatar-sm);
+    height: var(--woof-avatar-sm);
     border-radius: var(--woof-radius-full);
     object-fit: cover;
 }
@@ -338,19 +568,14 @@
 .checkin-single-dog {
     display: flex;
     align-items: center;
-    gap: var(--woof-space-2);
+    gap: var(--woof-space-3);
+    padding: var(--woof-space-2) 0;
 }
 
 .checkin-single-dog-name {
-    font-size: var(--woof-text-body);
+    font-size: var(--woof-text-headline);
     font-weight: var(--woof-font-weight-semibold);
     color: var(--woof-color-neutral-900);
-}
-
-.checkin-duration-section {
-    display: flex;
-    flex-direction: column;
-    gap: var(--woof-space-1);
 }
 
 .checkin-duration-row {
@@ -359,12 +584,13 @@
 }
 
 .duration-chip {
+    flex: 1;
     padding: var(--woof-space-2) var(--woof-space-3);
-    min-width: 48px;
+    min-width: 0;
     border: 1.5px solid var(--woof-color-neutral-200);
     background: none;
     border-radius: var(--woof-radius-full);
-    font-size: var(--woof-text-body);
+    font-size: var(--woof-text-callout);
     font-weight: var(--woof-font-weight-medium);
     font-family: inherit;
     color: var(--woof-color-neutral-600);
@@ -372,6 +598,7 @@
     transition: all var(--woof-duration-fast);
     white-space: nowrap;
     text-align: center;
+    height: var(--woof-btn-height-sm);
 }
 
 .duration-chip:hover {
@@ -392,20 +619,21 @@
 
 .checkin-note-input {
     width: 100%;
-    padding: var(--woof-space-2) var(--woof-space-3);
-    border: 1px solid var(--woof-color-neutral-200);
+    padding: var(--woof-space-3) var(--woof-space-4);
+    border: 1.5px solid var(--woof-color-neutral-200);
     border-radius: var(--woof-radius-md);
     font-size: var(--woof-text-body);
     font-family: inherit;
     color: var(--woof-color-neutral-900);
-    background: var(--woof-surface-primary);
-    transition: border-color var(--woof-duration-fast);
+    background: var(--woof-surface-secondary);
+    transition: border-color var(--woof-duration-fast), background var(--woof-duration-fast);
     box-sizing: border-box;
 }
 
 .checkin-note-input:focus {
     outline: none;
     border-color: var(--woof-color-brand-primary);
+    background: var(--woof-surface-primary);
 }
 
 .checkin-note-input::placeholder {
@@ -418,16 +646,18 @@
     justify-content: center;
     gap: var(--woof-space-2);
     width: 100%;
-    padding: var(--woof-space-2) var(--woof-space-3);
+    height: var(--woof-btn-height-lg);
     background: var(--woof-color-brand-primary);
     color: var(--woof-color-neutral-0);
     border: none;
-    border-radius: var(--woof-radius-md);
-    font-size: var(--woof-text-body);
+    border-radius: var(--woof-btn-radius);
+    font-size: var(--woof-text-headline);
     font-weight: var(--woof-font-weight-semibold);
     font-family: inherit;
     cursor: pointer;
     transition: background var(--woof-duration-fast);
+    box-shadow: var(--woof-shadow-brand);
+    margin-top: var(--woof-space-1);
 }
 
 .checkin-confirm-btn:hover {
@@ -439,11 +669,82 @@
     cursor: not-allowed;
 }
 
+/* Mode toggle pills */
+.checkin-mode-toggle {
+    display: flex;
+    gap: 2px;
+    background: var(--woof-color-neutral-100);
+    border-radius: var(--woof-radius-full);
+    padding: 3px;
+}
+
+.mode-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--woof-space-2);
+    padding: var(--woof-space-2) var(--woof-space-4);
+    border: none;
+    background: none;
+    border-radius: var(--woof-radius-full);
+    font-size: var(--woof-text-callout);
+    font-weight: var(--woof-font-weight-medium);
+    font-family: inherit;
+    color: var(--woof-color-neutral-400);
+    cursor: pointer;
+    transition: all var(--woof-duration-fast);
+    white-space: nowrap;
+    height: 40px;
+}
+
+.mode-pill--active {
+    background: var(--woof-surface-primary);
+    color: var(--woof-color-neutral-900);
+    font-weight: var(--woof-font-weight-semibold);
+    box-shadow: var(--woof-shadow-sm);
+}
+
+/* Schedule section */
+.checkin-time-input {
+    width: 100%;
+    padding: var(--woof-space-3) var(--woof-space-4);
+    border: 1.5px solid var(--woof-color-neutral-200);
+    border-radius: var(--woof-radius-md);
+    font-size: var(--woof-text-body);
+    font-family: inherit;
+    color: var(--woof-color-neutral-900);
+    background: var(--woof-surface-secondary);
+    transition: border-color var(--woof-duration-fast), background var(--woof-duration-fast);
+    box-sizing: border-box;
+}
+
+.checkin-time-input:focus {
+    outline: none;
+    border-color: var(--woof-color-brand-primary);
+    background: var(--woof-surface-primary);
+}
+
+.checkin-confirm-btn--schedule {
+    background: var(--woof-color-brand-primary);
+}
+
+.checkin-confirm-btn--schedule:hover {
+    background: var(--woof-color-brand-primary-dark);
+}
+
 @media (max-width: 768px) {
     .park-action-sticky {
         left: 0;
         bottom: 56px;
-        padding: 12px 20px 12px 20px;
+        padding: var(--woof-space-3) var(--woof-space-4) var(--woof-space-3);
+    }
+
+    .checkin-panel {
+        max-height: 70vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--woof-radius-lg) var(--woof-radius-lg) 0 0;
     }
 }
 </style>

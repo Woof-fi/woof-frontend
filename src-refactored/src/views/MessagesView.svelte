@@ -14,6 +14,7 @@
     let otherDogName = $state('');
     let loading = $state(true);
     let myDogId = $state(null);
+    let myDogName = $state('');
     // svelte-ignore state_referenced_locally
     let threadActive = $state(!!params.id);
 
@@ -31,6 +32,7 @@
         threadActive = true;
         messages = [];
         otherDogName = '';
+        myDogName = '';
 
         try {
             const data = await getMessages(convId);
@@ -42,9 +44,10 @@
 
             markConversationRead(convId).catch(() => {});
 
-            // Find myDogId from conversations list
+            // Find myDogId and name from conversations list
             const conv = conversations.find(c => c.id === convId);
             myDogId = conv?.myDogId || null;
+            myDogName = conv?.myDogName || '';
 
             // Messages come DESC, reverse for display
             messages = [...msgs].reverse();
@@ -78,7 +81,7 @@
 
         messageInput = '';
         try {
-            await sendMessage(selectedId, content);
+            await sendMessage(selectedId, content, myDogId);
             await openConversation(selectedId);
             await loadConversations();
         } catch (e) {
@@ -172,6 +175,9 @@
                                         <span class="conv-name">{conv.otherDog.name}</span>
                                         <span class="conv-time">{conv.lastMessageAt ? timeAgo(conv.lastMessageAt) : ''}</span>
                                     </div>
+                                    {#if conv.myDogName}
+                                        <span class="conv-my-dog">{t('messages.messagingAs').replace('{name}', conv.myDogName)}</span>
+                                    {/if}
                                     <span class="conv-preview">{conv.lastMessage || 'No messages yet'}</span>
                                 </div>
                                 {#if conv.unreadCount > 0}
@@ -188,9 +194,14 @@
                     <button class="back-btn thread-back-btn" id="thread-back-btn" aria-label="Back to conversations" onclick={handleBackBtn}>
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <span class="thread-title" id="thread-title">
-                        {otherDogName || t('messages.selectConversation')}
-                    </span>
+                    <div class="thread-title-group">
+                        <span class="thread-title" id="thread-title">
+                            {otherDogName || t('messages.selectConversation')}
+                        </span>
+                        {#if myDogName && otherDogName}
+                            <span class="thread-subtitle">{t('messages.messagingAs').replace('{name}', myDogName)}</span>
+                        {/if}
+                    </div>
                 </div>
                 <div class="thread-messages" id="thread-messages">
                     {#if !selectedId}
@@ -356,6 +367,15 @@
     margin-left: 8px;
 }
 
+.conv-my-dog {
+    font-size: 11px;
+    color: var(--woof-color-neutral-400);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-style: italic;
+}
+
 .conv-preview {
     font-size: 13px;
     color: var(--woof-color-neutral-500);
@@ -429,10 +449,22 @@
     padding: 4px 8px;
 }
 
+.thread-title-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
 .thread-title {
     font-weight: var(--woof-font-weight-semibold);
     font-size: var(--woof-text-headline);
     color: var(--woof-color-neutral-900);
+}
+
+.thread-subtitle {
+    font-size: 12px;
+    color: var(--woof-color-neutral-400);
+    font-style: italic;
 }
 
 .thread-messages {

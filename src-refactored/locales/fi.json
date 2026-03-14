@@ -320,7 +320,8 @@
     "sendFirst": "Lähetä ensimmäinen viesti!",
     "placeholder": "Kirjoita viesti...",
     "failedStart": "Keskustelun aloitus epäonnistui",
-    "loginToMessage": "Kirjaudu sisään lähettääksesi viestejä"
+    "loginToMessage": "Kirjaudu sisään lähettääksesi viestejä",
+    "messagingAs": "koirana {name}"
   },
   "breedDirectory": {
     "title": "Rodut",
@@ -479,7 +480,11 @@
     "uniqueParks": "Vieraillut puistot",
     "loginToCheckIn": "Kirjaudu sisään kirjautuaksesi puistoon",
     "confirmCheckIn": "Vahvista kirjautuminen",
-    "howLong": "Kuinka kauan?"
+    "howLong": "Kuinka kauan?",
+    "checkInCount": "Kirjaudu ({count})",
+    "checkOutCount": "Kirjaudu ulos ({count})",
+    "now": "Nyt",
+    "later": "Myöhemmin"
   },
   "admin": {
     "pending": "Odottaa",

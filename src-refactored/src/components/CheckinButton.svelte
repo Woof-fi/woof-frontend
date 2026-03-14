@@ -14,30 +14,36 @@
 
     let submitting = $state(false);
     let showCheckinForm = $state(false);
-    let selectedDogId = $state('');
+    let selectedDogIds = $state(new Set());
     let note = $state('');
 
     let authed = $derived(store.authUser !== null);
 
-    // Find if any of the user's dogs are already checked in
-    let myCheckin = $derived(() => {
-        if (!authed || myDogs.length === 0) return null;
+    // Find all of the user's dogs that are currently checked in
+    let myCheckins = $derived(() => {
+        if (!authed || myDogs.length === 0) return [];
         const myDogIds = new Set(myDogs.map(d => d.id));
-        return activeCheckins.find(c => myDogIds.has(c.dogId || c.dog_id || c.dog?.id));
+        return activeCheckins.filter(c => myDogIds.has(c.dogId || c.dog_id || c.dog?.id));
     });
 
-    let isCheckedIn = $derived(myCheckin() != null);
+    let checkedInCount = $derived(myCheckins().length);
+    let isCheckedIn = $derived(checkedInCount > 0);
 
     async function handleCheckIn() {
-        const dogId = selectedDogId || myDogs[0]?.id;
-        if (!dogId) return;
+        const ids = [...selectedDogIds];
+        if (ids.length === 0) return;
         submitting = true;
         try {
-            await checkInAtPark(parkId, { dogId, note: note.trim() || undefined });
-            showToast(t('dogPark.checkedIn'), 'success');
+            await Promise.all(ids.map(dogId =>
+                checkInAtPark(parkId, { dogId, note: note.trim() || undefined })
+            ));
+            const msg = ids.length > 1
+                ? t('dogPark.checkedIn')
+                : t('dogPark.checkedIn');
+            showToast(msg, 'success');
             showCheckinForm = false;
             note = '';
-            selectedDogId = '';
+            selectedDogIds = new Set();
             onCheckin?.();
         } catch (e) {
             const msg = e?.data?.error || t('dogPark.checkInFailed');
@@ -47,17 +53,48 @@
     }
 
     async function handleCheckOut() {
-        const checkin = myCheckin();
-        if (!checkin) return;
+        const checkins = myCheckins();
+        if (checkins.length === 0) return;
         submitting = true;
         try {
-            await checkOutFromPark(checkin.id);
+            await Promise.all(checkins.map(c => checkOutFromPark(c.id)));
             showToast(t('dogPark.checkedOut'), 'success');
             onCheckout?.();
         } catch (e) {
             showToast(t('common.error'), 'error');
         }
         submitting = false;
+    }
+
+    let wrapperEl = $state(null);
+
+    // Close dropdown when clicking outside
+    $effect(() => {
+        if (!showCheckinForm) return;
+        function onClickOutside(e) {
+            if (wrapperEl && !wrapperEl.contains(e.target)) {
+                showCheckinForm = false;
+            }
+        }
+        function onEscape(e) {
+            if (e.key === 'Escape') showCheckinForm = false;
+        }
+        document.addEventListener('click', onClickOutside, true);
+        document.addEventListener('keydown', onEscape);
+        return () => {
+            document.removeEventListener('click', onClickOutside, true);
+            document.removeEventListener('keydown', onEscape);
+        };
+    });
+
+    function toggleDog(dogId) {
+        const next = new Set(selectedDogIds);
+        if (next.has(dogId)) {
+            next.delete(dogId);
+        } else {
+            next.add(dogId);
+        }
+        selectedDogIds = next;
     }
 
     function handleClick() {
@@ -67,16 +104,36 @@
             showCheckinForm = !showCheckinForm;
             if (showCheckinForm) {
                 if (myDogs.length === 1) {
-                    selectedDogId = myDogs[0].id;
-                } else if (store.currentDog?.id && myDogs.some(d => d.id === store.currentDog.id)) {
-                    selectedDogId = store.currentDog.id;
+                    selectedDogIds = new Set([myDogs[0].id]);
+                } else {
+                    // Pre-select current dog if available
+                    const initial = new Set();
+                    if (store.currentDog?.id && myDogs.some(d => d.id === store.currentDog.id)) {
+                        initial.add(store.currentDog.id);
+                    }
+                    selectedDogIds = initial;
                 }
             }
         }
     }
+
+    let checkInLabel = $derived(() => {
+        const count = selectedDogIds.size;
+        if (count > 1) {
+            return t('dogPark.checkInCount').replace('{count}', String(count));
+        }
+        return t('dogPark.confirmCheckIn');
+    });
+
+    let checkOutLabel = $derived(() => {
+        if (checkedInCount > 1) {
+            return t('dogPark.checkOutCount').replace('{count}', String(checkedInCount));
+        }
+        return t('dogPark.checkOut');
+    });
 </script>
 
-<div class="checkin-wrapper">
+<div class="checkin-wrapper" bind:this={wrapperEl}>
     {#if !authed}
         <button class="checkin-btn checkin-btn--disabled" disabled>
             <i class="fas fa-paw"></i>
@@ -92,9 +149,9 @@
         >
             {#key submitting}
                 {#if submitting}
-                    <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.checkOut')}</span>
+                    <span class="btn-content"><span class="woof-spinner"></span> {checkOutLabel()}</span>
                 {:else}
-                    <span class="btn-content"><i class="fas fa-right-from-bracket"></i> {t('dogPark.checkOut')}</span>
+                    <span class="btn-content"><i class="fas fa-right-from-bracket"></i> {checkOutLabel()}</span>
                 {/if}
             {/key}
         </button>
@@ -122,9 +179,14 @@
                     {#each myDogs as dog (dog.id)}
                         <button
                             class="checkin-dog-option"
-                            class:checkin-dog-option--selected={selectedDogId === dog.id}
-                            onclick={() => { selectedDogId = dog.id; }}
+                            class:checkin-dog-option--selected={selectedDogIds.has(dog.id)}
+                            onclick={() => toggleDog(dog.id)}
                         >
+                            <span class="checkin-checkbox" class:checkin-checkbox--checked={selectedDogIds.has(dog.id)}>
+                                {#if selectedDogIds.has(dog.id)}
+                                    <i class="fas fa-check"></i>
+                                {/if}
+                            </span>
                             <img
                                 src={dog.profilePhoto || '/images/dog_profile_pic.jpg'}
                                 alt={dog.name}
@@ -147,13 +209,13 @@
             <button
                 class="checkin-confirm-btn"
                 onclick={handleCheckIn}
-                disabled={submitting || (myDogs.length > 1 && !selectedDogId)}
+                disabled={submitting || selectedDogIds.size === 0}
             >
                 {#key submitting}
                     {#if submitting}
-                        <span class="btn-content"><span class="woof-spinner"></span> {t('dogPark.confirmCheckIn')}</span>
+                        <span class="btn-content"><span class="woof-spinner"></span> {checkInLabel()}</span>
                     {:else}
-                        <span class="btn-content"><i class="fas fa-paw"></i> {t('dogPark.confirmCheckIn')}</span>
+                        <span class="btn-content"><i class="fas fa-paw"></i> {checkInLabel()}</span>
                     {/if}
                 {/key}
             </button>
@@ -268,6 +330,25 @@
 .checkin-dog-option--selected {
     border-color: var(--woof-color-brand-primary);
     background: var(--woof-color-brand-primary-subtle);
+}
+
+.checkin-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--woof-radius-sm);
+    border: 2px solid var(--woof-color-neutral-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--woof-color-neutral-0);
+    transition: all var(--woof-duration-fast) ease;
+}
+
+.checkin-checkbox--checked {
+    background: var(--woof-color-brand-primary);
+    border-color: var(--woof-color-brand-primary);
 }
 
 .checkin-dog-photo {

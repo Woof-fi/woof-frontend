@@ -117,6 +117,8 @@
                 <!-- Message textarea -->
                 <div class="feedback-field">
                     <textarea
+                        id="feedback-message"
+                        name="feedback-message"
                         bind:value={message}
                         placeholder={t('feedback.placeholder')}
                         maxlength={MAX_LENGTH}

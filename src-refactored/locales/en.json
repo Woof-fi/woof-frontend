@@ -320,7 +320,8 @@
     "sendFirst": "Send the first message!",
     "placeholder": "Type a message...",
     "failedStart": "Failed to start conversation",
-    "loginToMessage": "Please log in to send messages"
+    "loginToMessage": "Please log in to send messages",
+    "messagingAs": "via {name}"
   },
   "breedDirectory": {
     "title": "Breeds",
@@ -479,7 +480,11 @@
     "uniqueParks": "Parks visited",
     "loginToCheckIn": "Log in to check in",
     "confirmCheckIn": "Confirm check-in",
-    "howLong": "How long?"
+    "howLong": "How long?",
+    "checkInCount": "Check In ({count})",
+    "checkOutCount": "Check Out ({count})",
+    "now": "Now",
+    "later": "Later"
   },
   "admin": {
     "pending": "Pending",

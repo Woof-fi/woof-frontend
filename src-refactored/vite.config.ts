@@ -19,7 +19,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       // Include icon files from assets/icons/ in the service worker precache
-      includeAssets: ['icons/*.png', 'favicon.png'],
+      includeAssets: ['icons/*.png', 'favicon.png', 'favicon.svg'],
       manifest: {
         name: 'Woof',
         short_name: 'Woof',

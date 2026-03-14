@@ -121,7 +121,8 @@
 }
 
 .checkin-paw-icon {
-    color: var(--woof-color-neutral-200);
+    color: var(--woof-color-brand-primary);
+    opacity: 0.55;
     font-size: var(--woof-text-caption-1);
     margin-right: var(--woof-space-1);
 }
