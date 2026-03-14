@@ -55,7 +55,8 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `CreateActionSheet.svelte` — Bottom action sheet for create FAB (New post, Schedule park visit, Add health record)
 - `QuickVisitForm.svelte` — Park visit scheduling form with live park search
 - `PostImageCarousel.svelte` — Multi-image swipe carousel with dots, counter badge, double-tap like
-- `CheckinButton.svelte` — Park check-in/out dropdown form
+- `ParkActionBar.svelte` — Sticky park action bar (check-in/schedule with Now/Later toggle, follow); multi-dog checkbox selection, batch operations via Promise.all
+- `CheckinButton.svelte` — Park check-in/out dropdown form (multi-dog checkbox selection)
 - `CheckinCard.svelte` — Park check-in card in feed (compact PostCard style)
 - `ActiveVisitors.svelte` — Active park visitors display
 - `CheckinOptionsSheet.svelte` — Action sheet for check-ins (own: delete/share; others: report)
@@ -73,7 +74,7 @@ Svelte 5 SPA for Woof (dog social network). Built with Vite, deployed to S3 (`wo
 - `HomeView.svelte` — Tabbed feed (For You / Following); tab switch triggers Feed re-render
 - `ProfileView.svelte` — Dog profile orchestrator (composes ProfileHeader, ProfileTabs, PostsGrid, FriendsTab, HealthTab, ProfileFollowBar); manages state + API calls
 - `PostDetailView.svelte` — Single post view
-- `MessagesView.svelte` — Two-panel messaging with 10s polling
+- `MessagesView.svelte` — Two-panel messaging with 10s polling; shows "via {dogName}" for multi-dog users, passes senderDogId
 - `NotificationsView.svelte` — Notification feed at `/notifications`; marks all read on visit; 60s polling via Navigation bell badge
 - `AdminView.svelte` — Moderation panel with two sections: Reports (filter tabs pending/reviewed/actioned/dismissed; delete, mark reviewed, dismiss) and Flagged (Rekognition AI-flagged posts; approve or remove)
 - `PrivacyView.svelte` — GDPR Privacy Policy at `/privacy`
